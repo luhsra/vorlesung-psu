@@ -1,6 +1,10 @@
-\documentclass{beamer}
+\documentclass[xcolor={rgb,dvipsnames}]{beamer}
+\usetheme{sra}
 \usepackage{pageslts} %  theCurrentPage
 \usepackage{calc} % theCurrentPage+1
+\usepackage[physicalpagesinpdftoc,sracolors,autonotes]{beamertools}
+
+
 
 \newwrite\cutfile
 \immediate\openout\cutfile=\jobname.topics
@@ -15,4 +19,47 @@
 
 \AtBeginDocument{
   \pagenumbering{arabic} % for pageslts
+  \SetPartNumToFileNum
 }
+
+  % Name, token and semester of the course
+  \def\xtoken{PSÜ}
+  \def\xtitle{Programmiersprachen und Übersetzer (PSÜ)}%
+  \def\xterm{SS}
+  \def\xyear{20}
+
+  % General organization of the course
+  \def\PartA{Einführung}
+  \def\PartB{Prozesse und Dateien}
+  \def\PartC{Interaktion und Kommunikation}
+  \def\PartD{Speicher und Zugriffsschutz}
+  \def\PartX{Anhang}
+
+  \institute[SRA]{Institute for Systems Engineering\\System- und Rechnerarchitektur (SRA)}
+  \author[\copyright\,cd]{Christian Dietrich}
+
+  \def\termurl{\url{https://sra.uni-hannover.de/Lehre/\xterm\xyear/V_\xtoken}}
+  \edef\term{\xterm\, \xyear}
+  \def\auxWS{Wintersemester}
+  \def\auxSS{Sommersemester}
+  \edef\TERM{\csuse{aux\xterm} 20\xyear}
+
+  \def\xshortdate{\ifx\insertpart\empty\term{}\else Teil~\thepart, \term{}\fi}
+  \date[\xshortdate]{\TERM}
+
+  \title[\xtoken]{\xtitle}
+
+  % Parse job name <number>-<rest>.tex into \fileNumber=<number> and \fileName=<rest>.tex and
+  % set the part-counter so that the first section will be <number>
+  \newcommand{\SetPartNumToFileNum}{
+    \def\retrieveFileName##1-##2\next{\gdef\fileNumber{##1 \relax}\gdef\fileName{##2 \relax}}
+    \expandafter \retrieveFileName\jobname\next\relax
+    % -1, as the \section command first advances the counter
+    \setcounter{part}{\fileNumber}
+  }
+  % Customize numbering:
+  % We want to number frames as <chapter>-<frame> with <frame> being by-chapter numbers
+  % Note: The following works only if a patch is applied to beamerbaseframe.sty (see README)
+  \renewcommand{\theframenumber}{\thepart--\arabic{framenumber}}
+  \renewcommand{\insertframenumber}{\theframenumber}
+  \renewcommand{\InsertFrameNumber}{\insertframenumber}

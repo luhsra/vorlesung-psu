@@ -8,21 +8,36 @@
 
 .carousel-indicators li {
     display: inline-block;
-    width: 30px;
+    width: 10px;
     height: 8px;
-    margin: 10px;
+    margin: 5px;
     text-indent: 0;
     background-color: gray;
 }
 .carousel-indicators .active {
-    width: 30px;
+    width: 10px;
     height: 8px;
-    margin: 10px;
+    margin: 5px;
     background-color: red;
+}
+
+.carousel-indicators {
+    bottom: -25px;
+    margin-bottom: 0px;
+    line-height: 1em;
 }
 a.carousel-control-prev, a.carousel-control-next {
     background: none;
+    top:auto;
+    bottom: -25px;
+    width: 20px;
 }
+
+.carousel {
+    border: 1px solid black;
+    margin-bottom:35px;
+}
+
 
 /* Set the colors in <pre> blocks from the Leuven theme */
 pre                                      {background-color:#FFFFFF;}

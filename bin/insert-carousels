@@ -7,7 +7,7 @@ import glob
 def make_carousel(topic, files):
     print('<div class="content">')
     print('<div class="container">')
-    print('<div id="slides-' + topic +'" class="carousel slide" data-wrap="false" data-interval="0" data-ride="carousel">')
+    print('<div id="slides-' + topic +'" class="carousel" data-wrap="false" data-interval="0" data-ride="carousel">')
     print('<ol class="carousel-indicators">')
     print('<li data-target="#slides-'+ topic + '" data-slide-to="0" class="active"></li>')
     for i in range(1, len(files)):
@@ -17,9 +17,10 @@ def make_carousel(topic, files):
     active="active"
     for fn in files:
         print('<div class="carousel-item '+ active + '">')
-        print('   <img class="d-block w-100" src="'+fn+'"/>')
+        print('   <img class="d-block w-100"  href="#slides-'+topic+'" role="button" data-slide="next" src="'+fn+'"/>')
         print('</div>')
         active=''
+    print('</div>')
     print('<a class="carousel-control-prev" href="#slides-'+topic+'" role="button" data-slide="prev">')
     print('<span class="carousel-control-prev-icon" aria-hidden="true"></span>')
     print('<span class="sr-only">Previous</span>')
@@ -29,9 +30,7 @@ def make_carousel(topic, files):
     print('<span class="sr-only">Next</span>')
     print('</a>')
     print('</div>')
-    print('</div>')
-    print('</div>')
-    print('</div>')
+
 
 
 if __name__ == "__main__":

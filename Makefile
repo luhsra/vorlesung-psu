@@ -4,6 +4,7 @@ ORG=$(shell echo *.org)
 PDF=$(foreach i,${ORG_PDF},$(patsubst %.org,build/%.pdf,${i}))
 HTML=$(foreach i,${ORG},$(patsubst %.org,build/html/%.html,${i}))
 
+export TEXINPUTS := ./texmf-local//:./texmf//:${TEXINPUTS}
 
 all: slides html
 
