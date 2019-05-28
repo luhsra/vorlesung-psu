@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+
+import sys
+import subprocess
+import os.path
+
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        print(f"usage: {sys.argv[0]} [PDF] [TOPIC-FILE]")
+
+    pdf = sys.argv[1]
+    pdf_base, _ = os.path.splitext(pdf)
+    with open(sys.argv[2]) as fd:
+        for line in fd.readlines():
+            pages, topic = line.strip().split(":", 1)
+            split = ["pdftk", pdf, "cat", pages, "output", f"{pdf_base}-{topic}.pdf", "dont_ask"]
+            print(" ".join(split))
+            subprocess.check_call(split)
+
+            convert = ["convert",
+                       "-density", "400",
+                       f"{pdf_base}-{topic}.pdf",
+                       "-quality", "100",
+                       "-sharpen", "0x1.0",
+                       f"{os.path.dirname(pdf_base)}/html/{os.path.basename(pdf_base)}-{topic}-%04d.png"
+            ]
+            print(" ".join(convert))
+            subprocess.check_call(convert)

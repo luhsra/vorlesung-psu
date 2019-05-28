@@ -1,0 +1,18 @@
+\documentclass{beamer}
+\usepackage{pageslts} %  theCurrentPage
+\usepackage{calc} % theCurrentPage+1
+
+\newwrite\cutfile
+\immediate\openout\cutfile=\jobname.topics
+\newcounter{FirstPage} % counter, for first page number
+\newcounter{EndPage} % counter, for first page number
+\setcounter{FirstPage}{1} % Set FirstPage to page 1
+\newcommand{\SplitPDF}[1]{%
+  \setcounter{EndPage}{\theCurrentPage-1}
+  \immediate\write\cutfile{\theFirstPage -\theEndPage:#1}%
+  \setcounter{FirstPage}{\theCurrentPage}% set FirstPage to new first page
+}
+
+\AtBeginDocument{
+  \pagenumbering{arabic} % for pageslts
+}
