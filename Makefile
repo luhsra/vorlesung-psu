@@ -1,5 +1,5 @@
 ORG_PDF=$(shell echo 0*.org)
-ORG=$(shell echo *.org)
+ORG=$(filter-out export-prologue.org, $(shell echo *.org))
 
 PDF=$(foreach i,${ORG_PDF},$(patsubst %.org,build/%.pdf,${i}))
 HTML=$(foreach i,${ORG},$(patsubst %.org,build/html/%.html,${i}))
@@ -15,6 +15,7 @@ html: ${HTML}
 build:
 	@mkdir -p build/tangle
 	@mkdir -p build/html
+	@ln -fs ../../export-prologue.org build/html
 	@ln -fs ../../html/css build/html/
 	@ln -fs ../../html/js build/html/
 
@@ -59,9 +60,12 @@ build/%.pdf.split: build/%.pdf bin/split-pdf
 build/html/index.html: build/tangle/index.html
 	cp $< $@
 
-build/html/%.html: build/tangle/%.html build/%.pdf.split bin/insert-carousels
-	bin/insert-carousels $< $(patsubst build/tangle/%.html,build/%.topics,$<) \
-            > $(patsubst build/tangle/%.html,build/html/%.html,$<)
+build/html/%.html: %.org build/%.pdf.split bin/insert-carousels
+	cp $(patsubst %.org, build/%.pdf,$<) $(patsubst %.org, build/html/%-slides.pdf,$<)
+	bin/insert-carousels $< $(patsubst %.org,build/%.topics,$<) \
+            > $(patsubst %.org,build/html/%.org,$<)
+	emacsclient -e "(org-export-to-html-file \"$$PWD/build/html/$<\" \"$$PWD/$@\")"
+
 
 clean:
 	rm -rf build

@@ -3,59 +3,79 @@
 import sys
 import os
 import glob
+import logging
+logging.basicConfig(level=logging.DEBUG)
+from collections import OrderedDict
 
-def make_carousel(topic, files):
-    print('<div class="content">')
-    print('<div class="container">')
-    print('<div id="slides-' + topic +'" class="carousel" data-wrap="false" data-interval="0" data-ride="carousel">')
-    print('<ol class="carousel-indicators">')
-    print('<li data-target="#slides-'+ topic + '" data-slide-to="0" class="active"></li>')
+def make_carousel(label, files):
+    ret = []
+    if len(files) == 1:
+        ret += '#+BEGIN_EXPORT html\n'
+        ret += '   <img class="slide d-block w-100" src="'+files[0]+'"/>\n'
+        ret += '#+END_EXPORT\n'
+        return ret
+
+    ret += '#+BEGIN_EXPORT html\n'
+    ret += '<div class="content">'
+    ret += '<div class="container">'
+    ret += '<div id="slides-' + label +'" class="carousel" data-wrap="false" data-interval="0" data-ride="carousel">'
+    ret += '<ol class="carousel-indicators">'
+    ret += '<li data-target="#slides-'+ label + '" data-slide-to="0" class="active"></li>'
     for i in range(1, len(files)):
-        print('<li data-target="#slides-'+topic+'" data-slide-to="'+str(i)+'"></li>')
-    print('</ol>')
-    print('<div class="carousel-inner">')
+        ret += '<li data-target="#slides-'+label+'" data-slide-to="'+str(i)+'"></li>'
+    ret += '</ol>'
+    ret += '<div class="carousel-inner">'
     active="active"
     for fn in files:
-        print('<div class="carousel-item '+ active + '">')
-        print('   <img class="d-block w-100"  href="#slides-'+topic+'" role="button" data-slide="next" src="'+fn+'"/>')
-        print('</div>')
+        ret += '<div class="carousel-item '+ active + '">'
+        ret += '   <img class="slide d-block w-100"  href="#slides-'+label+'" role="button" data-slide="next" src="'+fn+'"/>'
+        ret += '</div>'
         active=''
-    print('</div>')
-    print('<a class="carousel-control-prev" href="#slides-'+topic+'" role="button" data-slide="prev">')
-    print('<span class="carousel-control-prev-icon" aria-hidden="true"></span>')
-    print('<span class="sr-only">Previous</span>')
-    print('</a>')
-    print('<a class="carousel-control-next" href="#slides-'+topic+'" role="button" data-slide="next">')
-    print('<span class="carousel-control-next-icon" aria-hidden="true"></span>')
-    print('<span class="sr-only">Next</span>')
-    print('</a>')
-    print('</div>')
+    ret += '</div>'
+    ret += '<a class="carousel-control-prev" href="#slides-'+label+'" role="button" data-slide="prev">'
+    ret += '<span class="carousel-control-prev-icon" aria-hidden="true"></span>'
+    ret += '<span class="sr-only">Previous</span>'
+    ret += '</a>'
+    ret += '<a class="carousel-control-next" href="#slides-'+label+'" role="button" data-slide="next">'
+    ret += '<span class="carousel-control-next-icon" aria-hidden="true"></span>'
+    ret += '<span class="sr-only">Next</span>'
+    ret += '</a>'
+    ret += '</div>\n'
+    ret += '</div>\n'
+    ret += '</div>\n'
+    ret += '#+END_EXPORT\n'
+    return ret
 
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print(f"usage: {sys.argv[0]} [HTML] [TOPIC-FILE]")
+        print(f"usage: {sys.argv[0]} [ORG-FILE] [TOPIC-FILE]")
 
-    html, topics = sys.argv[1:]
+    org, topics = sys.argv[1:]
     with open(topics) as fd:
-        topics = {}
-        for _, topic in [x.strip().split(":", 1) for x in fd.readlines()]:
-            basename = os.path.basename(html)
+        topics = OrderedDict()
+        for _, lines, topic in [x.strip().split(":", 2) for x in fd.readlines()]:
+            basename = os.path.basename(org)
             base,_ = os.path.splitext(basename)
-            pattern = f"build/html/{base}-{topic}-*.png"
-            topics[topic] = [os.path.basename(x) for x in sorted(glob.glob(pattern))]
+            pattern = f"build/html/{base}-{topic}-{lines}-*.svg"
+            topics[(topic, lines)] = [os.path.basename(x) for x in sorted(glob.glob(pattern))]
 
 
-    with open(html) as fd:
-        lines = iter(fd.readlines())
-        for line in lines:
-            sys.stdout.write(line)
-            found,files = None, None
-            for topic in topics:
-                if line.startswith("<h") and topic+"</h" in line:
-                    found,files = topic,topics[topic]
-                    del topics[topic]
+    with open(org) as fd:
+        lines = list(fd.readlines())
+        for (topic,linum), svgs in reversed(topics.items()):
+            logging.info("%s %s",topic, linum)
+            start, end = list(map(int, linum.split('-')))
+            while end > start:
+                if '#+END_SRC' in lines[end-1].upper():
                     break
-            if found:
-                make_carousel(found, files)
+                end -= 1
+
+            assert '#+BEGIN_SRC' in lines[start-1].upper(), \
+                "Could not find begin of block for %s" % (topic)
+            assert '#+END_SRC' in lines[end-1].upper(), \
+                "Could not find begin of block for %s" % (topic)
+            lines[start-1:end] = make_carousel(topic + linum, svgs)
+
+        print("".join(lines))

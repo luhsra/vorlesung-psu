@@ -34,8 +34,11 @@ a.carousel-control-prev, a.carousel-control-next {
 }
 
 .carousel {
-    border: 1px solid black;
     margin-bottom:35px;
+}
+
+.slide {
+    border: 1px solid black;
 }
 
 

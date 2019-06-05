@@ -9,4 +9,29 @@
 
 Alles was man gerne hier sagen möchte.
 
-- [[./01-einleitung.html][Einleitung]]
+1. [[file:01-einleitung.org][Einleitung]]
+2. Technik: Lexen und Parsen
+   - Tokenstrom, (Kontextfreie) Gramatiken, Abstrakter Syntaxbaum, Parsertechniken, Parsergeneratoren
+3. Konzepte: Typen
+   - Primitiv, Strukturierte und Unstrukturierte Komposition, Funktionstypen, Typableitungen, Typschablonen, Kompatibilität
+4. Konzepte: Namen
+   - Scoping, Lexikalisches und Dynamisches Binding, Type-directed Name Resolution, Overloading, Static and Dynamic Dispatch
+5. Technik: Intermediate Code Generierung
+   - 3-Address Code, Basic Blocks, Control-Fluss Graph, R-Values, L-Values
+6. Konzepte: Objekte
+   - Objekterzeugung, Initialisierung, Mixins, Prototype-Inheritance, Ownership, Lebenszeiten
+7. Konzepte: Operationen
+   - Standardkonstrukte, Auswertungsstrategie und Seiteneffekte, Daten und Verhalten, Verhaltenskomposition, Verhaltensableitung
+8. Technik: Optimierung
+   - Fixpunkt Analyse, Konstantenfortschreibung, Konstantenfolding, Dead Code Elimination
+9. Technik: Machienencodegenerierung
+   - Registerallokation, Instruction Scheduling, Funktionsaufrufe, ABI, Peephole Optimizer
+10. Konzepte: Das Objektorientierte Paradigma
+    - SOLID
+    - https://de.wikipedia.org/wiki/Prinzipien_objektorientierten_Designs
+11. Konzepte: Das Funktionale Paradigma
+    - Freiheit von Seiteneffekten
+12. Technik: Das Run-Time Environment
+    - ELF und Dynamische Libraries, Garbage Colletion, Just-in-Time Compilation
+13. Technik: Macros und Source-to-Source Transformation
+    - C-Präprozessor/M4, Hygenische Macros, Transpilation, Domain Specific Languages

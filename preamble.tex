@@ -1,9 +1,17 @@
 \documentclass[xcolor={rgb,dvipsnames}]{beamer}
-\usetheme{sra}
+\usetheme[wide=true]{sra}
+\usepackage[]{beamertools}
+\setbeamertemplate{navigation symbols}{}
 \usepackage{pageslts} %  theCurrentPage
-\usepackage{calc} % theCurrentPage+1
-\usepackage[physicalpagesinpdftoc,sracolors,autonotes]{beamertools}
+\usepackage{calc} % theCurrentPage
 
+
+\def\psuSectionStart#1{
+  \ifdefstring{\psuOldTitle}{#1}
+  {}% Then
+  {\section{#1}}%
+  \def\psuOldTitle{#1}
+}
 
 
 \newwrite\cutfile
@@ -11,9 +19,9 @@
 \newcounter{FirstPage} % counter, for first page number
 \newcounter{EndPage} % counter, for first page number
 \setcounter{FirstPage}{1} % Set FirstPage to page 1
-\newcommand{\SplitPDF}[1]{%
+\newcommand{\psuSectionStop}[2]{% {topic}{lines}
   \setcounter{EndPage}{\theCurrentPage-1}
-  \immediate\write\cutfile{\theFirstPage -\theEndPage:#1}%
+  \immediate\write\cutfile{\theFirstPage -\theEndPage:#2:#1}%
   \setcounter{FirstPage}{\theCurrentPage}% set FirstPage to new first page
 }
 
