@@ -1,0 +1,131 @@
+\RequirePackage{tikz}
+\usetikzlibrary{fit,arrows,positioning,calc}
+
+% Put node or scope onto a layer. By default, we have three layers,
+% foreground, main, and background
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+
+% /tikz/if in node={<true>}{<false>}
+\newif\iftikz@in@node
+\tikz@in@nodefalse
+\expandafter\def\expandafter\tikz@node@reset@hook%
+   \expandafter{\tikz@node@reset@hook\tikz@in@nodetrue}
+\tikzset{
+  if in node/.code 2 args={%
+    \iftikz@in@node\tikzset{#1}\else\tikzset{#1}\fi}}
+
+% Move visible or invisible nodes and whole scopes to another
+% layer
+\def\tikz@drawopacity{1}
+\def\tikz@fillopacity{1}
+\pgfkeys{%
+  /tikz/opacity/.add code={}{%
+    \def\tikz@drawopacity{#1}%
+    \def\tikz@fillopacity{#1}%
+  },
+  /tikz/draw opacity/.add code={}{%
+    \def\tikz@drawopacity{#1}%
+  },
+  /tikz/fill opacity/.add code={}{%
+    \def\tikz@fillopacity{#1}%
+  },
+  /tikz/on layer/.style={
+    if in node={node on layer={#1}}
+    {scope on layer={#1}}},
+  /tikz/scope on layer/.code={
+    \pgfonlayer{#1}\begingroup%
+    \aftergroup\endpgfonlayer%
+    \aftergroup\endgroup%
+  },
+  /tikz/node on layer/.code={%
+    \global\let\tikz@drawopacity@smuggle=\tikz@drawopacity%
+    \global\let\tikz@fillopacity@smuggle=\tikz@fillopacity%
+    \gdef\node@@onlayer{%
+      % Capture current tempbox
+      \setbox\tikz@tempbox=%
+      \hbox\bgroup\pgfonlayer{#1}%
+      \pgfsetfillopacity{\tikz@fillopacity@smuggle}%
+      \pgfsetstrokeopacity{\tikz@drawopacity@smuggle}%
+      \unhbox\tikz@tempbox%
+      \endpgfonlayer\egroup%
+    }%
+    \aftergroup\node@onlayer%
+  },
+}
+\def\node@onlayer{\aftergroup\node@@onlayer}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Convexpath
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Workaround function for switched parameters to atan2() in pgf before 3.0.0
+% Correct order is myatan2(y,x)
+\pgfmathdeclarefunction{myatan2}{2}{%
+    \pgfmathtruncatemacro\tmp{atan2(42,0) == 90.0}%
+    \ifnum\tmp=0%
+        \pgfmathparse{atan2(#2,#1)}%
+    \else%
+        \pgfmathparse{atan2(#1,#2)}%
+    \fi%
+}
+
+\newcommand{\convexpath}[2]{
+[
+    create hullnodes/.code={
+        \global\edef\namelist{#1}
+        \foreach [count=\counter] \nodename in \namelist {
+            \global\edef\numberofnodes{\counter}
+            \node at (\nodename) [draw=none,name=hullnode\counter] {};
+        }
+        \node at (hullnode\numberofnodes) [name=hullnode0,draw=none] {};
+        \pgfmathtruncatemacro\lastnumber{\numberofnodes+1}
+        \node at (hullnode1) [name=hullnode\lastnumber,draw=none] {};
+    },
+    create hullnodes
+]
+($(hullnode1)!#2!-90:(hullnode0)$)
+\foreach [
+    evaluate=\currentnode as \previousnode using \currentnode-1,
+    evaluate=\currentnode as \nextnode using \currentnode+1
+    ] \currentnode in {1,...,\numberofnodes} {
+-- ($(hullnode\currentnode)!#2!-90:(hullnode\previousnode)$)
+  let \p1 = ($(hullnode\currentnode)!#2!-90:(hullnode\previousnode) - (hullnode\currentnode)$),
+    \n1 = {myatan2(\y1,\x1)},
+    \p2 = ($(hullnode\currentnode)!#2!90:(hullnode\nextnode) - (hullnode\currentnode)$),
+    \n2 = {myatan2(\y2,\x2)},
+    \n{delta} = {-Mod(\n1-\n2,360)}
+  in
+    {arc [start angle=\n1, delta angle=\n{delta}, radius=#2]}
+}
+-- cycle
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% width as=<NODE>, height as=<NODE>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newlength\sra@tikz@length
+\newcommand\sra@tikz@widthofnode[1]{%
+  \pgfextractx{\sra@tikz@length}{\pgfpointanchor{#1}{east}}%
+  \pgfextractx{\pgf@xa}{\pgfpointanchor{#1}{west}}% \pgf@xa is a length defined by PGF for temporary storage. No need to create a new temporary length.
+  \addtolength{\sra@tikz@length}{-\pgf@xa}%
+}
+\newcommand\sra@tikz@heightofnode[1]{%
+  \pgfextracty{\sra@tikz@length}{\pgfpointanchor{#1}{north}}%
+  \pgfextracty{\pgf@ya}{\pgfpointanchor{#1}{south}}% \pgf@xa is a length defined by PGF for temporary storage. No need to create a new temporary length.
+  \addtolength{\sra@tikz@length}{-\pgf@ya}%
+}
+
+\tikzset{
+  width as/.style={
+    /utils/exec={\sra@tikz@widthofnode{#1}},
+    minimum width/.expanded=\the\sra@tikz@length,
+  },
+  height as/.style={
+    /utils/exec={\sra@tikz@heightofnode{#1}},
+    minimum height/.expanded=\the\sra@tikz@length,
+  },
+  size as/.style={width as={#1}, height as={#1}},
+}

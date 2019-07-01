@@ -1,0 +1,189 @@
+\documentclass{lecturefig}
+\usepackage{calc}
+\begin{document}
+\newlength\lecturedot
+  \setlength\lecturedot{\widthof{\textbf{V12}}}
+\begin{tikzpicture}
+  \tikzset{
+    topic/.style={
+      draw,align=left
+    },
+    lecture/.style={
+      label={[circle,anchor=mid,draw,fill=black,inner sep=2pt,align=center,
+        text width=\lecturedot,
+        font=\color{white}]north east:\textbf{V#1}},
+    },
+  }
+  \def\Title#1{\textbf{\Large #1}}
+  \begin{scope}[
+    topic/.append style={
+      text width=6cm,
+      anchor=north west,
+    },
+    principle/.style={
+      fill=badbee!40,
+    },
+    paradigm/.style={
+      fill=luhblue!40,
+    },
+  ]
+  \node[topic,lecture=2,principle] (type) {
+    \Title{Typen}\\
+    Primitive Typen\\
+    (Un)Strukturierte Komposition\\
+    Funktionstypen\\
+    Subtyping\\
+    Traits \& Typklassen\\
+  };
+  \node[right=of type.north east,topic,principle,lecture=3] (name) {
+    \Title{Namen}\\
+    Statische und Dynamische Bindung\\
+    Scoping Rules\\
+    Type-directed Name Resolution\\
+    Overloading\\
+    Static and Dynamic Dispatch
+  };
+  \node[below=of type.south west,topic,principle, lecture=6] (operation) {
+    \Title{Operationen}\\
+    Standardkonstrukte\\
+    Auswertungsstrategie\\
+    Call-By-\{Val,Ref,Name,Need\}\\
+    Seiteneffekte\\
+    Verhaltenskomposition
+  };
+
+  \node[right=of operation.north east,topic,principle,lecture=5] (object) {
+    \Title{Objekte}\\
+    Data Abstraction\\
+    Erzeugung \& Initialisierung\\
+    Lebenszeiten \& Ownership\\
+    Mixin Vererbung\\
+    Prototype Vererbung
+  };
+
+  \node[left=of operation.north west,yshift=5mm,topic,anchor=east,paradigm,lecture=12] (function) {
+    \Title{Das Funktionale Paradigma}\\
+    Parametrische Datentypen\\
+    Unifikation \& Typinferenz\\
+    Pattern Matching\\
+    Monaden\\
+    Immutable Data
+  };
+
+  \node[right=of object.north east,topic,yshift=5mm,anchor=west,paradigm,lecture=11] (oo) {
+    \Title{Das Objektoriente Paradigma}\\
+    Klassenbasierte Vererbung\\
+    Kapselung von Daten und Verhalten\\
+    Module und Namensräume\\
+    SOLID-Prinzipien\\
+  };
+
+  \node[left=of function.west,align=left,font=\Large\scshape]{
+    S\\[.5ex]
+    P\\[.5ex]
+    R\\[.5ex]
+    A\\[.5ex]
+    C\\[.5ex]
+    H\\[.5ex]
+    E\\[.5ex]
+    N
+  };
+\end{scope}
+
+\begin{scope}[
+    topic/.append style={
+      text width=5.5cm,
+      anchor=north west,
+      fill=safegreen!40,
+    }
+  ]
+
+
+\node[below=2 of operation.south west,topic,lecture=4] (semantic) {
+    \Title{Semantische Analyse}\\
+    Typprüfung\\
+    Namensauflösung\\
+    Fehlermeldungen\\
+    C-Präprozessor/M4\\
+    Hygenische Macros
+  };
+
+  \node[left=1.5 of semantic.north west,topic,anchor=north east,
+       lecture=1,
+       ] (parsing) {
+    \Title{Synaktische Analyse}\\
+    Tokenstrom\\
+    (Kontextfreie) Gramatiken\\
+    Abstrakter Syntaxbaum\\
+    Parsertechniken\\
+    Parsergeneratoren
+  };
+
+    \node[left=of parsing.north west,anchor=north east,align=left,font=\Large\scshape](label-compiler){
+    Ü\\[.5ex]
+    B\\[.5ex]
+    E\\[.5ex]
+    R\\[.5ex]
+    S\\[.5ex]
+    E\\[.5ex]
+    T\\[.5ex]
+    Z\\[.5ex]
+    E\\[.5ex]
+    R
+  };
+
+  \node[right=1.5 of semantic.north east,topic,lecture=7] (intermediate) {
+    \Title{Zwischencode}\\
+    3-Address Code\\
+    Code für Arith. Ausdrücke\\
+    R-Values \& L-Values\\
+    Basic Blocks \& Kontrollflussgraph\\
+    Kontrollfluskonstrukte
+  };
+
+  \node[right=1.5 of intermediate.north east,topic,lecture=9] (machine) {
+    \Title{Maschinencode}\\
+    Registerallokation\\
+    Funktionsaufrufe\\
+    Application Binary Interface\\
+    Peephole Optimizer
+  };
+
+  \node[below=1.5 of intermediate.south west,topic,lecture=8] (opt) {
+    \Title{Optimierung}\\
+    Fixpunkt Analyse\\
+    Konstantenfortschreibung\\
+    Konstante Auswertung\\
+    Entfernung toten Codes
+  };
+
+  \node[right=1.5 of opt.north east,topic,lecture=10] (runtime) {
+    \Title{Das Laufzeitsystem}\\
+    ELF und Linker\\
+    Dynamische Bibliotheken\\
+    Standardbibliotheken\\
+    Garbage Colletion\\
+    Just-in-Time Compilation
+  };
+
+  \draw[->] (parsing) -- node[above]{AST} (semantic);
+
+  \draw[->] (semantic) -- node[above]{AST} (intermediate);
+
+  \draw[->] (intermediate) to[bend left] (opt);
+  \node at ($(intermediate.south)!0.5!(opt.north)$) {IR};
+  \draw[->] (opt) to[bend left] (intermediate);
+  \draw[->] (intermediate) -- node[above]{IR} (machine);
+
+
+  \node at ($(machine.south east)!0.5!(runtime.north east)$) (bin) {\textsc{Binärprogram}};
+  \draw[->] (machine.south) to[out=-90,in=180] (bin);
+  \draw[->] (runtime.north) to[out=90,in=180] (bin);
+
+\end{scope}
+
+\coordinate (label-anchor) at ($(operation.south)!0.5!(semantic.north)$);
+\draw[dashed] (label-anchor-|label-compiler) -- (label-anchor-|bin.east);
+
+\end{tikzpicture}
+\end{document}
