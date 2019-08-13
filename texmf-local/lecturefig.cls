@@ -43,15 +43,4 @@
 
 \tikzset{
   >=Stealth,
-  tikz on layer/.style 2 args={
-    append after command={
-      \pgfextra{%
-        \begin{pgfinterruptpath}
-          \begin{pgfonlayer}{#1}
-            #2
-          \end{pgfonlayer}
-        \end{pgfinterruptpath}
-      }%
-    }
-  },
 }

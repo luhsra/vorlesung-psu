@@ -12,22 +12,16 @@ slides: ${PDF}
 
 html: ${HTML}
 
-build:
+build: texmf/ls-R
 	@mkdir -p build/tangle
 	@mkdir -p build/html
 	@ln -fs ../../export-prologue.org build/html
 	@ln -fs ../../html/css build/html/
 	@ln -fs ../../html/js build/html/
 
-# Generate shortcut targets:
-#
-# invoked with <prefix>-<rest>.pdf adds a set of rules
-#    <prefix> : <prefix>-<rest>.pdf
-#    <prefix>.dep : <prefix>-<rest>.dep
-#    <prefix>_handout : <prefix>-<rest>_handout.pdf
-#    <prefix>_notes : <prefix>-<rest>_notes.pdf
-#    <prefix>_all : <prefix>-<rest> <prefix>-<rest>_handout <prefix>-<rest>_notes
-#
+texmf/ls-R:
+	texhash texmf/
+
 define CREATE_SUB
 $(shell echo $(1) | awk -F- '{print $$1;}') : build/$(1:.org=.pdf)
 $(shell echo $(1) | awk -F- '{print $$1;}').html : build/html/$(1:.org=.html)
@@ -37,14 +31,15 @@ $(foreach f,$(ORG_PDF),\
 	$(eval $(call CREATE_SUB,$(f)))\
 )
 
-
+emacs/setup:
+	emacsclient -e "(load-file \"$$PWD/site-lisp/ob-tangle-macro.el\")" -q -u
 
 # We use the emacs server to tangle the shit out of it
-build/tangle/%.tex: %.org
+build/tangle/%.tex: %.org emacs/setup
 	emacsclient -e '(org-babel-tangle-file "'"$$PWD"'/$<" nil "latex")'
 	mv $(patsubst %.org,%.tex,$<) $@
 
-build/tangle/%.html: %.org
+build/tangle/%.html: %.org emacs/setup
 	emacsclient -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"
 
 build/%.tex: build/tangle/%.tex build
@@ -52,6 +47,13 @@ build/%.tex: build/tangle/%.tex build
 
 build/%.pdf: build/%.tex
 	latexmk -pdf $< -outdir=build
+
+fig/%.pdf: fig/%.tex texmf-local/lecturefig.cls
+	@mkdir -p build
+	latexmk -pdf $< -outdir=build
+	@echo "make: hard link from build/ to $@"
+	@cp $(patsubst fig/%,build/%,$@) $@
+
 
 build/%.pdf.split: build/%.pdf bin/split-pdf
 	bin/split-pdf $< $(patsubst %.pdf,%.topics,$<)
@@ -67,8 +69,11 @@ build/html/%.html: %.org build/%.pdf.split bin/insert-carousels
 	emacsclient -e "(org-export-to-html-file \"$$PWD/build/html/$<\" \"$$PWD/$@\")"
 
 
+
+
 clean:
 	rm -rf build
+	rm -f texmf/ls-R
 
 
 .PRECIOUS: build/%.pdf build/tangle/%.tex build/%.pdf.split build/%.tex

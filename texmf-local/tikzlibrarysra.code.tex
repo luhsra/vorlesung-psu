@@ -53,6 +53,18 @@
     }%
     \aftergroup\node@onlayer%
   },
+  % tikz on layer={LAYER}{TIKZ CODE}
+  /tikz/tikz on layer/.style 2 args={
+    append after command={
+      \pgfextra{%
+        \begin{pgfinterruptpath}
+          \begin{pgfonlayer}{#1}
+            #2
+          \end{pgfonlayer}
+        \end{pgfinterruptpath}
+      }%
+    }
+  },
 }
 \def\node@onlayer{\aftergroup\node@@onlayer}
 

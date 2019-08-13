@@ -77,7 +77,6 @@ int main() {
 *** Notes                                                        :noexport:
 **** Foobar Barfoo
 
-
 * Topic B
 #+BEGIN_SRC latex
 \begin{frame}\frametitle[short]{x\textbf{x}x}
