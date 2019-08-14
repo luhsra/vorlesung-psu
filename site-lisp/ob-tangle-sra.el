@@ -1,5 +1,8 @@
 (require 'ob-tangle)
-(provide 'ob-tangle-macro)
+(require 'ob-latex)
+(require 'ox-html)
+(require 'ox-tufte)
+
 
 (defun org-babel-tangle (&optional arg target-file lang)
   "Write code blocks to source-specific files.
@@ -288,3 +291,40 @@ non-nil, return the full association list to be used by
     (if only-this-block
 	(list (cons src-lang (list result)))
       result)))
+
+(defun org-tufte-src-block (src-block contents info)
+  (org-html-src-block src-block contents info))
+
+(defun org-export-to-html-file (src dst)
+  (interactive)
+  (let (buffer (find-buffer-visiting src))
+    (message "HTML %s: %s" src buffer)
+
+    (with-current-buffer
+        (find-file-noselect src)
+      (org-export-to-file 'tufte-html dst))
+    (when (not buffer)
+      (message "kill buffer %s: %s" src buffer)
+      (kill-buffer (find-buffer-visiting src)))))
+
+(defun org-babel-tangle-file (file &optional target-file lang)
+  "Extract the bodies of source code blocks in FILE.
+Source code blocks are extracted with `org-babel-tangle'.
+Optional argument TARGET-FILE can be used to specify a default
+export file for all source blocks.  Optional argument LANG can be
+used to limit the exported source code blocks by language.
+Return a list whose CAR is the tangled file name."
+  (interactive "fFile to tangle: \nP")
+  (let ((visited-p (find-buffer-visiting (expand-file-name file)))
+	to-be-removed)
+    (message "kill2: %s %s" file visited-p)
+    (prog1
+	(save-window-excursion
+	  (find-file file)
+	  (setq to-be-removed (current-buffer))
+	  (mapcar #'expand-file-name (org-babel-tangle nil target-file lang)))
+      (unless visited-p
+	(kill-buffer to-be-removed)))))
+
+
+(provide 'ob-tangle-sra)

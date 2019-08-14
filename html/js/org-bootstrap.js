@@ -11,11 +11,12 @@ $( document ).ready(function() {
     } else {
         // The content (and postamble) should be in a container.
         var toc = $('#table-of-contents').detach();
+        toc.insertAfter(".title");
 
         $('#content, #postamble').wrapAll("<div class='container'><div id='main-row' class='row'><div class='col-md-9'></div></div></div>");
-        toc.appendTo('#main-row');
-        $('#table-of-contents').addClass('nav-list');
-        $('#table-of-contents').wrapAll("<div class='col-md-3' style='margin-top: 100px;'></div>");
+
+        $('#table-of-contents').wrapAll("<div class='well'></div>");
+        $('#table-of-contents').addClass("well");
         var url = window.location.href.match(/.*\//) + "index.html";
         $('<a href="'+url+'">[Index]</a>').appendTo('#table-of-contents');
 

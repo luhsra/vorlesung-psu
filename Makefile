@@ -32,7 +32,7 @@ $(foreach f,$(ORG_PDF),\
 )
 
 emacs/setup:
-	emacsclient -e "(load-file \"$$PWD/site-lisp/ob-tangle-macro.el\")" -q -u
+	emacsclient -e "(load-file \"$$PWD/site-lisp/ob-tangle-sra.el\")" -q -u
 
 # We use the emacs server to tangle the shit out of it
 build/tangle/%.tex: %.org emacs/setup

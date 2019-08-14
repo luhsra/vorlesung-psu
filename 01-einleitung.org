@@ -20,89 +20,107 @@
 \psuSectionStop{Titlepage}{{{{range()}}}}
 #+END_SRC
 
+* Gedanken zu dieser Vorlesungseinheit                             :noexport:
+Mit der ersten Vorlesung, soll der Studierene für die Vorlesung
+motiviert werden. Es soll verstehen, welcher ganz konkreten
+Erkenntnisgewinn daraus gezogen werden kann sich mit
+Programmiersprachen und deren Implementierungen zu beschäftigen. Ihm
+muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
 
-* Topic A
+- Was muss der Studierende wissen um eine neue Programmiersprache
+  effektiv und effizient ein zu setzen?
+
+  - Welche Abstraktion bietet eine Programmiersprache an und was hat dies mit dem Ebenenmodell zu tun?
+
+  - Was ist der Unterschied zwischen einem Interpreter und einem Übersetzer?
+
+  - Was darf ein Übersetzer und was darf dieser nicht?
+
+
+* Motivation
+
 #+BEGIN_SRC latex
-  \begin{frame}{fooba \only<2>{asdsd}}
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-  Ut enimad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-  Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-  \pause bar
+  \begin{frame}{Der Dozent}
+    \bi
+    \ii Wer ist der Dozent da?\\{
+      Informatikstudium in Erlangen (ab 2009), Promotion in Hannover (2019)\\
+      Betriebssysteme, Emacs User, Schwäche für Graphdatenstrukturen
+    }\qquad
+    \ii Ich mag Programmiersprachen! {
+      \bi
+      \ii Sie erleichtern mir Lösungen klar und deutlich aufzuschreiben.
+      \ii Sowohl eleganter als auch zu komplexer Code ist Kunst.
+      \ei
+    }\qquad\qquad
+    \ii<2-> Dies ist meine erste eigene Vorlesung. {
+      \bi
+      \ii Wir müssen das jetzt gemeinsam durchstehen.
+      \ii Ich werde mein Bestes geben ihnen nur Sinnvolles zu vermitteln.
+      \ii Melden sie sich mit Fehlern, Kritik und Anregungen.
+      \ei
+    }
+    \ei
+  \end{frame}
+#+END_SRC
+
+#+BEGIN_SRC latex
+  \begin{frame}{Was soll diese Veranstaltung leisten?}
+  \bi
+  \ii<+-> Informatiker werden fortwährend mit neuen Sprache konfrontiert. {
+    \bi
+    \ii The next 700 programming languages, P. J. Landin\only<2->{, 1966}
+    \ei
+  }
+  \ii<+-> Anforderung: Schnell \alert{effektive} und \alert{effiziente} entwickeln.
+  \ii Mein Ziel: Ich muss ihnen das nötige Handwerkszeug geben, damit
+    sie möglichst schnell dazu kommen effektiv und effizent Programme
+    in einer neuen Sprache zu entwickeln.
+  \ei
+  \end{frame}
+
+  \begin{frame}{Wieso ist das überhaupt möglich?}
   \end{frame}
 #+END_SRC
 
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enimad
-minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+- Folie: Was soll diese Veranstaltung leisten?
+  - Jeder Informatiker wird fortwährend mit neuen Programmiersprachen konfrontiert
+  - Darin gilt es möglichst schnell zu einer guten Lösung zu kommen
+  - Mein Ziel: Ich muss ihnen das nötige Handwerkszeug geben, damit
+    sie möglichst schnell dazu kommen effektiv und effizent Programme
+    in einer neuen Sprache zu entwickeln.
 
-aliquip ex ea commodo consequat. Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-pariatur.  qui officia deserunt mollit anim id est laborum.
+- Folie: Wieso ist das überhaupt möglich?
+  - Informatiker denken sich Sprachen aus, damit andere Informatiker einer Maschiene erklären können was zu tun ist.
+  - Viel an Ingeneursleistung ist die Rekombination von bekannten
+    Konzepten, oder "Was der Bauer nicht kennt, implementiert er auch
+    nicht in seinem Übersetzer"
+  - Wenn sie lernen wie ein Sprachenentwickler zu denken, so erlernen sie neue Sprachen schneller.
+  - Ihr Gewinn: Demystifizierung der Übersetzer Blackbox.
+
+- Folie: Welchen Inhalt hat diese Veranstaltung?
+  - Programmiersprachen
+    - Kernkonzepte die sich in vielen Sprachen wiederfinden
+    - High-Level Paradigmen (funktional, OO), die sich daraus zusammensetzen
+    - Wir werden uns verschiedenste Programmiersprachen anschauen
+
+  - Übersetzer
+    - Zwischenschritte vom Zeichenstrom zum Assemblerprogram
+    - Nötige Datenstrukturen und Algorithmen
+    - Praktische Arbeit an einem einfachen Übersetzer
+
+* Abstrakte Maschienen
+
+* Struktur der Veranstaltung
 
 
-#+BEGIN_SRC latex
-\begin{frame}{Z1}
-foo
-\pause
-bar
-\end{frame}
-#+END_SRC
-
-Die Kernaufgabe.... Lorem ipsum dolor sit amet, consectetur
-adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
-magna aliqua. Ut enimad minim veniam, quis nostrud exercitation
-ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Hallo Welt, [fn::asdasdas]
-
-[[http://heise.de][asdas]]
-
-#+begin_src c++
-#include <iostream.h>
-
-int main() {
-  std::cout << "asddaa" << std::endl;
-}
-#+end_src
-
-| asdasd | asdsa |
-|--------+-------|
-| asdasd | asd   |
-
-*** Notes                                                        :noexport:
-**** Foobar Barfoo
-
-* Topic B
-#+BEGIN_SRC latex
-\begin{frame}\frametitle[short]{x\textbf{x}x}
-\framesubtitle{subsub}
-asd \pause ttt
-\end{frame}
-
-\begin{frame}\frametitle{\btPrevFrameTitle :\btPrevShortFrameTitle,\btPrevFrameSubtitle,+1}
-gy \pause lorem
-\end{frame}
-
-\begin{frame}{\btPrevFrameTitle}
-\btPrevFrameTitle
-\end{frame}
-#+END_SRC
-
-Die Kernaufgabe....
-
-#+BEGIN_SRC python
-print("Foobar")
-#+END_SRC
-
-*** Notes                                                        :noexport:
-**** Foobar Barfoo
+* Organisatorisches
 
 * Epilogue                                                         :noexport:
+
+* Footnotes
+
+
 # Local Variables:
 # org-html-htmlize-output-type: css
 # org-html-htmlize-font-prefix: "org-"
