@@ -2,6 +2,7 @@
 (require 'ob-latex)
 (require 'ox-html)
 (require 'ox-tufte)
+(require 'org-macro)
 
 
 (defun org-babel-tangle (&optional arg target-file lang)
@@ -220,9 +221,11 @@ non-nil, return the full association list to be used by
                              (if epilogue
                                  (setf (nth 1 info)
                                        (format "%s\n<<%s>>" (nth 1 info) epilogue)))
-                             (add-to-list 'macros
-                                          (cons "range" (format "%s-%s" beg-line end-line)))
-			     (org-babel-expand-noweb-references info))
+                             (setq macros
+                                   `(("range" . ,(format "%s-%s" beg-line end-line))
+                                     ("subtitle" . ,(org-macro--find-keyword-value "SUBTITLE" t))
+                                     ,@macros))
+                             (org-babel-expand-noweb-references info))
 			 (nth 1 info)))
                  (body (cond ((assq :no-expand params) body)
 		             ((fboundp expand-cmd) (funcall
@@ -299,7 +302,6 @@ non-nil, return the full association list to be used by
   (interactive)
   (let (buffer (find-buffer-visiting src))
     (message "HTML %s: %s" src buffer)
-
     (with-current-buffer
         (find-file-noselect src)
       (org-export-to-file 'tufte-html dst))

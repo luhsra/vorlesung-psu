@@ -1,4 +1,5 @@
-#+TITLE: 01 - Einleitung
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 01 - Einleitung
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 
@@ -13,7 +14,7 @@
 #+END_SRC
 
 #+BEGIN_SRC latex :tangle-prologue nil :tangle-epilogue nil
-\subtitle{{{{title()}}}}
+\subtitle{{{{subtitle()}}}}
 \begin{frame}
   \maketitle
 \end{frame}
@@ -37,7 +38,7 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
   - Was darf ein Übersetzer und was darf dieser nicht?
 
 
-* Motivation
+* Einleitung
 
 #+BEGIN_SRC latex
   \begin{frame}{Der Dozent}
@@ -65,64 +66,191 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
 
 #+BEGIN_SRC latex
   \begin{frame}{Was soll diese Veranstaltung leisten?}
+    \btUseExtraItemSep
   \bi
-  \ii<+-> Informatiker werden fortwährend mit neuen Sprache konfrontiert. {
+  \ii<+-> Informatiker werden fortwährend mit neuen Sprachen konfrontiert. {
     \bi
-    \ii The next 700 programming languages, P. J. Landin\only<2->{, 1966}
+    \ii The next 700 programming languages, P. J. Landin\only<+->{, \citeyear{landin:66:cacm}\hfill\cite{landin:66:cacm}}
+    \ii<+-> Hype Train (z.B. Rust), Evolution (C++20), Legacy (COBOL)
+    \ii<.-> Sprachen Allerorten: HTML5, LaTex/TikZ, SQL, QT5/QML,
     \ei
   }
-  \ii<+-> Anforderung: Schnell \alert{effektive} und \alert{effiziente} entwickeln.
-  \ii Mein Ziel: Ich muss ihnen das nötige Handwerkszeug geben, damit
-    sie möglichst schnell dazu kommen effektiv und effizent Programme
-    in einer neuen Sprache zu entwickeln.
+  \ii<+-> \Structure{Anforderung an Sie}: Schnell \alert{effektiv} und \alert{effizient} entwickeln können. {
+    \bi
+    \ii Effektiv:  In der Lage sein ein komplexes Program zu schreiben.
+    \ii Effizient: Das Programm soll schnell und sparsam sein.
+    \ii Häufig gibt es eine Abwägung zwischen beiden Zielen (siehe Skriptsprachen)
+    \ei
+  }
+  \ii<.-> \Structure{Mein Ziel}: Vermittlung von Handwerkszeug und Denkweisen {
+    \bi
+    \ii Welche Fragen muss ich an eine neue Programmiersprache stellen?
+    \ii Welche Konstrukte müssen prinzipbedingt teuer sein?
+    \ii Demystifizierung der Compiler Black Box.
+    \ei
+  }
   \ei
   \end{frame}
 
-  \begin{frame}{Wieso ist das überhaupt möglich?}
+  \begin{frame}[fragile,t]{Wieso ist das überhaupt möglich?}
+    \btUseExtraItemSep
+    \bi
+    \ii Sprachen wurden von Ingenieuren erdacht. Man baut was man kennt.  {
+      \bi
+      \ii Jede neue Sprache bringt nur eine Hand voll neuer Konzepte
+      \ii Der Rest ist eine Rekombination von bereits bekanntem
+      \ei
+    }
+    \ii<+-> Beispiel: Über einen Zahlenvektor iterieren {
+
+    \begin{code}<.>[tag=C]
+      \begin{C}[]
+        int sum = 0;
+        int *it;
+        for (it  = &vec[0];    // Initialisierung
+             it != &vec[10];   // Abbruchbedingung
+             ++it) {           // Nächstes Element
+          sum += (*i);
+        }
+      \end{C}
+    \end{code}%
+    \begin{code}<+>[tag=C++03]
+      \begin{CPP}[]
+        int sum = 0;
+        std::vector<int>::iterator it;
+        for (it = vec.begin();  // Initialisierung
+             it != vec.end();   // Abbruchbedingung
+             ++it) {            // Nächstes Element
+          sum += (*i);
+        }
+      \end{CPP}
+    \end{code}%
+    \begin{code}<+>[tag=C++11]
+      \begin{CPP}[]
+        int sum = 0;
+        for (int x : vec) { // foreach Schleife
+          sum += x
+        }
+      \end{CPP}
+    \end{code}
+    \begin{code}<+->[tag=Python]
+      \begin{py}[]
+        sum = 0
+        for x in vec:
+            sum += x
+      \end{py}
+    \end{code}
+  }
+    \ii<+> Gemeinsame Konzepte von verschiedenen Programmiersprachen {
+      \bi
+      \ii Datentypen, Objekte, Benennung von Objekten, Operationen auf Objekten
+      \ii Gemeinsamkeiten erleichtern erfahrenen Programmierern den Einstieg.
+      \ii Unendliche Mannigfaltigkeit in unendlicher Kombination!
+      \ei
+    }
+    \ei
+
   \end{frame}
 #+END_SRC
 
-
-- Folie: Was soll diese Veranstaltung leisten?
-  - Jeder Informatiker wird fortwährend mit neuen Programmiersprachen konfrontiert
-  - Darin gilt es möglichst schnell zu einer guten Lösung zu kommen
-  - Mein Ziel: Ich muss ihnen das nötige Handwerkszeug geben, damit
-    sie möglichst schnell dazu kommen effektiv und effizent Programme
-    in einer neuen Sprache zu entwickeln.
-
-- Folie: Wieso ist das überhaupt möglich?
-  - Informatiker denken sich Sprachen aus, damit andere Informatiker einer Maschiene erklären können was zu tun ist.
-  - Viel an Ingeneursleistung ist die Rekombination von bekannten
-    Konzepten, oder "Was der Bauer nicht kennt, implementiert er auch
-    nicht in seinem Übersetzer"
-  - Wenn sie lernen wie ein Sprachenentwickler zu denken, so erlernen sie neue Sprachen schneller.
-  - Ihr Gewinn: Demystifizierung der Übersetzer Blackbox.
-
-- Folie: Welchen Inhalt hat diese Veranstaltung?
-  - Programmiersprachen
-    - Kernkonzepte die sich in vielen Sprachen wiederfinden
-    - High-Level Paradigmen (funktional, OO), die sich daraus zusammensetzen
-    - Wir werden uns verschiedenste Programmiersprachen anschauen
-
-  - Übersetzer
-    - Zwischenschritte vom Zeichenstrom zum Assemblerprogram
-    - Nötige Datenstrukturen und Algorithmen
-    - Praktische Arbeit an einem einfachen Übersetzer
-
-* Abstrakte Maschienen
-
 * Struktur der Veranstaltung
 
+#+BEGIN_SRC latex
+  \begin{frame}{Welchen Inhalt hat diese Veranstaltung?}
+    \bi
+    \ii \STRUCTURE{Programmiersprachen}: Abstrahiert von der echten Maschiene {
+      \bi
+      \ii Kernkonzepte die sich in vielen Sprachen wiederfinden
+      \ii High-Level Paradigmen (funktional, OO), die sich daraus zusammensetzen
+      \ii Wir werden uns verschiedenste Programmiersprachen anschauen
+      \ei
+      }
+    \ei
+
+    \begin{center}
+      \Large {\Huge $\downarrow$} Programmiersprachen und Übersetzer {\Huge $\uparrow$}
+    \end{center}
+
+    \bi
+    \ii \STRUCTURE{Übersetzer}: Bringt die Abstraktionen auf die Maschiene {
+      \bi
+      \ii Zwischenschritte vom Zeichenstrom zum Assemblerprogram
+      \ii Nötige Datenstrukturen und Algorithmen
+      \ii Praktische Arbeit an einem einfachen Übersetzer
+      \ei
+    }
+    \ei
+
+  \end{frame}
+
+  \begin{frame}{Programmiersprachen}
+    \centering
+    \includegraphics[height=\textheight-2cm,page=1]{fig/01-overview-small}
+  \end{frame}
+
+  \begin{frame}{Übersetzer}
+    \includegraphics[width=\textwidth,page=2]{fig/01-overview-small}
+  \end{frame}
+
+  \begin{frame}{Übersicht}
+    \includegraphics[width=\textwidth,page=3]{fig/01-overview-small}
+  \end{frame}
+#+END_SRC
+
+* Ebenenmodell und Virtuelle Maschienen
+:PROPERTIES:
+:CUSTOM_ID: 01-ebenenmodell
+:END:
+
+#+BEGIN_SRC latex
+
+
+  \begin{frame}{Der Blick aus 10000 Meilen}
+  \bi
+  \ii Test
+  \ei
+  \end{frame}
+
+  \begin{frame}[label=vm-hierarchie]
+    \frametitle{Hierarchie virtueller Maschinen\,\cite[S.\,3]{tanenbaum:06:sco}}
+
+    \begin{itemize}
+    \item Schrittweises Schließen der semantischen Lücke durch
+      \bi
+        \item \structure{Interpretation auf} einer einfacheren (virtuellen) Maschine
+        \item \structure{Übersetzung für} eine einfachere (virtuelle) Maschine
+      \ei
+    \begin{center}\scriptsize
+      \begin{tabular}{cp{2.8cm}p{6cm}}
+         Ebene\\
+         \llap{\raisebox{-0.5\height}[0pt]{\includegraphics[width=6ex]{fig/01-problem}\hskip4ex}}
+         $n$ & virtuelle Maschine $M_n$ mit Maschinensprache $S_n$ &
+           Programme in $S_n$ werden von einem auf einer tieferen Maschine
+     laufenden Interpreter gedeutet oder in Programme tieferer Maschinen
+     übersetzt\\ \hline
+         $\vdots$ & \multicolumn{1}{c}{$\vdots$}
+                  & \multicolumn{1}{c}{$\vdots$}\\[0.5ex] \hline
+         $2$ & virtuelle Maschine $M_2$ mit Maschinensprache $S_2$ &
+           Programme in $S_2$ werden von einem auf $M_1$ bzw. $M_0$
+     laufenden Interpreter gedeutet oder nach $S_1$ bzw. $S_0$
+     übersetzt\\ \hline
+         $1$ & virtuelle Maschine $M_1$ mit Maschinensprache $S_1$ &
+           Programme in $S_1$ werden von einem auf $M_0$
+     lau\-fen\-den Interpreter gedeutet oder nach $S_0$ übersetzt\\ \hline
+         \llap{\raisebox{-0.5\height}[0pt]{\includegraphics[width=6ex]{fig/01-cpu}\hskip4ex}}
+         $0$ & reale Maschine $M_0$ mit Maschinensprache $S_0$ &
+           Programme in $S_0$ werden direkt von der Hardware ausgeführt
+      \end{tabular}
+    \end{center}
+
+      \vfill
+      \item \structure{Übersetzung} und \structure{Interpretation} als Techniken, um (auch in Kombination) Programme auf HW zur Ausführung zu bringen.
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}[t,label=vm-hierarchie-beispiel]{Beispiel: Arbeitsplatzrechner}
+    \animation[trim={\btLeftMargin} 0pt 0pt 0pt, width=\textwidth]{1/1,2/2}{fig/01-layers}
+  \end{frame}
+#+END_SRC
 
 * Organisatorisches
-
-* Epilogue                                                         :noexport:
-
-* Footnotes
-
-
-# Local Variables:
-# org-html-htmlize-output-type: css
-# org-html-htmlize-font-prefix: "org-"
-# org-html-klipsify-src: t
-# End:

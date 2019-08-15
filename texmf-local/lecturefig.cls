@@ -10,6 +10,9 @@
 \RequirePackage[active,tightpage]{preview}
 \RequirePackage{wasysym}
 \RequirePackage{marvosym}
+\RequirePackage{helvet}
+\RequirePackage{lmodern}
+
 
 \RequirePackage{tikz}
 
@@ -43,4 +46,5 @@
 
 \tikzset{
   >=Stealth,
+  every tikzpicture/.style={\sffamily},
 }

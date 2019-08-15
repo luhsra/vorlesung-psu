@@ -13,6 +13,7 @@
     margin: 5px;
     text-indent: 0;
     background-color: gray;
+    cursor: pointer;
 }
 .carousel-indicators .active {
     width: 10px;
@@ -39,6 +40,7 @@ a.carousel-control-prev, a.carousel-control-next {
 
 .slide {
     border: 1px solid black;
+    cursor: pointer;
 }
 
 

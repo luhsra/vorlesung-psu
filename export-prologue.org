@@ -1,9 +1,12 @@
+#+LANGUAGE: de
 #+HTML_HEAD: <meta name="viewport" content="width=device-width, initial-scale=1"/>
-#+HTML_HEAD: <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
-#+HTML_HEAD: <link rel="stylesheet" href="css/tufte.css" type="text/css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/tufte.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/style.css" />
 #+HTML_HEAD: <script type="text/javascript" src="js/jquery.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="js/bootstrap.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="js/org-bootstrap.js"></script>
+#+BEGIN_COMMENT
 #+HTML_HEAD: <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.7.3/brython.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.7.3/brython_stdlib.js"></script>
+#+END_COMMENT

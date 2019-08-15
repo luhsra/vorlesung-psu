@@ -1,0 +1,228 @@
+\documentclass{lecturefig}
+\usepackage{calc}
+\begin{document}
+
+\newlength\lecturedot
+\setlength\lecturedot{\widthof{\textbf{V12}}}
+\def\lecturedotpos{north east}
+  \tikzset{
+    topic/.style={
+      draw,align=left
+    },
+    lecture/.style={
+      label={[circle,anchor=mid,draw,fill=black,inner sep=2pt,align=center,
+        text width=\lecturedot,
+        font=\color{white}]\lecturedotpos:\textbf{V#1}},
+    },
+    principle/.style={
+      fill=badbee!40,
+    },
+    paradigm/.style={
+      fill=luhblue!40,
+    },
+    compiler/.style={
+      fill=safegreen!40,
+    },
+  }
+  \def\Title#1{\textbf{\Large #1}}
+
+\begin{tikzpicture}
+
+  \begin{scope}[
+    topic/.append style={
+      text width=6cm,
+      anchor=north west,
+    },
+    topic double/.append style={
+      text width=13.25cm,
+    },
+  ]
+  \node[topic,lecture=2,principle] (type) {
+    \Title{Typen}\\
+    Primitive Typen\\
+    (Un)Strukturierte Komposition\\
+    Funktionstypen\\
+    Subtyping\\
+    Traits \& Typklassen\\
+  };
+  \node[right=of type.north east,topic,principle,lecture=3] (name) {
+    \Title{Namen}\\
+    Statische und Dynamische Bindung\\
+    Scoping Rules\\
+    Type-directed Name Resolution\\
+    Overloading\\
+    Static and Dynamic Dispatch
+  };
+  \node[below=of type.south west,topic,principle, lecture=6] (operation) {
+    \Title{Operationen}\\
+    Standardkonstrukte\\
+    Auswertungsstrategie\\
+    Call-By-\{Val,Ref,Name,Need\}\\
+    Seiteneffekte\\
+    Verhaltenskomposition
+  };
+
+  \node[right=of operation.north east,topic,principle,lecture=5] (object) {
+    \Title{Objekte}\\
+    Data Abstraction\\
+    Erzeugung \& Initialisierung\\
+    Lebenszeiten \& Ownership\\
+    Mixin Vererbung\\
+    Prototype Vererbung
+  };
+
+  \node[above=of type.north west,yshift=4mm,topic,paradigm,topic double,anchor=west, lecture=12] (function) {
+    \Title{Das Funktionale Paradigma}
+  };
+
+  \node[below=of operation.south west,yshift=-4mm,topic,paradigm,topic double,anchor=west,lecture=11] (oo) {
+    \Title{Das Objektoriente Paradigma}
+  };
+
+\end{scope}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{scope}[
+    topic/.append style={
+      text width=5.5cm,
+      anchor=north west,
+      compiler,
+    }
+  ]
+
+
+\node[below=2 of operation.south west,topic,lecture=4] (semantic) {
+    \Title{Semantische Analyse}\\
+    Typprüfung\\
+    Namensauflösung\\
+    Fehlermeldungen\\
+    Sprachmacros
+  };
+
+  \node[above=1.5 of semantic.north west,topic,anchor=south west,
+       lecture=1,
+       ] (parsing) {
+    \Title{Synaktische Analyse}\\
+    Tokenstrom\\
+    (Kontextfreie) Gramatiken\\
+    Abstrakter Syntaxbaum\\
+    Parsertechniken\\
+    Parsergeneratoren
+  };
+
+\node[right=1.5 of parsing.north east,topic,lecture=7] (intermediate) {
+    \Title{Zwischencode}\\
+    3-Address Code\\
+    Code für Arith. Ausdrücke\\
+    R-Values \& L-Values\\
+    Basic Blocks \& Kontrollflussgraph\\
+    Kontrollfluskonstrukte
+  };
+
+  \node[right=1.5 of semantic.north east,topic,lecture=9] (machine) {
+    \Title{Maschinencode}\\
+    Registerallokation\\
+    Funktionsaufrufe\\
+    Application Binary Interface\\
+    Peephole Optimizer
+  };
+
+
+
+  \node[right=1.5 of intermediate.north east,topic,lecture=8] (opt) {
+    \Title{Optimierung}\\
+    Fixpunkt Analyse\\
+    Konstantenfortschreibung\\
+    Konstante Auswertung\\
+    Entfernung toten Codes
+  };
+
+  \node[right=1.5 of machine.north east,topic,lecture=10] (runtime) {
+    \Title{Das Laufzeitsystem}\\
+    ELF und Linker\\
+    Dynamische Bibliotheken\\
+    Standardbibliotheken
+  };
+
+
+  \draw[->] (parsing) -- node[right]{AST} (semantic);
+
+  \draw[->] (semantic) -- node[above,sloped]{AST} (intermediate);
+
+  \draw[<->] (opt)--  node[above]{IR}  (intermediate);
+  \draw[->] (intermediate) -- node[left]{IR} (machine);
+
+
+  \node[yshift=-1cm] at ($(machine.south west)!0.5!(runtime.south east)$) (bin) {\textsc{Binärprogram}};
+  \draw[->] (machine.south) to[out=-90,in=180] (bin);
+  \draw[->] (runtime.south) to[out=-90,in=0] (bin);
+\end{scope}
+
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \tikzset{
+    topic/.append style={
+      text width=8cm,
+      anchor=north,yshift=-5mm
+    }
+  }
+
+  \def\lecturedotpos{east}
+
+  \node[topic,compiler, lecture=1]  (syntax) {
+    \Title{Synaktische Analyse}
+  };
+
+  \node[topic,lecture=2,principle]  (type) at (syntax.south) {
+    \Title{Typen}
+  };
+  \node[topic,principle,lecture=3]  (name) at (type.south) {
+    \Title{Namen}
+  };
+
+  \node[topic,compiler,lecture=4]  (semantic) at (name.south) {
+    \Title{Semantische Analyse}
+  };
+
+  \node[topic,principle,lecture=5,]  (object) at (semantic.south) {
+    \Title{Objekte}
+  };
+
+  \node[topic,principle, lecture=6]  (op) at (object.south) {
+    \Title{Operationen}
+  };
+
+  \node[topic,compiler,lecture=7,anchor=north west,yshift=5mm,xshift=2cm]  (@) at (syntax.north east) {
+    \Title{Zwischencode}
+  };
+
+  \node[topic,compiler,lecture=8]  (@) at (@.south) {
+    \Title{Optimierung}
+  };
+
+  \node[topic,compiler,lecture=9]  (@) at (@.south) {
+    \Title{Maschinencode}
+  };
+
+
+
+
+  \node[topic,compiler,lecture=10]  (@) at (@.south) {
+    \Title{Das Laufzeitsystem}
+  };
+
+  \node[topic,paradigm,lecture=11]  (oo) at (@.south) {
+    \Title{Das Objektoriente Paradigma}
+  };
+
+
+  \node[topic, paradigm,lecture=12]  (@) at (oo.south) {
+    \Title{Das Funktionale Paradigma}
+  };
+
+
+\end{tikzpicture}
+
+\end{document}

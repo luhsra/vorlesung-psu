@@ -1,10 +1,16 @@
 \documentclass[xcolor={rgb,dvipsnames}]{beamer}
+%*****************************************************************************
+%** beamer setup  **************************************************************
+
+\usecolortheme{rose}
 \usetheme[wide=true]{sra}
-\usepackage[]{beamertools}
 \setbeamertemplate{navigation symbols}{}
+
+\usepackage[physicalpagesinpdftoc,sracolors,autonotes]{beamertools}
+
+
 \usepackage{pageslts} %  theCurrentPage
 \usepackage{calc} % theCurrentPage
-
 
 \def\psuSectionStart#1{
   \ifdefstring{\psuOldTitle}{#1}
@@ -25,10 +31,13 @@
   \setcounter{FirstPage}{\theCurrentPage}% set FirstPage to new first page
 }
 
+
 \AtBeginDocument{
   \pagenumbering{arabic} % for pageslts
   \SetPartNumToFileNum
 }
+
+
 
   % Name, token and semester of the course
   \def\xtoken{PSÜ}
@@ -71,3 +80,220 @@
   \renewcommand{\theframenumber}{\thepart--\arabic{framenumber}}
   \renewcommand{\insertframenumber}{\theframenumber}
   \renewcommand{\InsertFrameNumber}{\insertframenumber}
+
+
+  \newcommand{\animation}[3][]{%
+  \foreach \p/\s in {#2} {%
+    \only<\s>{%
+      \includegraphics[page=\p,#1]{#3}%
+    }%
+  }%
+}
+
+
+%*****************************************************************************
+%** bibliography *************************************************************
+
+\usepackage[style=numeric-comp,hyperref,maxnames=3,minnames=3,defernums=true, backend=bibtex8]{biblatex}
+\defbibheading{bibliography}{}
+\bibliography{refs,bib/sra-ext}
+\renewcommand{\bibfont}{\scriptsize}
+\DeclareFieldFormat{postnote}{#1}
+
+
+
+%*****************************************************************************
+%** code blocks **************************************************************
+
+  \makeatletter
+  \setbeamercolor{code}{fg=black,bg=luhlightgray!50}
+
+  \define@key{beamercolbox}{text width}{\pgfmathsetlengthmacro{\beamer@colbox@wd}{#1}}
+  \define@key{beamercolbox}{text height}{\pgfmathsetlengthmacro{\beamer@colbox@ht}{#1}}
+  \define@key{beamercolbox}{text depth}{\pgfmathsetlengthmacro{\beamer@colbox@dp}{#1}}
+  \define@key{beamercolbox}{background color}{\setbeamercolor{code}{fg=black,bg=#1}}
+  \define@key{beamercolbox}{scale content}{\def\bt@innerscale{#1}}
+  \define@key{beamercolbox}{tag}{\def\bt@tag{#1}}
+
+  \newenvironment<>{code}[1][\empty]{%
+    \begin{onlyenv}#2%
+    \vspace{2pt}%
+    \setkeys{beamercolbox}{#1}
+    \lstset{aboveskip=0pt,belowskip=0pt,linewidth=\beamer@colbox@wd}%
+    \rule{2pt}{0pt}\begin{beamercolorbox}[colsep*=2pt,text width=\linewidth-4pt, text depth=0ex,#1]{code}%
+    \ifdef\bt@innerscale{%
+      \pgfmathsetlength{\@tempdima}{\beamer@colbox@wd/\bt@innerscale}
+      \begin{adjustbox}{scale=\bt@innerscale}
+      \begin{minipage}{\@tempdima}
+        \lstset{linewidth=\@tempdima}%
+      }{}
+  }{%
+    \vspace{-1.2\baselineskip}\hfill{\emph{\color{black!70!white}\csuse{bt@tag}}}
+    \vspace{0.4\baselineskip}
+    \ifdef\bt@innerscale{%
+      \end{minipage}
+      \end{adjustbox}
+    }{}%
+    \end{beamercolorbox}\rule{2pt}{0pt}\vspace{2pt}%
+    \end{onlyenv}%
+    \ignorespacesafterend%
+  }
+
+  \lstloadlanguages{C,C++,Java,sh,[x86masm]Assembler}
+  \lstdefinestyle{basestyle}{
+    basicstyle=\footnotesize\ttfamily,
+    keywordstyle=\color{luhblue},
+    commentstyle=\color{luhgray},
+    showstringspaces=false,
+    breaklines=false,
+    mathescape=true,
+    lineskip=-3pt,
+    escapechar={§},
+    numbersep=1.5em,
+    numberstyle=\tiny,
+    showlines
+  }
+  \lstdefinestyle{smaller}{%
+    basicstyle=\scriptsize\ttfamily,
+  }
+  \lstdefinestyle{C}{
+    style=basestyle,
+    language={C},
+    morekeywords={inline},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
+  \lstdefinestyle{ASM}{
+    style=basestyle,
+		mathescape=false,
+    language={[x86masm]Assembler},
+		keywords={.macro, .endm},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
+  \lstdefinestyle{CPP}{
+    style=basestyle,
+    language={C++},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
+  \lstdefinestyle{py}{
+    style=basestyle,
+    language={python},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
+  \lstdefinestyle{Java}{
+    style=basestyle,
+    language={Java},
+    moredelim=**[is][\bfseries]{'}{'},
+    moredelim=**[is][\slshape]{''}{''},
+    moredelim=**[is][\lsthighlight]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{i4blue}]{@@@}{@@@},
+  }
+
+\let\C=\relax
+
+\lstnewenvironment{C}[1][]{
+  \lstset{style=C, autogobble, #1}
+} {}
+
+\lstnewenvironment{CPP}[1][]{
+  \lstset{style=CPP, autogobble, #1}
+} {}
+\lstnewenvironment{py}[1][]{
+  \lstset{style=py, autogobble, #1}
+} {}
+
+  % set default for \lstinline
+  \lstset{style=C, basicstyle=\scriptsize\ttfamily, keywordstyle={}}
+
+  \lstdefinestyle{highlighting}{
+    style=nohighlighting,
+    moredelim=**[is][\btHL<1>]{@1}{@},
+    moredelim=**[is][\btHL<2>]{@2}{@},
+    moredelim=**[is][\btHL<3>]{@3}{@},
+    moredelim=**[is][\btHL<4>]{@4}{@},
+    moredelim=**[is][\btHL<5>]{@5}{@},
+    moredelim=**[is][\btHL<6>]{@6}{@},
+    moredelim=**[is][\btHL<7>]{@7}{@},
+    moredelim=**[is][\btHL<8>]{@8}{@},
+    moredelim=**[is][\btHL<9>]{@9}{@},
+ }
+  \lstdefinestyle{nohighlighting}{
+    moredelim=**[is][]{@1}{@},
+    moredelim=**[is][]{@2}{@},
+    moredelim=**[is][]{@3}{@},
+    moredelim=**[is][]{@4}{@},
+    moredelim=**[is][]{@5}{@},
+    moredelim=**[is][]{@6}{@},
+    moredelim=**[is][]{@7}{@},
+    moredelim=**[is][]{@8}{@},
+    moredelim=**[is][]{@9}{@},
+  }
+  \lstdefinestyle{highlight1}{
+    style=nohighlighting,
+    moredelim=**[is][\btHL]{@1}{@},
+  }
+  \lstdefinestyle{highlight2}{
+    style=nohighlighting,
+    moredelim=**[is][\btHL]{@2}{@},
+  }
+  \lstdefinestyle{highlight3}{
+    style=nohighlighting,
+    moredelim=**[is][\btHL]{@3}{@},
+  }
+  \lstdefinestyle{highlight4}{
+    style=nohighlighting,
+    moredelim=**[is][\btHL]{@4}{@},
+  }
+  \lstdefinestyle{highlight5}{
+    style=nohighlighting,
+    moredelim=**[is][\btHL]{@5}{@},
+  }
+  \lstdefinestyle{highlight6}{
+    style=nohighlighting,
+    moredelim=**[is][\btHL]{@6}{@},
+  }
+  \lstdefinestyle{highlight7}{
+    style=nohighlighting,
+    moredelim=**[is][\btHL]{@7}{@},
+  }
+
+
+  % Makros to underbrace/overbrace elements in listings
+  %
+  % \lstub<overlay spec>{stuff}{brace comment}
+  % \lstob<overlay spec>{stuff}{brace comment}
+  %
+  %
+  \newcommand<>{\lstub}[2]{\ensuremath{%
+    \underset{%
+      \onslide#3{\text{#1}}
+    }{%
+      {\only#3\underbrace{
+        \text{#2}
+      }}
+    }
+  }}
+  \newcommand<>{\lstob}[2]{\ensuremath{%
+    \overset{%
+      \onslide#3{\text{#1}}
+    }{%
+      {\only#3\overbrace{
+        \text{#2}
+      }}
+    }
+  }}

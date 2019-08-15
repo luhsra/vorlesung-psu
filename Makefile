@@ -22,8 +22,11 @@ build: texmf/ls-R
 texmf/ls-R:
 	texhash texmf/
 
+
 define CREATE_SUB
-$(shell echo $(1) | awk -F- '{print $$1;}') : build/$(1:.org=.pdf)
+prefix :=
+build/$(1:.org=.pdf): $(shell prefix=`echo $(1) | awk -F- '{print $$1;}'`; echo fig/$${prefix}-*.pdf)
+$(shell echo $(1) | awk -F- '{print $$1;}'): build/$(1:.org=.pdf)
 $(shell echo $(1) | awk -F- '{print $$1;}').html : build/html/$(1:.org=.html)
 endef
 # invoke it for lecture PDF target (01-Einfuehrung.pdf, ...)
@@ -31,16 +34,31 @@ $(foreach f,$(ORG_PDF),\
 	$(eval $(call CREATE_SUB,$(f)))\
 )
 
-emacs/setup:
-	emacsclient -e "(load-file \"$$PWD/site-lisp/ob-tangle-sra.el\")" -q -u
+# Setup the Emacs server
+EC=make -s emacs/ensure; emacsclient -s psu
+
+emacs/start:
+	@emacs -q -l site-lisp/init.el --daemon=psu
+	@echo "Started Emacs"
+
+emacs/stop:
+	@emaacsclient -s psu  -e '(kill-emacs 0)' >/dev/null 2>&1 || true
+	@pgrep -l -f "^emacs.*--daemon=psu" || true
+	@pkill -f "^emacs.*--daemon=psu" || true
+
+emacs/restart: emacs/stop emacs/start
+
+emacs/ensure:
+	@emacsclient -s psu -e 't' >/dev/null 2>&1 || make -s emacs/start
+
 
 # We use the emacs server to tangle the shit out of it
-build/tangle/%.tex: %.org emacs/setup
-	emacsclient -e '(org-babel-tangle-file "'"$$PWD"'/$<" nil "latex")'
+build/tangle/%.tex: %.org
+	${EC} -e '(org-babel-tangle-file "'"$$PWD"'/$<" nil "latex")'
 	mv $(patsubst %.org,%.tex,$<) $@
 
-build/tangle/%.html: %.org emacs/setup
-	emacsclient -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"
+build/tangle/%.html: %.org  export-prologue.org
+	${EC} -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"
 
 build/%.tex: build/tangle/%.tex build
 	@echo "\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
@@ -62,16 +80,16 @@ build/%.pdf.split: build/%.pdf bin/split-pdf
 build/html/index.html: build/tangle/index.html
 	cp $< $@
 
-build/html/%.html: %.org build/%.pdf.split bin/insert-carousels
+build/html/%.html: %.org build/tangle/%.html build/%.pdf.split bin/insert-carousels
 	cp $(patsubst %.org, build/%.pdf,$<) $(patsubst %.org, build/html/%-slides.pdf,$<)
 	bin/insert-carousels $< $(patsubst %.org,build/%.topics,$<) \
             > $(patsubst %.org,build/html/%.org,$<)
-	emacsclient -e "(org-export-to-html-file \"$$PWD/build/html/$<\" \"$$PWD/$@\")"
+	${EC} -e "(org-export-to-html-file \"$$PWD/build/html/$<\" \"$$PWD/$@\")"
 
 
 
 
-clean:
+clean: emacs/stop
 	rm -rf build
 	rm -f texmf/ls-R
 

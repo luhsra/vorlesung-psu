@@ -20,15 +20,17 @@ def make_carousel(label, files):
     ret += '<div class="container">'
     ret += '<div id="slides-' + label +'" class="carousel" data-wrap="false" data-interval="0" data-ride="carousel">'
     ret += '<ol class="carousel-indicators">'
-    ret += '<li data-target="#slides-'+ label + '" data-slide-to="0" class="active"></li>'
+    li_opts = f'data-target="#slides-{label}"'
+    ret += f'<li {li_opts} data-slide-to="0" class="active"></li>'
     for i in range(1, len(files)):
-        ret += '<li data-target="#slides-'+label+'" data-slide-to="'+str(i)+'"></li>'
+        ret += f'<li {li_opts} data-slide-to="'+str(i)+'"></li>'
     ret += '</ol>'
     ret += '<div class="carousel-inner">'
     active="active"
     for fn in files:
         ret += '<div class="carousel-item '+ active + '">'
-        ret += '   <img class="slide d-block w-100"  href="#slides-'+label+'" role="button" data-slide="next" src="'+fn+'"/>'
+        # On the image we will add an handler in org-bootstrap.js
+        ret += '   <img class="slide d-block w-100" src="'+fn+'"/>'
         ret += '</div>'
         active=''
     ret += '</div>'

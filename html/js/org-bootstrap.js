@@ -15,7 +15,7 @@ $( document ).ready(function() {
 
         $('#content, #postamble').wrapAll("<div class='container'><div id='main-row' class='row'><div class='col-md-9'></div></div></div>");
 
-        $('#table-of-contents').wrapAll("<div class='well'></div>");
+        $('#table-of-contents').wrapAll("<div class='card bg-light mb-2 pb-1'></div>");
         $('#table-of-contents').addClass("well");
         var url = window.location.href.match(/.*\//) + "index.html";
         $('<a href="'+url+'">[Index]</a>').appendTo('#table-of-contents');
@@ -27,5 +27,15 @@ $( document ).ready(function() {
 
         $('#footnotes').appendTo('.col-md-9');
 
+        $("img.slide").each(function (idx, img) {
+            $(img).click(function(e) {
+                if(e.shiftKey || e.ctrlKey || e.altKey) {
+                    $(img).closest('.carousel').carousel('prev');
+                } else {
+                    $(img).closest('.carousel').carousel('next');
+                }
+                return true;
+            });
+        });
     }
 });
