@@ -82,12 +82,12 @@
 	pics/.cd,
 	nothing/.style={},
 	layers/.style={code={%
-		\node[box, label=\L0] (dle)                 {Logikebene};
-		\node[box, label=\L1, above of=dle] (mae)   {Mikroarchitekturebene};
-		\node[box, label=\L2, above of=mae] (bse)   {Befehlssatzebene};
-		\node[box, label=\L3, above of=bse] (mpe)    {Maschinenprogrammebene};
-		\node[box, label=\L4, above of=mpe] (ase)    {Assemblersprachenebene};
-		\node[box, label=\L5, onslide=<2>{fill=luhblue,text=white},above of=ase] (pose)   {Hochsprachenebene};
+		\node[box, label=$E_0$] (dle)                 {Logikebene};
+		\node[box, label=$E_1$, above of=dle] (mae)   {Mikroarchitekturebene};
+		\node[box, label=$E_2$, above of=mae] (bse)   {Befehlssatzebene};
+		\node[box, label=$E_3$, above of=bse] (mpe)    {Maschinenprogrammebene};
+		\node[box, label=$E_4$, above of=mpe] (ase)    {Assemblersprachenebene};
+		\node[box, label=$E_5$, onslide=<2>{fill=luhblue,text=white},above of=ase] (pose)   {Hochsprachenebene};
 		\begin{scope}[every node/.style={pos=0.5}]
 			\draw (pose.south) to coordinate(HLL) (ase.north);
 			\draw (ase.south) to coordinate(SYS) (mpe.north);

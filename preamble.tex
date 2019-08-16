@@ -101,6 +101,31 @@
 \DeclareFieldFormat{postnote}{#1}
 
 
+%*****************************************************************************
+%** Legalcode *************************************************************
+\usepackage{tikz}
+\usetikzlibrary{tikzmark,arrows}
+\usepackage{pgfkeys}
+
+\pgfkeys{
+  /legalcode/commons/.style={url={https://commons.wikimedia.org/wiki/File:#1}},
+  /legalcode/url/.code={%
+    \def\lcText##1{\href{#1}{##1}}
+  },
+  /legalcode/author/.code={\def\lcAuthor{, #1}},
+  /legalcode/license/CC BY-SA 3.0/.code={%
+    \def\lcLicense{\href{https://creativecommons.org/licenses/by-sa/3.0/legalcode}{CC BY-SA 3.0}}%
+  },
+}
+\newcommand{\legalcode}[3][]{% [opts]{license}{title}
+  \bgroup%
+  \def\lcText##1{##1}
+  \def\lcAuthor{}
+  \pgfkeys{/legalcode/.cd,#1,license/#2}%
+  \parbox{\textwidth}{\centering\color{gray}\tiny\lcText{#3}\lcAuthor{} \mbox{(\lcLicense)}}
+  \egroup
+}
+
 
 %*****************************************************************************
 %** code blocks **************************************************************

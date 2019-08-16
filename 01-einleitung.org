@@ -132,7 +132,7 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
           sum += x
         }
       \end{CPP}
-    \end{code}
+    \end{code}%
     \begin{code}<+->[tag=Python]
       \begin{py}[]
         sum = 0
@@ -203,54 +203,88 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
 :END:
 
 #+BEGIN_SRC latex
-
-
-  \begin{frame}{Der Blick aus 10000 Meilen}
-  \bi
-  \ii Test
-  \ei
+  \begin{frame}{Systemnahe Informatik}\framesubtitle{Der Blick aus 10000 Meilen}
+    \begin{columns}
+      \begin{column}{0.35\textwidth}
+        \begin{center}\small
+          \includegraphics[width=1.5cm]{fig/01-problem}\\\relax
+          [Problem]\\[1ex]
+          \fbox{\parbox{0.8\textwidth}{\centering
+            Hochsprache\\
+            $\Uparrow$\\
+            \structure{Semantische Lücke}\\
+            $\Downarrow$\\
+            CPU-Steuersignale
+          }}\\[1ex]\relax
+        [Ausführung]\\\relax
+        \includegraphics[width=1.5cm]{fig/01-cpu}
+        \end{center}
+      \end{column}\hfill
+      \begin{column}{0.6\textwidth}
+        \bi
+        \ii {Informatisches Urproblem:\\ Schließen der Semantischen Lücke}\bigskip
+        \ii Komplexitätsreduktion durch Abstraktion {
+          \bi
+          \ii Hierarchisch angeordnete \structure{virtuelle Maschienen}
+          \ii Definierte Schnittstellen nach oben
+          \ii Schrittweise Vereinfachungen nach unten
+          \ei
+        }\bigskip
+        \ii PSÜ: Zwei Sichtweisen {
+          \bi
+          \ii Top-Down: Was bieten Sprachen an?
+          \ii Bottom-Up: Wie bildet ein Compiler das ab?
+          \ei
+        }
+        \ei
+      \end{column}
+    \end{columns}
   \end{frame}
 
+
+  \newcommand{\down}[2][1em]{\tikzmark{#2}\tikz[remember picture,overlay]\draw[>=latex',->,thick,srared] (pic cs:#2)--++(down:#1);}
   \begin{frame}[label=vm-hierarchie]
     \frametitle{Hierarchie virtueller Maschinen\,\cite[S.\,3]{tanenbaum:06:sco}}
 
-    \begin{itemize}
-    \item Schrittweises Schließen der semantischen Lücke durch
-      \bi
-        \item \structure{Interpretation auf} einer einfacheren (virtuellen) Maschine
-        \item \structure{Übersetzung für} eine einfachere (virtuelle) Maschine
-      \ei
-    \begin{center}\scriptsize
-      \begin{tabular}{cp{2.8cm}p{6cm}}
-         Ebene\\
-         \llap{\raisebox{-0.5\height}[0pt]{\includegraphics[width=6ex]{fig/01-problem}\hskip4ex}}
-         $n$ & virtuelle Maschine $M_n$ mit Maschinensprache $S_n$ &
-           Programme in $S_n$ werden von einem auf einer tieferen Maschine
-     laufenden Interpreter gedeutet oder in Programme tieferer Maschinen
-     übersetzt\\ \hline
-         $\vdots$ & \multicolumn{1}{c}{$\vdots$}
-                  & \multicolumn{1}{c}{$\vdots$}\\[0.5ex] \hline
-         $2$ & virtuelle Maschine $M_2$ mit Maschinensprache $S_2$ &
-           Programme in $S_2$ werden von einem auf $M_1$ bzw. $M_0$
-     laufenden Interpreter gedeutet oder nach $S_1$ bzw. $S_0$
-     übersetzt\\ \hline
-         $1$ & virtuelle Maschine $M_1$ mit Maschinensprache $S_1$ &
-           Programme in $S_1$ werden von einem auf $M_0$
-     lau\-fen\-den Interpreter gedeutet oder nach $S_0$ übersetzt\\ \hline
-         \llap{\raisebox{-0.5\height}[0pt]{\includegraphics[width=6ex]{fig/01-cpu}\hskip4ex}}
-         $0$ & reale Maschine $M_0$ mit Maschinensprache $S_0$ &
-           Programme in $S_0$ werden direkt von der Hardware ausgeführt
-      \end{tabular}
-    \end{center}
-
-      \vfill
-      \item \structure{Übersetzung} und \structure{Interpretation} als Techniken, um (auch in Kombination) Programme auf HW zur Ausführung zu bringen.
-    \end{itemize}
+    \begin{columns}
+      \begin{column}{0.7\textwidth}
+        \bi
+        \ii Schrittweises Schließen der semantischen Lücke\\[2ex]{
+          \begin{tabular}{cllc}
+            Ebene & Abstraktion & \\\hline
+            $n$ & virtuelle Maschine $M_n$ & Sprache $L_n$ & \down{a} \\ \hline
+            $\vdots$ & \multicolumn{1}{c}{$\vdots$}  & \multicolumn{1}{c}{$\vdots$}&\down{x}\\[0.5ex] \hline
+            $2$ & virtuelle Maschine $M_2$ & Sprache $L_2$ &\down{b}\\ \hline
+            $1$ & virtuelle Maschine $M_1$ & Sprache $L_1$ &\down{c}\\ \hline
+            $0$ & reale Maschine $M_0$ & Sprache $L_0$\\\hline
+          \end{tabular}
+        }\bigskip
+        \ii {$L_x$-Program wird auf Maschiene $M_{x-1}$ abgebildet
+          \bi
+          \ii \STRUCTURE{Dynamisch}: Interpreter als $L_{x-1}$-Program
+          \ii \STRUCTURE{Statisch}: Compiler erzeugt $L_{x-1}$ Program\\
+              Spätere Abbildung von $L_{x-1}$ auf $M_{x-2}$.
+          \ei
+        }
+        \ei
+      \end{column}\hfill
+      \begin{column}{0.2\textwidth}
+        \begin{tikzpicture}
+          \foreach \x/\s in {0/0.7,1/0.8,2/0.9,3/1} {
+            \node at (\x*1mm,-\x * 8mm) {
+              \includegraphics[width=\s\textwidth]{fig/01-matroschka}
+            };
+          }
+        \end{tikzpicture}
+        \legalcode[commons=Dedoushka-no_bg.jpg]{CC BY-SA 3.0}{Dedoushka}
+      \end{column}
+    \end{columns}
   \end{frame}
 
   \begin{frame}[t,label=vm-hierarchie-beispiel]{Beispiel: Arbeitsplatzrechner}
     \animation[trim={\btLeftMargin} 0pt 0pt 0pt, width=\textwidth]{1/1,2/2}{fig/01-layers}
   \end{frame}
+
 #+END_SRC
 
 * Organisatorisches
