@@ -39,6 +39,9 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
 
 
 * Einleitung
+:PROPERTIES:
+:CUSTOM_ID: 01-einleitung
+:END:
 
 #+BEGIN_SRC latex
   \begin{frame}{Der Dozent}
@@ -153,12 +156,15 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
   \end{frame}
 #+END_SRC
 
-* Struktur der Veranstaltung
+* Inhalt der Veranstaltung
+:PROPERTIES:
+:CUSTOM_ID: 01-inhalt
+:END:
 
 #+BEGIN_SRC latex
   \begin{frame}{Welchen Inhalt hat diese Veranstaltung?}
     \bi
-    \ii \STRUCTURE{Programmiersprachen}: Abstrahiert von der echten Maschiene {
+    \ii \STRUCTURE{Programmiersprachen}: Abstrahiert von der echten Maschine {
       \bi
       \ii Kernkonzepte die sich in vielen Sprachen wiederfinden
       \ii High-Level Paradigmen (funktional, OO), die sich daraus zusammensetzen
@@ -172,7 +178,7 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
     \end{center}
 
     \bi
-    \ii \STRUCTURE{Übersetzer}: Bringt die Abstraktionen auf die Maschiene {
+    \ii \STRUCTURE{Übersetzer}: Bringt die Abstraktionen auf die Maschine {
       \bi
       \ii Zwischenschritte vom Zeichenstrom zum Assemblerprogram
       \ii Nötige Datenstrukturen und Algorithmen
@@ -197,13 +203,46 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
   \end{frame}
 #+END_SRC
 
-* Ebenenmodell und Virtuelle Maschienen
+#+BEGIN_SRC latex
+\begin{frame}{Was passiert in den Übungen?}
+FIXME
+\end{frame}
+#+END_SRC
+
+#+BEGIN_SRC latex
+\begin{frame}{Literaturhinweise}
+FIXME
+\end{frame}
+#+END_SRC
+
+* TODO Organisation der Veranstaltung
+:PROPERTIES:
+:CUSTOM_ID: 01-organisation
+:END:
+
+#+BEGIN_SRC latex
+\begin{frame}{Organisatorische Hinweise}
+\bi
+\ii Wie funktioniert der Vorlesungsbetrieb?
+\ii Wie funktioniert der Übungsbetrieb?
+\ii Was ist Klausurrelevant
+\ei
+\end{frame}
+#+END_SRC
+
+
+* Ebenenmodell und Virtuelle Maschinen
 :PROPERTIES:
 :CUSTOM_ID: 01-ebenenmodell
 :END:
 
 #+BEGIN_SRC latex
-  \begin{frame}{Systemnahe Informatik}\framesubtitle{Der Blick aus 10000 Meilen}
+\begin{frame}
+\centering
+\Huge Ebenenmodell\\und\\ Virtuelle Maschinen
+\end{frame}
+
+\begin{frame}{Systemnahe Informatik}\framesubtitle{Der Blick aus 10000 Meilen}
     \begin{columns}
       \begin{column}{0.35\textwidth}
         \begin{center}\small
@@ -225,7 +264,7 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
         \ii {Informatisches Urproblem:\\ Schließen der Semantischen Lücke}\bigskip
         \ii Komplexitätsreduktion durch Abstraktion {
           \bi
-          \ii Hierarchisch angeordnete \structure{virtuelle Maschienen}
+          \ii Hierarchisch angeordnete \structure{virtuelle Maschinen}
           \ii Definierte Schnittstellen nach oben
           \ii Schrittweise Vereinfachungen nach unten
           \ei
@@ -259,7 +298,7 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
             $0$ & reale Maschine $M_0$ & Sprache $L_0$\\\hline
           \end{tabular}
         }\bigskip
-        \ii {$L_x$-Program wird auf Maschiene $M_{x-1}$ abgebildet
+        \ii {$L_x$-Program wird auf Maschine $M_{x-1}$ abgebildet
           \bi
           \ii \STRUCTURE{Dynamisch}: Interpreter als $L_{x-1}$-Program
           \ii \STRUCTURE{Statisch}: Compiler erzeugt $L_{x-1}$ Program\\
@@ -287,4 +326,91 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
 
 #+END_SRC
 
-* Organisatorisches
+
+#+begin_src latex
+  \begin{frame}[t]{"Virtuelle Maschinen"}
+    \alert{Wichtig:} Wir meinen nicht VMWare, Virtualbox oder KVM.\bigskip
+
+    \bi
+    \ii Maschienenmodell der virtuellen Maschine {
+      \bi
+      \ii \structure{Speicher/Objekte}: Wie kann man Daten ablegen und wieder abrufen?
+      \ii \structure{Befehle/Operationen}: Wie kann man Daten miteinander kombinieren?
+      \ii Ein "\structure{Prozessor}" kann dieses Modell implementieren.
+      \ei
+    }\medskip
+    \ii Maschinenprogramme {
+      \bi
+      \ii Eine Menge Befehlen, die gegen das Maschinenmodell geschrieben wurden.
+      \ii Wird von einem Prozessor verarbeitet um ein Ergebnis zu berechnen.
+      \ei
+    }\medskip
+    \ii Sprache der virtuellen Maschiene {
+      \bi
+      \ii Nicht jede Zeichenkette ist ein für jedes Maschinenmodell ein valides Program.
+      \ii Synaktische und Semantische Regeln um valide Programme zu schreiben.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile,t]{Beispiel: Die RISC-V (Virtuelle) Maschine}
+    RISC-V ist eine Rechnerarchitektur, die an industrieller Relevanz gewinnt.\bigskip
+
+    \bi
+    \ii Maschienenmodell (RV32I) {
+      \bi
+      \ii \structure{Speicher}: 32 CPU Register + frei addressierbarer Speicher.
+      \ii \structure{Befehle}: 47 Instruktionen mit arithmetischen, binären und Sprungbefehlen.
+      \ii Der SweRV von Western Digital is \alert{ein} Prozessor für dieses Modell.
+      \ei
+    }\medskip
+    \ii Beispiel eines Maschinenprograms: 02 b5 05 3b 80 82 \pause{
+      \\{\scriptsize (Wir tun mal so als wäre Assembler und Binärcode das gleiche)}\smallskip
+      \begin{code}[tag=RV32I]
+        \begin{asm}[]
+          multiply: # int multiply(int a, int b) { return a*b; }
+              mul a0, a0, a1
+              ret
+        \end{asm}
+      \end{code}
+    }\medskip
+    \ii Die RV32I Assemblersprache {
+      \bi
+      \ii Welche Mnemonics gibt es? Anzahl und Art der Argumente.
+      \ii \texttt{add}: 1 Ziel- und 2 Quellregister; \texttt{addi}: 1 Zielregister und 12-Bit Ganzzahl
+      \ii \enquote{\texttt{addi a0, a2, $\gamma_i$}} -- wäre nicht valide in der RV32I Sprache.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile,t]{Beispiel: Die virtuelle C Maschine}
+    \bi
+    \ii Maschienenmodell {
+      \bi
+      \ii \structure{Speicher}: Definierten Variablen und über Pointer erreichbarer Speicher
+      \ii \structure{Befehle}: z.B: \lstinline{if (a < 3) return b * (c + d);}
+      \ii Sowohl GCC als auch Clang sind \enquote{Prozessoren} für dieses Modell.
+      \ii Es gibt auch C Interpreter die als Prozessoren agieren.
+      \ei
+    }\medskip
+    \ii Beispielprogramm : Der Obfuscated Tiny C Compiler (2048 Zeichen)\footnote{\url{https://bellard.org/otcc/}}{
+      \begin{code}[tag=C90]
+        \lstinputlisting[basicstyle=\ttfamily\tiny, breaklines=true, postbreak=\mbox{}]{lst/01-otcc.c}
+      \end{code}
+    }\medskip
+    \ii Die C Sprache (eigentlich eine ganze Familie von Sprachen) {
+      \bi
+      \ii Variablen und Funktionen müssen deklariert sein, um sie zu nutzen.
+      \ii Eine Ganzzahl is kein valider Funktionsname.
+      \ii \enquote{\texttt{"12345(b, c)}} -- is kein valides C Programm.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+#+end_src
+Bootstrapping und Cross-Compilation
+- T-Diagramme
+- Übersetzung

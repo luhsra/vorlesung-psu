@@ -1,0 +1,6 @@
+...
+F d,z,C,h,P,K,ac,q,G,v,Q,R,D,L,W,M;E(n{ x D++=e;} o f{ a L){ h=x L++;a h b 2){
+L=0;h=W;}} i h=fgetc(Q);} X f{ J isalnum(h)|h b 95;} Y f{ a h b 92){o f;
+a h b 110)h=10;}} c{F e,j,m; p isspace(h)|h b 35){a h b 35){o f;c;a d b 536){
+c;E(32);k d=1;k(d t)=D;} p h!=10){E(h); o f;} E(h);E(2);} o f;} C=0;d=h;a X f)
+...

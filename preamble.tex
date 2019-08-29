@@ -11,6 +11,7 @@
 
 \usepackage{pageslts} %  theCurrentPage
 \usepackage{calc} % theCurrentPage
+\usepackage{csquotes}
 
 \def\psuSectionStart#1{
   \ifdefstring{\psuOldTitle}{#1}
@@ -164,6 +165,14 @@
     \ignorespacesafterend%
   }
 
+  \lstdefinelanguage[riscv]{Assembler}%
+{morestring=[b]",
+  morekeywords=[1]{bne, beq, blt, bltu, bge, bgeu, jal, jalr, auipc, lb, lh, lw, ld, lbu, lhu, lwu, sb, sh, sw, sd, amoadd_w, amoxor_w, amoswap_w, amoand_w, amoor_w, amomin_w, amominu_w, amomax_w, amomaxu_w, amoadd_d, amoswap_d, amoxor_d, amoand_d, amoor_d, amomin_d, amominu_d, amomax_d, amomaxu_d, lr_w, lr_d, sc_w, sc_d, lui, addi, slti , sltiu, andi, ori, xori, slli, srli, srai, add, sub, slt, sltu, and, or, xor, sll, srl, sra, addiw, slliw, srliw, sraiw, addw, subw, sllw, srlw, sraw, mul, mulh, mulhu, mulhsu, mulw, div, divu, rem, remu, divw, divuw, remw, remuw, fence, fence_i, sfence_vm, scall, sbreak, sret, mrts, wfi, csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
+  }
+comment=[l]\#%
+}[keywords,comments,strings]
+
+
   \lstloadlanguages{C,C++,Java,sh,[x86masm]Assembler}
   \lstdefinestyle{basestyle}{
     basicstyle=\footnotesize\ttfamily,
@@ -194,7 +203,7 @@
   \lstdefinestyle{ASM}{
     style=basestyle,
 		mathescape=false,
-    language={[x86masm]Assembler},
+    language={[riscv]Assembler},
 		keywords={.macro, .endm},
     moredelim=**[is][\bfseries]{`}{`},
     moredelim=**[is][\slshape]{``}{``},
@@ -240,6 +249,9 @@
 } {}
 \lstnewenvironment{py}[1][]{
   \lstset{style=py, autogobble, #1}
+} {}
+\lstnewenvironment{asm}[1][]{
+  \lstset{style=ASM, autogobble, #1}
 } {}
 
   % set default for \lstinline
