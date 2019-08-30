@@ -117,6 +117,9 @@
   /legalcode/license/CC BY-SA 3.0/.code={%
     \def\lcLicense{\href{https://creativecommons.org/licenses/by-sa/3.0/legalcode}{CC BY-SA 3.0}}%
   },
+  /legalcode/license/Free Art License/.code={%
+    \def\lcLicense{Free Art License}%
+  }
 }
 \newcommand{\legalcode}[3][]{% [opts]{license}{title}
   \bgroup%
@@ -222,6 +225,16 @@ comment=[l]\#%
   \lstdefinestyle{py}{
     style=basestyle,
     language={python},
+    includerangemarker=false,
+    rangeprefix={\#},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
+  \lstdefinestyle{text}{
+    style=basestyle,
     moredelim=**[is][\bfseries]{`}{`},
     moredelim=**[is][\slshape]{``}{``},
     moredelim=**[is][\btHL]{@}{@},
@@ -242,6 +255,10 @@ comment=[l]\#%
 
 \lstnewenvironment{C}[1][]{
   \lstset{style=C, autogobble, #1}
+} {}
+
+\lstnewenvironment{stdout}[1][]{
+  \lstset{style=text, autogobble, #1}
 } {}
 
 \lstnewenvironment{CPP}[1][]{
@@ -334,3 +351,8 @@ comment=[l]\#%
       }}
     }
   }}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Misc
+\newcommand{\advantage}[1]{\bgroup\color{safegreen}#1{\egroup}}

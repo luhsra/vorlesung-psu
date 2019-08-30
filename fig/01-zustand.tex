@@ -1,0 +1,41 @@
+\documentclass{lecturefig}
+\usepackage{calc}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}
+    \foreach \i/\s in {0/0,1/2,2/3,3/6,4/7} {
+      \def\x{\i cm}
+      \only<2->{\def\x{\s cm}}
+      \node[draw,circle,inner sep=2pt] at (\x, 0) (q\i) {$q_\i$};
+    }
+    \draw[->] (q0) -- (q1);
+    \draw[->] (q1) -- (q2);
+    \draw[->] (q2) -- (q3);
+    \draw[->] (q3) -- (q4);
+    \draw[->] (q4) -- ++(east:1cm) node[anchor=west]{\ldots};
+
+    \node[left=0.2 of q0] {Quellprogramm};
+
+    \only<2-> {
+      \foreach \i/\s in {a/0,b/1,c/2,d/3,e/4,f/5,g/6,h/7} {
+        \node[draw,circle,inner sep=2pt] at (\s cm, -1.5cm) (p\i) {$p_\i$};
+      }
+
+      \def\last{a}
+      \foreach \i in {b,c,d,e,f,g,h} {
+        \draw[->] (p\last) -- (p\i);
+        \xdef\last{\i}
+      }
+      \draw[->] (ph) -- ++(east:1cm) node[anchor=west]{\ldots};
+
+      \foreach \p/\q in {a/0,c/1,d/2,g/3,h/4} {
+        \draw[->,double] (p\p) -- (q\q);
+      }
+
+
+      \node[left=0.2 of pa] {Zielprogramm};
+    }
+
+\end{tikzpicture}
+\end{frame}
+\end{document}

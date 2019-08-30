@@ -1,0 +1,20 @@
+\documentclass{lecturefig}
+\usepackage{calc}
+\begin{document}
+\begin{frame}[fragile]
+\begin{tikzpicture}
+  \newcommand{\T}[5]{
+    \node[minimum size=1cm,anchor=north west, #2] (#1-from) {#3};
+    \node[minimum size=1cm,right=1 of #1-from] (#1-to) {#5};
+    \node[minimum size=1cm,anchor=north] (#1-on) at ($(#1-from.south)!0.5!(#1-to.south)$) {#4};
+    \draw[->] (#1-from) -- (#1-to);
+    \draw (#1-from.north west) -- (#1-to.north east) -- (#1-to.south east)
+    -- (#1-on.north east) -- (#1-on.south east) -- (#1-on.south west) -- (#1-on.north west) -- (#1-from.south west) --cycle;
+  }
+
+  \T{orig}{}{L}{M}{M}
+  \T{new}{at={(orig-on.north east)}}{M}{m}{m}
+
+\end{tikzpicture}
+\end{frame}
+\end{document}

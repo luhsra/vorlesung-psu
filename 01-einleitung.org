@@ -236,96 +236,99 @@ FIXME
 :CUSTOM_ID: 01-ebenenmodell
 :END:
 
+Das Ebenenmodell
+
 #+BEGIN_SRC latex
-\begin{frame}
-\centering
-\Huge Ebenenmodell\\und\\ Virtuelle Maschinen
-\end{frame}
-
-\begin{frame}{Systemnahe Informatik}\framesubtitle{Der Blick aus 10000 Meilen}
-    \begin{columns}
-      \begin{column}{0.35\textwidth}
-        \begin{center}\small
-          \includegraphics[width=1.5cm]{fig/01-problem}\\\relax
-          [Problem]\\[1ex]
-          \fbox{\parbox{0.8\textwidth}{\centering
-            Hochsprache\\
-            $\Uparrow$\\
-            \structure{Semantische Lücke}\\
-            $\Downarrow$\\
-            CPU-Steuersignale
-          }}\\[1ex]\relax
-        [Ausführung]\\\relax
-        \includegraphics[width=1.5cm]{fig/01-cpu}
-        \end{center}
-      \end{column}\hfill
-      \begin{column}{0.6\textwidth}
-        \bi
-        \ii {Informatisches Urproblem:\\ Schließen der Semantischen Lücke}\bigskip
-        \ii Komplexitätsreduktion durch Abstraktion {
-          \bi
-          \ii Hierarchisch angeordnete \structure{virtuelle Maschinen}
-          \ii Definierte Schnittstellen nach oben
-          \ii Schrittweise Vereinfachungen nach unten
-          \ei
-        }\bigskip
-        \ii PSÜ: Zwei Sichtweisen {
-          \bi
-          \ii Top-Down: Was bieten Sprachen an?
-          \ii Bottom-Up: Wie bildet ein Compiler das ab?
-          \ei
-        }
-        \ei
-      \end{column}
-    \end{columns}
+  \begin{frame}
+  \centering
+  \Huge Ebenenmodell\\und\\ Virtuelle Maschinen
   \end{frame}
 
-
-  \newcommand{\down}[2][1em]{\tikzmark{#2}\tikz[remember picture,overlay]\draw[>=latex',->,thick,srared] (pic cs:#2)--++(down:#1);}
-  \begin{frame}[label=vm-hierarchie]
-    \frametitle{Hierarchie virtueller Maschinen\,\cite[S.\,3]{tanenbaum:06:sco}}
-
-    \begin{columns}
-      \begin{column}{0.7\textwidth}
-        \bi
-        \ii Schrittweises Schließen der semantischen Lücke\\[2ex]{
-          \begin{tabular}{cllc}
-            Ebene & Abstraktion & \\\hline
-            $n$ & virtuelle Maschine $M_n$ & Sprache $L_n$ & \down{a} \\ \hline
-            $\vdots$ & \multicolumn{1}{c}{$\vdots$}  & \multicolumn{1}{c}{$\vdots$}&\down{x}\\[0.5ex] \hline
-            $2$ & virtuelle Maschine $M_2$ & Sprache $L_2$ &\down{b}\\ \hline
-            $1$ & virtuelle Maschine $M_1$ & Sprache $L_1$ &\down{c}\\ \hline
-            $0$ & reale Maschine $M_0$ & Sprache $L_0$\\\hline
-          \end{tabular}
-        }\bigskip
-        \ii {$L_x$-Program wird auf Maschine $M_{x-1}$ abgebildet
+  \begin{frame}{Systemnahe Informatik}\framesubtitle{Der Blick aus 10000 Meilen}
+      \begin{columns}
+        \begin{column}{0.35\textwidth}
+          \begin{center}\small
+            \includegraphics[width=1.5cm]{fig/01-problem}\\\relax
+            [Problem]\\[1ex]
+            \fbox{\parbox{0.8\textwidth}{\centering
+              Hochsprache\\
+              $\Uparrow$\\
+              \structure{Semantische Lücke}\\
+              $\Downarrow$\\
+              CPU-Steuersignale
+            }}\\[1ex]\relax
+          [Ausführung]\\\relax
+          \includegraphics[width=1.5cm]{fig/01-cpu}
+          \end{center}
+        \end{column}\hfill
+        \begin{column}{0.6\textwidth}
           \bi
-          \ii \STRUCTURE{Dynamisch}: Interpreter als $L_{x-1}$-Program
-          \ii \STRUCTURE{Statisch}: Compiler erzeugt $L_{x-1}$ Program\\
-              Spätere Abbildung von $L_{x-1}$ auf $M_{x-2}$.
-          \ei
-        }
-        \ei
-      \end{column}\hfill
-      \begin{column}{0.2\textwidth}
-        \begin{tikzpicture}
-          \foreach \x/\s in {0/0.7,1/0.8,2/0.9,3/1} {
-            \node at (\x*1mm,-\x * 8mm) {
-              \includegraphics[width=\s\textwidth]{fig/01-matroschka}
-            };
+          \ii {Informatisches Urproblem:\\ Schließen der Semantischen Lücke}\bigskip
+          \ii Komplexitätsreduktion durch Abstraktion {
+            \bi
+            \ii Hierarchisch angeordnete \structure{virtuelle Maschinen}
+            \ii Definierte Schnittstellen nach oben
+            \ii Schrittweise Vereinfachungen nach unten
+            \ei
+          }\bigskip
+          \ii PSÜ: Zwei Sichtweisen {
+            \bi
+            \ii Top-Down: Was bieten Sprachen an?
+            \ii Bottom-Up: Wie bildet ein Compiler das ab?
+            \ei
           }
-        \end{tikzpicture}
-        \legalcode[commons=Dedoushka-no_bg.jpg]{CC BY-SA 3.0}{Dedoushka}
-      \end{column}
-    \end{columns}
-  \end{frame}
+          \ei
+        \end{column}
+      \end{columns}
+    \end{frame}
 
-  \begin{frame}[t,label=vm-hierarchie-beispiel]{Beispiel: Arbeitsplatzrechner}
-    \animation[trim={\btLeftMargin} 0pt 0pt 0pt, width=\textwidth]{1/1,2/2}{fig/01-layers}
-  \end{frame}
+
+    \newcommand{\down}[2][1em]{\tikzmark{#2}\tikz[remember picture,overlay]\draw[>=latex',->,thick,srared] (pic cs:#2)--++(down:#1);}
+    \begin{frame}[label=vm-hierarchie]
+      \frametitle{Hierarchie virtueller Maschinen\,\cite[S.\,3]{tanenbaum:06:sco}}
+
+      \begin{columns}
+        \begin{column}{0.7\textwidth}
+          \bi
+          \ii Schrittweises Schließen der semantischen Lücke\\[2ex]{
+            \begin{tabular}{cllc}
+              Ebene & Abstraktion & \\\hline
+              $n$ & virtuelle Maschine $M_n$ & Sprache $L_n$ & \down{a} \\ \hline
+              $\vdots$ & \multicolumn{1}{c}{$\vdots$}  & \multicolumn{1}{c}{$\vdots$}&\down{x}\\[0.5ex] \hline
+              $2$ & virtuelle Maschine $M_2$ & Sprache $L_2$ &\down{b}\\ \hline
+              $1$ & virtuelle Maschine $M_1$ & Sprache $L_1$ &\down{c}\\ \hline
+              $0$ & reale Maschine $M_0$ & Sprache $L_0$\\\hline
+            \end{tabular}
+          }\bigskip
+          \ii {$L_x$-Program wird auf Maschine $M_{x-1}$ abgebildet
+            \bi
+            \ii \STRUCTURE{Dynamisch}: Interpreter als $L_{x-1}$-Program
+            \ii \STRUCTURE{Statisch}: Compiler erzeugt $L_{x-1}$ Program\\
+                Spätere Abbildung von $L_{x-1}$ auf $M_{x-2}$.
+            \ei
+          }
+          \ei
+        \end{column}\hfill
+        \begin{column}{0.2\textwidth}
+          \begin{tikzpicture}
+            \foreach \x/\s in {0/0.7,1/0.8,2/0.9,3/1} {
+              \node at (\x*1mm,-\x * 8mm) {
+                \includegraphics[width=\s\textwidth]{fig/01-matroschka}
+              };
+            }
+          \end{tikzpicture}
+          \legalcode[commons=Dedoushka-no_bg.jpg]{CC BY-SA 3.0}{Dedoushka}
+        \end{column}
+      \end{columns}
+    \end{frame}
+
+    \begin{frame}[t,label=vm-hierarchie-beispiel]{Beispiel: Arbeitsplatzrechner}
+      \animation[trim={\btLeftMargin} 0pt 0pt 0pt, width=\textwidth]{1/1,2/2}{fig/01-layers}
+    \end{frame}
 
 #+END_SRC
 
+Virtuelle Maschinen
 
 #+begin_src latex
   \begin{frame}[t]{"Virtuelle Maschinen"}
@@ -354,11 +357,11 @@ FIXME
     \ei
   \end{frame}
 
-  \begin{frame}[fragile,t]{Beispiel: Die RISC-V (Virtuelle) Maschine}
+  \begin{frame}[fragile,t]{Beispiel: Die (virtuelle) RISC-V Maschine}
     RISC-V ist eine Rechnerarchitektur, die an industrieller Relevanz gewinnt.\bigskip
 
     \bi
-    \ii Maschienenmodell (RV32I) {
+    \ii Maschinenmodell (RV32I) {
       \bi
       \ii \structure{Speicher}: 32 CPU Register + frei addressierbarer Speicher.
       \ii \structure{Befehle}: 47 Instruktionen mit arithmetischen, binären und Sprungbefehlen.
@@ -387,7 +390,7 @@ FIXME
 
   \begin{frame}[fragile,t]{Beispiel: Die virtuelle C Maschine}
     \bi
-    \ii Maschienenmodell {
+    \ii Maschinenmodell {
       \bi
       \ii \structure{Speicher}: Definierten Variablen und über Pointer erreichbarer Speicher
       \ii \structure{Befehle}: z.B: \lstinline{if (a < 3) return b * (c + d);}
@@ -410,7 +413,187 @@ FIXME
     \ei
   \end{frame}
 
+  \begin{frame}<1-2>{Definitionen}
+    \btUseExtraItemSep \setbeamercovered{transparent}
+    \begin{description}
+    \item[Programmiersprache] Regelwerk zur Erstellung von Zeichenketten, die valide Programme für ein bestimmtes
+      Maschinenmodell sind. Verletzt eine Zeichenkette auch nur eine dieser Regeln ist es kein entsprechendes Programm.
+    \item<1>[Interpreter] Ein Programm das  Sprachprozessor für bestimmten Maschinenmodell ist und andere Programme direkt ausführt.
+    \item[Übersetzer] Ebenfalls ein Sprachprozessor, der das gegebene Programm allerdings nicht ausführt, sondern in eine valides
+      Maschinenprogramm für eine andere Sprache übersetzt.
+    \end{description}
+  \end{frame}
+
 #+end_src
-Bootstrapping und Cross-Compilation
+
+Beobachtbare Zustände
+
+#+begin_src latex
+  \begin{frame}{Beobachtbare Zustände und Zustandsfolgen}
+    \structure{Frage:} Wann ist eine Übersetzung eigentlich korrekt?\bigskip
+
+    \bi
+    \ii Das Maschinenmodell bestimmt den beobachtbaren Zustand ($q_n$) {
+      \bi
+      \ii Bei RISC-V: Zustand ist der Registersatz nach jeder Instruktionen.
+      \ii Wir werden keine halb ausgeführten Instruktionen sehen.
+      \ii Definition des beobachtbaren Zustands ist schwer bei komplexeren Sprachen.
+      \ei
+    }\medskip
+    \ii Programmausführung durch einen Prozessor ergibt eine Zustandfolge: \\
+    $q = (q_1, q_2, \ldots, q_n)$ {
+      \bi
+      \ii Die Zustände sind vom Speicher der Maschine abgeleitet
+      \ii Die Übergänge sind Folge von ausgeführten Operationen: $q_t\rightarrow q_{t+1}$
+      \ei
+    }
+    \ei
+    \medskip
+    \includegraphics[page=1]{fig/01-zustand}
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Beispiel einer Zustandsfolge}
+    \bi
+    \ii Berechnung des größten gemeinsamen Teilers {
+      \bi
+      \ii Wiederholte Subtraktion {
+      \begin{columns}
+        \begin{column}{0.4\textwidth}
+          \begin{code}[tag=Py]
+            \lstinputlisting[style=py,linerange=sub0-sub1]{lst/ggt.py}
+          \end{code}
+        \end{column}
+        \hfill
+        \begin{column}{0.4\textwidth}\ttfamily
+          \begin{stdout}
+          (i,j) = (7, 35)
+                  (7, 28)
+                  (7, 21)
+                  (7, 14)
+                  (7, 7)
+          \end{stdout}
+        \end{column}
+      \end{columns}
+       }\pause
+    \ii Wiederholtes Modulo {
+      \begin{columns}
+        \begin{column}{0.4\textwidth}
+          \begin{code}[tag=Py]
+            \lstinputlisting[style=py,linerange=mod0-mod1]{lst/ggt.py}
+          \end{code}
+        \end{column}
+        \hfill
+        \begin{column}{0.4\textwidth}
+          \begin{stdout}
+          (i,j) = (7, 35)
+                  (0, 7)
+          \end{stdout}
+        \end{column}
+      \end{columns}
+    }
+    \ei }\medskip
+    \ii Beide Programme brechnen das gleiche Ergebnis: ggT=7\\
+        Sie zeigen aber unterschiedliche Zustandsfolgen.
+        \ei
+    \medskip
+    \pause
+    \structure{Frage:} Darf ein Übersetzer einen Algorithmus tauschen?
+  \end{frame}
+
+  \begin{frame}{Korrektheit einer Übersetzung}
+    \bi
+    \ii Die Programmiersprache definiert die \alert{beobachtbaren} Zustände. {
+      \bi
+      \ii Ein- und Ausgabe ist immer beobachtbar, oft aber auch Teile des Speichers
+      \ii Bei C: Nur das Schreiben von globalen Variablen, nicht aber von Lokalen.
+      \ei
+    }\bigskip
+    \ii Ein \advantage{korrekter} Übersetzer erhält alle beobachtbaren Zustände.{
+      \bi
+      \ii Es kann eine Abbildungsfunktion geben:\\[2ex]{
+        \includegraphics[page=2,width=0.9\textwidth]{fig/01-zustand}
+      }
+      \ii Eine sehr absurder Übersetzer könnte alle beobachtbaren Bits invertieren.
+      \ei
+    }\bigskip
+    \ii Grundlage von optimierenden Übersetzer! {
+      \bi
+      \ii Ein optimierender Übersetzer erhält nur den beobachtbaren Zustand.
+      \ii Der nicht-beobachtbare Zustand kann sich beliebig ändern.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile,t]{Beispiele korrekter Übersetzung von C nach \only<1>{C}\only<2>{RISC-V}\only<3>{Kobold}}
+    \begin{code}[tag=C]
+      \begin{C}[]
+        void foo() {
+          int x = 0;
+          x += 1; x += 1; x += 1;
+          return x;
+        }
+      \end{C}
+    \end{code}
+    \begin{center}
+      \Huge$\Downarrow$
+    \end{center}
+    \begin{code}<1>[tag=C]
+      \begin{C}[]
+        void foo() {
+          return 3;
+        }
+      \end{C}
+    \end{code}%
+    \begin{code}<2>[tag={RV32I}]
+      \begin{asm}[]
+        foo:
+          lui a0, 3
+          ret
+      \end{asm}
+    \end{code}%
+    \begin{code}<3>[tag={Kobold}]
+      \begin{columns}
+        \begin{column}{0.25\textwidth}
+          \centering
+          \includegraphics[height=3cm]{fig/01-cobold}
+          \legalcode[commons=Kobold_artlibre_jnl.jpg]{Free Art License}{Jean-no}
+        \end{column}\hfill
+        \begin{column}{0.6\textwidth}
+          \centering
+          Dies ist ein besonders gut geschulter Kobold. Immer wenn man ihn irgendetwas fragt, wird er mit \ALERT{3} antworten.
+        \end{column}
+      \end{columns}
+    \end{code}
+  \end{frame}
+#+end_src
+
+* Bootstrapping und Cross-Compilation
+
+#+begin_src latex
+  \begin{frame}
+    \Huge\centering
+    Bootstrapping\\
+    und\\
+    Cross-Compilation
+  \end{frame}
+
+  \begin{frame}{Wer übersetzt den Übersetzer?}
+    \bi
+    \ii Woher kommt eigentlich der Übersetzter und wo läuft er? {
+      \bi
+      \ii Die allerersten Übersetzer von Programmen waren Menschen.
+      \ii Wo sie herkommen: Evolution. Worauf sie laufen: Physik (wie der Kobold).
+      \ei
+    }
+    \ii Wir wollen eine Übersetzer von L nach M der auf M läuft. {
+    }
+    \ei
+  \end{frame}
+
+#+end_src
+Wo läuft eigentlich mein Übersetzer? Und wie komme ich zu ihm?
+
 - T-Diagramme
 - Übersetzung
