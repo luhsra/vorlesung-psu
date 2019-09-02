@@ -511,7 +511,7 @@ Beobachtbare Zustände
     }\bigskip
     \ii Ein \advantage{korrekter} Übersetzer erhält alle beobachtbaren Zustände.{
       \bi
-      \ii Es kann eine Abbildungsfunktion geben:\\[2ex]{
+      \ii Es kann eine allerdings Abbildungsfunktion geben:\\[2ex]{
         \includegraphics[page=2,width=0.9\textwidth]{fig/01-zustand}
       }
       \ii Eine sehr absurder Übersetzer könnte alle beobachtbaren Bits invertieren.
@@ -569,31 +569,166 @@ Beobachtbare Zustände
   \end{frame}
 #+end_src
 
-* Bootstrapping und Cross-Compilation
+* Bootstrapping und Portierung
 
 #+begin_src latex
   \begin{frame}
     \Huge\centering
     Bootstrapping\\
     und\\
-    Cross-Compilation
+    Protierung
   \end{frame}
 
   \begin{frame}{Wer übersetzt den Übersetzer?}
     \bi
-    \ii Woher kommt eigentlich der Übersetzter und wo läuft er? {
+    \ii Wo läuft eigentlich der Übersetzer und wie kommen wir zu ihm? {
       \bi
       \ii Die allerersten Übersetzer von Programmen waren Menschen.
       \ii Wo sie herkommen: Evolution. Worauf sie laufen: Physik (wie der Kobold).
       \ei
+    }\pause
+    \ii Wir brauchen eine Übersetzer von L nach M der auf M läuft.\\[2ex] {
+      \begin{center}
+        \includegraphics[page=1,width=0.7\textwidth]{fig/01-t-diagram}
+      \end{center}
     }
-    \ii Wir wollen eine Übersetzer von L nach M der auf M läuft. {
+    \ei
+    \bii
+    \ii \Alert{Aber:} Es is zu aufwendig einen Übersetzer in M (z.B. Assembler) zu schreiben.
+    \ii Wir wollen den Übersetzer lieber in L schreiben und irgendwie nach M bringen.
+    \ii Dieser Prozess heißt Bootstrapping ($=$ sich selbst aus dem Sumpf ziehen).
+    \eii
+  \end{frame}
+
+  \begin{frame}[t]{T-Diagramme (oder Tombstone Diagramme)}
+    \bi
+    \ii T-Diagramme dienen zur Visualisierung des Bootstrapping Problems \\[2ex] {
+      \begin{center}
+        \includegraphics[page=1,width=0.7\textwidth]{fig/01-t-diagram}
+      \end{center}
+    }
+    \ei
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \bi
+        \ii Interpreter (für M auf m)\\[2ex]{
+          \begin{center}
+            \includegraphics[page=2,height=3cm]{fig/01-t-diagram}
+          \end{center}
+        }
+        \ei
+      \end{column}
+      \begin{column}{0.49\textwidth}
+        \bi
+        \ii Echte Maschinen (führen m aus)\\[2ex]{
+          \begin{center}
+            \includegraphics[page=3,height=2cm]{fig/01-t-diagram}
+            \vspace{1cm}
+          \end{center}
+        }
+        \ei
+      \end{column}
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}{1. Möglichkeit: Selbstübersetzung mittels Interpreter}
+    \bi
+    \ii Schreibe einen Interpreter \dn2 für L. Führe \dn1 auf \dn2 aus, um \dn[fill=badbee!40]{1} in \dn[fill=badbee!40]{1'} zu übersetzen.\\[2ex] {
+      \begin{center}
+        \only<1>{\includegraphics[height=4cm, page=4]{fig/01-t-diagram}}%
+        \only<2>{\includegraphics[height=4cm, page=5]{fig/01-t-diagram}}
+      \end{center}
+    }
+    \iiad (Langsame) Interpreter schreiben ist meist einfacher als Übersetzer.
+    \iida Doppelter Aufwand und der Interpreter ist Wegwerfware
+    \iida Verhält sich \dn1 auf echter Hardware und im Interpreter gleich?
+    \ei
+  \end{frame}
+
+  \begin{frame}{2. Möglichkeit: Vereinfachter Übersetzer}
+    \bi
+    \ii Ableitung eines einfacheren Übersetzers \dn2 aus dem Vollausgestatten \dn1.\\[2ex] {
+      \begin{center}
+        \includegraphics[height=2cm, page=6]{fig/01-t-diagram}
+      \end{center}
+      \bi
+      \ii Das Subset L' (von L) enthält nur die unbedingt notwendigen Sprachelemente.
+      \ii Das Subset M' (von M) enthält nur einfache Maschinenbefehle.
+      \ii \dn{2} darf langsam sein und langsamen Code erzeugen.
+      \ei
+    }
+    \ii<2-> Manuelle oder semiautomatische Übersetzung von \dn{2} in \dn{3}.\\[2ex] {
+      \begin{center}
+        \includegraphics[height=2cm, page=7]{fig/01-t-diagram}
+      \end{center}
+      \bi
+      \ii Teilweise mit einem existierenden Übersetzers einer anderen Sprache möglich.
+      \ei
     }
     \ei
   \end{frame}
 
+  \begin{frame}{2. Möglichkeit: Vereinfachter Übersetzer}
+    \begin{center}
+      \animation[width=0.8\textwidth]{8/1,9/2,10/3,11/4}{fig/01-t-diagram}
+    \end{center}
+    \begin{enumerate}
+    \item Übersetze \dn{2} mit \dn{3}: \dn{2a} ist langsam und erzeugt langsamen Code.
+    \item<3-> Übersetze \dn{1} zu einem langsamen, aber optimierenden, Übersetzer (1a).
+    \item<4-> Übersetze \dn{1} erneut mit sich selbst (1b).
+    \end{enumerate}
+  \end{frame}
 #+end_src
-Wo läuft eigentlich mein Übersetzer? Und wie komme ich zu ihm?
 
-- T-Diagramme
-- Übersetzung
+
+Portierung
+#+begin_src latex
+  \begin{frame}{Portierung auf neue Plattform und Cross-Compiler}
+    \begin{center}
+      \animation[width=0.7\textwidth]{12/1,13/2,14/3-}{fig/01-t-diagram}
+    \end{center}
+    \bi
+    \ii Ähnliches Probleme wenn man auf eine neue Plattform N wechselt. {
+      \bi
+      \ii<2-> Mit der vorhandenen Werkzeugkette: Erzeuge den \alert{Cross-Compiler} \dn{Z'}.
+      \ii<3-> Übersetze \dn{Z} mit seinem Cross-Compiler zu \dn{Z''}.
+      \ei
+    }
+    \ii<4> Zunehmend kein Problem mehr, da viele Übersetzer Multitarget bieten. {
+      \bi
+      \ii Das Übersetzerbackend  bietet, über Optionen, sowohl M als auch N an.
+      \ii LLVM: \texttt{llc -version} \hfill(\texttt{llc} ist das Backend von LLVM)
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
+
+* Zusammenfassung
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+    \bi
+    \ii Virtuelle Maschinen führen Programme aus, haben Speicher und Befehle{%
+      \bi
+      \ii Ihre Maschinensprache umfasst alle valide Programme.
+      \ii Korrekter Übersetzer erhält die Sprachsemantik und beobachtbare Zustände.
+      \ei
+    }\bigskip
+    \ii Ebenenmodell: Schrittweise Abstraktion von der echten Hardware {
+      \bi
+      \ii Obere Schichten bieten ausdrucksstärkere Sprachen.
+      \ii Untere Schichten sind direkt implementierbar.
+      \ii Übergang zu den unteren Schichten durch Übersetzung (oder Interpretation)
+      \ei
+    }\bigskip
+    \ii Bootstrapping: Der erste Übersetzer übersetzt sich selbst. {
+      \bi
+      \ii Reduktion auf manuelle Übersetzung eines abgespeckten Übersetzers
+      \ii Bei der Portierung auf neue Plattform braucht es einn Cross-Compiler
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
