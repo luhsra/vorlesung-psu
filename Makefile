@@ -56,6 +56,8 @@ emacs/ensure:
 build/tangle/%.tex: %.org
 	${EC} -e '(org-babel-tangle-file "'"$$PWD"'/$<" nil "latex")'
 	mv $(patsubst %.org,%.tex,$<) $@
+	bin/delete-frames $@
+
 
 build/tangle/%.html: %.org  export-prologue.org
 	${EC} -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"

@@ -168,11 +168,17 @@
     \ignorespacesafterend%
   }
 
-  \lstdefinelanguage[riscv]{Assembler}%
-{morestring=[b]",
-  morekeywords=[1]{bne, beq, blt, bltu, bge, bgeu, jal, jalr, auipc, lb, lh, lw, ld, lbu, lhu, lwu, sb, sh, sw, sd, amoadd_w, amoxor_w, amoswap_w, amoand_w, amoor_w, amomin_w, amominu_w, amomax_w, amomaxu_w, amoadd_d, amoswap_d, amoxor_d, amoand_d, amoor_d, amomin_d, amominu_d, amomax_d, amomaxu_d, lr_w, lr_d, sc_w, sc_d, lui, addi, slti , sltiu, andi, ori, xori, slli, srli, srai, add, sub, slt, sltu, and, or, xor, sll, srl, sra, addiw, slliw, srliw, sraiw, addw, subw, sllw, srlw, sraw, mul, mulh, mulhu, mulhsu, mulw, div, divu, rem, remu, divw, divuw, remw, remuw, fence, fence_i, sfence_vm, scall, sbreak, sret, mrts, wfi, csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
-  }
-comment=[l]\#%
+  \lstdefinelanguage[riscv]{Assembler}{
+    morestring=[b]",
+    morekeywords=[1]{bne, beq, blt, bltu, bge, bgeu, jal, jalr, auipc, lb, lh, lw, ld, lbu, lhu, lwu, sb, sh, sw, sd, amoadd_w, amoxor_w, amoswap_w, amoand_w, amoor_w, amomin_w, amominu_w, amomax_w, amomaxu_w, amoadd_d, amoswap_d, amoxor_d, amoand_d, amoor_d, amomin_d, amominu_d, amomax_d, amomaxu_d, lr_w, lr_d, sc_w, sc_d, lui, addi, slti , sltiu, andi, ori, xori, slli, srli, srai, add, sub, slt, sltu, and, or, xor, sll, srl, sra, addiw, slliw, srliw, sraiw, addw, subw, sllw, srlw, sraw, mul, mulh, mulhu, mulhsu, mulw, div, divu, rem, remu, divw, divuw, remw, remuw, fence, fence_i, sfence_vm, scall, sbreak, sret, mrts, wfi, csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
+    }
+    comment=[l]\#%
+  }[keywords,comments,strings]
+
+\lstdefinelanguage{lzero}{
+  morestring=[b]",
+  morekeywords=[1]{if,while,return,func,int},
+  comment=[l]{//}%
 }[keywords,comments,strings]
 
 
@@ -241,6 +247,17 @@ comment=[l]\#%
     moredelim=**[is][\color{orange}]{@@}{@@},
     moredelim=**[is][\color{srared}]{@@@}{@@@},
   }
+  \lstdefinestyle{lzero}{
+    style=basestyle,
+    language={lzero},
+    includerangemarker=false,
+    rangeprefix={//},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
   \lstdefinestyle{Java}{
     style=basestyle,
     language={Java},
@@ -266,6 +283,9 @@ comment=[l]\#%
 } {}
 \lstnewenvironment{py}[1][]{
   \lstset{style=py, autogobble, #1}
+} {}
+\lstnewenvironment{lzero}[1][]{
+  \lstset{style=lzero, autogobble, #1}
 } {}
 \lstnewenvironment{asm}[1][]{
   \lstset{style=ASM, autogobble, #1}

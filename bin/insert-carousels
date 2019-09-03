@@ -69,6 +69,7 @@ if __name__ == "__main__":
         for (topic,linum), svgs in reversed(topics.items()):
             logging.info("%s %s",topic, linum)
             start, end = list(map(int, linum.split('-')))
+            end = min(end, len(lines))
             while end > start:
                 if '#+END_SRC' in lines[end-1].upper():
                     break

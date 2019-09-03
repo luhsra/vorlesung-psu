@@ -43,13 +43,27 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
 :CUSTOM_ID: 01-einleitung
 :END:
 
+In diesem Skript[fn::Shift+Mouse Click für Rückwärts in den Folien]
+sind die Themen der Vorlesung "Programmiersprachen und Übersetzer"
+noch einmal schriftlich erörtert. Dabei erhebt das Skript **keinen**
+Anspruch auf Vollständigkeit und es ersetzt auch nicht die Lektüre von
+Lehr- und Fachbüchern. Im Verlaufe der Veranstaltung finden sie die
+entsprechenden Literaturhinweise.
+
 #+BEGIN_SRC latex
   \begin{frame}{Der Dozent}
+    \PutAt{(10cm,1.6cm)}{
+      \includegraphics[width=2cm]{fig/01-dietrich}
+    }
     \bi
-    \ii Wer ist der Dozent da?\\{
-      Informatikstudium in Erlangen (ab 2009), Promotion in Hannover (2019)\\
-      Betriebssysteme, Emacs User, Schwäche für Graphdatenstrukturen
-    }\qquad
+    \ii Wer ist der Dozent da? (22. Semester)\\{
+      \bi
+      \ii Informatikstudium in Erlangen (ab 2009)
+      \ii System- und Rechnerarchitektur (ab 2017)
+      \ii Promotion in Hannover (2019)
+      \ii Betriebssysteme, Emacs User, Schwäche für Graphen
+      \ei
+    }\medskip
     \ii Ich mag Programmiersprachen! {
       \bi
       \ii Sie erleichtern mir Lösungen klar und deutlich aufzuschreiben.
@@ -66,6 +80,7 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
     \ei
   \end{frame}
 #+END_SRC
+
 
 #+BEGIN_SRC latex
   \begin{frame}{Was soll diese Veranstaltung leisten?}
@@ -186,9 +201,36 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
       \ei
     }
     \ei
-
   \end{frame}
 
+  \begin{frame}{Literaturhinweise}\small
+    \begin{columns}
+      \begin{column}{2cm}
+        \includegraphics[width=\linewidth]{fig/01-pragmatics}%
+      \end{column}
+      \begin{column}{9cm}
+        \emph{Programming Language Pragmatics, Fourth Edition.\\Michael L. Scott, 2015.}\\[1ex]
+        Folgt einer ähnlichen Herangehensweise wie die Vorlesung. Deckt sowohl den Sprach- als auch den Übersetzerteil ab.
+      \end{column}
+    \end{columns}
+    \bigskip
+    \begin{columns}
+      \begin{column}{2cm}
+        \includegraphics[width=\linewidth]{fig/01-aho}%
+      \end{column}
+
+      \begin{column}{8cm}
+        \emph{Compiler: Prinzipien, Techniken und Werkzeuge.\\Ullmann, Lam, Sethi, Aho, 2008.}\\[1ex]
+         \textbf{Das} klassische Buch zum Übersetzerbau (Drachenbuch). Auch bereits in der alten Auflage von unschätzbarem Wissen.
+       \end{column}
+       \begin{column}{2cm}
+         \includegraphics[width=\linewidth]{fig/01-aho-old}%
+       \end{column}
+     \end{columns}
+  \end{frame}
+#+END_SRC
+
+#+begin_src latex
   \begin{frame}{Programmiersprachen}
     \centering
     \includegraphics[height=\textheight-2cm,page=1]{fig/01-overview-small}
@@ -201,33 +243,92 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
   \begin{frame}{Übersicht}
     \includegraphics[width=\textwidth,page=3]{fig/01-overview-small}
   \end{frame}
+
+  \begin{frame}[fragile]{Was passiert in den Übungen?}
+    \Alert{Ziel:} Vertiefung von theoretischem Wissen und praktische Erfahrungen.
+    \medskip
+    \bi
+    \ii Theorieaufgaben zur Durchdringung des Vorlesungsinhalts
+    \ii Praktische Programmieraufgaben {
+      \bi
+      \ii Erweiterung eines kleinen Beispielübersetzers (in Python)
+      \ii Arbeiten am Parser, der Typprüfung, Codeerzeugung, und am Optimierer
+      \ii Übersetzer macht selbst rege gebrauch von Python Sprachfeaturen
+      \ei
+    }\medskip
+    \ii Die Programmiersprache L0 - Basis unseres Übersetzers{
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{code}[tag=L0]
+            \begin{lzero}[]
+              var fib_calls : int;
+
+              func fib(n : int) : int {
+                fib_calls = fib_calls + 1;
+                if (n <= 1) {
+                  return n;
+                }
+                return fib(n-1) + fib(n-2);
+              }
+
+            \end{lzero}
+          \end{code}
+        \end{column}
+        \hfill
+        \begin{column}{0.49\textwidth}
+          \btUseExtraItemSep[-\smallskipamount]
+          \bi
+          \ii Globale und lokale Variablen
+          \ii Funktionen mit mehreren Argumenten
+          \ii Nur Ganzahlen und Pointer
+          \ii Keine Sicherheitsnetze
+          \ei
+
+        \end{column}
+      \end{columns}
+    }
+    \ei
+  \end{frame}
 #+END_SRC
 
-#+BEGIN_SRC latex
-\begin{frame}{Was passiert in den Übungen?}
-FIXME
-\end{frame}
-#+END_SRC
-
-#+BEGIN_SRC latex
-\begin{frame}{Literaturhinweise}
-FIXME
-\end{frame}
-#+END_SRC
-
-* TODO Organisation der Veranstaltung
+* Organisation der Veranstaltung
 :PROPERTIES:
 :CUSTOM_ID: 01-organisation
 :END:
 
 #+BEGIN_SRC latex
-\begin{frame}{Organisatorische Hinweise}
-\bi
-\ii Wie funktioniert der Vorlesungsbetrieb?
-\ii Wie funktioniert der Übungsbetrieb?
-\ii Was ist Klausurrelevant
-\ei
-\end{frame}
+  \begin{frame}[t]{Organisatorische Hinweise}
+  \PutAt{(10.5cm,1cm)}{
+    \includegraphics[width=2cm]{fig/01-dietrich}\\[2ex]
+    \includegraphics[width=2cm]{fig/01-landsberg}
+  }
+  \bi
+  \ii Vorlesung: 13 Vorlesung, wöchentlich {
+    \bi
+    \ii Dienstag 9:00-11:00, 201, Conticampus
+    \ii Semesterplan und Vorlesungskipt auf der SRA Webseite
+    \ii \url{https://www.sra.uni-hannover.de/p/lehre-V\_PS\%C3\%9C}
+    \ei
+  }\medskip
+  \ii Wie funktioniert der Übungsbetrieb? {
+    \bi
+    \ii 2 Übungstracks (A,B), mit einer Woche Versatz (wie GBS)
+    \ii 6 Übungsaufgaben mit praktischem und theoretischem Inhalt\\[1ex]
+    \ii Pro Track: 6 Tafel- und 6 Kleingruppenübungen, alternierend
+    \ii Tafelübung: Dienstag 16:00-18:00,
+    \ii Kleingruppenübung: Betreuung durch studentische Hilfskräfte
+    \ei
+  }\medskip
+  \ii Bonuspunkte auf die Klausur {
+    \bi
+    \ii Abgabe der Übungsaufgaben
+    \ii Testatklausur am \alert{23. Juni 2019}
+    \ii Maximaler Bonus: 2 Notenstufen (-0.7); Übertragbar ins Folgesemester
+    \ei
+  }\bigskip
+  \ii<2-> Was ist Klausurrelevant? \hfill\ALERT{\strut \only<3->{Vorlesung+Skript+Übung} }
+  \ei
+  \end{frame}
 #+END_SRC
 
 
@@ -576,7 +677,7 @@ Beobachtbare Zustände
     \Huge\centering
     Bootstrapping\\
     und\\
-    Protierung
+    Portierung
   \end{frame}
 
   \begin{frame}{Wer übersetzt den Übersetzer?}
@@ -730,5 +831,9 @@ Portierung
       \ei
     }
     \ei
+  \end{frame}
+
+  \begin{frame}{Quellenverzeichnis}
+    \printbibliography
   \end{frame}
 #+end_src

@@ -43,6 +43,18 @@ a.carousel-control-prev, a.carousel-control-next {
     cursor: pointer;
 }
 
+/* Overwrite tufte.css */
+@media only screen and (max-aspect-ratio: 1/1){
+    body{
+        padding: 2pt;
+        width: 100%;
+    }
+    .container {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
 
 /* Set the colors in <pre> blocks from the Leuven theme */
 pre                                      {background-color:#FFFFFF;}

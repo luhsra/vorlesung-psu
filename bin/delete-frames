@@ -1,0 +1,34 @@
+#!/usr/bin/python3
+
+import sys
+import subprocess
+import os.path
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print(f"usage: {sys.argv[0]} [TEX]")
+        sys.exit("--")
+
+    tex = sys.argv[1]
+    with open(tex) as fd:
+        lines = fd.readlines()
+
+    # Is there a marker?
+    if any([('%%ONLY%%' in line) for line in lines]):
+        # Strip it!
+        section = None
+        fd = open(tex, "w+")
+        for line in lines:
+            if 'psuSectionStart' in line:
+                section = []
+                print_section = False
+            if section is not None:
+                if '%%ONLY%%' in line:
+                    print_section = True
+                section.append(line)
+                if 'psuSectionStop' in line:
+                    if print_section:
+                        fd.write("".join(section))
+                    section = None
+            else:
+                fd.write(line)
