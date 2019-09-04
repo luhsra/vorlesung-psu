@@ -12,6 +12,7 @@
 \RequirePackage{marvosym}
 \RequirePackage{helvet}
 \RequirePackage{lmodern}
+\RequirePackage{convention} % texmf-local
 
 
 \RequirePackage{tikz}

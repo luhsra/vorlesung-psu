@@ -230,20 +230,97 @@ entsprechenden Literaturhinweise.
   \end{frame}
 #+END_SRC
 
+#+BEGIN_SRC latex
+    \begin{frame}{Übersicht}
+      \includegraphics[width=\textwidth,page=3]{fig/01-overview-small}
+    \end{frame}
+
+    \begin{frame}{Programmiersprachen}
+      \centering
+      \includegraphics[height=\textheight-2cm,page=1]{fig/01-overview-small}
+    \end{frame}
+
+    \begin{frame}{Übersetzer}
+      \includegraphics[width=\textwidth,page=2]{fig/01-overview-small}
+    \end{frame}
+
+    \begin{frame}[fragile]{Kurzübersicht: Syntaktische Analyse}
+      \framesubtitle{\lecturetag{compiler}{1}}
+      \begin{center}
+        \includegraphics[page=1,width=0.6\linewidth]{fig/01-overview-example}
+      \end{center}
+      \bi
+      \ii Von der Zeichenkette zum Abstrakten Syntaxbaum {
+        \bi
+        \ii Strukturierte Daten lassen sich leicher verarbeiten als Strings
+        \ii Formaler Gramatiken und effiziente Parsetechniken
+        \ii Parser prüft einen Teil der Spracheregeln: Syntaktische Korrektheit
+        \ei
+      }
+      \ei
+    \end{frame}
+
+    \begin{frame}{Kurzübersicht: Semantische Analyse}
+      \framesubtitle{\lecturetag{compiler}{4}}
+      \begin{center}
+        \includegraphics[page=2,width=0.6\linewidth]{fig/01-overview-example}
+      \end{center}
+      \bi
+      \ii Von Typprüfung und Namensauflösung {
+        \bi
+        \ii Ist das Programm wirklich Teil der Sprache?
+        \ii Namensauflösung findet zu jedem Bezeichner das jeweilige Objekt.
+        \ii Typprüfung stellt sicher, dass die deklarierten und inferrierten Typen stimmen.
+        \ei
+      }
+      \ei
+    \end{frame}
+
+    \begin{frame}{Kurzübersicht: Zwischencodeerzeugung}
+      \framesubtitle{\lecturetag{compiler}{7}}
+      \begin{center}
+        \includegraphics[page=3,width=\linewidth]{fig/01-overview-example}
+      \end{center}
+      \bi
+      \ii Vom Syntaxbaum zum Kontrollflussgraphen {
+        \bi
+        \ii Zwischencode ist eine ausdrucksmächtige virtuelle Maschine.
+        \ii Bereits nahe an realer Maschine, aber gut für Analysen und Optimierungen
+        \ii Alle Sprachkonstrukte müssen linearisiert werden.
+        \ei
+      }
+      \ei
+    \end{frame}
+
+    \begin{frame}[fragile]{Kurzübersicht: Maschinencode}
+      \framesubtitle{\lecturetag{compiler}{9}}
+      \begin{columns}
+        \begin{column}{0.4\textwidth}
+          \includegraphics[page=4,width=\linewidth]{fig/01-overview-example}
+        \end{column}\hfill
+        \begin{column}{0.4\textwidth}
+          \begin{code}[tag=RV32I]
+          \lstinputlisting[style=ASM]{lst/01-example-if.S}
+        \end{code}
+      \end{column}
+    \end{columns}
+    \bigskip
+
+    \bi
+    \ii Vom Zwischencode zur realen Maschine {
+      \bi
+      \ii Auswahl von passenden Befehlen der realen Maschine
+      \ii Bestimmung des Stacklayouts für jede Funktion
+      \ii Entscheidung welcher Wert zu welchem Zeitpunkt in einem Register \enquote{lebt}.
+      \ei
+    }
+    \ei
+
+    \end{frame}
+
+#+END_SRC
+
 #+begin_src latex
-  \begin{frame}{Programmiersprachen}
-    \centering
-    \includegraphics[height=\textheight-2cm,page=1]{fig/01-overview-small}
-  \end{frame}
-
-  \begin{frame}{Übersetzer}
-    \includegraphics[width=\textwidth,page=2]{fig/01-overview-small}
-  \end{frame}
-
-  \begin{frame}{Übersicht}
-    \includegraphics[width=\textwidth,page=3]{fig/01-overview-small}
-  \end{frame}
-
   \begin{frame}[fragile]{Was passiert in den Übungen?}
     \Alert{Ziel:} Vertiefung von theoretischem Wissen und praktische Erfahrungen.
     \medskip

@@ -15,16 +15,16 @@
         font=\color{white}]\lecturedotpos:\textbf{V#1}},
     },
     principle/.style={
-      fill=badbee!40,
+      fill=principlecolor,
     },
     paradigm/.style={
-      fill=luhblue!40,
+      fill=paradigmcolor,
     },
     compiler/.style={
-      fill=safegreen!40,
+      fill=compilercolor,
     },
   }
-  \def\Title#1{\textbf{\Large #1}}
+  \def\Title#1{\textbf{\Large \strut #1}}
 
 \begin{tikzpicture}
 
@@ -78,7 +78,6 @@
   \node[below=of operation.south west,yshift=-4mm,topic,paradigm,topic double,anchor=west,lecture=11] (oo) {
     \Title{Das Objektoriente Paradigma}
   };
-
 \end{scope}
 \end{tikzpicture}
 
@@ -175,6 +174,10 @@
     \Title{Synaktische Analyse}
   };
 
+  \node[topic,fill=lightgray,lecture=0,anchor=south,yshift=10mm]  (einleitung) at (syntax.north){
+    \Title{Einleitung}
+  };
+
   \node[topic,lecture=2,principle]  (type) at (syntax.south) {
     \Title{Typen}
   };
@@ -221,6 +224,14 @@
   \node[topic, paradigm,lecture=12]  (@) at (oo.south) {
     \Title{Das Funktionale Paradigma}
   };
+
+
+
+  \draw (op.south west) ++(down:1.5cm)
+  node[anchor=west,compiler,draw]      (l0) {\Title{Technik: Übersetzer}};
+  \node[right=1 of l0 ,principle,draw] (l1) {\Title{Basis: Sprachkonzepte}};
+  \node[right=1 of l1 ,paradigm,draw] (l2) {\Title{Philosophie: Designprinzipien}};
+
 
 
 \end{tikzpicture}

@@ -1,0 +1,60 @@
+\documentclass{lecturefig}
+\usepackage{calc}
+\begin{document}
+\newlength{\monowidth}
+\settowidth{\monowidth}{\texttt{i}}
+
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}
+    \only<1>{
+    \node[inner sep=1,draw] (code) {\texttt{if ( a >b)\{return b; \} else return c;}};
+    \foreach \i in {1,...,36} {
+      \draw (code.south west)++(east:\pgflinewidth)++(1pt,\pgflinewidth)++(east:\monowidth*\i) -- ++(up:0.8ex);
+    }
+    }
+
+    \tikzset{
+      results/.style={->,double,shorten >=5pt, shorten <=5pt},
+      ast/.style={draw,font=\ttfamily},
+      sibling distance=6em,
+      type/.style={
+        onslide=<2->{label={[draw,fill=safegreen!30!white,node on layer=foreground,font=\scriptsize,inner sep=2pt,shift={(-3pt,-3pt)}]north east:#1}}
+      },
+      alloc/.style={
+        onslide=<2->{label={[draw,fill=badbee!30!white,node on layer=foreground,font=\scriptsize,inner sep=2pt,yshift=2pt]south:#1}}
+      }
+    }
+    \only<1-3>{
+    \node (root) [ast] at (0, -1.5cm) {if}
+       child { node[ast,type=bool] {>}
+                 child { node[ast,type=int,alloc=local] {a}}
+                 child { node[ast,type=int,alloc=global] {b}}
+             }
+       child { node[ast] {return} child {node[ast,type=int,alloc=global] {b}}}
+       child { node[ast] (ret2) {return} child {node[ast,type=int,alloc=local] {a}}}
+       ;
+     }
+
+    \only<1>{\draw[results] (code) -- node[right]{parsing}(root);}
+
+    \only<3-4>{
+      \tikzset{
+        bb/.style={draw,font=\ttfamily\scriptsize, align=left}
+      }
+      \node[bb] (bb0) at (7cm, -2cm) {bb0:\\\ \ load tmp0, \textbf{\$b}\\\ \ iflt tmp0, a, bb1, bb2};
+      \node[bb,below=0.5 of bb0,xshift=-1cm] (bb1) {bb1:\\\ \ return a;};
+      \node[bb,below=1.5 of bb0,xshift=1cm] (bb2) {bb1:\\\ \ load tmp2, \textbf{\$b};\\ \ \ return tmp2};
+      \node[bb,left=0.3 of bb2] (bb3) {\textit{empty}};
+      \draw[->] (bb0) -- (bb1);
+      \draw[->] (bb0) -- (bb2);
+      \draw[->] (bb1) -- (bb3);
+      \draw[->] (bb2) -- (bb3);
+    }
+    \only<3>{
+      \draw[results] (root) -- node[above]{code generation}(root.east-|bb0.west);
+    }
+  \end{tikzpicture}
+
+\end{frame}
+\end{document}

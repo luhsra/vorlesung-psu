@@ -13,6 +13,7 @@
 \usepackage{calc} % theCurrentPage
 \usepackage{csquotes}
 
+
 % Section Title and Block Number
 \newcommand{\psuSectionStart}[2]{
   \ifdefstring{\psuOldTitle}{#1}
@@ -191,7 +192,7 @@
     showstringspaces=false,
     breaklines=false,
     mathescape=true,
-    lineskip=-3pt,
+    lineskip=-2pt,
     escapechar={§},
     numbersep=1.5em,
     numberstyle=\tiny,
@@ -376,7 +377,11 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Misc
+\usepackage{convention} % texmf-local
 \newcommand{\advantage}[1]{\bgroup\color{safegreen}#1{\egroup}}
 \newcommand{\dn}[2][]{\tikz[baseline]\node[anchor=base,circle,inner sep=1pt,draw,#1]{#2};}
 \renewcommand{\iiad}{\ii[\color{safegreen}\textbf{+}]}  % advantage
 \renewcommand{\iida}{\ii[\color{safered}\textbf{--}]} % disadvantage
+\newcommand{\lecturetag}[3][]{%
+  \tikz[baseline]\node[anchor=base,draw=black,fill=#2color,#1]{\color{black}Vorlesung #3};
+}
