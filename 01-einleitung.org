@@ -380,7 +380,7 @@ entsprechenden Literaturhinweise.
     \includegraphics[width=2cm]{fig/01-landsberg}
   }
   \bi
-  \ii Vorlesung: 13 Vorlesung, wöchentlich {
+  \ii Vorlesung: 13 Vorlesung {
     \bi
     \ii Dienstag 9:00-11:00, 201, Conticampus
     \ii Semesterplan und Vorlesungskipt auf der SRA Webseite
@@ -396,11 +396,11 @@ entsprechenden Literaturhinweise.
     \ii Kleingruppenübung: Betreuung durch studentische Hilfskräfte
     \ei
   }\medskip
-  \ii Bonuspunkte auf die Klausur {
+  \ii Bonuspunkte auf die Klausur (wie bei GBS) {
     \bi
-    \ii Abgabe der Übungsaufgaben
-    \ii Testatklausur am \alert{23. Juni 2019}
-    \ii Maximaler Bonus: 2 Notenstufen (-0.7); Übertragbar ins Folgesemester
+    \ii Abgabe der Übungsaufgaben, maximal +10\%  Klausurpunkte
+    \ii Testatklausur am \alert{23. Juni 2019}, maximal +10\% der Klausurpunkte
+    \ii Bonuspunkte werden auf \structure{bestandene} Klausuren angerechnet.
     \ei
   }\bigskip
   \ii<2-> Was ist Klausurrelevant? \hfill\ALERT{\strut \only<3->{Vorlesung+Skript+Übung} }
