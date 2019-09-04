@@ -13,7 +13,8 @@
 \usepackage{calc} % theCurrentPage
 \usepackage{csquotes}
 
-\def\psuSectionStart#1{
+% Section Title and Block Number
+\newcommand{\psuSectionStart}[2]{
   \ifdefstring{\psuOldTitle}{#1}
   {}% Then
   {\section{#1}}%

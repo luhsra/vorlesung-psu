@@ -28,6 +28,8 @@ prefix :=
 build/$(1:.org=.pdf): $(shell prefix=`echo $(1) | awk -F- '{print $$1;}'`; echo fig/$${prefix}-*.pdf)
 $(shell echo $(1) | awk -F- '{print $$1;}'): build/$(1:.org=.pdf)
 $(shell echo $(1) | awk -F- '{print $$1;}').html : build/html/$(1:.org=.html)
+$(shell echo $(1) | awk -F- '{print $$1;}').tangle : build/tangle/$(1:.org=.tex)
+$(shell echo $(1) | awk -F- '{print $$1;}').split: build/$(1:.org=.pdf.split)
 endef
 # invoke it for lecture PDF target (01-Einfuehrung.pdf, ...)
 $(foreach f,$(ORG_PDF),\

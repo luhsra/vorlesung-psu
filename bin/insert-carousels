@@ -4,6 +4,7 @@ import sys
 import os
 import glob
 import logging
+import re
 logging.basicConfig(level=logging.DEBUG)
 from collections import OrderedDict
 
@@ -48,7 +49,18 @@ def make_carousel(label, files):
     ret += '#+END_EXPORT\n'
     return ret
 
-
+def find_blocks(lines):
+    tangle, start, end = True, None, None
+    for idx, line in enumerate(lines):
+        if "#+begin_src" in line.lower():
+            start = idx
+            if "latex" in line and not re.search(":tangle.*no", line):
+                tangle = True
+            else:
+                tangle = False
+        if "#+end_src" in line.lower() and tangle:
+            end = idx
+            yield(start, end)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -63,22 +75,12 @@ if __name__ == "__main__":
             pattern = f"build/html/{base}-{topic}-{lines}-*.svg"
             topics[(topic, lines)] = [os.path.basename(x) for x in sorted(glob.glob(pattern))]
 
-
     with open(org) as fd:
         lines = list(fd.readlines())
-        for (topic,linum), svgs in reversed(topics.items()):
-            logging.info("%s %s",topic, linum)
-            start, end = list(map(int, linum.split('-')))
-            end = min(end, len(lines))
-            while end > start:
-                if '#+END_SRC' in lines[end-1].upper():
-                    break
-                end -= 1
-
-            assert '#+BEGIN_SRC' in lines[start-1].upper(), \
-                "Could not find begin of block for %s" % (topic)
-            assert '#+END_SRC' in lines[end-1].upper(), \
-                "Could not find begin of block for %s" % (topic)
-            lines[start-1:end] = make_carousel(topic + linum, svgs)
+        blocks = list(find_blocks(lines))
+        for (topic,block_number), svgs in reversed(topics.items()):
+            logging.info("%s %s",topic, block_number)
+            start, end = blocks[int(block_number)-1]
+            lines[start:end+1] = make_carousel(topic + block_number, svgs)
 
         print("".join(lines))

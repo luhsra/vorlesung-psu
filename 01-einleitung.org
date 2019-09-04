@@ -5,12 +5,12 @@
 
 #+NAME: topic
 #+BEGIN_SRC latex :tangle no
-\psuSectionStart{{{{property(ITEM)}}}}
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
 #+END_SRC
 
 #+NAME: endtopic
 #+BEGIN_SRC latex :tangle no
-\psuSectionStop{{{{property(ITEM)}}}}{{{{range()}}}}
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
 #+END_SRC
 
 #+BEGIN_SRC latex :tangle-prologue nil :tangle-epilogue nil
@@ -18,7 +18,7 @@
 \begin{frame}
   \maketitle
 \end{frame}
-\psuSectionStop{Titlepage}{{{{range()}}}}
+\psuSectionStop{Titlepage}{{{{n(block,-)}}}}
 #+END_SRC
 
 * Gedanken zu dieser Vorlesungseinheit                             :noexport:

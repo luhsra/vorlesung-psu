@@ -320,6 +320,7 @@ Return a list whose CAR is the tangled file name."
   (let ((visited-p (find-buffer-visiting (expand-file-name file)))
 	to-be-removed)
     (message "kill2: %s %s" file visited-p)
+    (org-macro--counter-initialize t)
     (prog1
 	(save-window-excursion
 	  (find-file file)
@@ -327,6 +328,11 @@ Return a list whose CAR is the tangled file name."
 	  (mapcar #'expand-file-name (org-babel-tangle nil target-file lang)))
       (unless visited-p
 	(kill-buffer to-be-removed)))))
+
+(defun org-macro--counter-initialize (&optional new-file)
+  "Initialize `org-macro--counter-table'."
+  (if new-file
+      (setq org-macro--counter-table (make-hash-table :test #'equal))))
 
 
 (provide 'ob-tangle-sra)
