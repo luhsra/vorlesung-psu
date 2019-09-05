@@ -304,7 +304,8 @@ non-nil, return the full association list to be used by
     (message "HTML %s: %s" src buffer)
     (with-current-buffer
         (find-file-noselect src)
-      (org-export-to-file 'tufte-html dst))
+      (org-export-to-file 'tufte-html dst)
+      )
     (when (not buffer)
       (message "kill buffer %s: %s" src buffer)
       (kill-buffer (find-buffer-visiting src)))))
@@ -333,6 +334,25 @@ Return a list whose CAR is the tangled file name."
   "Initialize `org-macro--counter-table'."
   (if new-file
       (setq org-macro--counter-table (make-hash-table :test #'equal))))
+
+(require 'org-element)
+(defun org-macro-headlines (file)
+  (with-current-buffer (find-file-noselect file)
+    (org-with-wide-buffer
+     (let ((data  (org-element-parse-buffer 'headline))
+	   (res "") (sep ""))
+       (message ":%s:" (buffer-string))
+       (dolist (headline (cddr data))
+         (let ((id (org-element-property :CUSTOM_ID headline))
+               (tags (org-element-property :tags headline))
+               (title (org-element-property :title headline)))
+           (message "%s %s" id (member 'noexport tags))
+           (unless (or (not id) (member 'noexport tags))
+             (setq res (format "%s%s[[%s#%s][%s]]"
+                               res sep file id title))
+             (setq sep " - "))))
+       (message ">>> %s" data)
+       res))))
 
 
 (provide 'ob-tangle-sra)

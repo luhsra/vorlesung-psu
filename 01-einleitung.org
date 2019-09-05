@@ -521,7 +521,6 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen sie sowohl den Aufb
   \end{frame}
 #+END_SRC
 
-
 * Ebenenmodell und Virtuelle Maschinen
 :PROPERTIES:
 :CUSTOM_ID: 01-ebenenmodell
@@ -861,6 +860,9 @@ Beobachtbare Zustände
 #+end_src
 
 * Bootstrapping und Portierung
+:PROPERTIES:
+:CUSTOM_ID: 01-bootstrapping
+:END:
 
 #+begin_src latex
   \begin{frame}

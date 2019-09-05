@@ -1,11 +1,14 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+INCLUDE: export-prologue.org
+#+OPTIONS: toc:nil
+#+MACRO: headlines (eval (org-macro-headlines $1))
 
-Alles was man gerne hier sagen möchte.
 
-1. [[file:01-einleitung.org][Einleitung]]
- -. [[file:01-einleitung.org::#01-ebenenmodell]
-2. Übersetzer: Lexen und Parsen
+* [[file:01-einleitung.org][Einleitung]]
+
+Abschnitte: {{{headlines(./01-einleitung.org)}}}
+
+* Übersetzer: Lexen und Parsen
    - Tokenstrom, (Kontextfreie) Gramatiken, Abstrakter Syntaxbaum, Parsertechniken, Parsergeneratoren
 
 3. Sprachen: Typen
