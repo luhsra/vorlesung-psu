@@ -67,6 +67,14 @@ button.execute {
     }
 }
 
+.slide-print {
+    border: 1px solid black;
+    cursor: default;
+    width: 45% !important;
+    margin: 8pt;
+    display: inline-block;
+}
+
 
 /* Set the colors in <pre> blocks from the Leuven theme */
 pre                                      {background-color:#FFFFFF;}

@@ -227,7 +227,6 @@ Durch einen Klick auf den "Load Interpreter" Button, wird [[https://github.com/v
 Allerdings erfolgt das Nachladen von Klipse von Drittseiten, für deren Einstellung zu ihrer Privatsphäre wir nicht garantieren können.
 Falls sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.mozilla.org/de/firefox/addon/umatrix/][uMatrix]], nutzen, müssen sie ihre Einstellungen entsprechend anpassen.
 
-
 * Inhalt der Veranstaltung
 :PROPERTIES:
 :CUSTOM_ID: 01-inhalt
@@ -286,6 +285,30 @@ Falls sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.
      \end{columns}
   \end{frame}
 #+END_SRC
+
+Diese Veranstaltung trägt den Namen "Programmiersprachen und Übersetzer" und ist dementsprechend auch entlang dieser beiden Begriffe in zwei Teile getrennt, die allerdings eng miteinander interagieren.
+Die Programmiersprachen geben vor, welche Konstrukte bei der *effektiven* Kodierung von Programmen verwendet werden können.
+Auf der Gegenseite entscheidet der Übersetzer, wie diese Konstrukte auf die darunterliegende Maschine abgebildet werden und er bestimmt damit maßgeblich die *Effizienz* der Programmausführung.
+
+Im Bereich der Sprachen werden wir uns mit Kernkonzepten beschäftigen, die in vielen unterschiedlichen Sprachen auftauchen.
+Dazu gehört die Frage nach Typannotationen (z.B., ~int~, ~struct element~), genauso wie die Menge der verwendbaren Kontrollstrukturen (z.B.
+~if~, ~while~, ~do-while~).
+Hierbei werden wir eine Fokus auf jene Konzepte werfen, die in Sprachen verwendet werden die dem funktionale bzw.
+dem objekt-orientierten Paradigma zugeordnet werden können.
+Man kann davon sprechen, dass ein **Programmierparadigma** aus diesen Konzepten zusammengesetzt wird um einen bestimmen Stil oder "Philosophie" von Implementierungen zu ermöglichen.
+Jedoch kann heute kaum noch eine Programmiersprache nur einem dieser Paradigmen zugeordnet werden.
+
+Auf Seite der Übersetzer, wollen wir uns jene Zwischenschritte anschauen, die notwendig sind um Programme einer Hochsprache in die eigentliche Sprache der Maschine zu übersetzen.
+Durch diese mechanische Übersetzung, bei der die Abstraktionen der Sprache schrittweise abgebaut werden, können wir nicht nur fest stellen ob bei der Kodierung Fehler passiert sind (der Übersetzung schlägt fehl), sondern es können auch diverse Optimierungen durchgeführt werden, auf die wir ebenfalls einen kurzen Blick werfen wollen.
+Dabei können die Vorlesungen zum Übersetzerbau keine vollständige Einleitung sein, dazu ist die Vielfalt an möglichen Sprachkonstrukten zu groß.
+Das Ziel dieser Termine ist es ihnen einen Überblick über die kanonischen Zwischenschitte der Übersetzung von imperativen Sprachen zu geben.
+Dabei ist es ebenfalls mein Ziel ihnen eine Intuition zu vermitteln, welche Konstrukte einer Sprache inhärent weniger effizient sind als andere.
+
+Als Literatur zu dieser Vorlesung empfehle ich ihnen "Programming Language Pragmatics" von Micahel L.
+Scott, welches eine ähnliche Mischung von Sprachkonzepten und Übersetzerbau wie diese Vorlesung hat.
+Dabei deckt dieses Buch viel mehr ab als wir in dieser Veranstaltung machen können, und ist daher nicht nur eine gute Grundlage zur Vor- und Nachbereitung, sondern auch ein Startpunkt für alle Studierenden, die sich noch tiefer mit dem Thema auseinander setzen wollen.
+Daneben muss man auch **das** klassische Buch zum Übersetzerbau von Ullmann, Lam, Sethi und Aho empfehlen, welches den Übersetzerbau noch intensiver diskutiert.
+Im Laufe der Veranstaltung werde ich, wo sinnvoll, einzelne Unterkapitel aus diesen Büchern referenzieren.
 
 #+BEGIN_SRC latex
     \begin{frame}{Übersicht}
@@ -377,7 +400,32 @@ Falls sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.
 
 #+END_SRC
 
-YYY
+Die drei Themenbereiche:
+Übersetzertechniken, Sprachkonzepten und Paradigmen von Programmiersprachen werden in den nächsten 12 Vorlesungen vermischt und aufeinander aufbauend behandelt werden.
+Dabei werden wir in der ersten Hälfte des Semesters die notwendigen Grundlagen an Sprachkonzepten schaffen, um sie dann direkt in der entsprechenden Phase der Übersetzung verwendet zu können.
+Zum Beispiel führt die semantische Analyse sowohl die Typprüfung, als auch die Namensauflösung durch, wodurch Vorlesung 2 und 3 direkt in die Semantische Analyse im Übersetzer übergeht.
+
+In der zweiten Hälfte des Semesters wird der Fokus der Veranstaltung sich in beide Richtungen erweitern:
+Zum einen lernen wir die weiteren technischen Schritte kennen um vom Abstrakten Syntaxbaum zum fertigen Maschinenprogramm zu kommen.
+Zum anderen schauen wir uns die Philosophie hinter dem objektorientierten und dem funktionalen Programmierparadigma an, welche aus den grundlegenden Sprachkonzepten komponiert sind.
+Hier geht es nur noch teilweise um konkrete Techniken und Sprachkonstrukte, sondern mehr um jene Designentscheidungen und Prinzipien die man anwenden muss um objekt-orientiert bzw.
+funktional zu programmieren.
+Denn nur weil eine Sprache Abstraktionen für Klassen und Objekte anbietet, heißt es noch lange nicht, dass alle Programme, die in jener Sprache verfasst sind, automatisch auch Objekt-Orientiert sind.
+Man kann jede Turing-vollständige Sprache gegen den Strich bürsten; man sollte es nur nicht tun.
+
+Die einzelnen Schritte der Übersetzung können wir in mindestens vier Abschnitte eingeteilen, die von weiteren, optionalen, Abschnitten begleitet werden können.
+Jeder dieser Abschnitte wird in einer Vorlesung behandelt und soll einen Überblick über das jeweilige Thema bieten.
+
+- Syntaktische Analyse :: Die Übersetzung startet in der Syntaktischen Analyse mit dem Einlesen des Programms als Zeichenkette (z.B. von der Festplatte). Dabei haben die einzelnen Zeichen noch keinerlei *Bedeutung* (oder Semantik) für den Übersetzer, sondern es ist nur ein Array von Bytes. Zu diesem Zeitpunkt ist der Quellcode noch nach dem jeweiligen Gusto des Programmiers (z.B., überflüssige Leerzeichen) formatiert. Durch die Syntaktische Analyse überführen wir diese Sequenz von Bytes in einen **Abstrakten Syntaxbaum** (AST), der die hierarchische Programmstruktur widerspiegelt. In dem gezeigten Beispiel, ist die Bedingung ~a > b~ als erstes Kind der Bedingung im Baum eingeordnet. Um diesen Schritt der Strukturextraktion zu machen, werden wir uns die *Lexing* (Abtastung) und *Parsing* (Zerteilung) anschauen. Nachdem wir ein Programm syntaktisch analysiert haben, wissen wir ob es einen Syntaxfehler enthält. Allerdings ist noch nicht klar, ob es wirklich ein valides Programm der gewünschten Sprache ist, denn es könnte, zum Beispiel, noch Typfehler enthalten.
+- Semantische Analyse :: Den zweiten notwendigen Schritt der Programmanalyse führen wir auf dem AST durch. Dabei analysieren wir den AST auf seine semantische Bedeutung. Zum einen bedeutet das den Schritt *vom Identifier zum Namen* zu machen (Namensauflösung) und für jede Verwendung einer Variable die gültige Definition zu finden. Im Beispiel sieht man dem AST erst nach der Semantischen Analyse an, dass ~a~ eine lokale und ~b~ eine globale Variable ist. Weiterhin wird das Programm auf Typkorrektheit hin untersucht: Passen, die von den Blättern des Baumes  (unten) zur Wurzel (oben) hin propagierten Datentypen, zu den verwendeten Operationen. Würde man im Beispiel schreiben ~a > "hallo"~, wäre dies zwar syntaktisch Korrekt, jedoch nicht semantisch, da man Zahlen nicht mit Zeichenketten vergleichen darf. Nach der Semantischen Analyse wissen wir endgültig ob das Programm ein valides Programm ist. Tritt bis hier kein Fehler bei der Übersetzung auf, darf auch in den nachfolgenden Schritten kein Fehler mehr auftreten.
+- Erzeugung des Zwischencodes :: Mit dem Übergang vom AST zum Zwischencode (engl. intermediate representation, IR) klopfen wir die hierarchische Baumstruktur einzelner Operationen platt und machen einen großen Schritt hin zur realen Maschine. Der Zwischencode moderner Übersetzer ist die Assemblerbefehle angelehnt, enthält aber noch genug Informationen um weitreichende Programmoptimierungen durchzuführen. Der Zwischencode enthält keine sprachspezifischen Konstrukte mehr und kann daher für Sprachfrontends verwendet werden. Zum Beispiel wird sowohl die Programmiersprache [[https://www.rust-lang.org/][Rust]] als auch C++ (bei Verwendung von clang) in LLVM IR[fn::Einen kurzen Überblick über LLVM IR bietet der folgende Blogeintrag: https://idea.popcount.org/2013-07-24-ir-is-better-than-assembly/]
+ übersetzt, bevor es an Optimierung und die Erzeugung der Binärdatei geht.
+   #+CAPTION: Mehrere Frontends übersetzen in die gleiche Zwischensprache und erlauben es daher den selben Optimierer und verschiedene Maschinenbackends zu verwenden. Die Abbildung stammt aus dem [[http://aosabook.org/en/llvm.html][AOSA Buch]], CC BY-SA 3.0, Chris Lattner.
+   #+NAME:   fig:01-retargetable-compiler
+   [[./fig/01-retargetable-compiler.png]]
+
+
+- Maschinencode :: Für den letzten Schritt zur Binärdatei, muss der Zwischencode zu Assemblerinstruktionen übersetzt werden. Dabei müssen semantisch äquivalente Befehle oder Befehlssequenzen der realen Maschine ausgewählt werden. Weiterhin verwendet der Zwischencode noch (unendlich viele) Variablen, wo die reale Maschine nur eine endliche Anzahl an Registern anbietet. Daher müssen die Werte an diese realen Register gebunden werden (Registerallokation).
 
 #+begin_src latex
   \begin{frame}[fragile]{Was passiert in den Übungen?}
@@ -427,8 +475,11 @@ YYY
   \end{frame}
 #+END_SRC
 
-
-XXX
+Während wir in der Vorlesung die theoretischen Grundlagen kennen lernen, soll ihr Wissen in der Übung weiter vertieft werden.
+Dies wird zum einen dadurch geschehen, dass wir ihnen passende theoretische Aufgaben zur Bearbeitung stellen.
+Zum anderen sollen sie auch praktische Übungen an einem Beispielübersetzer, der von uns bereitgestellt wird, durchführen.
+Dieser Übersetzer verarbeitet bereits die rudimentäre L0 Sprache und wird von ihnen um diverse Fähigkeiten erweitert werden.
+Durch diese Arbeit an einem existierenden Übersetzer lernen sie sowohl den Aufbau eines solchen Softwareprojekts kennen, als können die Arbeit eines Übersetzers "Live und in Farbe" erleben.
 
 * Organisation der Veranstaltung
 :PROPERTIES:

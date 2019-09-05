@@ -8,14 +8,15 @@ $( document ).ready(function() {
     }
 
     if ($.urlParam('print') != null) {
-        $(".slide").removeClass('w-100').addClass('d-print-block');
+        $(".slide").removeClass('w-100');
         var inner = $(".carousel-inner");
         inner.siblings().remove();
         inner.unwrap().unwrap().unwrap();
-        inner.removeClass('carousel-inner').addClass('row');
-        inner.children().removeClass('carousel-item').addClass('col-md-6');
-        inner.children().children().addClass('w-100');
-        window.print();
+        inner.removeClass('carousel-inner');
+        // inner.children().removeClass('carousel-item').addClass('slide');
+        inner.children().children().unwrap();
+        $(".slide").removeClass('d-block').removeClass('slide').addClass('slide-print');
+        // window.print();
     } else {
         // The content (and postamble) should be in a container.
         var toc = $('#table-of-contents').detach();

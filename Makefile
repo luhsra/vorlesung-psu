@@ -18,6 +18,8 @@ build: texmf/ls-R
 	@ln -fs ../../export-prologue.org build/html
 	@ln -fs ../../html/css build/html/
 	@ln -fs ../../html/js build/html/
+	@ln -fs ../../fig     build/html
+
 
 texmf/ls-R:
 	texhash texmf/

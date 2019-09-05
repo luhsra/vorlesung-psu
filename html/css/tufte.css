@@ -82,13 +82,19 @@ article { position: relative;
 section { padding-top: 1rem;
           padding-bottom: 1rem; }
 
-p, ol, ul { font-size: 1.4rem;
-            line-height: 2rem; }
+p, ol, ul, dl{
+    font-size: 1.3rem;
+    line-height: 1.8rem;
+}
 
 p { margin-top: 1.4rem;
     margin-bottom: 1.4rem;
     padding-right: 0;
     vertical-align: baseline; }
+
+dd {
+    padding-left: 1em;
+}
 
 /* Chapter Epigraphs */
 div.epigraph { margin: 5em 0; }
