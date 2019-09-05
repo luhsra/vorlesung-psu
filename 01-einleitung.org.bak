@@ -50,7 +50,7 @@
 #+END_SRC
 
 * Gedanken zu dieser Vorlesung                                     :noexport:
-Mit der ersten Vorlesung, soll der Studierende für die Vorlesung
+Mit der ersten Vorlesung, soll der Studierene für die Vorlesung
 motiviert werden. Es soll verstehen, welcher ganz konkreten
 Erkenntnisgewinn aus der Veranstaltung gezogen werden kann sich mit
 Programmiersprachen und deren Implementierungen zu beschäftigen. Ihm
@@ -80,7 +80,7 @@ nicht die Lektüre von Lehr- und Fachbüchern. Im Verlaufe der
 Veranstaltung werden sie entsprechenden Literaturhinweise, sowohl
 Bücher als auch Links zu entsprechenden Fachartikeln und
 Blogeinträgen, finden. Sollten sie weitere Interessante Artikel zur
-Veranstaltung finden, scheuen sie sich nicht mir diese zuzusenden.
+Veranstaltung finden, scheuen sie sich mir nicht diese zuzusenden.
 
 Um unnötige Dopplungen mit den Folien zu vermeiden, haben wir die
 einzelnen Vorlesungsfolien in dieses Dokument mit eingebunden. Zu den
@@ -97,7 +97,7 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
     \bi
     \ii The next 700 programming languages, P. J. Landin\only<+->{, \citeyear{landin:66:cacm}\hfill\cite{landin:66:cacm}}
     \ii<+-> Hype Train (z.B. Rust), Evolution (C++20), Legacy (COBOL)
-    \ii<.-> Sprachen allerorten: HTML5, LaTeX/TikZ, SQL, QT5/QML
+    \ii<.-> Sprachen allerorten: HTML5, LaTex/TikZ, SQL, QT5/QML
     \ei
   }
   \ii<+-> \Structure{Anforderung an sie}: Schnell \alert{effektiv} und \alert{effizient} entwickeln können. {
@@ -188,8 +188,8 @@ Diese beständige Entwicklung stellt allerdings auch eine Herausforderung für s
 Mit den Programmiersprachen, die sie im Laufe ihres Studiums konfrontiert sind, werden sie nicht über die nächsten 40 Jahre kommen.
 Um zukunftssicher zu werden, brauchen sie nicht nur rein technisches Wissen um eine oder zwei Sprachen, sondern systematisches und konzeptionelles Wissen das nicht so schnell altert, wie der Hype-Train vom Java Bahnhof, über die C# Hochebene, zur **Rust**-Mine braucht.
 
-Aber nicht nur die fortschreitende Entwicklung einzelner Programmiersprachen oder das Aufkommen von ganz neuen Sprachen bringt dauerhafte Relevanz für das Thema, sondern auch die schiere Prävalenz und die Vielfalt an Sprachen, die von Computern mechanisch verarbeitet werden.
-Sprachen werden nicht nur für die Kodifikation von ausführbaren Programmen verwendet, sondern, unter anderem, auch zur Aufbereitung von Informationen (z.B., [[https://www.w3.org/standards/webdesign/htmlcss][HTML5]] oder [[http://www.texample.net/tikz/][TiKZ]]) oder zur Beschreibung von Datenabfragen (z.B., SQL oder [[http://overpass-turbo.eu/s/M4M][Overpass]]).
+Aber nicht nur die fortschreitende Entwicklung einzelner Programmiersprachen oder das aufkommen von ganz neuen Sprachen bringt dauerhafte Relevanz für das Thema, sondern auch die schiere Prevalenz und die Vielfalt an Sprachen, die von Computern mechanisch verarbeitet werden.
+Sprachen werden nicht nur für das Kodifikation von ausführbaren Programmen verwendet, sondern, unter anderem, auch zur Aufbereitung von Informationen (z.B., [[https://www.w3.org/standards/webdesign/htmlcss][HTML5]] oder [[http://www.texample.net/tikz/][TiKZ]]) oder zur Beschreibung von Datenabfragen (z.B., SQL oder [[http://overpass-turbo.eu/s/M4M][Overpass]]).
 
 Im Verlaufe ihres Lebens wird an sie, nachdem entschieden wurde Programmiersprache R++ in Version 2034 zu verwenden, die Anforderung gestellt werden möglichst schnell **effektiv** darin zu werden ein möglichst **effizientes** Programm zu schreiben.
 Die von ihnen erwartete Effektivität besteht darin, dass sie überhaupt in die Lage kommen ein Programm zu schreiben.
@@ -202,7 +202,7 @@ Da sie das Erlernen neuer Sprachen also nicht vermeiden können, können sie es 
 Dies ist auch das angepeilte Vorgehen dieser Veranstaltung:
 Wir werden uns Sprachkonzepte anschauen, die immer wieder auftauchen, und wir werden versuchen ihre *Essenz* heraus zu destillieren.
 Dabei werden wir uns Beispiele aus verschiedensten Sprachen anschauen um unterschiedliche Ausprägungen dieser Konzepte kennen zu lernen.
-Nur so können wir der großen Vielfalt an Sprachen adäquat begegnen ohne in einer Flut technischer Details unterzugehen.
+Nur so können wir der großen Vielfalt an Sprachen adequat begegnen ohne in einer Flut technischer Details unter zu gehen.
 
 Zu Gute kommt uns dabei, dass Ingenieure, auch bei der Entwicklung einer neuen Sprache, nicht jedes mal auf der grünen Wiese anfangen, sondern gerne auf altbewährte Konzepte zurückgreifen.
 Diese Evolutionäre Entwicklung ist allerdings nicht reiner Phantasielosigkeit geschuldet, sondern hat den sozialen Faktor, dass andere Ingenieure leichter in die neue Sprache hinein finden; die Einstiegshürde ist deutlich geringer.
@@ -252,7 +252,7 @@ Falls sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.
     \bi
     \ii \STRUCTURE{Übersetzer}: Bringt die Abstraktionen auf die Maschine {
       \bi
-      \ii Zwischenschritte vom Zeichenstrom zum Assemblerprogramm
+      \ii Zwischenschritte vom Zeichenstrom zum Assemblerprogram
       \ii Nötige Datenstrukturen und Algorithmen
       \ii Praktische Arbeit an einem einfachen Übersetzer
       \ei
@@ -311,7 +311,7 @@ Falls sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.
         \bi
         \ii Strukturierte Daten lassen sich einfacher verarbeiten als Strings.
         \ii Formale Grammatiken und effiziente Parsertechniken
-        \ii Parser prüft einen Teil der Sprachregeln: Syntaktische Korrektheit
+        \ii Parser prüft einen Teil der Spracheregeln: Syntaktische Korrektheit
         \ei
       }
       \ei
@@ -389,7 +389,7 @@ YYY
       \bi
       \ii Erweiterung eines kleinen Beispielübersetzers (in Python)
       \ii Arbeiten am Parser, der Typprüfung, Codeerzeugung, und am Optimierer
-      \ii Übersetzer macht selbst rege Gebrauch von Python Sprachfeatures
+      \ii Übersetzer macht selbst rege gebrauch von Python Sprachfeatures
       \ei
     }\medskip
     \ii Die Programmiersprache L0 - Basis unseres Übersetzers{
@@ -416,7 +416,7 @@ YYY
           \bi
           \ii Globale und lokale Variablen
           \ii Funktionen mit mehreren Argumenten
-          \ii Nur Ganzzahlen und Pointer
+          \ii Nur Ganzahlen und Pointer
           \ii Keine Sicherheitsnetze
           \ei
 
@@ -445,7 +445,7 @@ XXX
   \ii Vorlesung: 13 Termine {
     \bi
     \ii Dienstag 9:00-11:00 Uhr, 201, Conticampus
-    \ii Semesterplan und Vorlesungsskript auf der SRA Webseite
+    \ii Semesterplan und Vorlesungskript auf der SRA Webseite
     \ii \url{https://www.sra.uni-hannover.de/p/lehre-V\_PS\%C3\%9C}
     \ei
   }\medskip
@@ -572,7 +572,7 @@ Virtuelle Maschinen
 
 #+begin_src latex
   \begin{frame}[t]{"Virtuelle Maschinen"}
-    \alert{Wichtig:} Wir meinen nicht VMWare, VirtualBox oder KVM.\bigskip
+    \alert{Wichtig:} Wir meinen nicht VMWare, Virtualbox oder KVM.\bigskip
 
     \bi
     \ii Maschinenmodell der virtuellen Maschine {
@@ -605,7 +605,7 @@ Virtuelle Maschinen
       \bi
       \ii \structure{Speicher}: 32 CPU Register + frei adressierbarer Speicher
       \ii \structure{Befehle}: 47 Instruktionen mit arithmetischen, binären und Sprungbefehlen
-      \ii Der SweRV von Western Digital ist \alert{ein} Prozessor für dieses Modell.
+      \ii Der SweRV von Western Digital is \alert{ein} Prozessor für dieses Modell.
       \ei
     }\medskip
     \ii Beispiel eines Maschinenprogramms: 02 b5 05 3b 80 82 \pause{
@@ -680,7 +680,7 @@ Beobachtbare Zustände
       \ii Definition des beobachtbaren Zustands ist bei komplexeren Sprachen schwierig.
       \ei
     }\medskip
-    \ii Programmausführung durch einen Prozessor ergibt eine Zustandsfolge: \\
+    \ii Programmausführung durch einen Prozessor ergibt eine Zustandfolge: \\
     $q = (q_1, q_2, \ldots, q_n)$ {
       \bi
       \ii Die Zustände sind vom Speicher der Maschine abgeleitet.
@@ -834,7 +834,7 @@ Beobachtbare Zustände
     }
     \ei
     \bii
-    \ii \Alert{Aber:} Es ist zu aufwendig einen Übersetzer in M (z.B. Assembler) zu schreiben.
+    \ii \Alert{Aber:} Es is zu aufwendig einen Übersetzer in M (z.B. Assembler) zu schreiben.
     \ii Wir wollen den Übersetzer lieber in L schreiben und irgendwie nach M bringen.
     \ii Dieser Prozess heißt Bootstrapping ($=$ sich selbst aus dem Sumpf ziehen).
     \eii
@@ -888,7 +888,7 @@ Beobachtbare Zustände
 
   \begin{frame}{2. Möglichkeit: Vereinfachter Übersetzer}
     \bi
-    \ii Ableitung eines einfacheren Übersetzers \dn2 aus dem voll ausgestatteten \dn1.\\[2ex] {
+    \ii Ableitung eines einfacheren Übersetzers \dn2 aus dem vollausgestatten \dn1.\\[2ex] {
       \begin{center}
         \includegraphics[height=2cm, page=6]{fig/01-t-diagram}
       \end{center}

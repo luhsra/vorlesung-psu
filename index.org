@@ -6,7 +6,7 @@ Alles was man gerne hier sagen möchte.
 1. [[file:01-einleitung.org][Einleitung]]
  -. [[file:01-einleitung.org::#01-ebenenmodell]
 2. Übersetzer: Lexen und Parsen
-   - Tokenstrom, (Kontextfreie) Gramatiken, Abstrakter Syntaxbaum, Parsertechniken, Parsergeneratoren
+   - Tokenstrom, (Kontextfreie) Grammatiken, Abstrakter Syntaxbaum, Parsertechniken, Parsergeneratoren
 
 3. Sprachen: Typen
    - Primitiv, Strukturierte und Unstrukturierte Komposition, Funktionstypen, Typableitungen, Typschablonen, Kompatibilität
@@ -15,7 +15,7 @@ Alles was man gerne hier sagen möchte.
    - Brujin Indices + Lexical Depth
 5. Übersetzer: Semantische Analyse und Source-to-Source Transformation
    - Typprüfung, Namensauflösung, Fehlermeldungen
-   - C-Präprozessor/M4, Hygenische Macros, Transpilation, Domain Specific Languages
+   - C-Präprozessor/M4, Hygenische Makros, Transpilation, Domain Specific Languages
 
 6. Sprachen: Objekte
    - Data Abstraction, Objekterzeugung, Lebenszeiten, Ownership, Initialisierung, Mixins, Prototype-Inheritance,
