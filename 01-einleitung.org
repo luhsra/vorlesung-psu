@@ -13,45 +13,13 @@
 \psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
 #+END_SRC
 
-#+BEGIN_SRC latex :tangle-prologue nil :tangle-epilogue nil
+#+BEGIN_SRC latex :tangle-prologue nil
 \subtitle{{{{subtitle()}}}}
 \begin{frame}
   \maketitle
 \end{frame}
-\psuSectionStop{Titlepage}{{{{n(block,-)}}}}
-#+END_SRC
 
-* Gedanken zu dieser Vorlesungseinheit                             :noexport:
-Mit der ersten Vorlesung, soll der Studierene für die Vorlesung
-motiviert werden. Es soll verstehen, welcher ganz konkreten
-Erkenntnisgewinn daraus gezogen werden kann sich mit
-Programmiersprachen und deren Implementierungen zu beschäftigen. Ihm
-muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
-
-- Was muss der Studierende wissen um eine neue Programmiersprache
-  effektiv und effizient ein zu setzen?
-
-  - Welche Abstraktion bietet eine Programmiersprache an und was hat dies mit dem Ebenenmodell zu tun?
-
-  - Was ist der Unterschied zwischen einem Interpreter und einem Übersetzer?
-
-  - Was darf ein Übersetzer und was darf dieser nicht?
-
-
-* Einleitung
-:PROPERTIES:
-:CUSTOM_ID: 01-einleitung
-:END:
-
-In diesem Skript[fn::Shift+Mouse Click für Rückwärts in den Folien]
-sind die Themen der Vorlesung "Programmiersprachen und Übersetzer"
-noch einmal schriftlich erörtert. Dabei erhebt das Skript **keinen**
-Anspruch auf Vollständigkeit und es ersetzt auch nicht die Lektüre von
-Lehr- und Fachbüchern. Im Verlaufe der Veranstaltung finden sie die
-entsprechenden Literaturhinweise.
-
-#+BEGIN_SRC latex
-  \begin{frame}{Der Dozent}
+\begin{frame}{Der Dozent}
     \PutAt{(10cm,1.6cm)}{
       \includegraphics[width=2cm]{fig/01-dietrich}
     }
@@ -78,9 +46,48 @@ entsprechenden Literaturhinweise.
       \ei
     }
     \ei
-  \end{frame}
+\end{frame}
 #+END_SRC
 
+* Gedanken zu dieser Vorlesung                                     :noexport:
+Mit der ersten Vorlesung, soll der Studierene für die Vorlesung
+motiviert werden. Es soll verstehen, welcher ganz konkreten
+Erkenntnisgewinn aus der Veranstaltung gezogen werden kann sich mit
+Programmiersprachen und deren Implementierungen zu beschäftigen. Ihm
+muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
+
+- Was muss der Studierende wissen um eine neue Programmiersprache
+  effektiv und effizient ein zu setzen?
+
+  - Welche Abstraktion bietet eine Programmiersprache an und was hat
+    dies mit dem Ebenenmodell zu tun?
+
+  - Was ist der Unterschied zwischen einem Interpreter und einem
+    Übersetzer?
+
+  - Was darf ein Übersetzer und was darf dieser nicht?
+
+
+* Einleitung
+:PROPERTIES:
+:CUSTOM_ID: 01-einleitung
+:END:
+
+In diesem Skript sind die Themen der Vorlesung "Programmiersprachen
+und Übersetzer" noch einmal schriftlich erörtert. Dabei erhebt das
+Skript **keinen** Anspruch auf Vollständigkeit und es ersetzt auch
+nicht die Lektüre von Lehr- und Fachbüchern. Im Verlaufe der
+Veranstaltung werden sie entsprechenden Literaturhinweise, sowohl
+Bücher als auch Links zu entsprechenden Fachartikeln und
+Blogeinträgen, finden. Sollten sie weitere Interessante Artikel zur
+Veranstaltung finden, scheuen sie sich mir nicht diese zuzusenden.
+
+Um unnötige Dopplungen mit den Folien zu vermeiden, haben wir die
+einzelnen Vorlesungsfolien in dieses Dokument mit eingebunden. Zu den
+jeweiligen Abschnitten finden sie die Erläuterungen, Ergänzungen und
+Informationen, die während der Vorlesung auf der "Tonspur" erzählt
+werden. In den jeweiligen Folienblöcken können sie mittels Mausklick
+vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
 
 #+BEGIN_SRC latex
   \begin{frame}{Was soll diese Veranstaltung leisten?}
@@ -143,6 +150,13 @@ entsprechenden Literaturhinweise.
         }
       \end{CPP}
     \end{code}%
+    \begin{code}<+->[tag=Python]
+      \begin{py}[]
+        sum = 0
+        for x in vec:
+            sum += x
+      \end{py}
+    \end{code}%
     \begin{code}<+>[tag=C++11]
       \begin{CPP}[]
         int sum = 0;
@@ -150,13 +164,6 @@ entsprechenden Literaturhinweise.
           sum += x
         }
       \end{CPP}
-    \end{code}%
-    \begin{code}<+->[tag=Python]
-      \begin{py}[]
-        sum = 0
-        for x in vec:
-            sum += x
-      \end{py}
     \end{code}
   }
     \ii<+> Gemeinsame Konzepte von verschiedenen Programmiersprachen {
@@ -170,6 +177,56 @@ entsprechenden Literaturhinweise.
 
   \end{frame}
 #+END_SRC
+
+Zunächst stellt sich die Frage, wieso es für einen Informatiker sinnvoll ist sich im Detail mit Programmiersprachen, ihren Konzepten und ihrer Übersetzung in Maschinencode zu beschäftigen.
+Schließlich gibt es all diese Werkzeuge bereits und wir können sie einfach verwenden.
+Außerdem haben sie vielleicht das Gefühl, dass Übersetzer und deren Konstruktion ein schwer zu durchdringendes Thema sind und eher an schwarze Magie denn an normale Programmierung erinnern.
+Aus eigener Erfahrung kann ich ihnen sagen:
+dem ist nicht so und sowohl Programmiersprachen, als auch Übersetzer, sind ein spannendes Feld der Informatik in dem eine beständige Entwicklung stattfindet.
+
+Diese beständige Entwicklung stellt allerdings auch eine Herausforderung für sie, als Informatiker oder Informatik-geneigter Ingenieur, da.
+Mit den Programmiersprachen, die sie im Laufe ihres Studiums konfrontiert sind, werden sie nicht über die nächsten 40 Jahre kommen.
+Um zukunftssicher zu werden, brauchen sie nicht nur rein technisches Wissen um eine oder zwei Sprachen, sondern systematisches und konzeptionelles Wissen das nicht so schnell altert, wie der Hype-Train vom Java Bahnhof, über die C# Hochebene, zur **Rust**-Mine braucht.
+
+Aber nicht nur die fortschreitende Entwicklung einzelner Programmiersprachen oder das aufkommen von ganz neuen Sprachen bringt dauerhafte Relevanz für das Thema, sondern auch die schiere Prevalenz und die Vielfalt an Sprachen, die von Computern mechanisch verarbeitet werden.
+Sprachen werden nicht nur für das Kodifikation von ausführbaren Programmen verwendet, sondern, unter anderem, auch zur Aufbereitung von Informationen (z.B., [[https://www.w3.org/standards/webdesign/htmlcss][HTML5]] oder [[http://www.texample.net/tikz/][TiKZ]]) oder zur Beschreibung von Datenabfragen (z.B., SQL oder [[http://overpass-turbo.eu/s/M4M][Overpass]]).
+
+Im Verlaufe ihres Lebens wird an sie, nachdem entschieden wurde Programmiersprache R++ in Version 2034 zu verwenden, die Anforderung gestellt werden möglichst schnell **effektiv** darin zu werden ein möglichst **effizientes** Programm zu schreiben.
+Die von ihnen erwartete Effektivität besteht darin, dass sie überhaupt in die Lage kommen ein Programm zu schreiben.
+Die erwartete Effizienz besteht darin, dass das erstellte Programm nicht unrealistisch lange für eine einfache Aufgabe braucht.
+Aber auch wenn sie selbst in die Lage kommen die Wahl der Programmiersprache für ein neues Projekt zu treffen, brauchen sie das nötige Wissen um eine informierte Entscheidung treffen zu können.
+Beispielsweise muss die Abwägung zwischen der performanten Ausführung einer übersetzten Sprache und der schnellen Entwicklung in einer Skriptsprache, je nach Anwendungsfall,Unternehmenstruktur und Verfügbarkeit von Entwicklern, anders getroffen werden.
+Ein Startup, welches seine Webanwendung in [[https://github.com/azac/cobol-on-wheelchair][COBOL]] entwickelt, wird es schwer haben die nötige Entwicklungsgeschwindigkeit zu erreichen.
+
+Da sie das Erlernen neuer Sprachen also nicht vermeiden können, können sie es sich auch gleich möglichst *einfach* machen und wiederverwendbare Konzepte lernen anstatt 20 Ausprägungen von selbem Konzept.
+Dies ist auch das angepeilte Vorgehen dieser Veranstaltung:
+Wir werden uns Sprachkonzepte anschauen, die immer wieder auftauchen, und wir werden versuchen ihre *Essenz* heraus zu destillieren.
+Dabei werden wir uns Beispiele aus verschiedensten Sprachen anschauen um unterschiedliche Ausprägungen dieser Konzepte kennen zu lernen.
+Nur so können wir der großen Vielfalt an Sprachen adequat begegnen ohne in einer Flut technischer Details unter zu gehen.
+
+Zu Gute kommt uns dabei, dass Ingenieure, auch bei der Entwicklung einer neuen Sprache, nicht jedes mal auf der grünen Wiese anfangen, sondern gerne auf altbewährte Konzepte zurückgreifen.
+Diese Evolutionäre Entwicklung ist allerdings nicht reiner Phantasielosigkeit geschuldet, sondern hat den sozialen Faktor, dass andere Ingenieure leichter in die neue Sprache hinein finden; die Einstiegshürde ist deutlich geringer.
+Ein Beispiel für das evolutionäre einschleichen eines Sprachkonzepts in den Kanon allgemein bekannter Konzepte ist die Iteration über eine Sequenz von Elementen.
+Wo in C noch umständlich mit Zeigern hantiert wird, und die alte C++ Variante beinahe genauso aussieht, hat die aktuelle Version von C++ die Möglichkeit, mittels einer Kurzschreibweise, über Sequenzen zu iterieren.
+
+#+begin_src python
+  sequence = [1, 1, 2, 3, 5, 8, 13]
+  idx = 0
+  while idx < len(sequence):
+      print(sequence[idx])
+      idx += 1
+
+  print("---")
+  for element in sequence:
+      print(element)
+#+end_src
+
+Im Verlaufe des Skriptes gibt es Quellcodebeispiele, die direkt im Browser ausgeführt werden können.
+Um die Ladezeit der Seite zu verringern haben wir darauf verzichtet diese Funktionalität standardmäßig zu aktivieren.
+Durch einen Klick auf den "Load Interpreter" Button, wird [[https://github.com/viebel/klipse][Klipse]] nachgeladen und die Beispiele erwachen zum Leben und können auch direkt im Browser editiert werden.
+Allerdings erfolgt das Nachladen von Klipse von Drittseiten, für deren Einstellung zu ihrer Privatsphäre wir nicht garantieren können.
+Falls sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.mozilla.org/de/firefox/addon/umatrix/][uMatrix]], nutzen, müssen sie ihre Einstellungen entsprechend anpassen.
+
 
 * Inhalt der Veranstaltung
 :PROPERTIES:
@@ -320,6 +377,8 @@ entsprechenden Literaturhinweise.
 
 #+END_SRC
 
+YYY
+
 #+begin_src latex
   \begin{frame}[fragile]{Was passiert in den Übungen?}
     \Alert{Ziel:} Vertiefung von theoretischem Wissen und praktische Erfahrungen.
@@ -367,6 +426,9 @@ entsprechenden Literaturhinweise.
     \ei
   \end{frame}
 #+END_SRC
+
+
+XXX
 
 * Organisation der Veranstaltung
 :PROPERTIES:
@@ -911,6 +973,8 @@ Portierung
   \end{frame}
 
   \begin{frame}{Quellenverzeichnis}
+    \nocite{scott:15:book}
+    \nocite{aho:07}
     \printbibliography
   \end{frame}
 #+end_src

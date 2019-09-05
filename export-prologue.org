@@ -6,7 +6,3 @@
 #+HTML_HEAD: <script type="text/javascript" src="js/jquery.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="js/bootstrap.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="js/org-bootstrap.js"></script>
-#+BEGIN_COMMENT
-#+HTML_HEAD: <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.7.3/brython.min.js"></script>
-#+HTML_HEAD: <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.7.3/brython_stdlib.js"></script>
-#+END_COMMENT

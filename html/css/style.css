@@ -43,6 +43,18 @@ a.carousel-control-prev, a.carousel-control-next {
     cursor: pointer;
 }
 
+button.execute {
+    display: inline;
+    position: relative;
+    background-color: white;
+    top: 10px;
+    left: 10px;
+    padding: 3px;
+    border: 1px solid black;
+    z-index: 1;
+    mouse: pointer;
+}
+
 /* Overwrite tufte.css */
 @media only screen and (max-aspect-ratio: 1/1){
     body{

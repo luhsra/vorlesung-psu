@@ -56,6 +56,7 @@ emacs/ensure:
 
 # We use the emacs server to tangle the shit out of it
 build/tangle/%.tex: %.org
+	@mkdir -p build/tangle
 	${EC} -e '(org-babel-tangle-file "'"$$PWD"'/$<" nil "latex")'
 	mv $(patsubst %.org,%.tex,$<) $@
 	bin/delete-frames $@

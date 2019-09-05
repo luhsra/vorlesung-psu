@@ -8,9 +8,11 @@
 
 (require 'org)
 (require 'ob-tangle-sra)
+(require 'htmlize)
 
-(setq org-html-klipsify-src t)
+(setq org-html-klipsify-src nil)
 (setq org-html-htmlize-font-prefix  "org-")
 (setq org-html-htmlize-output-type 'css)
+
 
 (message "... emacs is started.")

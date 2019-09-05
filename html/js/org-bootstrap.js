@@ -1,5 +1,13 @@
 $( document ).ready(function() {
-    if (window.location.search.search('print') != -1) {
+    $.urlParam = function(name){
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results==null) {
+            return null;
+        }
+        return decodeURI(results[1]) || 0;
+    }
+
+    if ($.urlParam('print') != null) {
         $(".slide").removeClass('w-100').addClass('d-print-block');
         var inner = $(".carousel-inner");
         inner.siblings().remove();
@@ -23,7 +31,7 @@ $( document ).ready(function() {
         var url = window.location.href.replace('.html', '-slides.pdf');
         $('<a href="'+url+'">[Slides]</a>').appendTo('#table-of-contents');
 
-        $('<a href="?print">[Drucken]</a>').appendTo('#table-of-contents');
+        $('<a href="?print=true">[Drucken]</a>').appendTo('#table-of-contents');
 
         $('#footnotes').appendTo('.col-md-9');
 
@@ -37,5 +45,39 @@ $( document ).ready(function() {
                 return true;
             });
         });
+
+        $("pre.src").each(function (idx, block) {
+            var button = $('<button class="execute">Load Interpreter</button>');
+            button.insertBefore(block);
+            button.click(function(e) {
+                // Click Klipse
+                if ($("script#script-klipse").length == 0) {
+                    var script = document.createElement('script');
+                    script.id = 'script-klipse';
+                    script.type='text/javascript';
+                    script.src = "https://storage.googleapis.com/app.klipse.tech/plugin_prod/js/klipse_plugin.min.js";
+                    script.onload = function() {
+                        $("button.execute").detach();
+                    }
+                    document.head.appendChild(script);
+                    var css = document.createElement('link');
+                    css.rel = 'stylesheet'
+                    css.type = 'text/css';
+                    css.href = 'https://storage.googleapis.com/app.klipse.tech/css/codemirror.css';
+                    script.id = 'script-klipse';
+                    document.head.appendChild(css);
+                }
+            });
+        });
+
+        window.klipse_settings = {
+            selector_eval_html: '.src-html',
+            selector_eval_js: '.src-js',
+            selector_eval_python_client: '.src-python',
+            selector_eval_scheme: '.src-scheme',
+            selector: '.src-clojure',
+            selector_eval_ruby: '.src-ruby',
+            eval_idle_msec: 100
+        };
     }
 });
