@@ -1081,13 +1081,13 @@ Wir können sie also ebenso mittels eines Kobolds implementieren anstatt mit ein
     }
     \iiad (Langsame) Interpreter schreiben ist meist einfacher als Übersetzer.
     \iida Doppelter Aufwand und der Interpreter ist Wegwerfware
-    \iida Verhält sich \dn1 auf echter Hardware und im Interpreter gleich?
+    \iida Verhält die \dn1 und \dn2 wirklich gleich?
     \ei
   \end{frame}
 
   \begin{frame}{2. Möglichkeit: Vereinfachter Übersetzer}
     \bi
-    \ii Ableitung eines einfacheren Übersetzers \dn2 aus dem voll ausgestatteten \dn1.\\[2ex] {
+    \ii Ableitung eines einfacheren Übersetzers \dn2 aus \dn1.\\[2ex] {
       \begin{center}
         \includegraphics[height=2cm, page=6]{fig/01-t-diagram}
       \end{center}
@@ -1120,8 +1120,46 @@ Wir können sie also ebenso mittels eines Kobolds implementieren anstatt mit ein
   \end{frame}
 #+end_src
 
+Wir haben bereits gesehen, dass Übersetzer Programme von einer Sprache in eine andere Sprache, unter Beibehaltung der beobachtbaren Zustände, transformieren.
+Bisher haben wir allerdings noch nicht darüber gesprochen auf welcher Maschine dieser Übersetzer ausgeführt werden soll und wer das Übersetzerprogramm erstellt.
 
-Portierung
+Aus Anwendersicht möchten wir einen Übersetzer für unsere Programmiersprache L haben, der auf der selben Maschine M läuft, auf der wir später auch das Zielprogramm ausführen wollen.
+Allerdings ist es sehr aufwendig einen Übersetzer direkt in M zu schreiben, denn M hat tradtionellerweise weniger nützliche Abstraktionen als L (Ebenenmodell).
+Einen Übersetzer in Assembler zu schreiben macht einfach keine Freude.
+Ausserdem wäre dann unser mühsam erstellter Übersetzer spezifisch für unsere Zielplattform und wir müssten mit jeder neuen Prozessorarchitektur einen neuen Übersetzer erstellen.
+Daher wollen wir lieber den Übersetzer in der Sprache L schreiben.
+
+Dies hat auch den Vorteil, dass wir, als neue Sprachentwickler, gleich die Vor- und Nachteile unser neuen Sprache kennenlernen und vielleicht noch Anpassungen an der Sprache vornehmen.
+Außerdem ist ein Übersetzer ein hinreichend komplexes Softwareprojekt um herauszufinden ob der Übersetzer korrekt arbeitet, wenn man ihn mit sich selbst füttert.
+Weil man sich in diesem Prozess quasi selbst an den Haaren aus dem Sumpf zieht, heißt dieser Prozess *Bootstrapping*.
+Außerdem gehört es quasi zum guten Ton eines Sprachentwicklers, wenn sein Übersetzer in der eingenen Sprache geschrieben ist und sich selbst übersetzen kann[fn::[[https://en.wikipedia.org/wiki/Self-hosting_(compilers)][Wikipedia: Self-Hosting Compiler]]].
+
+Prinzipiell haben wir zwei Möglichkeiten, die beide ihre Vor- und Nachteile haben.
+Zum einen können wir, neben dem Übersetzer für L der in L geschrieben ist, auch einen Interpreter für L in M schreiben.
+Da ein Interpreter, zumindest wenn man erlaubt, dass er langsam sein darf, weniger Komplex ist als ein Übersetzer, spart man bei der Entwicklung und der Portierung auf neue Plattformen Zeit.
+Nachteil an dieser Variante ist, dass der Interpreter, wenn wir ihn nicht an anderer Stelle noch einmal verwenden können, Wegwerfware ist.
+Viel schwerwiegender ist allerdings das ein Konsistenzproblem.
+Denn woher wissen wir, dass Interpreter und Übersetzer wirklich die gleiche Sprache implementieren oder ob sich doch in einem von beidem ein Fehler eingeschlichen hat.
+
+Die andere Möglichkeit, verwendet eine Interativen Prozess der Selbstübersetzung einer vereinfachten Variante des Übersetzers.
+Nachdem man der Übersetzer (L->M) in L geschrieben hat, definiert man die Untermengen L' und M', die gerade noch so mächtig sind um einen vollständigen Übersetzer zu schreiben.
+Dies kann passieren, indem man exotische Sprachfeatures in L' weglässt bzw. die komplexeren Maschinenbefehle die M eigentlich bietet ignoriert.
+
+Mit diesen Untermengen, leitet man aus dem eigentlichen Übersetzer einen vereinfachten Übersetzer her, der in L' implementiert ist und nur ineffizienten Code für die M' erzeugt.
+Da M' eine Untermenge von M ist, läuft auch jedes Zielprogramm des vereinfachten Übersetzers auf unser eigentlichen Zielarchitektur.
+Häufig kann die Ableitung des vereinfachten Übersetzers dadurch geschehen, dass man die komplizierteren Phasen des Übersetzungsvorgangs, wie Optimierung, einfach weglässt (z.B. mit ~#ifdef~).
+
+In einem zweiten Schritt, müssen wir diesen vereinfachten Übersetzer per Hand, oder mit Hilfe eines anderen Übersetzers, für die Maschine M' implementieren.
+Und obwohl unser vereinfacher Übersetzer eigentlich L übersetzen kann, können wir bei diesem manuellen Schritt sogar noch mehr Aspekte weg lassen, sodass am Ende nur ein Übersetzer für ~L'->M'~ entsteht.
+Damit haben wir zum ersten mal ein Programm, das auf der Maschine M läuft und so etwas ähnliches wie L übersetzen kann.
+
+Im Folgenden übersetzen wir zuerst den vereinfachten Übersetzer mit seiner Implementierung.
+Damit bekommen wir eine volle Version des vereinfachten Übersetzers, den nun wirklich den gesamten Umfang von L versteht und verarbeiten kann.
+Als nächstes Stecken wir den orginalen Übersetzer in diesen vereinfachten Übersetzer und bekommen eine langsame Variante des orginalen Übersetzers, der auf M' läuft, aber schon Code für M erzeugt.
+Eine weitere Interation der Selbstübersetzung, liefert nun endlich das gewünschte Ergebnis: einen schnellen Übersetzer, der unsere Sprache L verarbeitet und Programme für M erzeugt.
+Wiederholt man der Vorgang ein weiteres Mal und vergleicht die Binärdateien der beiden letzten Übersetzer, so kann man noch weiteres Vertrauen in die Übersetzungsleistung gewinnen[fn::Ein interessantes Beispiel eines absichtlichen Fehlers beim Bootstrapping ist das klassische Paper von Ken Thompson, einem der Erfinder von C, [[https://dl.acm.org/citation.cfm?id=358210][Reflections on trusting trust]].
+Dort hat Thompson einen Übersetzer geschrieben, der eine Hintertür beim Übersetzungsvorgang einbaut, wenn der Übersetzer selbst übersetzt wird.].
+
 #+begin_src latex
   \begin{frame}{Portierung auf neue Plattform und Cross-Compiler}
     \begin{center}
@@ -1143,6 +1181,16 @@ Portierung
     \ei
   \end{frame}
 #+end_src
+
+Ein ähnliches Probelm wie beim Bootstrappen tritt bei der Portierung eines Übersetzers auf eine neue Hardwarearchitektur auf.
+Allerdings ist hier der Vorgang deutlich vereinfacht, da wir bereits einen Übersetzer für L haben, der auf der alten Hardware läuft.
+Wir erweitern unseren Übersetzer dahingehend, dass er die neue Architektur N als Ausgabeformat unterstützt und übersetzen ihn für M.
+Eine zweite Iteration der Selbstübersetzung, liefert nun einen Übersetzer der auf N läuft und Code für N erzeugt.
+
+Früher war die Portierung von Übersetzern ein größeres Problem, da ein Übersetzerprogramm meist nur ein einziges Ausgabeformat unterstützt hat.
+Also entweder konnte er Code für M erzeugen oder für N.
+Ein Beispiel für solch einen Übersetzer ist ~gcc~; dort benötigt man für jede Zielplattform ein eigenes Übersetzerbinary.
+Modernere Übersetzer sind Multi-Targetfähig und sind von Anfang an darauf vorbereitet Code für  unterschiedliche Architekturen zu erzeugen (siehe LLVM Graphik weiter oben).
 
 
 * Zusammenfassung
