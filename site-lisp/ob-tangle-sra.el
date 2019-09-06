@@ -336,22 +336,26 @@ Return a list whose CAR is the tangled file name."
       (setq org-macro--counter-table (make-hash-table :test #'equal))))
 
 (require 'org-element)
+
+(defun s-replace (old new s)
+  "Replaces OLD with NEW in S."
+  (declare (pure t) (side-effect-free t))
+  (replace-regexp-in-string (regexp-quote old) new s t t))
+
 (defun org-macro-headlines (file)
   (with-current-buffer (find-file-noselect file)
     (org-with-wide-buffer
      (let ((data  (org-element-parse-buffer 'headline))
 	   (res "") (sep ""))
-       (message ":%s:" (buffer-string))
        (dolist (headline (cddr data))
          (let ((id (org-element-property :CUSTOM_ID headline))
                (tags (org-element-property :tags headline))
                (title (org-element-property :title headline)))
-           (message "%s %s" id (member 'noexport tags))
            (unless (or (not id) (member 'noexport tags))
              (setq res (format "%s%s[[%s#%s][%s]]"
-                               res sep file id title))
+                               res sep (s-replace ".org" ".html" file)
+			       id title))
              (setq sep " - "))))
-       (message ">>> %s" data)
        res))))
 
 

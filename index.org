@@ -4,11 +4,12 @@
 #+MACRO: headlines (eval (org-macro-headlines $1))
 
 
-* [[file:01-einleitung.org][Einleitung]]
+* [[file:01-einleitung.org][01 - Einleitung]
 
 Abschnitte: {{{headlines(./01-einleitung.org)}}}
 
-* Übersetzer: Lexen und Parsen
+* 02 - Übersetzer: Lexen und Parsen
+
    - Tokenstrom, (Kontextfreie) Gramatiken, Abstrakter Syntaxbaum, Parsertechniken, Parsergeneratoren
 
 3. Sprachen: Typen

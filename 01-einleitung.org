@@ -526,8 +526,6 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen sie sowohl den Aufb
 :CUSTOM_ID: 01-ebenenmodell
 :END:
 
-Das Ebenenmodell
-
 #+BEGIN_SRC latex
   \begin{frame}
   \centering
@@ -618,7 +616,22 @@ Das Ebenenmodell
 
 #+END_SRC
 
-Virtuelle Maschinen
+Nach der vorangegangenen Motivation, wieso es sich lohnt sich mit Übersetzern und Programmiersprachen, zu beschäftigen, wollen wir nun diese beiden Themen in den Kanon der Informatik, genauer gesagt der **systemnahen** Informatik, einordnen.
+Hierbei sind Programmiersprachen ein ganz essentieller Teil bei einem der grundlegendsten Problemen der Informatik:
+Dem Zwiespalt zwischen dem Wunsch seine Problemlösung möglichst abstrakt und nahe am Problem zu formulieren, und der Realität der real existierenden Maschinen.
+Diesen Zwiespalt nennen wir auch **semantische Lücke**, da zwischen einer mathematischen Formulierung und dem existierenden Silizium eine große Lücke klappt.
+Dank Alan Turing und Alonzo Church, wissen wir das sehr einfache Turingmaschinen bereits alles berechnen können, was berechnet werden kann; aber bequem geht es dabei keinesfalls zu.
+
+Daher ist es ein Ziel der Informatik, die man auch als die *Wissenschaft von der Abstraktion* bezeichnen kann, diese semantische Lücke durch möglichst gute und effiziente Abstraktionen zu schließen.
+Da der Abstand zwischen beiden Seiten, mathematisches Problem und reale Hardware, sehr groß ist, sind sogar mehrere Abstraktionsstufen notwendig, die als Hierarchie von *virtuellen Maschinen* übereinander angeordnet werden.
+In dieser Veranstaltung, werden wir uns einer dieser Schichten, der Hochsprachenebene, von zwei Seiten, einmal von unten nach oben (Bottom-Up), und einmal von oben nach unten (Top-Down) nähern.
+
+Durch die Hierarchie der virtuellen Maschinen, wie sie von Tanenbaum beschrieben wird, abstrahieren wir von der realen Maschine, die ganz unten liegt, schrittweise, indem wir immer abstraktere virtuelle Maschinen darüber legen.
+Jede dieser virtuellen Maschinen kommt mit ihrer eigenen Sprache in der sie programmiert wird:
+Wo die reale Maschine mittels Binärcode programmiert wird, können wir die weiter oben liegenden Maschinen bereits in textuell erfassbarem Assemblercode oder in einer Hochsprache wie C programmieren.
+Die Abbildung von den oben liegenden Maschinen, die ja nicht real existieren sondern nur rein virtuelle Konzepte sind, auf die unteren Schichten erfolgt ebenso schrittweise, wie wir die Abstraktionen aufeinander aufgetürmt haben.
+Dabei kann die Abbildung auf die darunterliegende Maschine entweder *statisch* durch einen Übersetzer oder *dynamisch* durch einen Interpreter erfolgen.[fn::Die Unterscheidung zwischen statisch (vor der Laufzeit) und dynamisch (zur Laufzeit) wird uns durch das ganze Semester hindurch begleiten. Es das erste Kernkonzept von Programmiersprachen dem wir begegnen; man kann es  als die Frage "Was passiert in einer Sprache statisch und was passiert dynamisch?" formulieren kann.]
+
 
 #+begin_src latex
   \begin{frame}[t]{"Virtuelle Maschinen"}
