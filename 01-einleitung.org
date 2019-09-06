@@ -325,7 +325,7 @@ Im Laufe der Veranstaltung werde ich, wo sinnvoll, einzelne Unterkapitel aus die
     \end{frame}
 
     \begin{frame}[fragile]{Kurzübersicht: Syntaktische Analyse}
-      \framesubtitle{\lecturetag{compiler}{1}}
+      \framesubtitle{\lecturetag{compiler}{2}}
       \begin{center}
         \includegraphics[page=1,width=0.6\linewidth]{fig/01-overview-example}
       \end{center}
@@ -341,7 +341,7 @@ Im Laufe der Veranstaltung werde ich, wo sinnvoll, einzelne Unterkapitel aus die
     \end{frame}
 
     \begin{frame}{Kurzübersicht: Semantische Analyse}
-      \framesubtitle{\lecturetag{compiler}{4}}
+      \framesubtitle{\lecturetag{compiler}{5}}
       \begin{center}
         \includegraphics[page=2,width=0.6\linewidth]{fig/01-overview-example}
       \end{center}
@@ -357,7 +357,7 @@ Im Laufe der Veranstaltung werde ich, wo sinnvoll, einzelne Unterkapitel aus die
     \end{frame}
 
     \begin{frame}{Kurzübersicht: Zwischencodeerzeugung}
-      \framesubtitle{\lecturetag{compiler}{7}}
+      \framesubtitle{\lecturetag{compiler}{8}}
       \begin{center}
         \includegraphics[page=3,width=\linewidth]{fig/01-overview-example}
       \end{center}
@@ -373,7 +373,7 @@ Im Laufe der Veranstaltung werde ich, wo sinnvoll, einzelne Unterkapitel aus die
     \end{frame}
 
     \begin{frame}[fragile]{Kurzübersicht: Maschinencode}
-      \framesubtitle{\lecturetag{compiler}{9}}
+      \framesubtitle{\lecturetag{compiler}{10}}
       \begin{columns}
         \begin{column}{0.4\textwidth}
           \includegraphics[page=4,width=\linewidth]{fig/01-overview-example}
@@ -630,8 +630,14 @@ Durch die Hierarchie der virtuellen Maschinen, wie sie von Tanenbaum beschrieben
 Jede dieser virtuellen Maschinen kommt mit ihrer eigenen Sprache in der sie programmiert wird:
 Wo die reale Maschine mittels Binärcode programmiert wird, können wir die weiter oben liegenden Maschinen bereits in textuell erfassbarem Assemblercode oder in einer Hochsprache wie C programmieren.
 Die Abbildung von den oben liegenden Maschinen, die ja nicht real existieren sondern nur rein virtuelle Konzepte sind, auf die unteren Schichten erfolgt ebenso schrittweise, wie wir die Abstraktionen aufeinander aufgetürmt haben.
-Dabei kann die Abbildung auf die darunterliegende Maschine entweder *statisch* durch einen Übersetzer oder *dynamisch* durch einen Interpreter erfolgen.[fn::Die Unterscheidung zwischen statisch (vor der Laufzeit) und dynamisch (zur Laufzeit) wird uns durch das ganze Semester hindurch begleiten. Es das erste Kernkonzept von Programmiersprachen dem wir begegnen; man kann es  als die Frage "Was passiert in einer Sprache statisch und was passiert dynamisch?" formulieren kann.]
+Dabei kann die Abbildung auf die darunterliegende Maschine entweder *statisch* durch eine Übersetzung oder *dynamisch* durch Interpretation erfolgen.[fn::Die Unterscheidung zwischen statisch (vor der Laufzeit) und dynamisch (zur Laufzeit) wird uns durch das ganze Semester hindurch begleiten. Es das erste Kernkonzept von Programmiersprachen dem wir begegnen; man kann es  als die Frage "Was passiert in einer Sprache statisch und was passiert dynamisch?" formulieren.]
 
+Im konkreten Falle eines Arbeitsplatzrechers, ordnet sich die Hochsprachenebene direkt über der Ebene der Assemblersprache ein.
+Das, in den Folien gezeigte, Bild kennen sie bereits aus der Veranstaltung "[[https://www.sra.uni-hannover.de/p/lehre-V_GBS][Grundlagen der Betriebssysteme]]", in der sie sich mit der Maschinenprogramm und Befehlssatzebene auseinander gesetzt hat.
+Zur Erinnerung:
+das Betriebssystem nimmt eine Teilinterpretation des Anwenderprogamms vor, indem es jeden Systemaufruf (~int 0x80~, ~sysenter~) aus dem Maschinenprogramm interpretiert, aber alle anderen Befehle (~mov~, ~add~) direkt auf der Befehlssatzebene ausführt.
+In PSÜ, werden wir uns nun nicht mit (Teil)Interpretation auseinander setzen, sondern mit der Übersetzung von Hochsprachenprogrammen in Assemblersprachenprogrammen.
+Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linkens (FIXME), der neben dem Assemblieren, die letzten Schritte zum ausführbaren Binärprogram fehlt.
 
 #+begin_src latex
   \begin{frame}[t]{"Virtuelle Maschinen"}
@@ -729,11 +735,106 @@ Dabei kann die Abbildung auf die darunterliegende Maschine entweder *statisch* d
 
 #+end_src
 
-Beobachtbare Zustände
+Zunächst wollen wir uns mit dem Konzept der "virtuellen Maschinen", welche wir im Ebenenmodell aufeinander stapeln, genauer beschäftigen und die Frage beantworten, was diese virtuellen Maschinen sind.
+Dabei beschäftigen wir uns nicht mit der Virtualisierung von echter Hardware, wie bei VMWare, bei der es darum geht eine existierende Maschinenschnittstelle (der IBM PC) so zu virtualisieren, dass man mehrere Instanzen davon nebeneinander laufen lassen kann.
+Unsere virtuellen Maschinen haben Schnittstellen die unterschiedlich sind von den Maschinen auf denen sie implementiert werden.
+
+Grundlegend besteht eine virtuelle Maschine aus zwei Komponenten:
+dem *Speicher* und den angebotenen *Befehlen*.
+Dabei können Befehle Daten aus dem Speicher lesen, verarbeiten sie, und schreiben die Ergebnisse wieder zurück. Die Gesamtheit des Speichers zu einem Zeitpunkt ist der *Zustand* der virtuellen Maschine.
+Reihen wir mehrere (valide) Befehle hintereinander, so erhalten haben wir ein Programm der Maschine.
+Um dieses sehr abstrakte Konzept zu verdeutlichen, wollen wir einen *Prozessor* für das Modell einer kleinen virtuellen Maschine in Python implementieren.
+
+#+begin_src python
+  def prozessor(memory, program, maximal_steps=10):
+      """Prozessor fuer eine virtuelle Maschine mit 2 Befehlen: add und print"""
+      # Der Programmzaehler zeigt den naechsten Befehl an
+      pc = 0
+      steps = 0
+
+      while steps < maximal_steps and pc < len(program):
+          steps += 1
+          # Der Array Zugriff: Holen der Instruktion
+          (operation, operand) = program[pc]
+
+          # Das if: Dekodierung der Instruktion
+          if operation == "add":
+              # Das Ausführen der Operation
+              memory[operand] += 1
+          elif operation == 'print':
+              print(memory[operand])
+          else:
+              raise RuntimeError("Invalid Opcode")
+
+          # Gebe den Zustand nach jedem Befehl aus
+          # print("Zustand nach %s: %s" %(program[pc], memory))
+
+          # Inkrementieren des Programmzählers
+          pc += 1
+
+  program = [
+      # (Operation, Speicherzelle)
+      ("add",   0),
+      ("add",   0),
+      ("add",   1),
+      ("print", 0)
+  ]
+
+  memory = [0] * 5 # 5 Worte an genulltem Speicher
+
+  prozessor(memory, program)
+#+end_src
+
+Die gezeigte virtuelle Maschine beinhaltet beinahe alle Elemente, die zu unserem Verständnis von virtuellen Maschinen gehören.
+Zum ersten haben wir den Prozessor (~prozessor()~), der die Semantik des Maschinenmodells als Interpreter implementiert; ein Übergebenes Programm wird also direkt ausgeführt anstatt ein Programm einer tieferen Ebene zu erzeugen.
+Dieser Prozessor ist mit Hilfe der virtuellen Python-Maschine implementiert, die ihrerseits interpretiert wird.
+
+Weiterhin hält ~program~ das auszuführende Programm und die Variable ~memory~ den Speicher der virtuellen Maschine.
+Beides übergeben wir den Prozessor, der die Befehlsfolge sequentiell ausführt[fn::Nicht jede virtuelle Maschine hat eine solch sequentielle Ausführungsreihenfolge. Für manche Maschinenmodelle darf der Prozessor eine gute Reihenfolge, in gewissen Grenzen, selbst auswählen]. Spielen sie mit der virtuellen Maschine herum: (1) Lassen sie sich den Zustand nach jedem Befehl ausgeben. (2) Fügen sie einen neuen Befehl ~mul10~ ein, der eine Speicherzelle mit 10 multipliziert. (3) Was passiert wenn sie einen Befehl in das Programm einfügen, der nicht vom Prozessor unterstützt wird? (4) Was passiert wenn sie die adressierte Speicherzelle beim ~print~ auf 100 setzen?
+
+Das einzige was in dem Beispiel fehlt, ist die *Sprache der virtuellen Maschine*, denn diese ist nur im Skript, und hoffentlich jetzt auch in ihren Köpfen, zu finden.
+Kurz könnte man sagen:
+Ein Programm unserer Beispielsprache ist eine Liste von Befehlen, die jeweils aus Operation und Operand bestehen; dabei muss die Operation eine der Zeichenketten ~"add"~ oder ~"print"~ sein.
+Der Operand ist die Adresse einer Speicherzelle, derer wir 5 haben, kodiert als Ganzzahl.
+
+Mit Hilfe dieser Sprachdefinition, können sie nun noch einmal an die Aufgaben 3 und 4 herangehen und werden sehen, dass das einfügen eines invaliden Befehls zwar Vordergründig zu einem ~RuntimeError~ geführt hat, aber der Prozessor eigentlich richtig gehandelt hat.
+Denn das übergebene Programm was leider kein Program, welches gegen unser Maschinenmodell programmiert wurde, es hatte nur Ähnlichkeit mit einem validen Programm. Ähnlich Verhält es sich mit der zu großen Speicheradresse (4); auch dort war das übergebene Programm nicht von unserer Sprachdefinition abgedeckt.
+
+Die Sprache eines Maschinenmodells beschreibt also wie valide Programme für dieses Modell aussehen müssen, damit sie von einem Prozessor der Sprache verarbeitet werden können.
+Dabei kann eine Sprache alle validen Programm exemplarisch aufzählen, aber einfacher ist es ein Regelwerk aufzustellen gegen das man Programme prüfen kann.
+Um möglichst eine möglichst präzise Prüfung vornehmen zu können, ist es sinnvoll diese Regel formal aufzuschreiben. Zum Beispiel indem man ein weiteres Programm schreibt, welches die Regel codiert. Im Folgenden, führen wir genau das für unsere kleine Sprache durch. Führen sie das Beispiel aus, und korrigieren sie alle Fehler im Programm.
+
+#+begin_src python
+  def sprache(program):
+      for (operation, operand) in program:
+          if operation not in ("add", "print"):
+              raise RuntimeError("Invalide Operation: " + str(operation))
+          if operand < 0 or operand > 5:
+              raise RuntimeError("Invalider Operand: " + str(operand))
+      print("Valides Programm")
+
+  programm = [
+      ("add", 10),
+      ("prnt", 3)
+  ]
+  sprache(programm)
+#+end_src
+
+Der hier gezeigte Code ist eine formale Beschreibung unserer Sprache, die gleichzeitig als Validierer arbeitet:
+wirft die Funktion eine Exception, so ist das übergebene Programm nicht Teil unserer Sprache.
+Die Funktion ~sprache()~ könnte so wie sie hier steht auch Teil eines Übersetzers sein.
+Dieser wird auch zuerst prüfen ob das übergebene Programm von den Sprachregeln abgedeckt ist, bevor das Programm in die Sprache einer anderen virtuellen oder realen Maschine übersetzt wird.
+
+Auf den Folien finden sie weitere Beispiele für reale bzw. virtuelle Maschinenmodelle (RISC-V und C).
+
+FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
 
 #+begin_src latex
   \begin{frame}{Beobachtbare Zustände und Zustandsfolgen}
-    \structure{Frage:} Wann ist eine Übersetzung eigentlich korrekt?\bigskip
+    \structure{Frage:} Wann ist eine Übersetzung eigentlich korrekt?\\
+    \structure{Informelle Antwort:} Das erzeugte Programm soll sich "gleich" verhalten.
+    \bigskip
+    \pause
 
     \bi
     \ii Das Maschinenmodell bestimmt den beobachtbaren Zustand ($q_n$) {
@@ -871,6 +972,26 @@ Beobachtbare Zustände
     \end{code}
   \end{frame}
 #+end_src
+
+Wir haben gelernt, dass ein Übersetzer von der Sprache eines Maschinenmodells in die Sprache eines anderen Maschinenmodells übersetzt.
+Zum Beispiel übersetzt ~gcc~ von der C Sprache in die RISC-V Sprache.
+Dabei ist es zwar klassisch, dass die Richtung der Übersetzung immer von den oberen Schichten des Ebenenmodells zu den weiter unten Liegenden geht, aber es ist nicht zwingend.
+Genauso ist es möglich, dass ein Übersetzer von RISC-V Assembler nach C (umgekehrte Richtung) übersetzt oder von C nach [[https://emscripten.org/][JavaScript]] (Quer zum Ebenenmodell).
+
+Jedoch stellt sich die Frage, wann wir von einem *korrekten* Übersetzer bzw.
+einer korrekten Übersetzung eines Programms sprechen können.
+Zum ersten ist es natürlich notwendig, das ein Übersetzer für jedes valide Quellprogramm, was er durch seine Validierungsfunktion sicherstellt, ein valides Zielprogramm erzeugt.
+Diese notwendige Bedingung ist allerdings ganz sicher nicht hinreichend, da ein Übersetzer, der immer dasselbe Programm ausgibt, egal mit was wir ihn füttern, ganz sicher nicht nützlich ist.
+
+Daher müssen wir noch einmal zu unserem Maschinenmodell zurückkehren und schauen was wir auf vom Übersetzer erwarten.
+Wir möchten, dass ein Übersetzer ein Zielprogramm erzeugt, dass sich so verhält wie das Quellprogramm es getan hätte.
+Im einfachsten Fall bedeutet das, dass beide Programme die gleiche Ausgabe erzeugen, wenn sie mit den gleichen Eingabedaten ausgeführt werden.
+Meistens stellt das Maschinenmodell aber noch weitere Regel für eine korrekte Übersetzung auf.
+
+Bei dieser erweiterten Definition von korrekter Übersetzung, erwarten wir nicht nur das Zielprogramm das gleiche Ergebnis berechnet und uns über den Ausgabekanal mitteilt, sondern auch dass es dies auf die gleiche Weise tut.
+Das Zielprogramm soll, im Grunde, die gleichen Schritte durchführt wie das Quellprogramm, nur auf einer anderen Maschine. Um dies formaler zu fassen, führen wir auf den Folien den Begriff der *beobachtbaren Zustand* ein.
+
+
 
 * Bootstrapping und Portierung
 :PROPERTIES:

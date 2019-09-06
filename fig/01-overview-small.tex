@@ -37,7 +37,7 @@
       text width=13.25cm,
     },
   ]
-  \node[topic,lecture=2,principle] (type) {
+  \node[topic,lecture=3,principle] (type) {
     \Title{Typen}\\
     Primitive Typen\\
     (Un)Strukturierte Komposition\\
@@ -45,7 +45,7 @@
     Subtyping\\
     Traits \& Typklassen\\
   };
-  \node[right=of type.north east,topic,principle,lecture=3] (name) {
+  \node[right=of type.north east,topic,principle,lecture=4] (name) {
     \Title{Namen}\\
     Statische und Dynamische Bindung\\
     Scoping Rules\\
@@ -53,7 +53,7 @@
     Overloading\\
     Static and Dynamic Dispatch
   };
-  \node[below=of type.south west,topic,principle, lecture=6] (operation) {
+  \node[below=of type.south west,topic,principle, lecture=7] (operation) {
     \Title{Operationen}\\
     Standardkonstrukte\\
     Auswertungsstrategie\\
@@ -62,7 +62,7 @@
     Verhaltenskomposition
   };
 
-  \node[right=of operation.north east,topic,principle,lecture=5] (object) {
+  \node[right=of operation.north east,topic,principle,lecture=6] (object) {
     \Title{Objekte}\\
     Data Abstraction\\
     Erzeugung \& Initialisierung\\
@@ -71,11 +71,11 @@
     Prototype Vererbung
   };
 
-  \node[above=of type.north west,yshift=4mm,topic,paradigm,topic double,anchor=west, lecture=12] (function) {
+  \node[above=of type.north west,yshift=4mm,topic,paradigm,topic double,anchor=west, lecture=13] (function) {
     \Title{Das Funktionale Paradigma}
   };
 
-  \node[below=of operation.south west,yshift=-4mm,topic,paradigm,topic double,anchor=west,lecture=11] (oo) {
+  \node[below=of operation.south west,yshift=-4mm,topic,paradigm,topic double,anchor=west,lecture=12] (oo) {
     \Title{Das Objektoriente Paradigma}
   };
 \end{scope}
@@ -91,7 +91,7 @@
   ]
 
 
-\node[below=2 of operation.south west,topic,lecture=4] (semantic) {
+\node[below=2 of operation.south west,topic,lecture=5] (semantic) {
     \Title{Semantische Analyse}\\
     Typprüfung\\
     Namensauflösung\\
@@ -100,7 +100,7 @@
   };
 
   \node[above=1.5 of semantic.north west,topic,anchor=south west,
-       lecture=1,
+       lecture=2,
        ] (parsing) {
     \Title{Synaktische Analyse}\\
     Tokenstrom\\
@@ -110,7 +110,7 @@
     Parsergeneratoren
   };
 
-\node[right=1.5 of parsing.north east,topic,lecture=7] (intermediate) {
+\node[right=1.5 of parsing.north east,topic,lecture=8] (intermediate) {
     \Title{Zwischencode}\\
     3-Address Code\\
     Code für Arith. Ausdrücke\\
@@ -119,7 +119,7 @@
     Kontrollfluskonstrukte
   };
 
-  \node[right=1.5 of semantic.north east,topic,lecture=9] (machine) {
+  \node[right=1.5 of semantic.north east,topic,lecture=10] (machine) {
     \Title{Maschinencode}\\
     Registerallokation\\
     Funktionsaufrufe\\
@@ -129,7 +129,7 @@
 
 
 
-  \node[right=1.5 of intermediate.north east,topic,lecture=8] (opt) {
+  \node[right=1.5 of intermediate.north east,topic,lecture=10] (opt) {
     \Title{Optimierung}\\
     Fixpunkt Analyse\\
     Konstantenfortschreibung\\
@@ -137,7 +137,7 @@
     Entfernung toten Codes
   };
 
-  \node[right=1.5 of machine.north east,topic,lecture=10] (runtime) {
+  \node[right=1.5 of machine.north east,topic,lecture=11] (runtime) {
     \Title{Das Laufzeitsystem}\\
     ELF und Linker\\
     Dynamische Bibliotheken\\
@@ -170,58 +170,58 @@
 
   \def\lecturedotpos{east}
 
-  \node[topic,compiler, lecture=1]  (syntax) {
+  \node[topic,compiler, lecture=2]  (syntax) {
     \Title{Synaktische Analyse}
   };
 
-  \node[topic,fill=lightgray,lecture=0,anchor=south,yshift=10mm]  (einleitung) at (syntax.north){
+  \node[topic,fill=lightgray,lecture=1,anchor=south,yshift=10mm]  (einleitung) at (syntax.north){
     \Title{Einleitung}
   };
 
-  \node[topic,lecture=2,principle]  (type) at (syntax.south) {
+  \node[topic,lecture=3,principle]  (type) at (syntax.south) {
     \Title{Typen}
   };
-  \node[topic,principle,lecture=3]  (name) at (type.south) {
+  \node[topic,principle,lecture=4]  (name) at (type.south) {
     \Title{Namen}
   };
 
-  \node[topic,compiler,lecture=4]  (semantic) at (name.south) {
+  \node[topic,compiler,lecture=5]  (semantic) at (name.south) {
     \Title{Semantische Analyse}
   };
 
-  \node[topic,principle,lecture=5,]  (object) at (semantic.south) {
+  \node[topic,principle,lecture=6]  (object) at (semantic.south) {
     \Title{Objekte}
   };
 
-  \node[topic,principle, lecture=6]  (op) at (object.south) {
+  \node[topic,principle, lecture=7]  (op) at (object.south) {
     \Title{Operationen}
   };
 
-  \node[topic,compiler,lecture=7,anchor=north west,yshift=5mm,xshift=2cm]  (@) at (syntax.north east) {
+  \node[topic,compiler,lecture=8,anchor=north west,yshift=5mm,xshift=2cm]  (@) at (syntax.north east) {
     \Title{Zwischencode}
   };
 
-  \node[topic,compiler,lecture=8]  (@) at (@.south) {
+  \node[topic,compiler,lecture=9]  (@) at (@.south) {
     \Title{Optimierung}
   };
 
-  \node[topic,compiler,lecture=9]  (@) at (@.south) {
+  \node[topic,compiler,lecture=10]  (@) at (@.south) {
     \Title{Maschinencode}
   };
 
 
 
 
-  \node[topic,compiler,lecture=10]  (@) at (@.south) {
+  \node[topic,compiler,lecture=11]  (@) at (@.south) {
     \Title{Das Laufzeitsystem}
   };
 
-  \node[topic,paradigm,lecture=11]  (oo) at (@.south) {
+  \node[topic,paradigm,lecture=12]  (oo) at (@.south) {
     \Title{Das Objektoriente Paradigma}
   };
 
 
-  \node[topic, paradigm,lecture=12]  (@) at (oo.south) {
+  \node[topic, paradigm,lecture=13]  (@) at (oo.south) {
     \Title{Das Funktionale Paradigma}
   };
 

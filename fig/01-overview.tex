@@ -27,7 +27,7 @@
       fill=luhblue!40,
     },
   ]
-  \node[topic,lecture=2,principle] (type) {
+  \node[topic,lecture=3,principle] (type) {
     \Title{Typen}\\
     Primitive Typen\\
     (Un)Strukturierte Komposition\\
@@ -35,7 +35,7 @@
     Subtyping\\
     Traits \& Typklassen\\
   };
-  \node[right=of type.north east,topic,principle,lecture=3] (name) {
+  \node[right=of type.north east,topic,principle,lecture=4] (name) {
     \Title{Namen}\\
     Statische und Dynamische Bindung\\
     Scoping Rules\\
@@ -43,7 +43,7 @@
     Overloading\\
     Static and Dynamic Dispatch
   };
-  \node[below=of type.south west,topic,principle, lecture=6] (operation) {
+  \node[below=of type.south west,topic,principle, lecture=7] (operation) {
     \Title{Operationen}\\
     Standardkonstrukte\\
     Auswertungsstrategie\\
@@ -52,7 +52,7 @@
     Verhaltenskomposition
   };
 
-  \node[right=of operation.north east,topic,principle,lecture=5] (object) {
+  \node[right=of operation.north east,topic,principle,lecture=6] (object) {
     \Title{Objekte}\\
     Data Abstraction\\
     Erzeugung \& Initialisierung\\
@@ -61,7 +61,7 @@
     Prototype Vererbung
   };
 
-  \node[left=of operation.north west,yshift=5mm,topic,anchor=east,paradigm,lecture=12] (function) {
+  \node[left=of operation.north west,yshift=5mm,topic,anchor=east,paradigm,lecture=13] (function) {
     \Title{Das Funktionale Paradigma}\\
     Parametrische Datentypen\\
     Unifikation \& Typinferenz\\
@@ -70,7 +70,7 @@
     Immutable Data
   };
 
-  \node[right=of object.north east,topic,yshift=5mm,anchor=west,paradigm,lecture=11] (oo) {
+  \node[right=of object.north east,topic,yshift=5mm,anchor=west,paradigm,lecture=12] (oo) {
     \Title{Das Objektoriente Paradigma}\\
     Klassenbasierte Vererbung\\
     Kapselung von Daten und Verhalten\\
@@ -99,7 +99,7 @@
   ]
 
 
-\node[below=2 of operation.south west,topic,lecture=4] (semantic) {
+\node[below=2 of operation.south west,topic,lecture=5] (semantic) {
     \Title{Semantische Analyse}\\
     Typprüfung\\
     Namensauflösung\\
@@ -109,7 +109,7 @@
   };
 
   \node[left=1.5 of semantic.north west,topic,anchor=north east,
-       lecture=1,
+       lecture=2,
        ] (parsing) {
     \Title{Synaktische Analyse}\\
     Tokenstrom\\
@@ -132,7 +132,7 @@
     R
   };
 
-  \node[right=1.5 of semantic.north east,topic,lecture=7] (intermediate) {
+  \node[right=1.5 of semantic.north east,topic,lecture=8] (intermediate) {
     \Title{Zwischencode}\\
     3-Address Code\\
     Code für Arith. Ausdrücke\\
@@ -141,7 +141,7 @@
     Kontrollfluskonstrukte
   };
 
-  \node[right=1.5 of intermediate.north east,topic,lecture=9] (machine) {
+  \node[right=1.5 of intermediate.north east,topic,lecture=10] (machine) {
     \Title{Maschinencode}\\
     Registerallokation\\
     Funktionsaufrufe\\
@@ -149,7 +149,7 @@
     Peephole Optimizer
   };
 
-  \node[below=1.5 of intermediate.south west,topic,lecture=8] (opt) {
+  \node[below=1.5 of intermediate.south west,topic,lecture=9] (opt) {
     \Title{Optimierung}\\
     Fixpunkt Analyse\\
     Konstantenfortschreibung\\
@@ -157,7 +157,7 @@
     Entfernung toten Codes
   };
 
-  \node[right=1.5 of opt.north east,topic,lecture=10] (runtime) {
+  \node[right=1.5 of opt.north east,topic,lecture=11] (runtime) {
     \Title{Das Laufzeitsystem}\\
     ELF und Linker\\
     Dynamische Bibliotheken\\
