@@ -17,7 +17,7 @@ Abschnitte: {{{headlines(./01-einleitung.org)}}}
    - Brujin Indices + Lexical Depth
 * [[05-semantische-analyse.org][Übersetzer: Semantische Analyse und Source-to-Source Transformation]]
    - Typprüfung, Namensauflösung, Fehlermeldungen
-   - C-Präprozessor/M4, Hygenische Macros, Transpilation, Domain Specific Languages
+   - C-Präprozessor/M4, Hygenische Makros, Transpilation, Domain Specific Languages
 
 6. Sprachen: Objekte
    - Data Abstraction, Objekterzeugung, Lebenszeiten, Ownership, Initialisierung, Mixins, Prototype-Inheritance,

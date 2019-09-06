@@ -50,7 +50,7 @@
 #+END_SRC
 
 * Gedanken zu dieser Vorlesung                                     :noexport:
-Mit der ersten Vorlesung, soll der Studierene für die Vorlesung
+Mit der ersten Vorlesung, soll der Studierende für die Vorlesung
 motiviert werden. Es soll verstehen, welcher ganz konkreten
 Erkenntnisgewinn aus der Veranstaltung gezogen werden kann sich mit
 Programmiersprachen und deren Implementierungen zu beschäftigen. Ihm
@@ -80,7 +80,7 @@ nicht die Lektüre von Lehr- und Fachbüchern. Im Verlaufe der
 Veranstaltung werden sie entsprechenden Literaturhinweise, sowohl
 Bücher als auch Links zu entsprechenden Fachartikeln und
 Blogeinträgen, finden. Sollten sie weitere Interessante Artikel zur
-Veranstaltung finden, scheuen sie sich mir nicht diese zuzusenden.
+Veranstaltung finden, scheuen sie sich nicht mir diese zuzusenden.
 
 Um unnötige Dopplungen mit den Folien zu vermeiden, haben wir die
 einzelnen Vorlesungsfolien in dieses Dokument mit eingebunden. Zu den
@@ -97,21 +97,21 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
     \bi
     \ii The next 700 programming languages, P. J. Landin\only<+->{, \citeyear{landin:66:cacm}\hfill\cite{landin:66:cacm}}
     \ii<+-> Hype Train (z.B. Rust), Evolution (C++20), Legacy (COBOL)
-    \ii<.-> Sprachen Allerorten: HTML5, LaTex/TikZ, SQL, QT5/QML,
+    \ii<.-> Sprachen allerorten: HTML5, LaTeX/TikZ, SQL, QT5/QML
     \ei
   }
-  \ii<+-> \Structure{Anforderung an Sie}: Schnell \alert{effektiv} und \alert{effizient} entwickeln können. {
+  \ii<+-> \Structure{Anforderung an sie}: Schnell \alert{effektiv} und \alert{effizient} entwickeln können. {
     \bi
-    \ii Effektiv:  In der Lage sein ein komplexes Program zu schreiben.
-    \ii Effizient: Das Programm soll schnell und sparsam sein.
-    \ii Häufig gibt es eine Abwägung zwischen beiden Zielen (siehe Skriptsprachen)
+    \ii Effektiv:  In der Lage sein, ein komplexes Programm zu schreiben.
+    \ii Effizient: Das Programm soll schnell und ressourcenschonend sein.
+    \ii Häufig gibt es eine Abwägung zwischen beiden Zielen (siehe Skriptsprachen).
     \ei
   }
-  \ii<.-> \Structure{Mein Ziel}: Vermittlung von Handwerkszeug und Denkweisen {
+  \ii<.-> \Structure{Mein Ziel}: Vermittlung von Handwerkszeug und Denkweisen. {
     \bi
     \ii Welche Fragen muss ich an eine neue Programmiersprache stellen?
     \ii Welche Konstrukte müssen prinzipbedingt teuer sein?
-    \ii Demystifizierung der Compiler Black Box.
+    \ii Demystifizierung der Compiler Black Box
     \ei
   }
   \ei
@@ -120,13 +120,13 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
   \begin{frame}[fragile,t]{Wieso ist das überhaupt möglich?}
     \btUseExtraItemSep
     \bi
-    \ii Sprachen wurden von Ingenieuren erdacht. Man baut was man kennt.  {
+    \ii Sprachen wurden von Ingenieuren erdacht. Man baut, was man kennt.  {
       \bi
-      \ii Jede neue Sprache bringt nur eine Hand voll neuer Konzepte
-      \ii Der Rest ist eine Rekombination von bereits bekanntem
+      \ii Jede neue Sprache bringt nur eine Hand voll neuer Konzepte.
+      \ii Der Rest ist eine Rekombination von bereits Bekanntem.
       \ei
     }
-    \ii<+-> Beispiel: Über einen Zahlenvektor iterieren {
+    \ii<+-> Beispiel: Über einen Zahlenvektor iterieren. {
 
     \begin{code}<.>[tag=C]
       \begin{C}[]
@@ -135,7 +135,7 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
         for (it  = &vec[0];    // Initialisierung
              it != &vec[10];   // Abbruchbedingung
              ++it) {           // Nächstes Element
-          sum += (*i);
+          sum += (*it);
         }
       \end{C}
     \end{code}%
@@ -146,7 +146,7 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
         for (it = vec.begin();  // Initialisierung
              it != vec.end();   // Abbruchbedingung
              ++it) {            // Nächstes Element
-          sum += (*i);
+          sum += (*it);
         }
       \end{CPP}
     \end{code}%
@@ -188,8 +188,8 @@ Diese beständige Entwicklung stellt allerdings auch eine Herausforderung für s
 Mit den Programmiersprachen, die sie im Laufe ihres Studiums konfrontiert sind, werden sie nicht über die nächsten 40 Jahre kommen.
 Um zukunftssicher zu werden, brauchen sie nicht nur rein technisches Wissen um eine oder zwei Sprachen, sondern systematisches und konzeptionelles Wissen das nicht so schnell altert, wie der Hype-Train vom Java Bahnhof, über die C# Hochebene, zur **Rust**-Mine braucht.
 
-Aber nicht nur die fortschreitende Entwicklung einzelner Programmiersprachen oder das aufkommen von ganz neuen Sprachen bringt dauerhafte Relevanz für das Thema, sondern auch die schiere Prevalenz und die Vielfalt an Sprachen, die von Computern mechanisch verarbeitet werden.
-Sprachen werden nicht nur für das Kodifikation von ausführbaren Programmen verwendet, sondern, unter anderem, auch zur Aufbereitung von Informationen (z.B., [[https://www.w3.org/standards/webdesign/htmlcss][HTML5]] oder [[http://www.texample.net/tikz/][TiKZ]]) oder zur Beschreibung von Datenabfragen (z.B., SQL oder [[http://overpass-turbo.eu/s/M4M][Overpass]]).
+Aber nicht nur die fortschreitende Entwicklung einzelner Programmiersprachen oder das Aufkommen von ganz neuen Sprachen bringt dauerhafte Relevanz für das Thema, sondern auch die schiere Prävalenz und die Vielfalt an Sprachen, die von Computern mechanisch verarbeitet werden.
+Sprachen werden nicht nur für die Kodifikation von ausführbaren Programmen verwendet, sondern, unter anderem, auch zur Aufbereitung von Informationen (z.B., [[https://www.w3.org/standards/webdesign/htmlcss][HTML5]] oder [[http://www.texample.net/tikz/][TiKZ]]) oder zur Beschreibung von Datenabfragen (z.B., SQL oder [[http://overpass-turbo.eu/s/M4M][Overpass]]).
 
 Im Verlaufe ihres Lebens wird an sie, nachdem entschieden wurde Programmiersprache R++ in Version 2034 zu verwenden, die Anforderung gestellt werden möglichst schnell **effektiv** darin zu werden ein möglichst **effizientes** Programm zu schreiben.
 Die von ihnen erwartete Effektivität besteht darin, dass sie überhaupt in die Lage kommen ein Programm zu schreiben.
@@ -202,7 +202,7 @@ Da sie das Erlernen neuer Sprachen also nicht vermeiden können, können sie es 
 Dies ist auch das angepeilte Vorgehen dieser Veranstaltung:
 Wir werden uns Sprachkonzepte anschauen, die immer wieder auftauchen, und wir werden versuchen ihre *Essenz* heraus zu destillieren.
 Dabei werden wir uns Beispiele aus verschiedensten Sprachen anschauen um unterschiedliche Ausprägungen dieser Konzepte kennen zu lernen.
-Nur so können wir der großen Vielfalt an Sprachen adequat begegnen ohne in einer Flut technischer Details unter zu gehen.
+Nur so können wir der großen Vielfalt an Sprachen adäquat begegnen ohne in einer Flut technischer Details unterzugehen.
 
 Zu Gute kommt uns dabei, dass Ingenieure, auch bei der Entwicklung einer neuen Sprache, nicht jedes mal auf der grünen Wiese anfangen, sondern gerne auf altbewährte Konzepte zurückgreifen.
 Diese Evolutionäre Entwicklung ist allerdings nicht reiner Phantasielosigkeit geschuldet, sondern hat den sozialen Faktor, dass andere Ingenieure leichter in die neue Sprache hinein finden; die Einstiegshürde ist deutlich geringer.
@@ -237,9 +237,9 @@ Falls sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.
     \bi
     \ii \STRUCTURE{Programmiersprachen}: Abstrahiert von der echten Maschine {
       \bi
-      \ii Kernkonzepte die sich in vielen Sprachen wiederfinden
+      \ii Kernkonzepte, die sich in vielen Sprachen wiederfinden
       \ii High-Level Paradigmen (funktional, OO), die sich daraus zusammensetzen
-      \ii Wir werden uns verschiedenste Programmiersprachen anschauen
+      \ii Wir werden uns verschiedenste Programmiersprachen anschauen.
       \ei
       }
     \ei
@@ -251,7 +251,7 @@ Falls sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.
     \bi
     \ii \STRUCTURE{Übersetzer}: Bringt die Abstraktionen auf die Maschine {
       \bi
-      \ii Zwischenschritte vom Zeichenstrom zum Assemblerprogram
+      \ii Zwischenschritte vom Zeichenstrom zum Assemblerprogramm
       \ii Nötige Datenstrukturen und Algorithmen
       \ii Praktische Arbeit an einem einfachen Übersetzer
       \ei
@@ -332,9 +332,9 @@ Im Laufe der Veranstaltung werde ich, wo sinnvoll, einzelne Unterkapitel aus die
       \bi
       \ii Von der Zeichenkette zum Abstrakten Syntaxbaum {
         \bi
-        \ii Strukturierte Daten lassen sich leicher verarbeiten als Strings
-        \ii Formaler Gramatiken und effiziente Parsetechniken
-        \ii Parser prüft einen Teil der Spracheregeln: Syntaktische Korrektheit
+        \ii Strukturierte Daten lassen sich einfacher verarbeiten als Strings.
+        \ii Formale Grammatiken und effiziente Parsertechniken
+        \ii Parser prüft einen Teil der Sprachregeln: Syntaktische Korrektheit
         \ei
       }
       \ei
@@ -391,7 +391,7 @@ Im Laufe der Veranstaltung werde ich, wo sinnvoll, einzelne Unterkapitel aus die
       \bi
       \ii Auswahl von passenden Befehlen der realen Maschine
       \ii Bestimmung des Stacklayouts für jede Funktion
-      \ii Entscheidung welcher Wert zu welchem Zeitpunkt in einem Register \enquote{lebt}.
+      \ii Entscheidung, welcher Wert zu welchem Zeitpunkt in einem Register \enquote{lebt}.
       \ei
     }
     \ei
@@ -437,7 +437,7 @@ Jeder dieser Abschnitte wird in einer Vorlesung behandelt und soll einen Überbl
       \bi
       \ii Erweiterung eines kleinen Beispielübersetzers (in Python)
       \ii Arbeiten am Parser, der Typprüfung, Codeerzeugung, und am Optimierer
-      \ii Übersetzer macht selbst rege gebrauch von Python Sprachfeaturen
+      \ii Übersetzer macht selbst rege Gebrauch von Python Sprachfeatures
       \ei
     }\medskip
     \ii Die Programmiersprache L0 - Basis unseres Übersetzers{
@@ -464,7 +464,7 @@ Jeder dieser Abschnitte wird in einer Vorlesung behandelt und soll einen Überbl
           \bi
           \ii Globale und lokale Variablen
           \ii Funktionen mit mehreren Argumenten
-          \ii Nur Ganzahlen und Pointer
+          \ii Nur Ganzzahlen und Pointer
           \ii Keine Sicherheitsnetze
           \ei
 
@@ -493,26 +493,26 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen sie sowohl den Aufb
     \includegraphics[width=2cm]{fig/01-landsberg}
   }
   \bi
-  \ii Vorlesung: 13 Vorlesung {
+  \ii Vorlesung: 13 Termine {
     \bi
-    \ii Dienstag 9:00-11:00, 201, Conticampus
-    \ii Semesterplan und Vorlesungskipt auf der SRA Webseite
+    \ii Dienstag 9:00-11:00 Uhr, 201, Conticampus
+    \ii Semesterplan und Vorlesungsskript auf der SRA Webseite
     \ii \url{https://www.sra.uni-hannover.de/p/lehre-V\_PS\%C3\%9C}
     \ei
   }\medskip
   \ii Wie funktioniert der Übungsbetrieb? {
     \bi
-    \ii 2 Übungstracks (A,B), mit einer Woche Versatz (wie GBS)
+    \ii 2 Übungstracks (A, B), mit einer Woche Versatz (wie GBS)
     \ii 6 Übungsaufgaben mit praktischem und theoretischem Inhalt\\[1ex]
     \ii Pro Track: 6 Tafel- und 6 Kleingruppenübungen, alternierend
-    \ii Tafelübung: Dienstag 16:00-18:00,
+    \ii Tafelübung: Dienstag 16:00-18:00 Uhr
     \ii Kleingruppenübung: Betreuung durch studentische Hilfskräfte
     \ei
   }\medskip
   \ii Bonuspunkte auf die Klausur (wie bei GBS) {
     \bi
     \ii Abgabe der Übungsaufgaben, maximal +10\%  Klausurpunkte
-    \ii Testatklausur am \alert{23. Juni 2019}, maximal +10\% der Klausurpunkte
+    \ii Testatklausur am \alert{23. Juni 2020}, maximal +10\% der Klausurpunkte
     \ii Bonuspunkte werden auf \structure{bestandene} Klausuren angerechnet.
     \ei
   }\bigskip
@@ -588,11 +588,11 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen sie sowohl den Aufb
               $0$ & reale Maschine $M_0$ & Sprache $L_0$\\\hline
             \end{tabular}
           }\bigskip
-          \ii {$L_x$-Program wird auf Maschine $M_{x-1}$ abgebildet
+          \ii {$L_x$-Programm wird auf Maschine $M_{x-1}$ abgebildet
             \bi
-            \ii \STRUCTURE{Dynamisch}: Interpreter als $L_{x-1}$-Program
-            \ii \STRUCTURE{Statisch}: Compiler erzeugt $L_{x-1}$ Program\\
-                Spätere Abbildung von $L_{x-1}$ auf $M_{x-2}$.
+            \ii \STRUCTURE{Dynamisch}: Interpreter als $L_{x-1}$-Programm
+            \ii \STRUCTURE{Statisch}: Compiler erzeugt $L_{x-1}$-Programm\\
+                Spätere Abbildung von $L_{x-1}$ auf $M_{x-2}$
             \ei
           }
           \ei
@@ -641,10 +641,10 @@ Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linke
 
 #+begin_src latex
   \begin{frame}[t]{"Virtuelle Maschinen"}
-    \alert{Wichtig:} Wir meinen nicht VMWare, Virtualbox oder KVM.\bigskip
+    \alert{Wichtig:} Wir meinen nicht VMWare, VirtualBox oder KVM.\bigskip
 
     \bi
-    \ii Maschienenmodell der virtuellen Maschine {
+    \ii Maschinenmodell der virtuellen Maschine {
       \bi
       \ii \structure{Speicher/Objekte}: Wie kann man Daten ablegen und wieder abrufen?
       \ii \structure{Befehle/Operationen}: Wie kann man Daten miteinander kombinieren?
@@ -654,13 +654,13 @@ Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linke
     \ii Maschinenprogramme {
       \bi
       \ii Eine Menge Befehlen, die gegen das Maschinenmodell geschrieben wurden.
-      \ii Wird von einem Prozessor verarbeitet um ein Ergebnis zu berechnen.
+      \ii Wird von einem Prozessor verarbeitet, um ein Ergebnis zu berechnen.
       \ei
     }\medskip
-    \ii Sprache der virtuellen Maschiene {
+    \ii Sprache der virtuellen Maschine {
       \bi
-      \ii Nicht jede Zeichenkette ist ein für jedes Maschinenmodell ein valides Program.
-      \ii Synaktische und Semantische Regeln um valide Programme zu schreiben.
+      \ii Nicht jede Zeichenkette ist ein für jedes Maschinenmodell valides Programm.
+      \ii Syntaktische und Semantische Regeln, um valide Programme zu schreiben.
       \ei
     }
     \ei
@@ -672,12 +672,12 @@ Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linke
     \bi
     \ii Maschinenmodell (RV32I) {
       \bi
-      \ii \structure{Speicher}: 32 CPU Register + frei addressierbarer Speicher.
-      \ii \structure{Befehle}: 47 Instruktionen mit arithmetischen, binären und Sprungbefehlen.
-      \ii Der SweRV von Western Digital is \alert{ein} Prozessor für dieses Modell.
+      \ii \structure{Speicher}: 32 CPU Register + frei adressierbarer Speicher
+      \ii \structure{Befehle}: 47 Instruktionen mit arithmetischen, binären und Sprungbefehlen
+      \ii Der SweRV von Western Digital ist \alert{ein} Prozessor für dieses Modell.
       \ei
     }\medskip
-    \ii Beispiel eines Maschinenprograms: 02 b5 05 3b 80 82 \pause{
+    \ii Beispiel eines Maschinenprogramms: 02 b5 05 3b 80 82 \pause{
       \\{\scriptsize (Wir tun mal so als wäre Assembler und Binärcode das gleiche)}\smallskip
       \begin{code}[tag=RV32I]
         \begin{asm}[]
@@ -701,10 +701,10 @@ Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linke
     \bi
     \ii Maschinenmodell {
       \bi
-      \ii \structure{Speicher}: Definierten Variablen und über Pointer erreichbarer Speicher
-      \ii \structure{Befehle}: z.B: \lstinline{if (a < 3) return b * (c + d);}
+      \ii \structure{Speicher}: Definierte Variablen und über Pointer erreichbarer Speicher
+      \ii \structure{Befehle}: z.B.: \lstinline{if (a < 3) return b * (c + d);}
       \ii Sowohl GCC als auch Clang sind \enquote{Prozessoren} für dieses Modell.
-      \ii Es gibt auch C Interpreter die als Prozessoren agieren.
+      \ii Es gibt auch C-Interpreter, die als Prozessoren agieren.
       \ei
     }\medskip
     \ii Beispielprogramm : Der Obfuscated Tiny C Compiler (2048 Zeichen)\footnote{\url{https://bellard.org/otcc/}}{
@@ -712,11 +712,11 @@ Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linke
         \lstinputlisting[basicstyle=\ttfamily\tiny, breaklines=true, postbreak=\mbox{}]{lst/01-otcc.c}
       \end{code}
     }\medskip
-    \ii Die C Sprache (eigentlich eine ganze Familie von Sprachen) {
+    \ii Die C-Sprache (eigentlich eine ganze Familie von Sprachen) {
       \bi
       \ii Variablen und Funktionen müssen deklariert sein, um sie zu nutzen.
-      \ii Eine Ganzzahl is kein valider Funktionsname.
-      \ii \enquote{\texttt{"12345(b, c)}} -- is kein valides C Programm.
+      \ii Eine Ganzzahl ist kein valider Funktionsname.
+      \ii \enquote{\texttt{"12345(b, c)}} -- ist kein valides C-Programm.
       \ei
     }
     \ei
@@ -726,9 +726,9 @@ Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linke
     \btUseExtraItemSep \setbeamercovered{transparent}
     \begin{description}
     \item[Programmiersprache] Regelwerk zur Erstellung von Zeichenketten, die valide Programme für ein bestimmtes
-      Maschinenmodell sind. Verletzt eine Zeichenkette auch nur eine dieser Regeln ist es kein entsprechendes Programm.
-    \item<1>[Interpreter] Ein Programm das  Sprachprozessor für bestimmten Maschinenmodell ist und andere Programme direkt ausführt.
-    \item[Übersetzer] Ebenfalls ein Sprachprozessor, der das gegebene Programm allerdings nicht ausführt, sondern in eine valides
+      Maschinenmodell sind. Verletzt eine Zeichenkette auch nur eine dieser Regeln, ist es kein entsprechendes Programm.
+    \item<1>[Interpreter] Ein Programm, das Sprachprozessor für ein bestimmtes Maschinenmodell ist und andere Programme direkt ausführt.
+    \item[Übersetzer] Ebenfalls ein Sprachprozessor, der das gegebene Programm allerdings nicht ausführt, sondern in ein valides
       Maschinenprogramm für eine andere Sprache übersetzt.
     \end{description}
   \end{frame}
@@ -837,18 +837,18 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
     \pause
 
     \bi
-    \ii Das Maschinenmodell bestimmt den beobachtbaren Zustand ($q_n$) {
+    \ii Das Maschinenmodell bestimmt den beobachtbaren Zustand ($q_n$). {
       \bi
-      \ii Bei RISC-V: Zustand ist der Registersatz nach jeder Instruktionen.
+      \ii Bei RISC-V: Zustand ist der Registersatz nach jeder Instruktion.
       \ii Wir werden keine halb ausgeführten Instruktionen sehen.
-      \ii Definition des beobachtbaren Zustands ist schwer bei komplexeren Sprachen.
+      \ii Definition des beobachtbaren Zustands ist bei komplexeren Sprachen schwierig.
       \ei
     }\medskip
-    \ii Programmausführung durch einen Prozessor ergibt eine Zustandfolge: \\
+    \ii Programmausführung durch einen Prozessor ergibt eine Zustandsfolge: \\
     $q = (q_1, q_2, \ldots, q_n)$ {
       \bi
-      \ii Die Zustände sind vom Speicher der Maschine abgeleitet
-      \ii Die Übergänge sind Folge von ausgeführten Operationen: $q_t\rightarrow q_{t+1}$
+      \ii Die Zustände sind vom Speicher der Maschine abgeleitet.
+      \ii Die Übergänge sind Folge von ausgeführten Operationen: $q_t\rightarrow q_{t+1}$.
       \ei
     }
     \ei
@@ -897,7 +897,7 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
       \end{columns}
     }
     \ei }\medskip
-    \ii Beide Programme brechnen das gleiche Ergebnis: ggT=7\\
+    \ii Beide Programme berechnen das gleiche Ergebnis: $ggT(7, 35)=7$.\\
         Sie zeigen aber unterschiedliche Zustandsfolgen.
         \ei
     \medskip
@@ -910,7 +910,7 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
     \ii Die Programmiersprache definiert die \alert{beobachtbaren} Zustände. {
       \bi
       \ii Ein- und Ausgabe ist immer beobachtbar, oft aber auch Teile des Speichers
-      \ii Bei C: Nur das Schreiben von globalen Variablen, nicht aber von Lokalen.
+      \ii Bei C: Nur das Schreiben von globalen Variablen, nicht aber von lokalen.
       \ei
     }\bigskip
     \ii Ein \advantage{korrekter} Übersetzer erhält alle beobachtbaren Zustände.{
@@ -921,7 +921,7 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
       \ii Eine sehr absurder Übersetzer könnte alle beobachtbaren Bits invertieren.
       \ei
     }\bigskip
-    \ii Grundlage von optimierenden Übersetzer! {
+    \ii Grundlage optimierender Übersetzer! {
       \bi
       \ii Ein optimierender Übersetzer erhält nur den beobachtbaren Zustand.
       \ii Der nicht-beobachtbare Zustand kann sich beliebig ändern.
@@ -933,7 +933,7 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
   \begin{frame}[fragile,t]{Beispiele korrekter Übersetzung von C nach \only<1>{C}\only<2>{RISC-V}\only<3>{Kobold}}
     \begin{code}[tag=C]
       \begin{C}[]
-        void foo() {
+        int foo() {
           int x = 0;
           x += 1; x += 1; x += 1;
           return x;
@@ -945,7 +945,7 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
     \end{center}
     \begin{code}<1>[tag=C]
       \begin{C}[]
-        void foo() {
+        int foo() {
           return 3;
         }
       \end{C}
@@ -1014,14 +1014,14 @@ Das Zielprogramm soll, im Grunde, die gleichen Schritte durchführt wie das Quel
       \ii Wo sie herkommen: Evolution. Worauf sie laufen: Physik (wie der Kobold).
       \ei
     }\pause
-    \ii Wir brauchen eine Übersetzer von L nach M der auf M läuft.\\[2ex] {
+    \ii Wir brauchen einen Übersetzer von L nach M der auf M läuft.\\[2ex] {
       \begin{center}
         \includegraphics[page=1,width=0.7\textwidth]{fig/01-t-diagram}
       \end{center}
     }
     \ei
     \bii
-    \ii \Alert{Aber:} Es is zu aufwendig einen Übersetzer in M (z.B. Assembler) zu schreiben.
+    \ii \Alert{Aber:} Es ist zu aufwendig einen Übersetzer in M (z.B. Assembler) zu schreiben.
     \ii Wir wollen den Übersetzer lieber in L schreiben und irgendwie nach M bringen.
     \ii Dieser Prozess heißt Bootstrapping ($=$ sich selbst aus dem Sumpf ziehen).
     \eii
@@ -1029,7 +1029,7 @@ Das Zielprogramm soll, im Grunde, die gleichen Schritte durchführt wie das Quel
 
   \begin{frame}[t]{T-Diagramme (oder Tombstone Diagramme)}
     \bi
-    \ii T-Diagramme dienen zur Visualisierung des Bootstrapping Problems \\[2ex] {
+    \ii T-Diagramme dienen zur Visualisierung des Bootstrapping Problems. \\[2ex] {
       \begin{center}
         \includegraphics[page=1,width=0.7\textwidth]{fig/01-t-diagram}
       \end{center}
@@ -1075,7 +1075,7 @@ Das Zielprogramm soll, im Grunde, die gleichen Schritte durchführt wie das Quel
 
   \begin{frame}{2. Möglichkeit: Vereinfachter Übersetzer}
     \bi
-    \ii Ableitung eines einfacheren Übersetzers \dn2 aus dem Vollausgestatten \dn1.\\[2ex] {
+    \ii Ableitung eines einfacheren Übersetzers \dn2 aus dem voll ausgestatteten \dn1.\\[2ex] {
       \begin{center}
         \includegraphics[height=2cm, page=6]{fig/01-t-diagram}
       \end{center}
@@ -1090,7 +1090,7 @@ Das Zielprogramm soll, im Grunde, die gleichen Schritte durchführt wie das Quel
         \includegraphics[height=2cm, page=7]{fig/01-t-diagram}
       \end{center}
       \bi
-      \ii Teilweise mit einem existierenden Übersetzers einer anderen Sprache möglich.
+      \ii Teilweise mit einem existierenden Übersetzer einer anderen Sprache möglich.
       \ei
     }
     \ei
@@ -1116,7 +1116,7 @@ Portierung
       \animation[width=0.7\textwidth]{12/1,13/2,14/3-}{fig/01-t-diagram}
     \end{center}
     \bi
-    \ii Ähnliches Probleme wenn man auf eine neue Plattform N wechselt. {
+    \ii Ähnliches Problem, wenn man auf eine neue Plattform N wechselt. {
       \bi
       \ii<2-> Mit der vorhandenen Werkzeugkette: Erzeuge den \alert{Cross-Compiler} \dn{Z'}.
       \ii<3-> Übersetze \dn{Z} mit seinem Cross-Compiler zu \dn{Z''}.
@@ -1153,7 +1153,7 @@ Portierung
     \ii Bootstrapping: Der erste Übersetzer übersetzt sich selbst. {
       \bi
       \ii Reduktion auf manuelle Übersetzung eines abgespeckten Übersetzers
-      \ii Bei der Portierung auf neue Plattform braucht es einn Cross-Compiler
+      \ii Bei der Portierung auf neue Plattform braucht es einen Cross-Compiler
       \ei
     }
     \ei

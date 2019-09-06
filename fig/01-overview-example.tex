@@ -8,7 +8,7 @@
 \begin{frame}[fragile]
   \begin{tikzpicture}
     \only<1>{
-    \node[inner sep=1,draw] (code) {\texttt{if ( a >b)\{return b; \} else return c;}};
+    \node[inner sep=1,draw] (code) {\texttt{if ( a >b)\{return b; \} else return b;}};
     \foreach \i in {1,...,36} {
       \draw (code.south west)++(east:\pgflinewidth)++(1pt,\pgflinewidth)++(east:\monowidth*\i) -- ++(up:0.8ex);
     }

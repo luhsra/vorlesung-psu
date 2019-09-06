@@ -57,7 +57,7 @@
     \Title{Operationen}\\
     Standardkonstrukte\\
     Auswertungsstrategie\\
-    Call-By-\{Val,Ref,Name,Need\}\\
+    Call-By-\{Val, Ref, Name, Need\}\\
     Seiteneffekte\\
     Verhaltenskomposition
   };
@@ -96,15 +96,15 @@
     Typprüfung\\
     Namensauflösung\\
     Fehlermeldungen\\
-    Sprachmacros
+    Sprachmakros
   };
 
   \node[above=1.5 of semantic.north west,topic,anchor=south west,
        lecture=2,
        ] (parsing) {
-    \Title{Synaktische Analyse}\\
+    \Title{Syntaktische Analyse}\\
     Tokenstrom\\
-    (Kontextfreie) Gramatiken\\
+    (Kontextfreie) Grammatiken\\
     Abstrakter Syntaxbaum\\
     Parsertechniken\\
     Parsergeneratoren
@@ -116,7 +116,7 @@
     Code für Arith. Ausdrücke\\
     R-Values \& L-Values\\
     Basic Blocks \& Kontrollflussgraph\\
-    Kontrollfluskonstrukte
+    Kontrollflusskonstrukte
   };
 
   \node[right=1.5 of semantic.north east,topic,lecture=10] (machine) {
@@ -153,7 +153,7 @@
   \draw[->] (intermediate) -- node[left]{IR} (machine);
 
 
-  \node[yshift=-1cm] at ($(machine.south west)!0.5!(runtime.south east)$) (bin) {\textsc{Binärprogram}};
+  \node[yshift=-1cm] at ($(machine.south west)!0.5!(runtime.south east)$) (bin) {\textsc{Binärprogramm}};
   \draw[->] (machine.south) to[out=-90,in=180] (bin);
   \draw[->] (runtime.south) to[out=-90,in=0] (bin);
 \end{scope}
@@ -171,7 +171,7 @@
   \def\lecturedotpos{east}
 
   \node[topic,compiler, lecture=2]  (syntax) {
-    \Title{Synaktische Analyse}
+    \Title{Syntaktische Analyse}
   };
 
   \node[topic,fill=lightgray,lecture=1,anchor=south,yshift=10mm]  (einleitung) at (syntax.north){
