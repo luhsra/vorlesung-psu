@@ -988,10 +988,22 @@ Wir möchten, dass ein Übersetzer ein Zielprogramm erzeugt, dass sich so verhä
 Im einfachsten Fall bedeutet das, dass beide Programme die gleiche Ausgabe erzeugen, wenn sie mit den gleichen Eingabedaten ausgeführt werden.
 Meistens stellt das Maschinenmodell aber noch weitere Regel für eine korrekte Übersetzung auf.
 
-Bei dieser erweiterten Definition von korrekter Übersetzung, erwarten wir nicht nur das Zielprogramm das gleiche Ergebnis berechnet und uns über den Ausgabekanal mitteilt, sondern auch dass es dies auf die gleiche Weise tut.
-Das Zielprogramm soll, im Grunde, die gleichen Schritte durchführt wie das Quellprogramm, nur auf einer anderen Maschine. Um dies formaler zu fassen, führen wir auf den Folien den Begriff der *beobachtbaren Zustand* ein.
+Bei dieser erweiterten Definition von korrekter Übersetzung, erwarten wir nicht nur das Zielprogramm das gleiche Ergebnis berechnet un uns mitteilt, sondern auch dass es dies auf die gleiche Weise tut.
+Das Zielprogramm soll, im Grunde, die gleichen Schritte durchführen wie das Quellprogramm, nur auf einer anderen virtuellen Maschine. Um dies formaler zu fassen, führen wir auf den Folien den Begriff der *beobachtbaren Zustand* ein.
 
+Wichtig beim Begriff des beobachtbaren Zustands ist, dass es vom Maschinenmodell bestimmt wird und es nicht zwingend den gesamten Speicher der virtuellen Maschine umfassen muss.
+Im Grunde legt das Maschinenmodell fest, welcher Teil des Zustandes wichtig sind und als beobachtbar gelten.
+Zum Beispiel, legt die Programmiersprache C fest, dass die Werte von globalen Variablen beobachtbar sind.
+Der Hintergrund dieser Entscheidung ist, das andere Threads die geschriebene Werte von globalen Variablen sehen, wenn die Zuweisung ausgeführt wurde und nicht erst am Ende der Funktion, oder gar noch später.
 
+Eine andere wichtige Erkenntnis aus der Defintion der korrekter Übersetzungen ist das *nur* der beobachtbare Zustand erhalten werden muss.
+Alles was die Sprache als nicht beobachtbar deklariert, kann vom Übersetzer beliebig verändert werden.
+Zum Beispiel, entfernen Übersetzer für C lokale Variablen aus Funktionen, die niemals verwendet werden.
+Dies ist laut C Standard eine völlig valide Optimierung, da die Werte von lokalen Variablen nicht beobachtbar sind.
+Umso mehr ein Machinenmodell als nicht beobachtbar deklariert, umso leichter fällt es einem optimierenden Übersetzer ein effizientes Zielprogramm zu erzeugen.
+Auf den Folien ist das Beispiel mit dem Kobold gezeigt, um genau dies zu verdeutlichen.
+Für die Funktion ~foo()~ ist es unerheblich wie die Funktionalität implementiert ist, da nur ihre Ausgabe von uns beobachtbar ist.
+Wir können sie also ebenso mittels eines Kobolds implementieren anstatt mit einer Maschine aus Silizium und Strom.
 
 * Bootstrapping und Portierung
 :PROPERTIES:

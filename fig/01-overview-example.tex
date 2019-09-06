@@ -8,7 +8,7 @@
 \begin{frame}[fragile]
   \begin{tikzpicture}
     \only<1>{
-    \node[inner sep=1,draw] (code) {\texttt{if ( a >b)\{return b; \} else return b;}};
+    \node[inner sep=1,draw] (code) {\texttt{if ( a >b)\{return b; \} else return a;}};
     \foreach \i in {1,...,36} {
       \draw (code.south west)++(east:\pgflinewidth)++(1pt,\pgflinewidth)++(east:\monowidth*\i) -- ++(up:0.8ex);
     }
@@ -42,9 +42,9 @@
       \tikzset{
         bb/.style={draw,font=\ttfamily\scriptsize, align=left}
       }
-      \node[bb] (bb0) at (7cm, -2cm) {bb0:\\\ \ load tmp0, \textbf{\$b}\\\ \ iflt tmp0, a, bb1, bb2};
-      \node[bb,below=0.5 of bb0,xshift=-1cm] (bb1) {bb1:\\\ \ return a;};
-      \node[bb,below=1.5 of bb0,xshift=1cm] (bb2) {bb1:\\\ \ load tmp2, \textbf{\$b};\\ \ \ return tmp2};
+      \node[bb] (bb0) at (7cm, -2cm) {bb0:\\\ \ load tmp0, \textbf{\$b}\\\ \ ifgt a, tmp0, bb1, bb2};
+      \node[bb,below=0.5 of bb0,xshift=-1cm] (bb1) {bb1:\\\ \ load tmp2, \textbf{\$b};\\ \ \ return tmp2;};
+      \node[bb,below=2 of bb0,xshift=1.3cm] (bb2) {bb2:\\\ \ return a;};
       \node[bb,left=0.3 of bb2] (bb3) {\textit{empty}};
       \draw[->] (bb0) -- (bb1);
       \draw[->] (bb0) -- (bb2);

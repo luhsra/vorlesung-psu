@@ -110,7 +110,7 @@
   \compiler[arrow,exec=safegreen,source=L, target=M, machine=M] {(0,0)} {C}
 
   \draw[<-] (C-input) -- ++(west:5mm) node[left,align=center]{Compilerinput\\Quellprogramm L};
-  \draw[->] (C-output) -- ++(east:5mm) node[right,align=center]{Compileroutput\\Zielprogramm L};
+  \draw[->] (C-output) -- ++(east:5mm) node[right,align=center]{Compileroutput\\Zielprogramm M};
   \node[below=0 of C-machine, align=center]{Ausführungs-\\plattform};
 \end{tikzpicture}
 \end{frame}
@@ -133,7 +133,7 @@
 \begin{frame}[fragile]
   \begin{tikzpicture}
     \compiler[arrow,source=L, target=M, machine=L,title=1,fill=badbee!40] {(0,0)} {C1};
-    \compiler[arrow,source=L, exec=safegreen, target=M, machine=M,title=1] {(C1-base east)} {C2};
+    \compiler[arrow,source=L, exec=safegreen, target=M, machine=L,title=1] {(C1-base east)} {C2};
     \interpreter[exec=safeblue,program=safegreen,source=L, title=2,machine=M] {(C2-south west)} {I};
     \machine[program=safeblue,machine=M] {(I-south west)} {I};
 

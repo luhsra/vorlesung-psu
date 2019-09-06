@@ -7,6 +7,6 @@ bb1:
   mv a0, r2
   j bb3
 bb2:
-  ld a0, b
+  ld a0, $b
 bb3:
   ret
