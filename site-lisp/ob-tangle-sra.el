@@ -2,7 +2,8 @@
 (require 'ob-latex)
 (require 'ox-html)
 (require 'ox-tufte)
-(require 'org-macro)
+
+(require 'org-macro-sra)
 
 
 (defun org-babel-tangle (&optional arg target-file lang)
@@ -329,34 +330,6 @@ Return a list whose CAR is the tangled file name."
 	  (mapcar #'expand-file-name (org-babel-tangle nil target-file lang)))
       (unless visited-p
 	(kill-buffer to-be-removed)))))
-
-(defun org-macro--counter-initialize (&optional new-file)
-  "Initialize `org-macro--counter-table'."
-  (if new-file
-      (setq org-macro--counter-table (make-hash-table :test #'equal))))
-
-(require 'org-element)
-
-(defun s-replace (old new s)
-  "Replaces OLD with NEW in S."
-  (declare (pure t) (side-effect-free t))
-  (replace-regexp-in-string (regexp-quote old) new s t t))
-
-(defun org-macro-headlines (file)
-  (with-current-buffer (find-file-noselect file)
-    (org-with-wide-buffer
-     (let ((data  (org-element-parse-buffer 'headline))
-	   (res "") (sep ""))
-       (dolist (headline (cddr data))
-         (let ((id (org-element-property :CUSTOM_ID headline))
-               (tags (org-element-property :tags headline))
-               (title (org-element-property :title headline)))
-           (unless (or (not id) (member 'noexport tags))
-             (setq res (format "%s%s[[%s#%s][%s]]"
-                               res sep (s-replace ".org" ".html" file)
-			       id title))
-             (setq sep " - "))))
-       res))))
 
 
 (provide 'ob-tangle-sra)

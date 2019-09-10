@@ -26,8 +26,9 @@
   }
   \def\Title#1{\textbf{\Large \strut #1}}
 
-\begin{tikzpicture}
 
+  \begin{frame}
+\begin{tikzpicture}
   \begin{scope}[
     topic/.append style={
       text width=6cm,
@@ -80,7 +81,15 @@
   };
 \end{scope}
 \end{tikzpicture}
+\end{frame}
 
+
+\tikzset{
+    highlight on/.style={
+      onslide=<#1>{label={[fit=(\tikzlastnode),draw,srared, inner sep=4pt,ultra thick,]center:}}
+    }
+  }
+\begin{frame}<1>[label=compiler]
 \begin{tikzpicture}
 \begin{scope}[
     topic/.append style={
@@ -88,10 +97,10 @@
       anchor=north west,
       compiler,
     }
-  ]
+    ]
 
 
-\node[below=2 of operation.south west,topic,lecture=5] (semantic) {
+\node[below=2 of operation.south west,topic,lecture=5,highlight on=3] (semantic) {
     \Title{Semantische Analyse}\\
     Typprüfung\\
     Namensauflösung\\
@@ -100,17 +109,17 @@
   };
 
   \node[above=1.5 of semantic.north west,topic,anchor=south west,
-       lecture=2,
+       lecture=2,highlight on=2
        ] (parsing) {
     \Title{Syntaktische Analyse}\\
-    Tokenstrom\\
+    Scanner \& Tokenstrom\\
     (Kontextfreie) Grammatiken\\
     Abstrakter Syntaxbaum\\
-    Parsertechniken\\
-    Parsergeneratoren
+    LL(1) \& Rekursiver Abstieg \\
+    LR(1) \& Parsergeneratoren
   };
 
-\node[right=1.5 of parsing.north east,topic,lecture=8] (intermediate) {
+\node[right=1.5 of parsing.north east,topic,lecture=8,highlight on=4] (intermediate) {
     \Title{Zwischencode}\\
     3-Address Code\\
     Code für Arith. Ausdrücke\\
@@ -119,7 +128,7 @@
     Kontrollflusskonstrukte
   };
 
-  \node[right=1.5 of semantic.north east,topic,lecture=10] (machine) {
+  \node[right=1.5 of semantic.north east,topic,lecture=10,highlight on=6] (machine) {
     \Title{Maschinencode}\\
     Registerallokation\\
     Funktionsaufrufe\\
@@ -129,7 +138,7 @@
 
 
 
-  \node[right=1.5 of intermediate.north east,topic,lecture=10] (opt) {
+  \node[right=1.5 of intermediate.north east,topic,lecture=9,highlight on=5] (opt) {
     \Title{Optimierung}\\
     Fixpunkt Analyse\\
     Konstantenfortschreibung\\
@@ -137,7 +146,7 @@
     Entfernung toten Codes
   };
 
-  \node[right=1.5 of machine.north east,topic,lecture=11] (runtime) {
+  \node[right=1.5 of machine.north east,topic,lecture=11,highlight on=7] (runtime) {
     \Title{Das Laufzeitsystem}\\
     ELF und Linker\\
     Dynamische Bibliotheken\\
@@ -159,7 +168,10 @@
 \end{scope}
 
 \end{tikzpicture}
+\end{frame}
 
+
+\begin{frame}
 \begin{tikzpicture}
   \tikzset{
     topic/.append style={
@@ -235,5 +247,10 @@
 
 
 \end{tikzpicture}
+
+\end{frame}
+
+\againframe<2->{compiler}
+
 
 \end{document}

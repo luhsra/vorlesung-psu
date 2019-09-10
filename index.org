@@ -8,8 +8,10 @@
 
 Abschnitte: {{{headlines(./01-einleitung.org)}}}
 
-* [[02-syntax.org][Übersetzer: Syntax, Lexen und Parsen]]
-   - Tokenstrom, (Kontextfreie) Gramatiken, Abstrakter Syntaxbaum, Parsertechniken, Parsergeneratoren
+* [[file:02-syntax.org][Übersetzer: Syntax, Lexen und Parsen]]
+
+Abschnitte: {{{headlines(./02-syntax.org)}}}
+
 * [[file:02-syntax.org][Sprachen: Typen]]
  - Primitiv, Strukturierte und Unstrukturierte Komposition, Funktionstypen, Typableitungen, Typschablonen, Kompatibilität
 * [[file:04-namen.org][Sprachen: Namen]]

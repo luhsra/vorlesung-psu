@@ -6,3 +6,4 @@
 #+HTML_HEAD: <script type="text/javascript" src="js/jquery.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="js/bootstrap.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="js/org-bootstrap.js"></script>
+#+MACRO: see (eval (org-macro-sra-see $1 $2))

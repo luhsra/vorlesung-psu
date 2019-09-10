@@ -7,6 +7,7 @@ import logging
 import re
 logging.basicConfig(level=logging.DEBUG)
 from collections import OrderedDict
+from common import normalize_topic
 
 def make_carousel(label, files):
     ret = []
@@ -70,6 +71,7 @@ if __name__ == "__main__":
     with open(topics) as fd:
         topics = OrderedDict()
         for _, lines, topic in [x.strip().split(":", 2) for x in fd.readlines()]:
+            topic = normalize_topic(topic)
             basename = os.path.basename(org)
             base,_ = os.path.splitext(basename)
             pattern = f"build/html/{base}-{topic}-{lines}-*.svg"

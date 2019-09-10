@@ -1,0 +1,143 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 02 - Syntaktische Analyse
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+Mit der zweiten Vorlesung, will ich die Syntaktische Analyse
+vollständig abdecken um möglichst schnell die Syntax als Vorhang vor
+der eigentlichen Bedeutung der Sprache hinter uns zu lassen. Am Anfang
+der Vorlesung soll der Zeichenstrom stehen und am Ende der Abstrakte
+Syntaxbaum. Dabei will ich vermeiden jede erdenkliche Art und Weise
+des Parsens zu behandeln, und nur schlaglichtartig einen Blick auf das
+Thema der Parser zu richten.
+
+- Motivation
+  - ?
+  - Sprachen sind eigentlich nicht Kontextfrei
+- Lexer
+  - Zerteilung in einen Tokenstrom
+  - Kombination aus endlichen Automaten
+- Parser
+  - Wiederholung Kontextfreie Grammatiken
+    - Backus-Naur-Form
+  - Ableitungsbaum bzw. Parsebaum
+  - Recursive Descent Parser/Syntaxgraphen/LL(1)
+  - Vom Parsebaum zum Abstrakten Syntaxbaum
+  - LR(1) Grammatiken und Parsergeneratoren (kurz)
+  - C ist nur mit Symbol Table parsebar
+  - Parsing ist ganz weites Feld, in dem es viele Unterschiedliche Klassen und Parsetechniken gibt. Was Menschen meist verwenden ist LALR(1).
+- Regular or Context-Free!
+  - Man wird ganz leicht eine weird machine.
+- Zusammenfassung
+
+Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
+ - Syntax ist nur ein Vorhang vor der eigentlichen Semantik.
+ - Der Studierende muss irgendwann den AST sehen und nicht mehr die Zeichen.
+ - Man kommt ganz schnell in größere Komplexitätsklassen.
+
+* Was ist die Syntax einer Sprache?
+#+begin_src latex
+\subtitle{{{{subtitle()}}}}
+\begin{frame}
+  \maketitle
+\end{frame}
+  \begin{frame}[t]{Einordnung in die Vorlesung: Syntaktische Analyse}
+    \begin{center}
+      \includegraphics[page=4,width=0.8\linewidth]{fig/01-overview-small}
+    \end{center}
+    \bi
+    \ii Die Syntaktische Analyse ist der erste Schritt in einem Übersetzer.\medskip
+    \ii Was sollte der \emph{effektive} und \emph{effiziente} Informatiker darüber Wissen? {
+    \bi
+    \ii Die Syntax ist die nur die Schreibweise, wie man die Konzepte notiert.
+    \ii Rekursiv geschachtelte Elemente und Bäume passen zueinander.
+    \ii Es gibt gute Formalismen und mächtige Werkzeuge zur Syntaktischen Analyse.
+    \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Was ist das Ziel der Syntaktischen Analyse?}
+    \begin{center}
+      \includegraphics[page=1,width=0.6\linewidth]{fig/01-overview-example}
+    \end{center}
+    \bi
+    \ii Überprüfung der Syntaxregeln und Extraktion der Programmstruktur {
+      \bi
+      \ii Syntaktische Korrektheit ist \alert{ein} Teil der Sprachregeln.
+      \ii Übersetzer für Programmiersprachen müssen Zeichenketten verarbeiten.
+      \ii Im Weiteren benötigen wir die Programmstruktur als abstrakten Syntaxbaum.
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
+Ein Übersetzer für
+(Maschinen)programme{{{see(01-ebenenmodell,Ebenenmodell)}}} wird
+meistens mit einer, oft sehr langen, Zeichenkette konfrontiert, von
+der der Programmierer behauptet es wäre ein valides Programm. Da der
+Programmier beim kodieren wahrscheinlich unter Zeitdruck stand, faul
+war, oder einfach ein anderes Verständnis von Ästhethik hat, darf der
+Übersetzer kreative Formatierungen und allerhöchstens die Erfüllung
+der minimalen Sprachregeln erwarten. Er muss also heraus finden, ob
+diese Zeichenkette ein valides Programm der erwarteten Sprache
+darstellt oder ob es fehlerhaft ist.
+
+Der erste Schritt dieser akribischen Untersuchung des Quellprogramms
+ist die *Syntaktische Analyse* oder *Syntaxanalyse*. Diese ist
+Vergleichbar mit der Rechtschreib- und Grammatikprüfung bei
+normalsprachlichen Texten, bei er es zunächst auch nur darum geht ob
+alle Worte richtig geschrieben und die Regeln der Satzstruktur
+eingehalten wurde. Dabei überprüft die Syntaxanalyse ebensowenig den
+Sinn eines Satzes, wie dies ein Rechtschreibprogramm tut.
+
+
+* Scanner und Tokenstrom
+- Tokenstrom
+- Reguläre Grammatiken
+- Kombination von Regulären Grammatiken
+
+* Parser und der Syntaxbaum
+- Kontextfreie Grammatiken
+
+** Parser mit Rekursivem Abstieg
+
+** Die LL(1) Grammatiken
+
+** Schwierigkeiten mit LL(1)
+- Linksrekursion
+- Common Prefixes
+** LR(1) und Parsergeneratoren
+- Dafür gibt es Lösungen, aber die Konstruktion der Parseautomaten ist schwieriger. Zum Glück gibt es dafür Tools.
+* Exkurs: Parsing und Sicherheit
+:PROPERTIES:
+:CUSTOM_ID: 02-turing-trap
+:END:
+
+C++ Templates are Turin Complete: http://port70.net/~nsz/c/c%2B%2B/turing.pdf
+
+https://stackoverflow.com/a/41418423/4099367
+https://stackoverflow.com/questions/41415006/which-contemporary-computer-languages-are-ll1
+
+
+* Zusammenfassung
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+  \end{frame}
+
+  \begin{frame}{Quellenverzeichnis}
+    \printbibliography
+  \end{frame}
+#+end_src

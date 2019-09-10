@@ -27,11 +27,13 @@ texmf/ls-R:
 
 define CREATE_SUB
 prefix :=
-build/$(1:.org=.pdf): $(shell prefix=`echo $(1) | awk -F- '{print $$1;}'`; echo fig/$${prefix}-*.pdf)
+build/$(1:.org=.pdf): $(shell prefix=`echo $(1) | awk -F- '{print $$1;}'`; find fig/ -name "$${prefix}-*.pdf" )
 $(shell echo $(1) | awk -F- '{print $$1;}'): build/$(1:.org=.pdf)
 $(shell echo $(1) | awk -F- '{print $$1;}').html : build/html/$(1:.org=.html)
 $(shell echo $(1) | awk -F- '{print $$1;}').tangle : build/tangle/$(1:.org=.tex)
 $(shell echo $(1) | awk -F- '{print $$1;}').split: build/$(1:.org=.pdf.split)
+$(shell echo $(1) | awk -F- '{print $$1;}').wc:
+	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $1 | wc -w
 endef
 # invoke it for lecture PDF target (01-Einfuehrung.pdf, ...)
 $(foreach f,$(ORG_PDF),\
