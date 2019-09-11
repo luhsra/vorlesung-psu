@@ -299,17 +299,23 @@ non-nil, return the full association list to be used by
 (defun org-tufte-src-block (src-block contents info)
   (org-html-src-block src-block contents info))
 
+(defmacro with-file-from-disk (filename &rest body)
+  (declare (indent 1) (debug t))
+  `(let* ((fn (expand-file-name ,filename))
+          (buf (find-buffer-visiting fn)))
+     (if buf
+       (with-current-buffer buf
+         (revert-buffer nil t)
+         ,@body)
+       (with-current-buffer (find-file-noselect fn)
+         ,@body))))
+
+
 (defun org-export-to-html-file (src dst)
   (interactive)
-  (let (buffer (find-buffer-visiting src))
-    (message "HTML %s: %s" src buffer)
-    (with-current-buffer
-        (find-file-noselect src)
-      (org-export-to-file 'tufte-html dst)
-      )
-    (when (not buffer)
-      (message "kill buffer %s: %s" src buffer)
-      (kill-buffer (find-buffer-visiting src)))))
+  (with-file-from-disk src
+    (org-export-to-file 'tufte-html dst)))
+
 
 (defun org-babel-tangle-file (file &optional target-file lang)
   "Extract the bodies of source code blocks in FILE.
@@ -319,17 +325,10 @@ export file for all source blocks.  Optional argument LANG can be
 used to limit the exported source code blocks by language.
 Return a list whose CAR is the tangled file name."
   (interactive "fFile to tangle: \nP")
-  (let ((visited-p (find-buffer-visiting (expand-file-name file)))
-	to-be-removed)
-    (message "kill2: %s %s" file visited-p)
+  (with-file-from-disk file
     (org-macro--counter-initialize t)
-    (prog1
-	(save-window-excursion
-	  (find-file file)
-	  (setq to-be-removed (current-buffer))
-	  (mapcar #'expand-file-name (org-babel-tangle nil target-file lang)))
-      (unless visited-p
-	(kill-buffer to-be-removed)))))
+    (org-babel-tangle nil target-file lang)))
+
 
 
 (provide 'ob-tangle-sra)

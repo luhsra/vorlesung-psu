@@ -1,0 +1,27 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}
+    \tikzset{state/.style={circle,draw,inner sep=2pt,fill=white}}
+
+    \node[state] (s0) at (0,0) {0};
+    \node[state] (s1) at (2,0) {1};
+    \node[state] (s2) at (4,0) {2};
+    \node[state,double] (s3) at (6,0) {3};
+
+    \draw
+    (s0) edge[->] node[above] {\small 0} (s1)
+    (s1) edge[->] node[above] (guard){\small x} (s2)
+    (s2) edge[->] node[above] {\small [0-9a-f]} (s3)
+    (s3) edge[loop right,] node[right]{\small [0-9a-f]} (s3);
+
+    \begin{pgfonlayer}{background}
+      \begin{scope}[every node/.style={visible on=<2>}, every pin edge/.style={visible on=<2>}]
+        \node[fit=(guard),inner sep=2pt, pin=30:Bedingung,fill=badbee!50] {};
+        \node[fit=(s3),pin=30:Akzeptierender Zustand,fill=badbee!50] {};
+        \node[fit=(s0),pin=-20:Startzustand,fill=badbee!50] {};
+      \end{scope}
+    \end{pgfonlayer}
+  \end{tikzpicture}
+\end{frame}
+\end{document}

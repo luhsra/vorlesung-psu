@@ -527,10 +527,7 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen sie sowohl den Aufb
 :END:
 
 #+BEGIN_SRC latex
-  \begin{frame}
-  \centering
-  \Huge Ebenenmodell\\und\\ Virtuelle Maschinen
-  \end{frame}
+  \dividerframe{Ebenenmodell\\und\\ Virtuelle Maschinen}
 
   \begin{frame}{Systemnahe Informatik}\framesubtitle{Der Blick aus 10000 Meilen}
       \begin{columns}
@@ -1011,12 +1008,7 @@ Wir können sie also ebenso mittels eines Kobolds implementieren anstatt mit ein
 :END:
 
 #+begin_src latex
-  \begin{frame}
-    \Huge\centering
-    Bootstrapping\\
-    und\\
-    Portierung
-  \end{frame}
+  \dividerframe{Bootstrapping\\und\\Portierung}
 
   \begin{frame}{Wer übersetzt den Übersetzer?}
     \bi

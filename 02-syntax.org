@@ -101,10 +101,141 @@ Vergleichbar mit der Rechtschreib- und Grammatikprüfung bei
 normalsprachlichen Texten, bei er es zunächst auch nur darum geht ob
 alle Worte richtig geschrieben und die Regeln der Satzstruktur
 eingehalten wurde. Dabei überprüft die Syntaxanalyse ebensowenig den
-Sinn eines Satzes, wie dies ein Rechtschreibprogramm tut.
+Sinn eines Satzes, welchen man auch als seine *Semantik* bezeichnen
+kann, wie dies ein Rechtschreibprogramm tut.
 
+Ein Beispiel, im Kontext von Programmiersprachen, für den Unterschied
+zwischen Syntax und Semantik ist das folgende Python Programm. Es
+stellt zwar ein syntaktisch korrektes Programm dar, ist also nach den
+Regeln der Sprache aufgeschrieben worden, aber es macht ergibt keinen
+Sinn, weil die Variable ~undef_variable~ nicht definiert wurde.
+Versuchen sie im interaktiven Interpreter, der auch eine Syntaxanalyse
+durchführt wie ein Übersetzer, einen Syntaxfehler zu provozieren.
+
+#+begin_src python
+foo = undef_variable + 3
+#+end_src
+
+Um zu Prüfen ob ein gegebenes Programm wirklich zum Maschinenmodell
+passt, wird es demnach nicht ausreichen seine Syntaktische Korrektheit
+zu prüfen. Aber es ist ein erster, wichtiger Schritt.
+
+Als Seiteneffekt der Syntaktischen Analyse bekommen wir auch noch den
+*abstrakten Syntaxbaum* oder AST (engl. abstract syntax tree). Dieser
+Baum, der das Rechenergebnis von Scanner und Parser ist, fängt die
+Struktur des Programms ein und wird in der folgenden Übersetzung als
+Datenbasis benötigt. Mit dieser Struktur des Programms meinen wir so
+etwas wie die korrekte Klammerung von arithmetischen Ausdrücken
+(~1+2*3-4~ wird verstanden als ~1+(2*3)-4~) oder welche Codezeile zum
+then-Teil einer Bedingung gehört.
+
+Für den Informatiker ist die Beschäftigung mit dem Thema Scannen und
+Parsen aus mehreren Gründen sehr lohnend: Durch den direkten Vergleich
+von Programmtext und AST sieht man, dass die konkrete Syntax einer
+Programmiersprache relativ egal ist, hauptsächlich mit Ästhetik,
+Klarheit und leichter Verständlichkeit zusammehängt, und vom
+Übersetzer bereits im ersten Schritt weg gewischt wird. Dennoch ist
+die Extraktion von Strukturen aus einer Zeichenkette ein immer wieder
+kehrendes Thema der Informatik, die nicht nur bei Programmiersprachen
+auftritt, sondern, zum Beispiel, auch bei Dateiformaten oder Netzwerkprotokollen.
+
+Daher hat die Informatik auch eine Reihe von präzisen Formalismen
+entwickelt (Reguläre und Kontextfreie Sprachen) mit Hilfe derer man
+solche Problem erfassen und angehen kann. Mit dieser Formalisierung
+kam auch die Möglichkeit Werkzeuge zu bauen, die einem dabei helfen
+Werkzeuge zur Syntaxanalyse zu erstellen
+(Parsergeneratoren)[fn::Parsergeneratoren werden auch
+Compiler-Compiler genannt, da sie Übersetzer sind, die Code erzeugen,
+der in Übersetzern verwendet wird.].
 
 * Scanner und Tokenstrom
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Scanner\\und\\Tokenstrom}
+
+  \begin{frame}{Tokenstrom}
+    \animation[width=\linewidth]{1/1,2/2-}{fig/02-token-stream}
+    \bi
+    \ii<2-> Gruppierung von Zeichen zu sprachspezifischen Bausteinen (Token) {
+      \bi
+      \ii Token haben eine \emph{Klasse} (func) und ggf. eine \emph{Nutzlast} (\texttt{"fnord"}, 23).
+      \ii Tokenstrom enthält keine Leerzeichen oder Kommentare.
+      \ii Unterschiedliche Schreibweisen (0x17, 23, 027, 0b10111) sind vereinheitlicht.
+      \ii Gemeinsame Prefixe werden zum längsten Match aufgelößt (\texttt{fn} vs. \texttt{fnord})
+      \ei
+    }\medskip
+    \ii<3-> Ziele der Abstraktion vom einzelnen Zeichen zum Token{
+      \bi
+      \ii \alert{Komplexitätsreduktion:} Es gibt immer weniger Token als Zeichen.
+      \ii \alert{Fokusierung} auf die Sprachelemente, nicht auf ihre Schreibweise.
+      \ii \alert{Vereinfachung} des Parsens durch weniger Sonderfälle (Kommentare).
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[t]{Scanner (oder Lexer)}
+    \signature{scanner\_next}{Stream[char]}{Token}
+    \bi
+    \ii<2-> Der Scanner (auch Abtaster oder Lexer) erzeugt den Tokenstrom {
+      \bi
+      \ii \texttt{scanner\_next} konsumiert Zeichen vom Anfang bis zum Ende eines Tokens.
+      \ii Implementierung: \alert<3>{manuell} oder mittels Regulären Ausdrücken und Tooling
+      \ei
+    }
+    \ei
+    \begin{code}<3->[tag=Py]
+      \lstinputlisting[style=PY,linerange={scanner0-scanner1,scanner2-scanner3}]{lst/02-scanner.py}
+    \end{code}
+    \only<1>{\begin{tikzpicture}[overlay,remember picture,box/.style={draw=srared,ultra thick}]
+        \node[fit=(sig-name),box,pin=-100:Funktionsname]{};
+        \node[fit=(sig-input),box,pin=-90:Parameter]{};
+        \node[fit=(sig-output),box,pin=-85:Rückgabewert]{};
+        \node[below=2 of sig-input] {\alert{Konvention}: Wir verwenden Funktionssignaturen aus Haskell};
+      \end{tikzpicture}}%
+  \end{frame}
+
+  \begin{frame}[t]{Wiederholung: Reguläre Sprachen und ihre Akzeptoren}
+    \bi
+    \ii Reguläre Sprachen werden von Typ-3 Grammatiken erzeugt. {
+      \btDefTab[4cm]
+      \bi
+      \ii (Nicht-)Terminale: \btSetTab \emph{nonterminal} $\rightarrow$ X
+      \ii Alternativen:      \btUseTab \emph{hexdigit} $\rightarrow$ 0 $\mid$ 1 $\mid$ 2  $\mid$ 3 $\mid$ \ldots  $\mid$ f
+      \ii Konkatenierung:    \btUseTab \emph{hexprefix} $\rightarrow$ 0x
+      \ii Wiederholung:      \btUseTab \emph{hexliteral} $\rightarrow$ \emph{hexprefix} \emph{hexdigit} \emph{hexdigit}*\hfill(Kleene Stern)
+      \ei
+    }\medskip
+    \ii Reguläre Ausdrücke sind eine Kurzschreibweise für diese Grammatiken {
+      \bi
+      \ii Für hexadezimale Zahlen: 0x[0-9a0-f][0-9a-f]*
+      \ii Verwendung zum Pattern Matching in Texten (\texttt{grep(1)}, Py: \texttt{import re}, \ldots)
+      \ii Effizient Implementierbar in $\mathcal{O}(n)$, wenn $n$ die Eingabelänge
+      \ei
+    }
+    \ii<2-> Darstellung und Implementierung: (nicht-)deterministische Automaten {\medskip
+      \begin{center}
+        \animation{1/2,2/3}{fig/02-automata-hex}
+      \end{center}
+      }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Scanner als Kombination von Regulären Automaten}
+    \animation[width=\linewidth]{1/1,2/2,3/3,4/4,5/5,6/6,7/7,8/8,9/9,10/10,11/11,12/12}{fig/02-scanner}
+
+    \bi
+    \ii Automaten parallel über die Eingabe ausführen.{
+      \bi
+      \ii Longest Possible Match, Konfliktauflösung bei mehrfachem Match
+      \ii Simulation des NFA, Umwandlung in \emph{determinstic finite automata} (\texttt{flex(1)})
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
+
 - Tokenstrom
 - Reguläre Grammatiken
 - Kombination von Regulären Grammatiken

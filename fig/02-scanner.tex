@@ -1,0 +1,107 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}
+    \tikzset{state/.style={circle,draw,inner sep=2pt}}
+
+    % fn matcher
+    \node[state] (fn-0) at (0,0) {0};
+    \node[state] (fn-1) at (1.5,0) {1};
+    \node[state,double] (fn-2) at (3,0) {2};
+    \node[below=0.2 of fn-0](fn-m) {\emph{Lexem:}};
+
+    \draw (fn-0) edge[->] node[above] {\small f} (fn-1)
+          (fn-1) edge[->] node[above] {\small n} (fn-2);
+
+    \node[fit=(fn-0) (fn-2) (fn-m),draw,inner sep=1.5ex,label={[rotate=90,anchor=south]left:func}] (fn){};
+
+
+
+    % func matcher
+    \node[state,above=2 of fn-0] (id-0) {0};
+    \node[state,right=2 of id-0,double] (id-1)  {1};
+    \node[state,right=2 of id-1,double] (id-2)  {2};
+    \node[below=0.2 of id-0](id-m) {\emph{Lexem:}};
+
+    \draw (id-0) edge[->] node[above] {\small [a-zA-Z\_]} (id-1)
+          (id-1) edge[->] node[above] {\small [a-zA-Z0-9\_]} (id-2)
+          (id-2) edge[->,loop right] node[right,](id-l-2) {\small [a-zA-Z0-9\_]} (id-2);
+    \node[fit=(id-0) (id-2) (id-m) (id-l-2),draw,inner sep=1.5ex,label={[rotate=90,anchor=south]left:identifier}] (id) {};
+
+    % oc matcher
+    \node[state,right=2 of fn-2] (hex-0) {0};
+    \node[state,right=1 of hex-0] (hex-1) {1};
+    \node[state,right=1 of hex-1] (hex-2) {2};
+    \node[state,right=1.5 of hex-2,double] (hex-3) {3};
+    \node[below=0.2 of hex-0](hex-m) {\emph{Lexem:}};
+    \draw (hex-0) edge[->] node[above] {\small 0} (hex-1)
+          (hex-1) edge[->] node[above] {\small x} (hex-2)
+          (hex-2) edge[->] node[above] {\small [0-9a-f]} (hex-3)
+          (hex-3) edge[->,loop right] node[right,](hex-l-2) {\small [0-9a-f]} (id-3);
+
+    \node[fit=(hex-0) (hex-2) (hex-m) (hex-l-2),draw,inner sep=1.5ex,label={[rotate=90,anchor=south]left:hex}] (hex) {};
+
+
+    \draw (fn.south west) ++(down:1.5cm) \foreach \idx/\x in {1/f,2/n,3/o,4/r,5/d,6/\ ,7/\ ,8/0,9/x,10/f,11/\$} {
+      node[anchor=west,draw,minimum width=3ex](c-\idx){\texttt{\strut{\x}}} ++(east:3ex)
+    };
+
+    % Begin - Ptr
+    \foreach \n/\overlay in {c-1/1-5,c-6/6,c-7/7,c-8/8-10,c-11/11} {
+      \only<\overlay>{ \draw[<-] (\n.north west) -- ++(up:2ex) node[above]{start}};
+    }
+
+    % End - Ptr
+    \foreach \n/\overlay in {1,...,11} {
+      \only<\overlay>{ \draw[<-] (c-\n.south) -- ++(down:2ex) node[below]{current}};
+    }
+    \only<12>{\draw[<-] (c-11.south east) -- ++(down:2ex) node[below]{current};}
+
+    % Colors
+    \begin{pgfonlayer}{background}
+      \node[fit=(id),inner sep=0pt,onslide=<9-11>{fill=gray!25}, onslide=<2-6>{fill=safegreen!25}]{};
+      \node[fit=(fn),inner sep=0pt,onslide=<9-11>{fill=gray!25}, onslide=<3-6>{fill=safegreen!25}]{};
+      \node[fit=(hex),inner sep=0pt,onslide=<2-6>{fill=gray!25}, onslide=<11>{fill=safegreen!25}]{};
+    \end{pgfonlayer}
+
+    % Matches
+    \only<3-6>{\node[right=0 of fn-m]{fn};}
+    \only<11>{\node[right=0 of hex-m]{0xf};}
+    \only<2-6>{\node[right=0 of id-m]{%
+        \only<2->{f}%
+        \only<3->{n}%
+        \only<4->{o}%
+        \only<5->{r}%
+        \only<6->{d}%
+      };}
+
+    % States
+    \begin{pgfonlayer}{background}
+      \foreach \overlay/\lst in {
+        1/{id-0, fn-0, hex-0},
+        2/{id-1, fn-1},
+        3/{id-2, fn-2},
+        3-6/{id-2},
+        7-8/{id-0, fn-0, hex-0},
+        9/{hex-1},
+        10/{hex-2},
+        11/{hex-3},
+      }{
+        \foreach \n in \lst {
+          \only<\overlay>{
+            \node[fit=(\n),circle,inner sep=0pt,fill=badbee!50]{};
+          }
+        }
+       }
+     \end{pgfonlayer}
+
+     \draw[->] (c-11.east) ++(east:1ex) -- ++(east:1cm) node(tokens){};
+     \only<7->{
+       \node[yshift=6mm,right=of tokens,fill=safeblue!50,pin={[draw]below:"fnord"}]{identifier};
+     }
+     \only<12>{
+       \node[yshift=6mm,right=3 of tokens,fill=srared!50,pin={[draw]below:15}]{literal};
+     }
+  \end{tikzpicture}
+\end{frame}
+\end{document}

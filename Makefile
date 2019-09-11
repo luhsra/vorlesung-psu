@@ -55,7 +55,7 @@ emacs/stop:
 emacs/restart: emacs/stop emacs/start
 
 emacs/ensure:
-	@emacsclient -s psu -e 't' >/dev/null 2>&1 || make -s emacs/start
+	@emacsclient -s psu -e 't' >/dev/null 2>&1 || make -s emacs/restart
 
 
 # We use the emacs server to tangle the shit out of it
@@ -70,7 +70,10 @@ build/tangle/%.html: %.org  export-prologue.org
 	${EC} -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"
 
 build/%.tex: build/tangle/%.tex build
-	@echo "\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
+	@echo "\\documentclass[xcolor={rgb,dvipsnames}]{beamer}\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
+
+build/%.handout.tex: build/tangle/%.tex build
+	@echo "\\documentclass[handout,xcolor={rgb,dvipsnames}]{beamer}\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
 
 build/%.pdf: build/%.tex
 	latexmk -pdf $< -outdir=build

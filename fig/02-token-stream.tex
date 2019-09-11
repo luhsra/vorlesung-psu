@@ -1,0 +1,53 @@
+\documentclass{lecturefig}
+\begin{document}
+    \newcount\idx
+    \idx=0
+
+    \def\charloop#1#2\@nnil{%
+      \edef\x{\the\idx}
+      \xdef\mypath{\csuse{mypath} -- node[draw,minimum width=1.5em,fill=white,\csuse{extra-\x}] (c-\the\idx) {\strut \texttt{#1}} ++(east:2em)}
+      \advance \idx by 1\relax
+      \def\repeat{\charloop #2\@nnil}%
+      \ifx&#2&\let\repeat\relax\fi%
+      \repeat%
+    }
+
+
+\begin{frame}
+  \begin{tikzpicture}
+
+    \only<2>{
+      \foreach \x in {2, 21}{\csgdef{extra-\x}{fill=lightgray}}
+      \foreach \x in {8,...,18}{\csgdef{extra-\x}{fill=lightgray}}
+      \foreach \x in {0,1}{\csgdef{extra-\x}{fill=safegreen!50}}
+      \foreach \x in {3,...,7}{\csgdef{extra-\x}{fill=safeblue!50}}
+      \foreach \x in {19}{\csgdef{extra-\x}{fill=badbee!50}}
+      \foreach \x in {20}{\csgdef{extra-\x}{fill=safeorange!50}}
+      \foreach \x in {22,...,25}{\csgdef{extra-\x}{fill=srared!50}}
+    }
+
+    \gdef\mypath{}
+    \charloop fn\ fnord/*\ bar\ */\ \ (\{\ 0x17\@nnil
+
+
+    \draw[->] (0,0) node[left,xshift=-2em]{Zeichenstrom} \mypath;
+
+    \pause
+    \draw[->] (0,-3cm) node[left,xshift=-2em]{Tokenstrom}
+      -- node[minimum width=4em, fill=safegreen!50,draw] (fn) {\strut func} ++(east:10em)
+      -- node[minimum width=4em, fill=safeblue!50,draw,pin={[draw]-90:"fnord"}] (id) {\strut identifier} ++(east:10em)
+      -- node[minimum width=4em, fill=badbee!50,draw] (lparen) {\strut lparen} ++(east:10em)
+      -- node[minimum width=4em, fill=safeorange!50,,draw] (lbracket) {\strut lbracket} ++(east:10em)
+      -- node[minimum width=4em, fill=srared!50,draw,pin={[draw]-90:23}] (literal) {\strut literal} ++(east:10em);
+
+    \draw[->] (c-0) -- (fn);
+    \draw[->] (c-3) -- (id);
+    \draw[->] (c-19) -- (lparen);
+    \draw[->] (c-20) -- (lbracket);
+    \draw[->] (c-22) -- (literal);
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
+% vim: filetype=tex
