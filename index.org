@@ -12,12 +12,13 @@ Abschnitte: {{{headlines(./01-einleitung.org)}}}
 
 Abschnitte: {{{headlines(./02-syntax.org)}}}
 
-* [[file:02-syntax.org][Sprachen: Typen]]
+
+* COMMENT[[file:02-syntax.org][ Sprachen: Typen]]
  - Primitiv, Strukturierte und Unstrukturierte Komposition, Funktionstypen, Typableitungen, Typschablonen, Kompatibilität
-* [[file:04-namen.org][Sprachen: Namen]]
+* COMMENT [[file:04-namen.org][Sprachen: Namen]]
    - Scoping, Statische und Dynamische Bindung, Type-directed Name Resolution, Overloading, Static and Dynamic Dispatch
    - Brujin Indices + Lexical Depth
-* [[05-semantische-analyse.org][Übersetzer: Semantische Analyse und Source-to-Source Transformation]]
+* COMMENT [[05-semantische-analyse.org][Übersetzer: Semantische Analyse und Source-to-Source Transformation]]
    - Typprüfung, Namensauflösung, Fehlermeldungen
    - C-Präprozessor/M4, Hygenische Makros, Transpilation, Domain Specific Languages
 

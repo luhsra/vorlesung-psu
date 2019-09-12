@@ -86,9 +86,7 @@
 
   \newcommand{\animation}[3][]{%
   \foreach \p/\s in {#2} {%
-    \only<\s>{%
-      \includegraphics[page=\p,#1]{#3}%
-    }%
+    \includegraphics<\s|handout:\s>[page=\p,#1]{#3}%
   }%
 }
 

@@ -8,10 +8,9 @@
       (setq org-macro--counter-table (make-hash-table :test #'equal))))
 
 (defun org-macro-headlines (file)
-  (with-current-buffer (find-file-noselect file)
-    (org-with-wide-buffer
-     (let ((data  (org-element-parse-buffer 'headline))
-	   (res "") (sep ""))
+  (with-file-from-disk file
+    (let ((data  (org-element-parse-buffer 'headline))
+	  (res "") (sep ""))
        (dolist (headline (cddr data))
          (let ((id (org-element-property :CUSTOM_ID headline))
                (tags (org-element-property :tags headline))
@@ -21,7 +20,7 @@
                                res sep (s-replace ".org" ".html" file)
 			       id title))
              (setq sep " - "))))
-       res))))
+       res)))
 
 ;;; SRA-ADDON: Add INCLUDE to the search regexp
 (defun org-macro--collect-macros (&optional files templates)

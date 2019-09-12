@@ -22,17 +22,25 @@ $( document ).ready(function() {
         var toc = $('#table-of-contents').detach();
         toc.insertAfter(".title");
 
-        $('#content, #postamble').wrapAll("<div class='container'><div id='main-row' class='row'><div class='col-md-9'></div></div></div>");
+        var content = $('#content, #postamble');
+        content.wrapAll("<div class='container'><div id='main-row' class='row'><div class='col-md-9'></div></div></div>");
+        content.children().unwrap();
 
         $('#table-of-contents').wrapAll("<div class='card bg-light mb-2 pb-1'></div>");
         $('#table-of-contents').addClass("well");
-        var url = window.location.href.match(/.*\//) + "index.html";
-        $('<a href="'+url+'">[Index]</a>').appendTo('#table-of-contents');
 
-        var url = window.location.href.replace('.html', '-slides.pdf');
-        $('<a href="'+url+'">[Slides]</a>').appendTo('#table-of-contents');
-
-        $('<a href="?print=true">[Drucken]</a>').appendTo('#table-of-contents');
+        if (window.location.href.match(/.*handout.html/)) {
+            $('<strong> - Druckversion</strong>').appendTo('.subtitle');
+        } else {
+            var url = window.location.href.match(/.*\//) + "index.html";
+            $('<a href="'+url+'">[Index]</a>').appendTo('#table-of-contents');
+            var url = window.location.href.replace('.html', '.slides.pdf');
+            $('<a href="'+url+'">[Folien,</a>').appendTo('#table-of-contents');
+            var url = window.location.href.replace('.html', '.handout.pdf');
+            $('<a href="'+url+'"> Handout]</a>').appendTo('#table-of-contents');
+            var url = window.location.href.replace('.html', '.handout.html?print=true');
+            $('<a href="'+url+'">[Druckversion]</a>').appendTo('#table-of-contents');
+        }
 
         $('#footnotes').appendTo('.col-md-9');
 

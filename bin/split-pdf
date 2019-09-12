@@ -11,25 +11,29 @@ if __name__ == '__main__':
 
     pdf = sys.argv[1]
     pdf_base, _ = os.path.splitext(pdf)
+    lecture = os.path.basename(pdf_base)
     with open(sys.argv[2]) as fd:
         for line in fd.readlines():
             pages, lines, topic = line.strip().split(":", 2)
             topic = normalize_topic(topic)
-            split = ["pdftk", pdf, "cat", pages, "output", f"{pdf_base}-{topic}-{lines}.pdf", "dont_ask"]
+            output_dir = f"build/html/{lecture}"
+            if not os.path.exists(output_dir):
+                os.mkdir(output_dir)
+            split = ["pdftk", pdf, "cat", pages, "output", f"{output_dir}/{topic}-{lines}.pdf", "dont_ask"]
             print(" ".join(split))
             subprocess.check_call(split)
 
-            convert = ["convert",
-                       "-density", "400",
-                       f"{pdf_base}-{topic}-{lines}.pdf",
-                       "-quality", "100",
-                       "-sharpen", "0x1.0",
-                       f"{os.path.dirname(pdf_base)}/html/{os.path.basename(pdf_base)}-{topic}-{lines}-%04d.png"
-            ]
+            #convert = ["convert",
+            #           "-density", "400",
+            #           f"{output_dir}/{topic}-{lines}.pdf",
+            #           "-quality", "100",
+            #           "-sharpen", "0x1.0",
+            #           f"{output_dir}/{topic}-{lines}-%04d.png"
+            #]
             # Use SVG
             convert = ["pdf2svg",
-                       f"{pdf_base}-{topic}-{lines}.pdf",
-                       f"{os.path.dirname(pdf_base)}/html/{os.path.basename(pdf_base)}-{topic}-{lines}-%04d.svg",
+                       f"{output_dir}/{topic}-{lines}.pdf",
+                       f"{output_dir}/{topic}-{lines}-%04d.svg",
                        "all"]
             print(" ".join(convert))
             subprocess.check_call(convert)

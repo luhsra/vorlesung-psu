@@ -47,6 +47,10 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
  - Man kommt ganz schnell in größere Komplexitätsklassen.
 
 * Was ist die Syntax einer Sprache?
+:PROPERTIES:
+:CUSTOM_ID: 02-syntax-analyse
+:END:
+
 #+begin_src latex
 \subtitle{{{{subtitle()}}}}
 \begin{frame}
@@ -149,11 +153,14 @@ Compiler-Compiler genannt, da sie Übersetzer sind, die Code erzeugen,
 der in Übersetzern verwendet wird.].
 
 * Scanner und Tokenstrom
+:PROPERTIES:
+:CUSTOM_ID: 02-scanner
+:END:
+
 #+begin_src latex
-  %%ONLY%%
   \dividerframe{Scanner\\und\\Tokenstrom}
 
-  \begin{frame}{Tokenstrom}
+  \begin{frame}<handout:3>{Tokenstrom}
     \animation[width=\linewidth]{1/1,2/2-}{fig/02-token-stream}
     \bi
     \ii<2-> Gruppierung von Zeichen zu sprachspezifischen Bausteinen (Token) {
@@ -187,15 +194,69 @@ der in Übersetzern verwendet wird.].
     \begin{code}<3->[tag=Py]
       \lstinputlisting[style=PY,linerange={scanner0-scanner1,scanner2-scanner3}]{lst/02-scanner.py}
     \end{code}
-    \only<1>{\begin{tikzpicture}[overlay,remember picture,box/.style={draw=srared,ultra thick}]
+    \only<1|handout:0>{\begin{tikzpicture}[overlay,remember picture,box/.style={draw=srared,ultra thick}]
         \node[fit=(sig-name),box,pin=-100:Funktionsname]{};
         \node[fit=(sig-input),box,pin=-90:Parameter]{};
         \node[fit=(sig-output),box,pin=-85:Rückgabewert]{};
         \node[below=2 of sig-input] {\alert{Konvention}: Wir verwenden Funktionssignaturen aus Haskell};
       \end{tikzpicture}}%
   \end{frame}
+#+end_src
 
-  \begin{frame}[t]{Wiederholung: Reguläre Sprachen und ihre Akzeptoren}
+Die Eingabe unseres Übersetzer ist eine Zeichenkette, die der
+Programmier auf der Tastatur mühsam eingetippt und dann in einer Datei
+gespeichert hat. In dem Prozess des kodierens hat der Programmierer
+die Programmstruktur, die in seinem Geist enstanden ist, in diese Zeichenkette *serialisiert*.
+
+Als ersten Schritt wollen wir die Zeichenkette in einen linearen
+*Tokenstrom* aus sprachspezifischen Elementen, wie Schlüsselwörter und
+Identifier, verwandeln. Dazu läuft der *Scanner* (= *Lexer*) einmal(!)
+über die Zeichenkette und emitiert, immer wenn ein vollständiges
+Sprachelement, was häufig aus mehr als einem Zeichen besteht, gelesen
+wurde, ein einzelnes *Token*. Diese Token haben immer eine Tokenklasse
+(z.B. Identifier oder "offnende runde Klammer") und manchmal eine
+Nutzlast. In dieser Nutzlast transportiert der Scanner weitere
+Informationen zum Token zu den Nachfolgenden Übersetzerstufen. So
+haben beispielsweise alle Identifier die kleine Tokenklasse
+(~identifier~) und tragen die überspannten Zeichen aus der Eingabe
+(das Lexem) als Identifiername als Nutzlast mit sich herum.
+
+Durch den Prozess des Scannens elimieren wir Leerzeichen und jegliche
+Codeformatierung, wir vereinheitlichen unterschiedliche Schreibweisen
+des gleichen Sprachelements und wir reduzieren die Anzahl der zu
+verarbeitenden Objekte erheblich. Dies macht Übersetzerbauer das Leben
+in folgenden erheblich einfacher, weil der Rest der Syntaxanalyse
+deutlich schneller ablaufen kann und wir viele Sonderfälle der Sprache
+bereits abgedeckt haben. So würden wir beispielsweise einen deutlich
+aufwendigeren Parser benötigen, wenn wir erst dort Kommentare, die überall
+im Quellcode auftauchen können, behandeln würden.
+
+Um einen Scanner für eine Sprache zu erstellen haben wir prinzipiell
+zwei Möglichkeiten: Entweder wir kodieren eine entsprechende Funktion
+manuell oder wir leiten einen Scanner von einer Menge regulärer
+Ausdrücke mit Hilfe eines Generators ab. Der manuelle Ansatz wird auch
+*ad-hoc* Ansatz genannt, da die kodierung als ein normales Programm
+keinem Formalismus folgt. Dies hat den Nachteil, dass es schwierig ist
+einen korrekten Scanner mit der Hand zu schreiben, aber es bringt auch
+den Vorteil, dass man an jeder Stelle Sonderbehandlungen einbauen
+kann, mit sich.
+
+In beiden Fällen benutzt der Scanner zwei Operationen auf dem
+Eingabestrom: *read()* konsumiert ein Zeichen vom Anfang gibt es
+zurück, *peek()* gibt dasselbe Zeichen zurück ohne es zu konsumieren.
+Insbesondere letzteres, das Vorausschauen, oder *look-ahead*, im
+Zeichenstrom ist ein Konzept, welches uns beim Parser wieder begegnen
+wird. Eine wichtige Eigenschaft von Scannern und Parsern ist es wie
+viele Zeichen der Vorausschau benötigt werden. Die meisten Sprachen
+kommen mit einem Scanner aus, der nur ein einzelnes Zeichen Vorschau
+benötigt[fn::Fortran ist ein trauriges Gegenbeispiel:
+[[http://shape-of-code.coding-guidelines.com/2009/12/20/parsing-fortran-95/]]
+].
+
+Im Beispiel, ....
+
+#+begin_src latex
+  \begin{frame}<handout:3>[t]{Wiederholung: Reguläre Sprachen und ihre Akzeptoren}
     \bi
     \ii Reguläre Sprachen werden von Typ-3 Grammatiken erzeugt. {
       \btDefTab[4cm]
@@ -221,7 +282,7 @@ der in Übersetzern verwendet wird.].
     \ei
   \end{frame}
 
-  \begin{frame}{Scanner als Kombination von Regulären Automaten}
+  \begin{frame}<handout:1,2,3,7,9,11>{Scanner als Kombination von Regulären Automaten}
     \animation[width=\linewidth]{1/1,2/2,3/3,4/4,5/5,6/6,7/7,8/8,9/9,10/10,11/11,12/12}{fig/02-scanner}
 
     \bi
@@ -233,11 +294,9 @@ der in Übersetzern verwendet wird.].
     }
     \ei
   \end{frame}
+
 #+end_src
 
-
-- Tokenstrom
-- Reguläre Grammatiken
 - Kombination von Regulären Grammatiken
 
 * Parser und der Syntaxbaum

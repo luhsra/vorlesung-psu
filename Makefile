@@ -15,7 +15,7 @@ html: ${HTML}
 build: texmf/ls-R
 	@mkdir -p build/tangle
 	@mkdir -p build/html
-	@ln -fs ../../export-prologue.org build/html
+	@ln -fs ../export-prologue.org build
 	@ln -fs ../../html/css build/html/
 	@ln -fs ../../html/js build/html/
 	@ln -fs ../../fig     build/html
@@ -24,22 +24,38 @@ build: texmf/ls-R
 texmf/ls-R:
 	texhash texmf/
 
+# Building the figures is only a precondition for this makefile. This is the easy part.
+fig/%.pdf: fig/%.tex build texmf-local/lecturefig.cls
+	latexmk -pdf $< -outdir=build
+	@cp $(patsubst fig/%,build/%,$@) $@
 
-define CREATE_SUB
-prefix :=
-build/$(1:.org=.pdf): $(shell prefix=`echo $(1) | awk -F- '{print $$1;}'`; find fig/ -name "$${prefix}-*.pdf" )
-$(shell echo $(1) | awk -F- '{print $$1;}'): build/$(1:.org=.pdf)
-$(shell echo $(1) | awk -F- '{print $$1;}').html : build/html/$(1:.org=.html)
-$(shell echo $(1) | awk -F- '{print $$1;}').tangle : build/tangle/$(1:.org=.tex)
-$(shell echo $(1) | awk -F- '{print $$1;}').split: build/$(1:.org=.pdf.split)
-$(shell echo $(1) | awk -F- '{print $$1;}').wc:
-	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $1 | wc -w
+
+define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung
+build/$(2).%.pdf: $(shell find fig -name "$(1)-*.pdf")
+$(1):                 build/$(2).slides.pdf
+$(1).view:            build/$(2).slides.pdf
+$(1).handout:         build/$(2).handout.pdf
+$(1).handout.view:    build/$(2).handout.pdf
+$(1).tangle:          build/tangle/$(2).tex
+$(1).split:           build/html/$(2).slides/.split-stamp
+$(1).handout.split:   build/html/$(2).handout/.split-stamp
+$(1).html:            build/html/$(2).html
+$(1).html.view:       build/html/$(2).html
+$(1).handout.html.view:  build/html/$(2).handout.html
+$(1).all:             $(1).html $(1).handout $(1).html.handout
+$(1).wc:
+	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $(2).org | wc -w
 endef
+
+%.view:
+	xdg-open $< &
+
 # invoke it for lecture PDF target (01-Einfuehrung.pdf, ...)
 $(foreach f,$(ORG_PDF),\
-	$(eval $(call CREATE_SUB,$(f)))\
+	$(eval $(call CREATE_SUB,$(shell echo $(f) | awk -F- '{print $$1;}'),$(f:.org=)))\
 )
 
+################################################################
 # Setup the Emacs server
 EC=make -s emacs/ensure; emacsclient -s psu
 
@@ -58,46 +74,55 @@ emacs/ensure:
 	@emacsclient -s psu -e 't' >/dev/null 2>&1 || make -s emacs/restart
 
 
-# We use the emacs server to tangle the shit out of it
+################################################################
+# With the emacs server, we can tangle the beamer slides from
+# the org file.
+
 build/tangle/%.tex: %.org
 	@mkdir -p build/tangle
 	${EC} -e '(org-babel-tangle-file "'"$$PWD"'/$<" nil "latex")'
 	mv $(patsubst %.org,%.tex,$<) $@
 	bin/delete-frames $@
 
-
-build/tangle/%.html: %.org  export-prologue.org
-	${EC} -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"
-
-build/%.tex: build/tangle/%.tex build
-	@echo "\\documentclass[xcolor={rgb,dvipsnames}]{beamer}\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
+build/%.slides.tex: build/tangle/%.tex build
+	@echo "\\documentclass[beamer,xcolor={rgb,dvipsnames}]{beamer}\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
 
 build/%.handout.tex: build/tangle/%.tex build
 	@echo "\\documentclass[handout,xcolor={rgb,dvipsnames}]{beamer}\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
 
+build/tangle/%.html: %.org
+	${EC} -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"
+
+
 build/%.pdf: build/%.tex
 	latexmk -pdf $< -outdir=build
+	@cp $@ build/html
 
-fig/%.pdf: fig/%.tex texmf-local/lecturefig.cls
-	@mkdir -p build
-	latexmk -pdf $< -outdir=build
-	@echo "make: hard link from build/ to $@"
-	@cp $(patsubst fig/%,build/%,$@) $@
-
-
-build/%.pdf.split: build/%.pdf bin/split-pdf
+################################################################
+# For the HTML version, we split the PDF file into many files
+# and convert them to SVG. These files are
+build/html/%/.split-stamp: build/%.pdf bin/split-pdf
+	mkdir -p $(patsubst build/%.pdf,build/html/%,$<)
+	rm -f $(patsubst build/%.pdf,build/html/%,$<)/*.pdf
+	rm -f $(patsubst build/%.pdf,build/html/%,$<)/*.svg
 	bin/split-pdf $< $(patsubst %.pdf,%.topics,$<)
-	touch $@
+	@touch $@
 
+build/html/%.html: %.org build/html/%.slides/.split-stamp bin/insert-carousels
+	bin/insert-carousels $< $(patsubst %.org,build/%.slides.topics,$<) \
+		> $(patsubst %.org,build/%.org,$<)
+	${EC} -e "(org-export-to-html-file \"$$PWD/build/$<\" \"$$PWD/$@\")"
+
+build/html/%.handout.html: %.org build/html/%.handout/.split-stamp bin/insert-carousels
+	bin/insert-carousels $< $(patsubst %.org,build/%.handout.topics,$<) \
+		> $(patsubst %.org,build/%.handout.org,$<)
+	${EC} -e "(org-export-to-html-file \"$$PWD/$(patsubst %.org,build/%.handout.org,$<)\" \"$$PWD/$@\")"
+
+# Special cases for the index file
+build/tangle/index.html: $(shell echo *.org)
+index index.view: build/html/index.html
 build/html/index.html: build/tangle/index.html
 	cp $< $@
-
-build/html/%.html: %.org build/tangle/%.html build/%.pdf.split bin/insert-carousels
-	cp $(patsubst %.org, build/%.pdf,$<) $(patsubst %.org, build/html/%-slides.pdf,$<)
-	bin/insert-carousels $< $(patsubst %.org,build/%.topics,$<) \
-            > $(patsubst %.org,build/html/%.org,$<)
-	${EC} -e "(org-export-to-html-file \"$$PWD/build/html/$<\" \"$$PWD/$@\")"
-
 
 
 
