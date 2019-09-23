@@ -1,3 +1,5 @@
+REMOTE=lab:/proj/www/sra.uni-hannover.de/Lehre/V_PSÜ/skript/.
+
 ORG_PDF=$(shell echo 0*.org)
 ORG=$(filter-out export-prologue.org, $(shell echo *.org))
 
@@ -29,7 +31,6 @@ fig/%.pdf: fig/%.tex build texmf-local/lecturefig.cls
 	latexmk -pdf $< -outdir=build
 	@cp $(patsubst fig/%,build/%,$@) $@
 
-
 define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung
 build/$(2).%.pdf: $(shell find fig -name "$(1)-*.pdf")
 $(1):                 build/$(2).slides.pdf
@@ -41,10 +42,13 @@ $(1).split:           build/html/$(2).slides/.split-stamp
 $(1).handout.split:   build/html/$(2).handout/.split-stamp
 $(1).html:            build/html/$(2).html
 $(1).html.view:       build/html/$(2).html
+$(1).handout.html:    build/html/$(2).handout.html
 $(1).handout.html.view:  build/html/$(2).handout.html
-$(1).all:             $(1).html $(1).handout $(1).html.handout
+$(1).all:             $(1).html $(1).handout $(1).handout.html
 $(1).wc:
 	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $(2).org | wc -w
+$(1).publish:   build/html/index.html $(1).all
+	cd build/html; rsync -aLv  ./index.html ./css ./js ./$(2)* ${REMOTE}
 endef
 
 %.view:
