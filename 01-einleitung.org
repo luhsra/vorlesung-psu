@@ -1147,8 +1147,8 @@ Im Folgenden übersetzen wir zuerst den vereinfachten Übersetzer mit seiner Imp
 Damit bekommen wir eine volle Version des vereinfachten Übersetzers, der nun wirklich den gesamten Umfang von L versteht und verarbeiten kann.
 Als nächstes stecken wir den originalen Übersetzer in diesen vereinfachten Übersetzer und bekommen eine langsame Variante des originalen Übersetzers, der auf M' läuft, aber schon Code für M erzeugt.
 Eine weitere Iteration der Selbstübersetzung, liefert nun endlich das gewünschte Ergebnis: einen schnellen Übersetzer, der unsere Sprache L verarbeitet und Programme für M erzeugt.
-Wiederholt man den Vorgang ein weiteres Mal und vergleicht die Binärdateien der beiden letzten Übersetzer.
-Wenn alles geklappt hat, sind beide Dateien bis aufs letzte Bit gleich, was weiteres Vertrauen in die Übersetzungsleistung des entwickelten Übersetzung bringt[fn::Ein interessantes Beispiel eines absichtlichen Fehlers beim Bootstrapping ist das klassische Paper von Ken Thompson, einem der Erfinder von C, [[https://dl.acm.org/citation.cfm?id=358210][Reflections on trusting trust]].
+Zum Schluss wiederholt man den Vorgang ein weiteres Mal und vergleicht die Binärdateien der beiden letzten Übersetzer.
+Wenn alles geklappt hat, sind beide Dateien bis aufs letzte Bit gleich, was weiteres Vertrauen in die Übersetzungsleistung des entwickelten Übersetzers bringt[fn::Ein interessantes Beispiel eines absichtlichen Fehlers beim Bootstrapping ist das klassische Paper von Ken Thompson, einem der Erfinder von C, [[https://dl.acm.org/citation.cfm?id=358210][Reflections on trusting trust]].
 Dort hat Thompson einen Übersetzer geschrieben, der eine Hintertür beim Übersetzungsvorgang einbaut, wenn der Übersetzer selbst übersetzt wird.].
 
 #+begin_src latex
