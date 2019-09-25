@@ -21,6 +21,8 @@ build: texmf/ls-R
 	@ln -fs ../../html/css build/html/
 	@ln -fs ../../html/js build/html/
 	@ln -fs ../../fig     build/html
+	@ln -fs ../../lst     build/html
+
 
 
 texmf/ls-R:
@@ -48,7 +50,7 @@ $(1).all:             $(1).html $(1).handout $(1).handout.html
 $(1).wc:
 	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $(2).org | wc -w
 $(1).publish:   build/html/index.html $(1).all
-	cd build/html; rsync -aLv  ./index.html ./css ./js ./$(2)* ${REMOTE}
+	cd build/html; rsync -aLv  ./index.html ./css ./js ./lst ./fig ./$(2)* ${REMOTE}
 endef
 
 %.view:

@@ -253,7 +253,27 @@ benötigt[fn::Fortran ist ein trauriges Gegenbeispiel:
 [[http://shape-of-code.coding-guidelines.com/2009/12/20/parsing-fortran-95/]]
 ].
 
-Im Beispiel, ....
+Im Beispiel [fn::Vollständiger Scanner: [[file:./lst/02-scanner.py]]],
+liefert die Funktion ~scanner_next()~ bei jedem Aufruf eine 2-Elementige
+Liste, bestehend aus Tokentyp und Nutzlast, zurück. Die Funktion
+überspringt zunächst alle Leerzeichen und Tabulatorzeichen, bevor die
+eigentliche Tokenerkennung startet. Dieser Beispielscanner erkennt nur
+Ganzzahlen, allerding ist es möglich diese Zahlen in binärer
+(~0b111~), oktaler (~0777~), oder hexadezimaler Schreibweise zu
+erkennen. Hierfür erkennt der Scanner, ob ein entsprechendes Präfix
+vorliegt (z.B. ~0x~ für hexadezimal) und ließt dannach ensprechend der
+erkannten Notation solange Zeichen aus der entsprechenden Klasse
+zulässiger Zeichen (~stream.read_many()~).
+
+#+INCLUDE: ../lst/02-scanner.py
+
+An diesem Beispiel ist es wichtig zu erkennen, dass das Zeichen ~0~
+ein *gemeinsames* Präfix ist und erst mit dem zweiten Zeichen (~b~,
+~x~, oder eine Oktalzahl) wirklich feststeht welche Notation an dieser
+Stelle vorliegt. Mit jedem weiteren gelesenen Zeichen, wird hier die
+Menge der möglichen Notationen weiter eingeschränkt. So ist ab der
+ersten gelesenen ~0~ klar, dass es sich nicht mehr um eine Zahl in
+Dezimalnotation handeln kann.
 
 #+begin_src latex
   \begin{frame}<handout:3>[t]{Wiederholung: Reguläre Sprachen und ihre Akzeptoren}
@@ -297,7 +317,121 @@ Im Beispiel, ....
 
 #+end_src
 
-- Kombination von Regulären Grammatiken
+Für Schritt der Tokenerkennung aus einem Zeichenstrom hat
+herausgestellt, dass der Rückgriff auf formale Konzepte aus der
+theoretischen Informatik höchst lohnend ist und das man mit *regulären
+Grammatiken* die Token der meisten Programmiersprachen hervorragend
+beschreiben kann. Daher wollen wir nun der ad-hoc Implementierung ~scanner_next()~ aus dem Beispiel, einen formaleren Hintergrund geben.
+
+Zu Beginn müssen wir uns daran erinnern, was Grammatiken überhaupt
+waren. Die theoretische Informatikvorlesung ist lange her, und die
+Erinnerung bereits verschommen. Zunächst ist eine (formale) Grammatik
+ein Regelsatz, der beschreibt wie man, beginnend von einem
+*Startsymbol*, über einen iterativen *Textersetzungsprozess*, zu einer
+Zeichenkette kommt. Zu jedem Zeitpunkt besteht die Zeichenkette aus
+einer Reihe von *terminalen* und *nicht-terminalen* Symbolen und die
+Ersetzung wird solange wiederholt, bis nur noch terminale Symbole
+übrig sind. Die Ersetzung an sich erfolgt durch eine Menge von Regel,
+die ein Muster erkennt und durch ein anderes Muster ersetzt. Alle
+Zeichenketten, die abgeleitet werden können nennt man die zugehörige
+(formale) Sprache[fn::Verwechslungsgefahr: Formale Sprachen sind etwas
+anderes als Programmiersprachen und sie haben nichts mit einem
+Maschinenmodell zu tun. Das Skript unterscheidet daher strikt zwischen
+formalen Sprachen und (einfach nur) Sprachen]. Im folgenden leiten
+wir, Zeile für Zeile, die Zeichenkette ~0xa2c~ aus dem Startsymbol
+~hexliteral~ her:
+
+#+begin_example
+hexliteral
+hexprefix hexdigit hexdigit*
+0x hexdigit hexdigit*
+0xa hexdigit*
+0xa2 hexdigit*
+0xa2c hexdigit*
+0xa2c
+#+end_example
+
+Je nachdem wie die Regeln einer Grammatik strukturiert sind, werden
+Grammatiken in unterschiedliche Klassen eingeteilt
+{{{wikipedia_de(Chomsky-Hierarchie)}}}. Eine der einfachsten Klassen, die
+besonders wünschenswerte Eigenschaften hat, ist die Klasse der
+*regulären Grammatiken*. Bei ihr gilt, dass auf der rechten Seite nur
+ein einzelnes nicht-Terminal stehen darf. Dies bedeutet, dass die
+Regel *kontextfrei* ist, da das nicht-Terminal, egal in welchem
+Kontext es steht, immer gleich ersetzt wird. Weiterhin muss für
+reguläre Grammatiken gelten, dass sie nicht rekursiv sind. Dies
+bedeutet, dass man durch wiederholte Anwendung der Regel nie mehr zum
+selben nicht-Terminal kommen darf. Beim Parsen werden wird
+*kontextfreie* Grammatiken verwenden, die genau diese Einschränkung
+nicht erfüllen und daher nicht regulär sind.
+
+Das Angenehme an regulären Grammatiken ist, dass man sehr leicht ein
+Programm ableiten kann, dass erkennt ob eine gegebene Zeichenkette von
+der Grammatik erzeugt werden könnte. Wir drehen also die Richtung der
+Grammatik um, erzeugen keine Zeichenketten mehr, sondern konsumieren
+sie. Genau das, was wir für unseren Scanner brauchen.
+
+Für das Erkennen einer regulären Sprache konstruiert man aus den
+Grammatikregeln einen *endlichen Automaten* der die Zeichenkette
+elementweise konsumiert. An jeder Kante des Automaten gibt es einen
+Bedingung (engl. Guard), die angibt, bei welchen gelesenen Zeichen die
+Transition möglich ist. Ist die Entscheidung, welche Transition
+genommen wird, zu irgendeinem Zeitpunkt nicht eindeutig, so ist der
+Automat *nicht-determinisitisch*. Erreichen wir beim Zeichen
+konsumieren einen einen akzeptierenden Zustand, so haben wir ein Wort
+der formalen Sprache erkannt. Allerdings können akzeptierende Zustände
+auch wieder Verlassen um noch längere Worte der Sprache zu Erkennen.
+Im Fall der Hexadezimalzahlen dürfen am Ende noch beliebig viele
+Zeichen aus der Klasse ~[0-9a-fA-F]~ auftauchen.
+
+Im Kontext eines Scanners bedeutet das Erreichen eines akzeptierenden
+Zustandes, dass wir ein valides Token gefunden haben. Allerdings
+könnte dieses Token auch das Prefix eines längeren Tokens sein. So ist
+zwar ~0xa2~ eine valide hexadezimale Zahl, aber es ist auch das Prefix
+für das Wort ~0xa2c~. Für Scanner wollen wir /immer/ jenes Token
+finden, das maximale Länge hat (*longest possible match*).
+
+
+Da es in einer Programmiersprache unterschiedliche Arten von Token
+gibt, die es zu erkennen gilt, müssen wir mehrere Automaten
+kombinieren; ein Automat/Grammatik/Sprache für jeden Tokentyp. Dazu
+lassen wir "einfach" all diese Automaten parallel laufen und füttern
+jedes gelesene Zeichen in alle Automaten gleichzeitig, sodass jeder
+Automat eine Transition macht. Hat ein Automat zu einem Zeitpunkt
+keine valide Transition, so fällt er aus (Folien: er wird grau) und
+wird nicht weiter mit Zeichen gefüttert. Erreich einer der Automaten
+einen akzeptierenden Zustand so merken wir uns das erkannte Wort (auch
+Lexem genannt). Wir füttern die Automaten so lange mit Zeichen bis
+auch der letzte von ihnen ausgefallen ist und geben das letzt
+gefundene Wort als Token zurück.
+
+Dieses parallel Ausführen von endlichen Automaten können wir entweder
+tatsächlich durchführen oder können, was effizienter ist, einen
+kombinerten Automaten konstruieren: Dazu fügt man einen weiteren
+Startzustand ein, der über Epsilon-Transitionen die Startzustände der
+einzelnen Token erreichen kann (was den kombierten Automaten immer
+nicht-deterministisch macht). Mittels der [[https://de.wikipedia.org/wiki/Potenzmengenkonstruktion][Potenzmengenkonstruktion]]
+leitet man den Equivalenten determinsitischen Automaten her.
+
+Zurück zu den weniger theoretischen Aspekten des Scannens. Im Beispiel
+auf den Folien, ist eine Situation abgebildet, bei der das
+Schlüsselwort ~fn~ das Prefix für den Identifier ~fnord~ ist und zum
+gleichen Zeitpunkt (~fn~) zwei Automaten das Lexem als valides Wort erkennen
+würden. In solchen Fällen müssen wir zusätzliche Regeln angeben
+welcher der Tokentypen den Vorrang hat. Für Programmiersprachen müssen
+Schlüsselwörter immer hörere Priorität als Identifier haben, solange
+der Identifier nicht länger ist. Dies ist der Grund, wieso Sie
+Schlüsselwörter nicht als Variabelennamen verwenden können und diese
+daher auch oft als *reservierte* Wörter genannt werden.
+
+Da die manuelle Konstruktion von endlichen Automaten und deren
+Kombination müßig ist, gibt es Programme, die aus einer Menge von
+regulären Ausdrücken einen Scanner erzeugen. Ein solches Programm ist
+[[https://www.cs.virginia.edu/~cr4bd/flex-manual/][flex(1)]]. Sollten sie später einen Lexer brauchen, der *schnell* und
+*korrekt* eine Zeichenkette in Tokens zerlegt, so zögern sie nicht und
+nehmen sie einen Scannergenerator zur Hand! Mehr zu den
+Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir Exkurs
+am Ende dieser Vorlesung kennen.
 
 * Parser und der Syntaxbaum
 - Kontextfreie Grammatiken

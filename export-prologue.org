@@ -7,3 +7,5 @@
 #+HTML_HEAD: <script type="text/javascript" src="js/bootstrap.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="js/org-bootstrap.js"></script>
 #+MACRO: see (eval (org-macro-sra-see $1 $2))
+#+MACRO: wikipedia_de [fn::Wikipedia: [[https://de.wikipedia.org/wiki/$1][$1]]]
+#+MACRO: wikipedia_en [fn::Wikipedia: [[https://en.wikipedia.org/wiki/$1][$1]]]
