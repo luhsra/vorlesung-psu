@@ -1,0 +1,41 @@
+\documentclass{lecturefig}
+\usetikzlibrary{chains}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[start chain,node distance=0.2cm]
+      \node [on chain,fill=badbee!50] (A1) {\emph{A}};
+      \node [on chain] {$\rightarrow$};
+      \node [on chain] {(};
+      \node [on chain,fill=badbee!50] (A2) {\emph{A}};
+      \node [on chain] {)};
+      \draw[->] (A2) -- ++(down:2em) -| (A1);
+    \end{tikzpicture}
+    \begin{tikzpicture}[start chain=1,start chain=2,start chain=3,node distance=0.2cm]
+      \node [on chain=1,fill=badbee!50] (E) {\emph{E}};
+      \node [on chain=1] {$\rightarrow$};
+      \node [on chain=1] (E2) {\emph{E}};
+      \node [on chain=1] {+};
+      \node [on chain=1,fill=safegreen!50] (T2) {\emph{T}};
+
+      \node [on chain=2,fill=safegreen!50,yshift=-2\baselineskip] at (E) (T) {\emph{T}};
+      \node [on chain=2] {$\rightarrow$};
+      \node [on chain=2] {\emph{T}};
+      \node [on chain=2] {*};
+      \node [on chain=2,fill=luhblue!50] (F2){\emph{F}};
+
+      \node [on chain=3,fill=luhblue!50,yshift=-2\baselineskip] at (T) (F) {\emph{F}};
+      \node [on chain=3] {$\rightarrow$};
+      \node [on chain=3] {(};
+      \node [on chain=3,fill=badbee!50] (E2) {\emph{E}};
+      \node [on chain=3] {)};
+      \node [on chain=3] {$\mid$};
+      \node [on chain=3] {\emph{Integer}};
+
+      \draw[->] (T2) |- ($(E)!0.5!(T)$) -- (T);
+      \draw[->] (F2) |- ($(T)!0.5!(F)$) -- (F);
+      \draw[->] (E2) |- ($(F.south west)+(-8pt,-3pt)$) |- (E);
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

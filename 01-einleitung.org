@@ -67,6 +67,11 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
 
   - Was darf ein Übersetzer und was darf dieser nicht?
 
+* TODO Verbesserungen                                              :noexport:
+
+- <mxk>dass auftauchen der "C-Virtuellen-Maschine" (aka PDP-11) ist etwas überraschend in dem Text, ich wusste, dass es kommt, aber etwas mehr hinführung von "hardware-vms" hin zu der abstrakten "sprach-vm" wäre glaube ich ganz gut um weniger leute zu verlieren
+
+- <mxk> und zu "Genauso ist es möglich, dass ein Übersetzer von RISC-V-Assembler nach C (umgekehrte Richtung) übersetzt oder von C nach JavaScript (quer zum Ebenenmodell)." währe wohl ein satz, dass entlang der abstaktionsschichten information verloren geht und deshalb die umkehr nicht verlustfrei sein kann, angemessen
 
 * Einleitung
 :PROPERTIES:

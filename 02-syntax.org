@@ -434,15 +434,103 @@ Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir Exkurs
 am Ende dieser Vorlesung kennen.
 
 * Parser und der Syntaxbaum
-- Kontextfreie Grammatiken
+:PROPERTIES:
+:CUSTOM_ID: 02-parser
+:END:
+#+begin_src latex
+  \begin{frame}<handout:2>{Blockstruktur und Klammerung}
+    \bi
+    \ii \textbf{Erinnerung}: Wir wollen Syntaxbaum aus Tokenstrom erzeugen
+    \bigskip
+    \ii Programmiersprachen enthalten \emph{geschachtelte} oder \emph{rekursive} Konstrukte{%
+      \bi
+      \ii Geklammerte Ausdrücke: \btSetTab ((1*2)+(3/4)-(5*6))\hfill\emph{explizit}\\
+      \ii Operatorpräzedenz:     \btUseTab 1*2+3/4-5*6\hfill\emph{implizit}
+      \ii Blockstrukturen:       \btUseTab if (\ldots) \{ if (\ldots) \{ while (\ldots) \{ \ldots \} \} \} \hfill\emph{explizit}
+      \ii Grammatik:             \btUseTab \grammarrule{\NT{expr}}{ ( \NT{expr} ) \OR  \NT{expr} + \NT{expr}}
+      \ei
+    }\medskip
+    \ii<2-> Bäume eignen sich diese Strukture zu erfassen!{
+      \includegraphics[width=0.45\linewidth,page=2]{fig/02-tree}\hfill
+      \includegraphics[width=0.45\linewidth,page=3]{fig/02-tree}
+      \bi
+      \ii{Token werden hierarchisch geordnet. Implizite Regeln werden explizit.}
+      \ii{Bäume sind \alert{rekursive} Datenstrukturen. Unterbäume sind auch Bäume!}
+      \ei
+    }
+    \ei
+  \end{frame}
 
-** Parser mit Rekursivem Abstieg
+  \begin{frame}<handout:1-2>[t]{Wiederholung: Kontextfreie Grammatiken}
+    \bi
+    \ii Reguläre Grammatiken nicht fähig rekursive Strukturen zu erfassen.\\
+    \enquote{Klammernzählen} ist verboten: \grammarrule{\NT{A}}{( \NT{A} ) \OR \EPSILON}
+    \bigskip
+    \ii Kontextfreie Sprachen werden von Typ-2 Grammatiken erzeugt.{
+      \bi
+      \ii Weiterhin erlaubt: Alternativen ($\mid$), Konkatenierung ($Aa$), Wiederholung ($A*$)
+      \ii Zusätzlich: Nicht-Terminale dürfen sich selbst referenzieren.{\medskip
+        \begin{center}
+          \includegraphics[width=0.3\linewidth,page=1]{fig/02-grammar}
+          \hspace{1cm}
+          \includegraphics[width=0.3\linewidth,page=2]{fig/02-grammar}
+        \end{center}
+      }
+      \ei
+    }\medskip
+    \ii Kontextfreie Sprachen können von Kellerautomaten erkannt werden.{
+      \bi
+      \ii Kellerautomat: Endlicher Zustandsautomat + Unendlicher Stapelspeicher
+      \ii Erkennung immer in $\mathcal{O}(n^3)$ möglich: Cocke-Younger-Kasami Algorithmus
+      \ii Für Programmiersprachen relevante Grammatiken: $\mathcal{O}(n)$
+      \ei
+    }
+    \ei%
+    \begin{tikzpicture}[remember picture,overlay,visible on=<2>]
+      \node[anchor=south east,inner sep=0,xshift=1cm] at (current page.south east) (yeah) {\includegraphics[width=4.5cm]{fig/yeah}};
+      \node[anchor=south east,fill=safegreen!50,draw,xshift=1.2cm,yshift=6mm] at (yeah.south west) {\Huge $\mathcal{O}(n)$};
+    \end{tikzpicture}
+  \end{frame}
+
+  \begin{frame}{Determinstische Kontextfreie Grammatiken}
+    \bi
+    \ii Kontextfrei bedeutet nicht direkt, dass der Baum eindeutig ist.{
+      \bi
+      \ii Linksableitung: Das linkeste Nichtterminal wird zuerst abgeleitet.
+      \ei
+      \medskip
+      \begin{center}
+        \small
+        \fbox{\grammarrule{\NT{E}}{ \NT{E} + \NT{E} \OR \NT{Integer}}\strut}
+        $\oplus$
+        \fbox{\strut 1 + 2 + 3 + 4}
+        $\Rightarrow$
+        \medskip
+
+        \includegraphics[width=0.3\linewidth,page=11]{fig/02-tree}
+        \includegraphics[width=0.3\linewidth,page=12]{fig/02-tree}
+        \includegraphics[width=0.3\linewidth,page=13]{fig/02-tree}
+      \end{center}
+    }\medskip
+    \ii Wir werden nur deterministische Grammatiken verwenden. {
+      \bi
+      \ii \alert<2>{LL-Grammatiken: \btDefTab \textbf{L}inks lesend, \textbf{L}inksableitend} \only<2>{\hfill $\Rightarrow$ Top-Down Parser}
+      \ii LR-Grammatiken:           \btUseTab \textbf{L}inks lesend, \textbf{R}echtsableitend           \only<2>{\hfill $\Rightarrow$ Parsergeneratoren}
+      \ii LL($k$)/LR($k$):          \btUseTab Mit $k$ Zeichen Look-Ahead Parsebar
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
+** Parser mit rekursivem Abstieg
 
 ** Die LL(1) Grammatiken
-
+- First, Follow und Predict Mengen
+- Tabellenbasierte Parser
 ** Schwierigkeiten mit LL(1)
+- Common Prefixes -> Linksfaktorisierung
 - Linksrekursion
-- Common Prefixes
 ** LR(1) und Parsergeneratoren
 - Dafür gibt es Lösungen, aber die Konstruktion der Parseautomaten ist schwieriger. Zum Glück gibt es dafür Tools.
 * Exkurs: Parsing und Sicherheit

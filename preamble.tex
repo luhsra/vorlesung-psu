@@ -101,11 +101,24 @@
 \DeclareFieldFormat{postnote}{#1}
 
 
-%*****************************************************************************
-%** Legalcode *************************************************************
+
+%****************************************************************
+%** tikz stuff
 \usepackage{tikz}
 \usetikzlibrary{tikzmark,arrows,fit,calc,positioning}
 \usepackage{pgfkeys}
+\tikzset{
+  small tree/.style={
+    every node/.append style={
+      font=\small,
+      draw,
+    },
+    node distance=1em,
+  }
+}
+
+%*****************************************************************************
+%** Legalcode *************************************************************
 
 \pgfkeys{
   /legalcode/commons/.style={url={https://commons.wikimedia.org/wiki/File:#1}},
@@ -128,7 +141,6 @@
   \parbox{\textwidth}{\centering\color{gray}\tiny\lcText{#3}\lcAuthor{} \mbox{(\lcLicense)}}
   \egroup
 }
-
 
 %*****************************************************************************
 %** code blocks **************************************************************

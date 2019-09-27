@@ -1,0 +1,95 @@
+\documentclass{lecturefig}
+\usetikzlibrary{trees}
+\begin{document}
+\begin{frame}<1-10>
+  \begin{tikzpicture}[
+    level distance=1cm,
+    level 1/.style={sibling distance=2cm},
+    level 2/.style={sibling distance=1cm},
+    ]
+
+  \begin{scope}[every node/.style={draw,fill=white}]
+  \node (root) {+}
+    child {node (mul) {*}
+      child {node (c1) {1}}
+      child {node (c2) {2}}
+    }
+    child {node (div) {/}
+    child {node (c3) {3}}
+      child {node (c4) {4}}
+    };
+  \end{scope}
+
+  % Wurzel, Innerer Knoten, Blatt
+  \begin{scope}[visible on=<2>, shorten <=5pt]
+    \draw[ultra thin] (root) -- ++(0:2cm) node[anchor=west]{Wurzel};
+    \draw[ultra thin] (div) -- ++(0:1cm) node[anchor=west]{Innerer Knoten};
+    \draw[ultra thin] (c4) -- ++(0:1cm) node[anchor=west]{Blatt};
+  \end{scope}
+
+
+  % Baum und Unterbaum
+  \begin{scope}[visible on=<3>]
+    \draw[dashed,thick,srared] \convexpath{c4,c1,root}{20pt};
+
+    \begin{scope}[on layer=background]
+      \fill[luhblue!40] \convexpath{c4,c3,div}{15pt};
+    \end{scope}
+
+    \draw[shorten <=17pt] (root) -- ++(0:2cm) node[anchor=west]{Baum};
+    \draw[shorten <=9pt] (div) -- ++(0:1.5cm) node[anchor=west,align=center]{(Unter-)\\Baum};
+  \end{scope}
+
+
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}<1-10>
+  \begin{tikzpicture}[
+    level distance=1cm,
+    level 1/.style={sibling distance=2cm},
+    level 2/.style={sibling distance=1cm},
+    ]
+    \begin{scope}[every node/.style={draw,fill=white},visible on=<1>]
+      \node (root) {+}
+         child {node (P){+}
+           child {node {+}
+             child {node {1}}
+             child {node {2}}
+           }
+           child {node {3}};
+         }
+         child {node {4}};
+         \draw (root) -- (P); % I have no idea why i need this
+
+         \node [below=3.2cm of root,draw=none] {Linksableitung};
+
+    \end{scope}
+    \begin{scope}[every node/.style={draw,fill=white},visible on=<2>]
+      \node (root) {+}
+      child { node (P) {+}
+        child {node {1}}
+        child {node {2}}
+      }
+      child {node {+}
+        child {node {3}}
+        child {node {4}}
+      };
+    \end{scope}
+
+    \begin{scope}[every node/.style={draw,fill=white},visible on=<3>]
+      \node (root) {+}
+         child {node {1}}
+         child {node {+}
+           child {node {2}}
+           child {node {+}
+             child {node {3}}
+             child {node {4}}
+           }};
+
+      \node [below=3.2cm of root,draw=none] {Rechtsableitung};
+    \end{scope}
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

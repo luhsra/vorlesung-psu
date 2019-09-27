@@ -3,7 +3,7 @@ REMOTE=lab:/proj/www/sra.uni-hannover.de/Lehre/V_PSÜ/skript/.
 ORG_PDF=$(shell echo 0*.org)
 ORG=$(filter-out export-prologue.org, $(shell echo *.org))
 
-PDF=$(foreach i,${ORG_PDF},$(patsubst %.org,build/%.pdf,${i}))
+PDF=$(foreach i,${ORG_PDF},$(patsubst %.org,build/%.slides.pdf,${i}))
 HTML=$(foreach i,${ORG},$(patsubst %.org,build/html/%.html,${i}))
 
 export TEXINPUTS := ./texmf-local//:./texmf//:${TEXINPUTS}
