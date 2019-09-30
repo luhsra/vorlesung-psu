@@ -11,7 +11,8 @@
 \usepackage{pageslts} %  theCurrentPage
 \usepackage{calc} % theCurrentPage
 \usepackage{csquotes}
-
+\usepackage{booktabs}
+\usepackage{xspace}
 
 % Section Title and Block Number
 \newcommand{\psuSectionStart}[2]{
@@ -168,8 +169,10 @@
         \lstset{linewidth=\@tempdima}%
       }{}
   }{%
-    \vspace{-1.2\baselineskip}\hfill{\emph{\color{black!70!white}\csuse{bt@tag}}}
-    \vspace{0.4\baselineskip}
+    \ifcsdef{bt@tag}{%
+      \vspace{-1.2\baselineskip}\hfill{\emph{\color{black!70!white}\csuse{bt@tag}}}
+      \vspace{0.4\baselineskip}
+    }{}%
     \ifdef\bt@innerscale{%
       \end{minipage}
       \end{adjustbox}
@@ -197,7 +200,7 @@
   \lstdefinestyle{basestyle}{
     basicstyle=\footnotesize\ttfamily,
     keywordstyle=\color{luhblue},
-    commentstyle=\color{luhgray},
+    commentstyle=\color{badbee!70!black},
     showstringspaces=false,
     breaklines=false,
     mathescape=true,

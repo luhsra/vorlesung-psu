@@ -34,8 +34,21 @@
       \draw[->] (T2) |- ($(E)!0.5!(T)$) -- (T);
       \draw[->] (F2) |- ($(T)!0.5!(F)$) -- (F);
       \draw[->] (E2) |- ($(F.south west)+(-8pt,-3pt)$) |- (E);
+    \end{tikzpicture}
 
+    \begin{tikzpicture}\small
+      \node[draw](head){\emph{intAddTail}};
+      \node[above=0.3 of head,xshift=2cm,anchor=west,draw] (rule1) {Int \emph{intAddTail}};
+      \node[below=0.3 of head,xshift=2cm,anchor=west,draw] (rule2) {$\epsilon$};
 
-  \end{tikzpicture}
+      \draw[->] (head) -- node[sloped,above](p){+} (rule1);
+      \draw[->] (head) -- node[sloped,below](e){$\dashv$} (rule2);
+
+      \begin{pgfonlayer}{background}
+        \node[fit=(p) (e),fill=badbee!50,rounded corners=5pt] (unambig){};
+        \draw[ultra thin] ($(unambig.south west)+(up:1em)$) -- ++(west:2em) node[anchor=east,align=center]{Eindeutig};
+      \end{pgfonlayer}
+    \end{tikzpicture}
+
 \end{frame}
 \end{document}
