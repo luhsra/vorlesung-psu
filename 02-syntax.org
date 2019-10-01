@@ -617,7 +617,7 @@ am Ende dieser Vorlesung kennen.
 
 
   \begin{alertblock}{Test: Ist eine Grammatik in LL(1)?}
-    Alle \PREDICT Mengen mit der gleichen \textbf{linken} Seiten müssen schnittfrei sein. Für jedes Nicht-Terminal ist Regelauswahl eindeutig.
+    Alle \PREDICT Mengen mit der gleichen \textbf{linken} Seite müssen schnittfrei sein. Für jedes Nicht-Terminal ist Regelauswahl eindeutig.
   \end{alertblock}
   \end{frame}
   #+end_src
@@ -789,13 +789,138 @@ am Ende dieser Vorlesung kennen.
 \end{frame}
 #+end_src
 
-[- Tabellenbasierte Parser]
+** TODO Tabellenbasierte Parser
 ** Schwierigkeiten mit LL(1)
-- Common Prefixes -> Linksfaktorisierung [1 Folie]
-- Linksrekursion                         [2 Folien]
-- Hässliche Syntaxbäume                  [1 Folie]
+#+begin_src latex
+
+  \begin{frame}<handout:2>{LL(1)-Probleme: Gemeinsame Prefixe}
+    \bi
+    \ii \textbf{Erinnerung:} Nur wenn alle \PREDICT Mengen mit der gleichen linken Seite (=A-Produktionen) schnittfrei sind, ist die Grammatik LL(1).\medskip
+    \ii Oft haben zwei A-Produktionen das gleiche Prefix und ein Look-Ahead von einem Token würde nicht reichen. \\{\smallskip
+      \btSetNamedTab[1cm]{\first}%
+      \btSetNamedTab[6.5cm]{\second}%
+      \first \grammarrule{\NT{stmt}}{\alert<1>{Ident} := \NT{expr}}   \second \PREDICT=\{Ident\}\\
+      \first \grammarrule{\NT{stmt}}{\alert<1>{Ident} ( \NT{argument\_list} )}  \second\PREDICT=\{Ident\}
+    }
+    \ii Mittels \emph{Linksfaktorisierung} kann man das Problem umgehen.\\{
+        \first \grammarrule{\NT{stmt}}{Ident \NT{stmt\_tail}}\\
+        \first \grammarrule{\NT{stmt\_tail}}{:= \NT{expr} }             \second\PREDICT=\{:=\}\\
+        \first \grammarrule{\NT{stmt\_tail}}{( \NT{argument\_list} )}   \second\PREDICT=\{(\}
+    }\medskip
+    \ii<2-> Linksfaktorisierte Grammatik ist \alert{nicht} equivalent! (Syntaxbäume){\medskip
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{tikzpicture}[small tree]
+            \node {\emph{stmt}}
+              child { node {Ident} }
+              child { node {:=} }
+              child { node {\emph{expr}}}
+              ;
+          \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.49\textwidth}
+          \begin{tikzpicture}[small tree,level distance=8mm]
+            \node {\emph{stmt}}
+              child { node {Ident} }
+              child { node {\emph{stmt\_tail}}
+                child { node {:=} }
+                child { node {\emph{expr}}}}
+              ;
+          \end{tikzpicture}
+        \end{column}
+      \end{columns}
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[t,fragile]{LL(1)-Probleme: Linksrekursion}
+    \vspace{-1em}
+    \bi
+    \ii LL(1) verbietet, dass eine Regel auf der linken Seite rekursiv ist.\\{
+      \btSetNamedTab[1cm]{\first}%
+      \btSetNamedTab[6.5cm]{\second}%
+      \first\grammarrule{\NT{intAdd}}{Int}\second\PREDICT=\{Int\}\\
+      \first\grammarrule{\NT{intAdd}}{\NT{intAdd} + Int}\second\PREDICT=\{Int\}
+    }\medskip
+    \ii \textbf{Informell}: Der Parser mit rekursivem Abstieg weiß nicht welche Regel er anwenden soll, wenn er einen Int sieht bzw. kommt in eine endlose Rekursion, wenn er die zweite Regel auswählt.{%
+      \begin{code}[]
+        \begin{py}[]
+          def addInt(token_stream):
+              if token_stream.peek() == TOK_INT:
+                 addInt(token_stream)
+              ...
+        \end{py}
+      \end{code}%
+    }
+    \ii<2-> \textbf{Definition}(Linksrekursiv): Mind. eine Regel hat folgende Ableitung. {
+      \[ A \Longrightarrow^* A \alpha \]
+    }
+    \ii<3-> \enquote{Reperatur} nur \alert{manchmal} möglich durch \emph{tail}-Umformung.\hfill{\scriptsize (LL(1)$\ll$LR(1))}\\{
+      \first\grammarrule{\NT{intAdd}}{Int \NT{intAddTail}}\second\PREDICT=\{Int\}\\
+      \first\grammarrule{\NT{intAddTail}}{+ Int}          \second\PREDICT=\{+\}\\
+      \first\grammarrule{\NT{intAddTail}}{\EPSILON}       \second\PREDICT=\{$\dashv$\}
+
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{LL(1)-Probleme: \enquote{Hässliche} Syntaxbäume}
+    \bi
+    \ii Faktorisierung und tail-Umformung zerstören Lokalität des Syntaxbaums.\\{
+        \begin{columns}
+          \begin{column}{0.49\textwidth}
+            \begin{center}
+              Mit Linksrekursion:\\[2ex]
+          \begin{tikzpicture}[small tree,level distance=8mm]
+            \node {\emph{intAdd}}
+              child { node {\emph{intAdd}} child { node {1} }}
+              child { node {+} }
+              child { node {2}}
+              ;
+            \end{tikzpicture}
+          \end{center}
+          \vfill
+        \end{column}
+        \begin{column}{0.49\textwidth}
+          \begin{center}
+          Ohne Linksrekursion:\\[2ex]
+          \begin{tikzpicture}[small tree,level distance=8mm]
+            \node {\emph{intAdd}}
+              child { node {1} }
+              child { node {\emph{intAddTail}}
+                child { node {+} }
+                child { node {2}}}
+              ;
+            \end{tikzpicture}
+          \end{center}
+        \end{column}
+      \end{columns}
+      \medskip
+      Mit Linksrekursion reicht oft Propagation alleinstehender Blätter.
+    }
+    \ii Parsergeneratoren können diese Probleme verstecken. ($\Rightarrow$ \texttt{antlr})
+    \bigskip
+    \ii<2> \textbf{Alternativ}: Verwendunng der mächtigeren Sprachklasse LR(1). {
+      \bi
+      \ii LR(1) erlaubt gemeinsame Prefixe und Linksrekursion.
+      \ii Konstruktion von LR(1) Parsern ist komplexer ($\Rightarrow$ Parsergenerator)
+      \ii Parser sind Tabellen-gestützte Automaten mit explizitem Stapelspeicher.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Einordnung von kontexfreien Grammatiken}
+    \begin{center}
+      \animation{1/1,2/2}{fig/02-complexities}
+    \end{center}
+  \end{frame}
+#+end_src
+
 ** LR(1) und Parsergeneratoren              [3 Folien]
 - Dafür gibt es Lösungen, aber die Konstruktion der Parseautomaten ist schwieriger. Zum Glück gibt es dafür Tools.
+
+
 * Exkurs: Parsing und Sicherheit
 :PROPERTIES:
 :CUSTOM_ID: 02-turing-trap

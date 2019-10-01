@@ -1,0 +1,53 @@
+\documentclass{lecturefig}
+\begin{document}
+\def\red#1{#1}
+\def\green#1{\color{safegreen}#1}
+\def\blue#1{\color{luhblue}#1}
+\colorlet{lrk}{safegreen}
+\colorlet{llk}{luhblue}
+
+
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[>=triangle 60, level distance=32mm, grow=right]\small
+   \tikzstyle{every node}=[rectangle,inner sep=4pt]
+\draw[draw=black, fill=srared!10, rounded corners] (0.8,3.3) rectangle (10.7,11);
+\node[anchor=west] at (1.2,10.75) {\textsf{\textbf{kontextfreie Grammatiken}}};
+\node (cyk) at (8.6,10.75) {$\mathcal{O}(n^3)$ (CYK)};
+
+\draw[draw=badbee, fill=badbee!30, rounded corners] (1.0,3.4) rectangle (10.5,10.5);
+\node[anchor=west] (@) at (1.2,10.25) {eindeutige kontextfreie Grammatiken};
+\node[anchor=west] at (@-|cyk.west) {$\mathcal{O}(n^2)$ (EARLY)};
+
+\draw[draw=lrk, fill=lrk!10, rounded corners] (1.2,3.5) rectangle (10.3,10.0);
+\node[anchor=west] at (1.2,9.7) (@) {\red{deterministische ktfr. Grammatiken}};
+\node[anchor=west] at (@-|cyk.west) {$\mathcal{O}(n)$ (LR(k))};
+
+
+\draw[draw=llk!70, fill=llk!10, rounded corners] (3.5,4.3) rectangle (5.6,9.4);
+\node[] at (4.6,9.05) {LL(k)-Gr.};
+%\draw[draw=red!70, rounded corners] (1.6,3.55) rectangle (9.7,8.8);
+%\draw[draw=red!70, rounded corners] (1.7,3.6) rectangle (9.6,8.7);
+\draw[draw=lrk!70, rounded corners] (1.8,3.65) rectangle (9.5,8.6);
+\node at (7.6,8.3) {LR(2)-Grammatiken};
+\draw[draw=lrk!70, rounded corners] (2.3,3.7) rectangle (9.0,7.6);
+\node at (7.9,7.3) {LR(1)-Gr.};
+%\node at (6.5,7.35) {\blue{\ding{'302}}};
+\node[draw=lrk!70, alt=<2>{ultra thick,pin={[fill=white,draw]north west:\texttt{yacc(1)}}}{}, anchor=south west,rounded corners,
+      minimum width=5.7cm,minimum height=3.2cm] at (2.8,3.9) {};
+
+\node at (7.3,6.8) {\only<2>{\bfseries}LALR(1)-Gr.};
+%\node at (6.0,6.8) {\blue{\ding{'301}}};
+\draw[draw=lrk!70, rounded corners] (3.3,4.1) rectangle (8.0,6.6);
+\node at (6.8,6.1) {SLR(1)-Gr.};
+%\node at (6.9,5.9) {\blue{\ding{'300}}};
+\draw[draw=lrk!70, rounded corners] (3.8,4.7) rectangle (7.5,5.6);
+\node at (6.5,5.3) {LR(0)-Gr.};
+\draw[draw=llk!70, alt=<2>{ultra thick}{}, rounded corners] (3.7,4.5) rectangle (5.4,7.5);
+\node[alt=<2>{pin={[draw,fill=white]north:Vorlesung}}] at (4.6,7.25) {\only<2>{\bfseries}LL(1)};
+%\node at (4.0,7.3) {\blue{\ding{'303}}};
+\draw[draw=llk!70, rounded corners] (3.9,4.8) rectangle (5.2,5.5);
+\node at (4.6,5.2) {LL(0)};
+\end{tikzpicture}
+\end{frame}
+\end{document}
