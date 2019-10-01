@@ -5,11 +5,12 @@ import os
 import glob
 import logging
 import re
+import shlex
 logging.basicConfig(level=logging.DEBUG)
 from collections import OrderedDict
 from common import normalize_topic
 
-def make_carousel(label, files):
+def make_carousel(label, title, files):
     ret = []
     if len(files) == 1:
         ret += '#+BEGIN_EXPORT html\n'
@@ -19,6 +20,8 @@ def make_carousel(label, files):
 
     ret += '#+BEGIN_EXPORT html\n'
     ret += '<div class="content">'
+    if title:
+        ret += f'<span class="marginnote">Folien: {title}</span>\n'
     ret += '<div class="container">'
     ret += '<div id="slides-' + label +'" class="carousel" data-wrap="false" data-interval="0" data-ride="carousel">'
     ret += '<ol class="carousel-indicators">'
@@ -51,17 +54,21 @@ def make_carousel(label, files):
     return ret
 
 def find_blocks(lines):
-    tangle, start, end = True, None, None
+    tangle, start, end, title = True, None, None, None
     for idx, line in enumerate(lines):
         if "#+begin_src" in line.lower():
-            start = idx
-            if "latex" in line and not re.search(":tangle.*no", line):
+            tokens = shlex.split(line)
+            start, end, title, tangle = idx, None, None, False
+            if "latex" in tokens:
                 tangle = True
-            else:
-                tangle = False
+                if ":tangle" in tokens and tokens[tokens.index(":tangle")+1] == "no":
+                    tangle = False
+            if ":title" in tokens:
+                title = tokens[tokens.index(":title")+1]
+
         if "#+end_src" in line.lower() and tangle:
             end = idx
-            yield(start, end)
+            yield(start, end, title)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -86,7 +93,7 @@ if __name__ == "__main__":
         blocks = list(find_blocks(lines))
         for (topic,block_number), svgs in reversed(topics.items()):
             logging.info("%s %s",topic, block_number)
-            start, end = blocks[int(block_number)-1]
-            lines[start:end+1] = make_carousel(topic + block_number, svgs)
+            start, end, title = blocks[int(block_number)-1]
+            lines[start:end+1] = make_carousel(topic + block_number, title, svgs)
 
         print("".join(lines))

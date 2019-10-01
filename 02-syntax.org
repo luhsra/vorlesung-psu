@@ -622,7 +622,9 @@ am Ende dieser Vorlesung kennen.
   \end{frame}
   #+end_src
 
-  #+begin_src  latex
+#+INCLUDE: ../lst/02-ll0-recursive.py
+
+#+begin_src  latex
     \begin{frame}[fragile]{Parser-Generator für Parser mit rekursiven Abstieg}
       \bi
       \ii Mit den \PREDICT Mengen können wir einen LL(1)-Parser generieren.{
@@ -648,7 +650,7 @@ am Ende dieser Vorlesung kennen.
               ``!!def @@NT.name@@(token_stream):!!
               # Die \PREDICT entscheidet ob eine Regel genommen wird
               for rule in NT.rules:
-              ``!!    if token_stream.peek() in @@\PREDICT(rule)@@:!!
+              ``!!    if token_stream.peek() in @@PREDICT(rule)@@:!!
                   for symbol in NT.righthandside:
                       if is_terminal(symbol):
               ``!!        ``@@..._load@@ = token_stream.read(expect=@@symbol.name@@)!!
@@ -663,9 +665,14 @@ am Ende dieser Vorlesung kennen.
       \ii Dieser Parser-Generator ist ein Übersetzer von \enquote{Grammatik} $\rightarrow$ Python.
       \ei
     \end{frame}
+#+end_src
+
+** Analyse von LL(1) Grammatiken
+
+#+begin_src latex
 
 
-    \begin{frame}{\PREDICT Mengen: Berechnung von \EPS und \FIRST}
+    \begin{frame}{\PREDICT: Berechnung von \EPS und \FIRST}
       \textbf{Bisher}: Die \PREDICT Menge fällt vom Himmel bzw. ist trivial.
       \bigskip
       \bi
@@ -680,8 +687,7 @@ am Ende dieser Vorlesung kennen.
       }
       \ii Beispiel für \EPS und \FIRST:\medskip{
         \begin{columns}
-          \begin{column}{0.47\textwidth}
-            \small
+          \begin{column}{0.44\textwidth}\small%
             \begin{exampleblock}{1+(3+4)+foo(2+5)}
               \btDefTab[1.8cm]
               \grammarrule{\NT{term}        \btUseTab}{\NT{factor} \NT{factor\_tail}}\\
@@ -690,10 +696,9 @@ am Ende dieser Vorlesung kennen.
               \grammarrule{\NT{trans}        \btUseTab}{Ident \OR \EPSILON}
             \end{exampleblock}
           \end{column}\hfill
-          \begin{column}{0.45\textwidth}
-            \small
-            \begin{tabular}{lll}\toprule
-              $\alpha$ & \EPS & \FIRST \\\midrule
+          \begin{column}{0.51\textwidth}\small%
+            \begin{tabular}[t]{lll}\toprule
+              $\alpha$ & \scriptsize$\EPS(\alpha)$ & \scriptsize$\FIRST(\alpha)$ \\\midrule
               term         & false & \{Int, Ident, (\}\\
               factor\_tail & true  & \{+\}\\
               factor       & false & \{Int, Ident, (\}\\
@@ -720,7 +725,7 @@ am Ende dieser Vorlesung kennen.
               \grammarrule{\NT{S}}{\NT{term} $\dashv$}                  \\
               \grammarrule{\NT{term}        }{\NT{factor} \NT{factor\_tail}}\\
               \grammarrule{\NT{factor\_tail}}{+ \NT{factor\_tail} \OR \EPSILON}\\
-            \end{column}\hfill
+            \end{column}
             \begin{column}{0.47\textwidth}
               \grammarrule{\NT{factor}      }{Int \OR trans ( \NT{term} ) }\\
               \grammarrule{\NT{trans}        }{Ident \OR \EPSILON}
@@ -734,7 +739,7 @@ am Ende dieser Vorlesung kennen.
         \def\NT{\emph}
         \def\abox#1{\fbox{\scriptsize\strut#1}}
         \begin{tabular}{lll}\toprule
-        A              & \FOLLOW     & Beispielhafte Satzformen                         \\\midrule
+        A              & $\FOLLOW(A)$     & Beispielhafte Satzformen                         \\\midrule
           term         & \{+,$\dashv$\}       & \abox{\NT{term}+1} \abox{1+\NT{term}$\dashv$ }                                 \\\midrule
           factor\_tail & \{),$\dashv$\}   & \abox{(1+\NT{factor\_tail})} \abox{1+\NT{factor\_tail} \textbf{$\dashv$}} \\\midrule
           factor       & \{+,),$\dashv$\} & \abox{1+\NT{factor}\textbf{+}3}
@@ -748,51 +753,48 @@ am Ende dieser Vorlesung kennen.
     \ei
     \end{frame}
 
-    %%ONLY%%
-    \begin{frame}[fragile]{\PREDICT: \FIRST $\oplus$ \FOLLOW}
-      \bi
-    \ii {\small $PREDICT(A \rightarrow \alpha) \equiv \FIRST(\alpha) \cup (\textbf{if }\EPS(\alpha)\textbf{ then }\FOLLOW(\alpha)\textbf{ else }\emptyset ) $}{ \\
-      \bigskip
-      \textbf{Intuition}: Ein Zeichen c sagt eine Regel dann voraus wenn:
-      \begin{enumerate}
-      \item Die Ableitung der rechten Seite mit dem Zeichen c startet (\FIRST).
-      \item Die rechte Seite $\alpha$ kann $\epsilon$ werden, daher muss man auf die Zeichen schauen die der Regel folgen können (\FOLLOW).
-      \end{enumerate}
-      \medskip\small
-      \begin{center}
-      \def\first{}
-      \def\second{}
-      \only<2>{\def\first{\rowcolor{badbee!50}}}
-      \only<3>{\def\second{\rowcolor{badbee!50}}}
-      \begin{tabular}{lll}\toprule
-        $A \rightarrow \alpha$                                                & \PREDICT          & $\EPS$ \\\midrule
-        \grammarrule{\NT{S}}{\alert<2>{\NT{term}$\dashv$}}                     & \{Int, Ident, (\} & 0      \\\midrule
-        \grammarrule{\alert<2>{\NT{term}}}{\alert<2>{\NT{factor} \NT{factor\_tail}}} & \{Int, Ident, (\} & 0      \\\midrule
-        \grammarrule{\NT{factor\_tail}}{+ \NT{factor\_tail}}   & \{+\}             & 0      \\
-        \first%
-        \grammarrule{\NT{factor\_tail}}{\EPSILON}              & \{), $\dashv$\}        & 1      \\\midrule
-        \grammarrule{\NT{factor}}{Int}                         & \{Int\}           & 0      \\
-        \grammarrule{\NT{factor}}{\alert<3>{trans(}\alert<2>{\NT{term})}}            & \{Ident, (\}      & 0      \\\midrule
-        \grammarrule{\NT{trans}}{Ident}                        & \{Ident\}         & 0      \\
-        \second%
-        \grammarrule{\NT{trans}}{\EPSILON}                     & \{(\}             & 1      \\
-        \bottomrule
-      \end{tabular}
-    \end{center}
-    }
-      \ei
-    \end{frame}
+\begin{frame}[fragile]{\PREDICT $=$ \FIRST $\oplus$ \FOLLOW}
+\bi
+\ii {\small $PREDICT(A \rightarrow \alpha) \equiv \FIRST(\alpha) \cup (\textbf{if }\EPS(\alpha)\textbf{ then }\FOLLOW(\alpha)\textbf{ else }\emptyset ) $}{ \\
+  \bigskip
+  \textbf{Intuition}: Ein Zeichen c sagt eine Regel dann voraus wenn:
+  \begin{enumerate}
+  \item Die Ableitung der rechten Seite mit dem Zeichen c startet (\FIRST).
+  \item Die rechte Seite $\alpha$ kann $\epsilon$ werden, daher muss man auf die Zeichen schauen die der Regel folgen können (\FOLLOW).
+  \end{enumerate}
+  \begin{center}
+  \def\first{}
+  \def\second{}
+  \only<3>{\def\first{\rowcolor{badbee!50}}}
+  \only<2>{\def\second{\rowcolor{badbee!50}}}
+  \scriptsize
+  \mbox{}\hspace{-1cm}\begin{tabular}{ll|c|l|l}\toprule
+    $A \rightarrow \alpha$                                                                      & \PREDICT      & $\EPS(\alpha)$ & $\FIRST(\alpha)$   & $\FOLLOW(A)$ \\\midrule
+    \grammarrule{\NT{S}}{\alert<3>{\NT{term}$\dashv$}}                                & Int, Ident, ( & 0         & Int, Ident,(  &              \\\midrule
+    \grammarrule{\alert<3>{\NT{term}}}{\alert<3>{\NT{factor} \NT{factor\_tail}}} & Int, Ident, ( & 0         & Int, Ident, ( & ), $\dashv$       \\\midrule
+    \grammarrule{\NT{factor\_tail}}{+ \NT{factor\_tail}}                         & +             & 0         & +             & \only<3>{\cellcolor{badbee!50}}  \\
+    \first%
+    \grammarrule{\NT{factor\_tail}}{\EPSILON}                                    & ), $\dashv$        & 1         & $\emptyset$           & \multirow{-2}{*}{), $\dashv$}       \\\midrule
+    \grammarrule{\NT{factor}}{Int}                                               & Int           & 0         & Int           &               \\
+    \grammarrule{\NT{factor}}{\alert<2>{trans(}\alert<3>{\NT{term})}}            & Ident, (      & 0         & Ident, (      & \multirow{-2}{*}{+, $\dashv$} \\\midrule
+    \grammarrule{\NT{trans}}{Ident}                                              & Ident         & 0         & Ident         & \only<2>{\cellcolor{badbee!50}} \\
+    \second%
+    \grammarrule{\NT{trans}}{\EPSILON}                                           & (             & 1         & $\emptyset$           & \multirow{-2}{*}{(}            \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+}
+\ii<4>[$\Rightarrow$] \alert{ In der Übung: konkreter Algorithmus für \EPS, \FIRST, \FOLLOW}
+\ei
+\end{frame}
 #+end_src
 
-#+INCLUDE: ../lst/02-ll0-recursive.py
-
-** Die LL(1) Grammatiken
-- First, Follow und Predict Mengen
-- Tabellenbasierte Parser
+[- Tabellenbasierte Parser]
 ** Schwierigkeiten mit LL(1)
-- Common Prefixes -> Linksfaktorisierung
-- Linksrekursion
-** LR(1) und Parsergeneratoren
+- Common Prefixes -> Linksfaktorisierung [1 Folie]
+- Linksrekursion                         [2 Folien]
+- Hässliche Syntaxbäume                  [1 Folie]
+** LR(1) und Parsergeneratoren              [3 Folien]
 - Dafür gibt es Lösungen, aber die Konstruktion der Parseautomaten ist schwieriger. Zum Glück gibt es dafür Tools.
 * Exkurs: Parsing und Sicherheit
 :PROPERTIES:
