@@ -911,10 +911,16 @@ am Ende dieser Vorlesung kennen.
   \end{frame}
 
   \begin{frame}{Einordnung von kontexfreien Grammatiken}
+    \vspace{-1em}
     \begin{center}
-      \animation{1/1,2/2}{fig/02-complexities}
+      \animation[width=\textwidth]{1/1,2/2}{fig/02-complexities}
     \end{center}
+      \bi
+      \ii Theorie von kontextfreien Grammatiken und Parsern ist gut erforscht.
+      \ii<2> Moderne Generatoren akzeptieren beinahe jede ktfr. detr. Grammatik und liefern gute Fehlermeldungen. \textbf{Nutzen sie diese!}
+      \ei
   \end{frame}
+
 #+end_src
 
 ** LR(1) und Parsergeneratoren              [3 Folien]
