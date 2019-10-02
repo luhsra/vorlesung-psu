@@ -983,19 +983,49 @@ Vielleicht macht man das hier noch.
     \bi
     \ii<2-> Der \textbf{Abstrakte Syntaxbaum} ist kondensiert auf das \alert{Wesentliche}.{
       \bi
-      \ii Abhängig davon, was die folgenden Übersetzerschritte brauchen.
+      \ii \enquote{Wesentlich} ist abhängig von den folgenden Übersetzerschritten.
       \ii Zusammenfalten Unterbäumen und Erzeugung semantischer Knoten (add).
       \ei
     }
     \ei
   \end{frame}
 #+end_src
+
 Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
 
 
 ** Probleme mit realen Sprachen
-Ganz so einfach ist das dann meist garnicht.....
 
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}{Parsingprobleme mit realen Sprachen}
+    \bi
+    \ii Sprachen mit optionalem \texttt{else}, können das \emph{dangling-else problem} haben.\\\medskip {
+      \btSetNamedTab[1cm]{\first}%
+      \first\grammarrule{\NT{stmt}}{\K{if} \NT{condition} \NT{then\_clause} \NT{else\_clause} \OR \K{\{} \NT{stmt\_list} \K{\}} \OR\ldots}\\
+      \first\grammarrule{\NT{then\_stmt}}{\K{then} \NT{stmt}}\\
+      \first\grammarrule{\NT{else\_stmt}}{\K{else} \NT{stmt} \OR \EPSILON}
+      \bi
+      \ii Grammatik ist \alert<1>{nicht} eindeutig! Wohin gehört bei \texttt{if-if-else} das \texttt{else}?\\\smallskip
+         \begin{center}
+           \only<1>{\texttt{\tikznode[draw=white]{if A then \tikznode[draw=white]{if B then doAB();} else doX();} }}
+           \only<2>{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB(); else doX();}} }}
+           \only<3>{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB();} else doX();} }}
+
+
+       \end{center}
+     \ii Die Sprache muss definieren welche Variante gewählt wird.
+     \ei
+   }
+   \medskip
+   \ii Oft reicht eine Token Look-Ahead garnicht aus.
+
+    \ei
+
+  \end{frame}
+#+end_src
+
+Ganz so einfach ist das dann meist garnicht.....
 * Exkurs: Parsing und Sicherheit
 :PROPERTIES:
 :CUSTOM_ID: 02-turing-trap

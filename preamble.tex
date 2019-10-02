@@ -425,3 +425,7 @@
   \hspace{\bt@identbox@indent}\tikz\node[draw,inner sep=2pt,bt@identbox]{\strut\usebox{\@tempboxa}};%
   \endgroup%
 }
+
+\newcommand{\tikznode}[2][]{%
+  \tikz[baseline]\node[anchor=base,#1]{#2};%
+}

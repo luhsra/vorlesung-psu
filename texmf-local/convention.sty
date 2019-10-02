@@ -4,7 +4,8 @@
 
 \newcommand{\grammarrule}[2]{%
   \begingroup%
-  \def\NT##1{\emph{##1}}%
+  \def\NT##1{\textsf{\emph{##1}}}%
+  \def\K##1{\texttt{##1}}%
   \def\OR{ $\mid$ }%
   \def\EPSILON{ $\epsilon$ }%
   #1 $\rightarrow$ #2%
