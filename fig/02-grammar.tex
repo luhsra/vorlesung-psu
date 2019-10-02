@@ -50,5 +50,83 @@
       \end{pgfonlayer}
     \end{tikzpicture}
 
-\end{frame}
+  \end{frame}
+
+  \tikzset{
+    box/.style={draw,fill=#1},
+    NT/.style={box=safegreen!30,font=\itshape},
+    T/.style={box=luhblue!30},
+  }
+
+
+  \begin{frame}
+    \begin{tikzpicture}[start chain, node distance=0.2cm]
+      \node[on chain,NT]{\strut varDef};
+      \node[on chain]{$\rightarrow$};
+      \node[on chain,T](t1){\strut var};
+      \node[on chain,T](t2){\strut Ident};
+      \node[on chain,T](t3){\strut =};
+      \node[on chain,NT,pin={[align=center]-90:Unterbaum\\vom Typ \emph{expr}}]{\strut expr};
+
+      \draw[decorate,decoration={brace,amplitude=5pt}]
+        (t3.south east)
+        -- node[below,yshift=-5pt,xshift=-5pt]{Token$\Rightarrow$Blätter}
+        (t1.south west);
+      \end{tikzpicture}
+    \end{frame}
+
+    \begin{frame}
+      \begin{tikzpicture}[level distance=2.5em]
+        \node[NT] (root) {varDef}
+        child[->] {node[T,yshift=5pt,xshift=1em] {var}}
+         child {node[T,yshift=-1em] (id) {Ident: "foo"}}
+         child {node[T] {=}}
+         child {node[NT] (expr) {expr}};
+
+
+       \end{tikzpicture}
+     \end{frame}
+
+     \begin{frame}
+       \begin{tikzpicture}[level distance=2.5em]
+         \tikzset{useful/.style={alt=<2>{draw=srared,ultra thick}{}}}
+         \node[NT,useful] (root) {varDef}
+         child {node[T,yshift=5pt,xshift=1em] {var}}
+         child {node[T,useful, yshift=-1em] (id) {Ident: "foo"}}
+         child {node[T] {=}}
+         child {node[NT,xshift=2em] {expr}
+           child {node[NT] {expr}
+             child {node[NT] {term}
+               child{ node[NT]{factor}
+                 child{ node[T,useful](one){1}}
+               }
+             }
+           }
+           child {node[T,useful] {+}}
+           child {node[NT] {term}
+             child{ node[NT]{factor}
+               child{ node[T,useful]{2}}
+             }
+           }
+         };
+         \node[left=1 of one,anchor=south east,align=left,draw,dashed,fill=luhlightgray!50] {
+           \grammarrule{\NT{expr}}{\NT{term}   \OR \NT{expr} + \NT{term}}\\
+           \grammarrule{\NT{term}}{\NT{factor} \OR \NT{term} * \NT{factor}}\\
+           \grammarrule{\NT{factor}}{Int \OR Ident \OR (\NT{expr})}
+         };
+
+         % Pseudo for alignment
+
+         \begin{scope}[visible on=<2->, level distance=4em]
+           \node[NT,right=6.5cm of root] (root2) {varDef}
+           child {node[T,align=left] (id) {Ident:\\"foo"}}
+           child {node[box=badbee!50] {add}
+             child {node[T] {1}}
+             child {node[T] {2}}
+           };
+         \end{scope}
+
+       \end{tikzpicture}
+     \end{frame}
+
 \end{document}

@@ -29,12 +29,13 @@ texmf/ls-R:
 	texhash texmf/
 
 # Building the figures is only a precondition for this makefile. This is the easy part.
-fig/%.pdf: fig/%.tex build texmf-local/lecturefig.cls
+fig/%.pdf: fig/%.tex texmf-local/lecturefig.cls
+	@${MAKE} build
 	latexmk -pdf $< -outdir=build
 	@cp $(patsubst fig/%,build/%,$@) $@
 
 define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung
-build/$(2).%.pdf: $(shell find fig -name "$(1)-*.pdf")
+build/$(2).slides.pdf build/$(2).handout.pdf: $(shell find fig/ -name "$(1)-*.pdf")
 $(1):                 build/$(2).slides.pdf
 $(1).view:            build/$(2).slides.pdf
 $(1).handout:         build/$(2).handout.pdf

@@ -668,6 +668,9 @@ am Ende dieser Vorlesung kennen.
 #+end_src
 
 ** Analyse von LL(1) Grammatiken
+:PROPERTIES:
+:CUSTOM_ID: 02-ll1-analysis
+:END:
 
 #+begin_src latex
 
@@ -789,8 +792,12 @@ am Ende dieser Vorlesung kennen.
 \end{frame}
 #+end_src
 
-** TODO Tabellenbasierte Parser
+** COMMENT Tabellenbasierte Parser
+Vielleicht macht man das hier noch.
 ** Schwierigkeiten mit LL(1)
+:PROPERTIES:
+:CUSTOM_ID: 02-ll1-problems
+:END:
 #+begin_src latex
 
   \begin{frame}<handout:2>{LL(1)-Probleme: Gemeinsame Prefixe}
@@ -923,9 +930,71 @@ am Ende dieser Vorlesung kennen.
 
 #+end_src
 
-** LR(1) und Parsergeneratoren              [3 Folien]
-- Dafür gibt es Lösungen, aber die Konstruktion der Parseautomaten ist schwieriger. Zum Glück gibt es dafür Tools.
+** Abstrakter Syntaxbaum
+:PROPERTIES:
+:CUSTOM_ID: 02-ast
+:END:
 
+#+begin_src latex
+  \begin{frame}<handout:2>[t,fragile]{Ableitungsbäume}
+    \bi
+    \ii \textbf{Bisher:} Wir haben angenommen, dass der Parser "magisch" einen benutzbaren Syntaxbaum erzeugt. Aber nach welchen Regeln?\medskip
+    \ii \textbf{Ableitungsbaum}: Jede Anwendung einer Regel wird zu einem Knoten. Die Blätter überdecken alle Token.\\\medskip
+    \begin{columns}[T ]
+      \begin{column}{0.49\textwidth}
+        \includegraphics[width=\linewidth,page=4]{fig/02-grammar}
+      \end{column}\hfill
+      \begin{column}{0.4\textwidth}
+        \includegraphics[width=\linewidth,page=5]{fig/02-grammar}
+      \end{column}
+    \end{columns}
+    \ii<2-> Ein erzeugter Parser kann den Ableitungsbaum recht einfach liefern.\\
+    \begin{code}
+      \begin{py}
+        def varDef(token_stream):
+            if token_stream.peek() == TOK_VAR:
+                # varDef -> var Ident = expr
+                ...
+                expr_tree = expr(token_stream)
+                # Ableitungsbaum als Python Tupel
+                return ("varDef", t_var, t_id, t_eq, expr_tree)
+      \end{py}
+    \end{code}
+    \ei
+  \end{frame}
+
+
+  \begin{frame}<handout:2>{Abstrakte Syntaxbaum}
+    \bi
+    \ii Oft ist der Ableitungsbaum zu detailiert. {
+      \bi
+      \ii Viele Token sind nur für den Parser (Klammerung).
+      \ii Regelumgeforumgen, um die Grammatik parsebar zu machen (Faktorisierung)
+      \ii Präzedenz von Operatoren wird über hierarchische Regeln ausgedrückt.
+      \ei
+    }
+    \ei
+
+    \medskip
+    \begin{center}
+      \animation[width=\linewidth]{6/1,7/2}{fig/02-grammar}
+    \end{center}
+
+    \bi
+    \ii<2-> Der \textbf{Abstrakte Syntaxbaum} ist kondensiert auf das \alert{Wesentliche}.{
+      \bi
+      \ii Abhängig davon, was die folgenden Übersetzerschritte brauchen.
+      \ii Zusammenfalten Unterbäumen und Erzeugung semantischer Knoten (add).
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
+
+
+** Probleme mit realen Sprachen
+Ganz so einfach ist das dann meist garnicht.....
 
 * Exkurs: Parsing und Sicherheit
 :PROPERTIES:

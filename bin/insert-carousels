@@ -8,7 +8,7 @@ import re
 import shlex
 logging.basicConfig(level=logging.DEBUG)
 from collections import OrderedDict
-from common import normalize_topic
+from common import normalize_topic, parse_block_src
 
 def make_carousel(label, title, files):
     ret = []
@@ -54,21 +54,17 @@ def make_carousel(label, title, files):
     return ret
 
 def find_blocks(lines):
-    tangle, start, end, title = True, None, None, None
+    start_line = None
     for idx, line in enumerate(lines):
-        if "#+begin_src" in line.lower():
-            tokens = shlex.split(line)
-            start, end, title, tangle = idx, None, None, False
-            if "latex" in tokens:
-                tangle = True
-                if ":tangle" in tokens and tokens[tokens.index(":tangle")+1] == "no":
-                    tangle = False
-            if ":title" in tokens:
-                title = tokens[tokens.index(":title")+1]
+        line = parse_block_src(line)
+        if not line: continue
+        if line['type'] == 'begin_src' and line['language'] == 'latex':
+            start_line = line
+            start_line['idx'] = idx
 
-        if "#+end_src" in line.lower() and tangle:
-            end = idx
-            yield(start, end, title)
+        if line['type'] == 'end_src' and start_line and start_line['tangle']:
+            yield(start_line['idx'], idx, start_line['title'])
+            start_line = None
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -83,7 +79,6 @@ if __name__ == "__main__":
             base,_ = os.path.splitext(basename)
             output_dir = f"build/html"
             pattern = f"{output_dir}/{base}/{topic}-{lines}-*.svg"
-            logging.info("pattern: %s", pattern)
             topics[(topic, lines)] = [os.path.relpath(x, output_dir) for x in sorted(glob.glob(pattern))]
             logging.info("%s %s slides: %s",topic, lines, len(topics[(topic, lines)]))
 
@@ -92,7 +87,7 @@ if __name__ == "__main__":
         lines = list(fd.readlines())
         blocks = list(find_blocks(lines))
         for (topic,block_number), svgs in reversed(topics.items()):
-            logging.info("%s %s",topic, block_number)
+            logging.info("%s %s", topic, block_number)
             start, end, title = blocks[int(block_number)-1]
             lines[start:end+1] = make_carousel(topic + block_number, title, svgs)
 
