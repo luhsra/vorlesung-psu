@@ -997,7 +997,7 @@ Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
 ** Probleme mit realen Sprachen
 
 #+begin_src latex
-  %%ONLY%%
+
   \begin{frame}{Parsingprobleme mit realen Sprachen}
     \bi
     \ii Sprachen mit optionalem \texttt{else}, können das \emph{dangling-else problem} haben.\\\medskip {
@@ -1006,24 +1006,83 @@ Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
       \first\grammarrule{\NT{then\_stmt}}{\K{then} \NT{stmt}}\\
       \first\grammarrule{\NT{else\_stmt}}{\K{else} \NT{stmt} \OR \EPSILON}
       \bi
-      \ii Grammatik ist \alert<1>{nicht} eindeutig! Wohin gehört bei \texttt{if-if-else} das \texttt{else}?\\\smallskip
+      \ii Grammatik ist \alert<1>{nicht} eindeutig! Wohin gehört bei \texttt{if-if-else} das \texttt{else}?\\
+       Die Sprache muss definieren welche Variante gewählt wird.\\\medskip
          \begin{center}
            \only<1>{\texttt{\tikznode[draw=white]{if A then \tikznode[draw=white]{if B then doAB();} else doX();} }}
            \only<2>{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB(); else doX();}} }}
-           \only<3>{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB();} else doX();} }}
+           \only<3->{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB();} else doX();} }}
 
 
        \end{center}
-     \ii Die Sprache muss definieren welche Variante gewählt wird.
+
      \ei
    }
    \medskip
-   \ii Oft reicht eine Token Look-Ahead garnicht aus.
+   \ii<4-> Oft reicht ein Token Look-Ahead nicht aus das Konstrukt zu erkennen. {
+   \bi
+   \ii Java: Felder und Methoden erlauben unterschiedliche Modifer: \\\medskip{
+     \btSetNamedTab[5mm]{\first}%
+     \btSetNamedTab[6.5cm]{\second}%
+     \first\texttt{\colorbox{badbee!50}{\strut public}\colorbox{srared!50}{\strut abstract} int foo = 0;} \second
+       Syntaxfehler lässt sich nicht\\[1ex]
+     \first\texttt{\colorbox{badbee!50}{\strut public}\colorbox{srared!50}{\strut abstract} int foo() \{\ldots\} } \second am \enquote{\texttt{abstract}} erkennen.
+   }\medskip
+   \ii Wir lassen beliebige Modifer zu, akzeptieren invalide Programme, und verschieben das Probelm auf die Semantische Analyse.
+   \ei
+   }
+   \ei
+  \end{frame}
 
+  \begin{frame}[fragile]{Paringprobleme mit realen Sprachen: \texttt{typedef}}
+    \bi
+    \ii Die Definition von eigenen Typnamen führt zu kontextsensitivität.{\\\smallskip
+      \btSetNamedTab[5mm]{\first}%
+      \btSetNamedTab[6.5cm]{\second}%
+      \first\grammarrule{\NT{typedef\_decl}}{\K{typedef} \NT{type} Ident}  \second$\Rightarrow$ Ident wird ein Typname\\[1ex]
+      \first\grammarrule{\NT{cast\_expr}}{(\NT{type\_name}) expr}          \second $\Rightarrow$ Referenz von Typnamen
+    }\medskip
+    \ii Ohne Kontext können wir Aufrufe und Casts nicht unterscheiden.{\\\smallskip
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{code}
+            \begin{C}
+              int bar;
+              int foo(int a) {};
+              ...
+              // Funktionsname in Klammern
+              (foo)(bar); // = foo(bar);
+            \end{C}
+          \end{code}
+        \end{column}
+        \begin{column}{0.49\textwidth}
+          \begin{code}
+            \begin{C}
+              int bar;
+              typedef char foo;
+              ...
+              // Typname in Klammern
+              (foo)(bar); // = (char)(bar)
+            \end{C}
+          \end{code}
+        \end{column}
+      \end{columns}
+    }\medskip
+    \ii<2-> \enquote{Lösung}: Der Lexer Hack vermeidet kontextsensitives  Parsing.{
+      \bi
+      \ii Der Scanner führt eine Liste von bereits definierten Typnamen mit.
+      \ii Er emitiert unterschiedliche Token für Typname und Identifier.
+      \ii Nun ist allerdings der Scanner kontextsensitiv!
+      \ei
+    }
+    \medskip
+    \ii<3>[$\Rightarrow$]{Echte Programmiersprachen sind nur auf den ersten Blick kontextfrei!}
     \ei
 
   \end{frame}
 #+end_src
+
+https://en.wikipedia.org/wiki/The_lexer_hack
 
 Ganz so einfach ist das dann meist garnicht.....
 * Exkurs: Parsing und Sicherheit
