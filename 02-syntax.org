@@ -1082,13 +1082,77 @@ Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
   \end{frame}
 #+end_src
 
-https://en.wikipedia.org/wiki/The_lexer_hack
+{{{wikipedia_en(The_lexer_hack)}}}
 
 Ganz so einfach ist das dann meist garnicht.....
 * Exkurs: Parsing und Sicherheit
 :PROPERTIES:
 :CUSTOM_ID: 02-turing-trap
 :END:
+
+#+begin_src latex
+  \dividerframe{Parsing\\und\\Sicherheit}
+
+  \begin{frame}[fragile]{Parser als Einfallstore für Angreifer}
+    \bi
+    \ii Nutzer, wie auch Angreifer, schicken Anfragen als Zeichenstrom {
+      \bi
+      \ii Parser extrahieren Typ, Argumente und strukturierte Daten.
+      \ii Komplexe Protokoll und Dateiformate (ASN.1, PDF, JPEG)
+      \ii Die Eingaben müssen validiert und transfomiert werden (XML: XSD, XSLT)
+      \ei
+    }\medskip
+    \ii Kleine (Programmier-)sprachen sind überall{
+      \bi
+      \ii Format Strings: \verb|printf("%3$*1$.*2$f", 10, 2, 1.11111);|
+      \ii Browser: HTML5, JavaScript, CSS, RDF, Embedded SVG, MathML, \ldots
+      \ei
+    }\medskip
+    \ii Handgeschreibene für komplexe Formate neigen zu Schwachstellen.{
+      \bi
+      \ii DNP3: Kommunikationsprotokoll im US Stromnetz ($> 100$ Seiten Standard)
+      \ii Untersuchung von 20 DNP3 Implementierung durch Fuzzing (2013-2014)
+      \ii 31 bekannte Schwachstellen in DNP3 Parsern.
+      \ei
+    }\medskip
+    \ei
+
+    \pause
+    \hspace{-5mm}\Large\ALERT{(Benutzer)Eingaben sind Lava! Parsergeneratoren!}
+
+  \end{frame}
+
+  \begin{frame}{Ungewollt Turing-Vollständig: Eingabevalidierung}
+    \bi
+    \ii Syntaktische (und semantische) Analyse validieren eine Eingabe.{
+      \bi
+      \ii Dazu wenden sie, teils komplexe, Regel auf die Eingabedaten an.
+      \ii Was wenn diese Regel so komplex sind, dass eine virtuelle Maschine entsteht?
+      \ii Der Übersetzer selbst wird zum Sprachprozessor.
+      \ei
+    }\medskip
+    \ii \enquote{C++ Templates are Turing Complete}, Veldhuizen, 2003 {
+      \bi
+      \ii Erlauben ein flexible Definition von Datentypen; aber auch Berechnung von $\pi$.
+      \ii Maschinenmodell: Typen sind Objekte, Rekursive Templates die Operationen.
+      \ii Es gibt sogar Standardbibliotheken zur C++ Template Programmierung.
+      \ei
+    }
+    \ei
+
+    \begin{code}
+      \lstinputlisting[style=CPP]{lst/02-factorial.cc}
+    \end{code}
+
+    \pause
+    \hspace{-5mm}\Large\ALERT{Maschinen die $\pi$ berechnen, führen auch Exploits aus.}
+
+  \end{frame}
+
+
+#+end_src
+
+
 
 C++ Templates are Turin Complete: http://port70.net/~nsz/c/c%2B%2B/turing.pdf
 
