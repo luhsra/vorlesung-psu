@@ -1163,6 +1163,33 @@ https://stackoverflow.com/questions/41415006/which-contemporary-computer-languag
 * Zusammenfassung
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
+    \bi
+    \ii Die Syntaktische Analyse extrahiert die Struktur eines Programms {
+      \bi
+      \ii Die rekursive Natur von Bäumen eignet sich Schachtelungen zu greifen.
+      \ii Syntaktische Korrektheit ist notwendig, jedoch nicht hinreichend.
+      \ei
+    }\medskip
+    \ii Scanner (Lexer) partitionieren den Zeichenstrom in einen Tokenstrom. {
+      \bi
+      \ii Token haben eine Klasse und eine Nutzlast: \texttt{(Int, 23)}
+      \ii Zerteilung mittels Regulären Ausdrücken und endlichen Zustandsautomaten.
+      \ei
+    }\medskip
+    \ii Parser ordnen die Token, mittels Grammatikregeln, in einem Baum an. {
+      \bi
+      \ii Die Sprachklasse LL(1) kann mittels rekursivem Abstieg erkannt werden.
+      \ii Die PREDICT Menge und der Look-Aheads entscheiden die nächste Regel.
+      \ii Im Parsebaum sind alle Token Blätter und alle Regeln Knoten.
+      \ei
+    }\medskip
+    \ii Strukturierte Sprachen sind allgegenwärtig und sicherheitsrelevant!{
+      \bi
+      \ii Jede Validierung von Eingabedaten erfordert strukturelles Verstehen.
+      \ii Formale Grammatiken und Parsergeneratoren helfen Lücken zu vermeiden.
+      \ei
+    }
+    \ei
   \end{frame}
 
   %\begin{frame}{Quellenverzeichnis}
