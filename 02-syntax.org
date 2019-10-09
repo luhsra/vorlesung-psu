@@ -413,25 +413,16 @@ einzelnen Token erreichen kann (was den kombierten Automaten immer
 nicht-deterministisch macht). Mittels der [[https://de.wikipedia.org/wiki/Potenzmengenkonstruktion][Potenzmengenkonstruktion]]
 leitet man den Equivalenten determinsitischen Automaten her.
 
-Zurück zu den weniger theoretischen Aspekten des Scannens. Im Beispiel
-auf den Folien, ist eine Situation abgebildet, bei der das
-Schlüsselwort ~fn~ das Prefix für den Identifier ~fnord~ ist und zum
-gleichen Zeitpunkt (~fn~) zwei Automaten das Lexem als valides Wort erkennen
-würden. In solchen Fällen müssen wir zusätzliche Regeln angeben
-welcher der Tokentypen den Vorrang hat. Für Programmiersprachen müssen
-Schlüsselwörter immer hörere Priorität als Identifier haben, solange
-der Identifier nicht länger ist. Dies ist der Grund, wieso Sie
-Schlüsselwörter nicht als Variabelennamen verwenden können und diese
-daher auch oft als *reservierte* Wörter genannt werden.
+Zurück zu den weniger theoretischen Aspekten des Scannens.
+Im Beispiel auf den Folien, ist eine Situation abgebildet, bei der das Schlüsselwort ~fn~ das Prefix für den Identifier ~fnord~ ist und zum gleichen Zeitpunkt (~fn~) zwei Automaten das Lexem als valides Wort erkennen würden.
+In solchen Fällen müssen wir zusätzliche Regeln angeben welcher der Tokentypen den Vorrang hat.
+Für Programmiersprachen müssen Schlüsselwörter immer hörere Priorität als Identifier haben, solange der Identifier nicht länger ist.
+Dies ist der Grund, wieso Sie Schlüsselwörter nicht als Variabelennamen verwenden können und diese daher auch oft als *reservierte* Wörter genannt werden.
 
-Da die manuelle Konstruktion von endlichen Automaten und deren
-Kombination müßig ist, gibt es Programme, die aus einer Menge von
-regulären Ausdrücken einen Scanner erzeugen. Ein solches Programm ist
-[[https://www.cs.virginia.edu/~cr4bd/flex-manual/][flex(1)]]. Sollten sie später einen Lexer brauchen, der *schnell* und
-*korrekt* eine Zeichenkette in Tokens zerlegt, so zögern sie nicht und
-nehmen sie einen Scannergenerator zur Hand! Mehr zu den
-Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir Exkurs
-am Ende dieser Vorlesung kennen.
+Da die manuelle Konstruktion von endlichen Automaten und deren Kombination müßig ist, gibt es Programme, die aus einer Menge von regulären Ausdrücken einen Scanner erzeugen.
+Ein solches Programm ist [[https://www.cs.virginia.edu/~cr4bd/flex-manual/][flex(1)]].
+Sollten sie später einen Lexer brauchen, der *schnell* und *korrekt* eine Zeichenkette in Tokens zerlegt, so zögern sie nicht und nehmen sie einen Scannergenerator zur Hand!
+Mehr zu den Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir in einem kleinen Exkurs am Ende dieser Vorlesung kennen.
 
 * Parser und der Syntaxbaum
 :PROPERTIES:
@@ -525,6 +516,73 @@ am Ende dieser Vorlesung kennen.
     \ei
   \end{frame}
 #+end_src
+
+Die syntaktische Analyse hat zwei primäre Ziele:
+(1) Die Überprüfung der syntaktischen Regeln der Sprache, also ob das Programm richtig notiert wurde.
+(2) Die Befüllung einer geeigneten Datenstruktur mit der extrahierten Struktur des Programms.
+
+Für beide Ziele stellt sich die Frage, welcher Natur die syntaktischen Konstrukte in echten Programmiersprachen sind?
+Hierbei fällt schnell auf, dass viele Konstrukte geschachtelt vorkommen können:
+Dies bedeutet, dass ein Kontrukt von einem Konstrukt anderer Art umschlossen auftreten kann. So umschließt ein Funktionsrumpf eine oder mehrere Programmanweisungen.
+Es ist sogar recht häufig, dass ein Konstrukt von einem Konstrukt gleicher Art umschlossen auftreten darf, und damit **rekursiv** ist.
+Dabei ist der arithmetische Ausdruck das Paradebeispiel, bei dem die Schachtelung entweder explzit durch Klammern oder implizit durch die Operatorpräzedenz notiert wird.
+
+Um der geschachtelten Natur von Programmiersprachen Rechnung zu tragen,  benötigen wir also eine Datenstruktur, die ebenfalls rekursiv ist.
+Die bedeutet, dass eine Instanz dieser Datenstruktur weitere, kleinere, Instanzen der gleichen Datenstruktur enthalten kann.
+Die einfachste Rekursive Datenstruktur, die in Frage kommt ist die einfach verkettete Liste:
+
+#+begin_src C
+struct list {
+    int value;
+    struct list * next;
+};
+#+end_src
+
+Bei dieser einfach verketteten Liste, ist das nachfolgende Element `next` widerum eine einfach verkettete Liste (oder `NULL`).
+Allerdings enthält jedes Element einer Liste maximal eine weitere Liste.
+Da wir bereits, bei den Anweisungen und dem Funktionsrumpf, erkannt haben das ein Sprachkonstrukt mehrere "Kinder" haben kann, ist sofort klar, dass die verkettete Liste ungeeignet für unsere Zwecke ist.
+
+Daher müssen wir auf die nächst mächtigere Klasse von Datenstruktur, nämlich die der **Bäume**, wechseln.
+Bäume sind hervorragend geeignet die syntaktische Struktur von Programmen zu erfassen:
+Sie sind rekursiv, da jedes Kind eines Knoten widerum ein Unterbaum ist; dabei sind Blätter sind trivale Bäume.
+
+Für unser Beispiel der arithmetischen Ausdrücke zeigt ein innerer Knoten an, welche Operation ausgeführt werden soll.
+Die Kinder dieses Knotens sind die Operanden, die verrechnet werden sollen.
+Da Operationen in der Regel nicht kommutativ sind, ist die Reihenfolge der Kinder wichtig.
+
+Für die Speicherung von Bäumen, können wir dann doch wieder Listen verwenden, solange wir Listen als Listenelemente zulassen.
+Dabei speichern wir immer im ersten Element einer Liste den aktuellen Knoten; alle weiteren Listenelemente sind die Kinder.
+Der Baum für den arithmetrischen Ausdruck `1*2+3/4` wäre dann[fn::In Lisp wäre es (+ (* 1 2) (/ 3 4)).
+In dieser Programmiersprache, die von Studierenden aufgrund ihrer immensen Menge an Klammerung gehassten wird, werden Programme direkt in einer solchen Listennotation notiert. Es gibt nur wenige weitere syntaktische Regeln.
+Dies erklärt auch ihre Beliebtheit bei Übersetzerbauern: Man kommt mit einem sehr einfachen Parser aus. Wenn sie also über die folgenden Abschnitte stöhnen, denken Sie daran: Mit Lisp wäre das alles nicht nötig]:
+
+#+begin_src python
+def node(tree):
+    return tree[0]
+
+def children(tree):
+    return tree[1:]
+
+tree = ['+', ['*', [1], [2]], ['/', [3], [4]]]
+print(children(tree))
+#+end_src
+
+Im Kapitel über Scanner haben wir bereits formale Grammatiken und formale Sprachen als eine Methode kennen gelernt, Regeln von Programmiersprachen zu notieren. Mit dieser Erfolgsgeschichte im Rücken, können wir uns nun daran machen auch die weiteren Sprachregeln formal auf zu schreiben.
+
+Hierbei stellt allerdings die erwähnte rekursive Natur von Programmiersprachen ein Hindernis dar:
+Bei regulären Sprachen haben wir explizit verboten, dass Regeln sich selbst referenzieren, also rekursiv sind.
+Daher sind Typ-3 Grammatiken **nicht**[fn::Dies ist auch der Grund, wieso man mit Regexen kein HTML parsen kann.
+Versuchen sie es nicht, es wird immer scheitern bzw.
+ein Hack bleiben.]
+geeignet um Programme zu parsen und wir müssen auf die Typ-2 Grammatiken, also die **Kontextfreien Sprachen** wechseln.
+Diese erlauben es, dass auf der rechten Seite einer Regel ein Nicht-Terminal stehen darf, welches (direkt oder indirekt) zur linken Seite abgeleitet werden kann.
+Dies erlaubt es, dass die eine kontextfreie Grammatik "Klammern zu zählen" kann, sie also korrekt balanciert Klammerungen erzeugt.
+
+Im Allgemeinen ist die Komplexität des "Wortproblems" (Prüfung ob ein Wort in der Sprache ist) für kontextfreie Sprachen kubisch{{{wikipedia_de(Cocke-Younger-Kasami-Algorithmus)}}}.
+Allerdings gibt es mit den **deterministischen kontextfreien Sprachen** eine Klasse von Sprachen, die in linearer Zeit, also viel viel schneller, erkennbar und damit parsebar ist.
+Daher versuchen alle Entwickler von Programmiersprachen in dieser Klasse zu bleiben.
+
+
 
 ** Parser mit rekursivem Abstieg
 #+begin_src latex
