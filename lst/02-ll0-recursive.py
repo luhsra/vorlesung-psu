@@ -33,30 +33,30 @@ TOK_PLUS = 1
 TOK_EOF = 2
 
 #parser0
-def addInt(token_stream):
-    # Nur eine Regel: addInt -> Int addIntTail
+def intAdd(token_stream):
+    # Nur eine Regel: intAdd -> Int intAddTail
     ## 'Int': Das erste Token muss ein INT sein
     int_load  = token_stream.read(expected=TOK_INT)
-    ## 'addIntTail': Rekursiver Abstieg
-    tail_tree = addIntTail(token_stream)
+    ## 'intAddTail': Rekursiver Abstieg
+    tail_tree = intAddTail(token_stream)
     # Baumstruktur als geschachtelte Listen
-    return ("head", int_load, tail_tree) #parser1
+    return ["intAdd", int_load, tail_tree] #parser1
 
 #parser2
-def addIntTail(token_stream):
+def intAddTail(token_stream):
     # Verwende Look-Ahead zur Regelauswahl
     if token_stream.peek() == TOK_PLUS:
-        # addIntTail -> '+' Int addIntTail
+        # intAddTail -> '+' Int intAddTail
         ## '+': consume the PLUS
         _         = token_stream.read(expected=TOK_PLUS)
         ## 'Int': capture the integer
         int_load  = token_stream.read(expected=TOK_INT)
-        ## 'addIntTail': Rekursiver Abstieg!
-        tail_tree = addIntTail(token_stream)
+        ## 'intAddTail': Rekursiver Abstieg!
+        tail_tree = intAddTail(token_stream)
         # Baumstruktur zurückgeben
-        return ("tail", int_load, tail_tree)
+        return ["intAddTail", int_load, tail_tree]
     elif token_stream.peek() == TOK_EOF: #... #parser3
-        return None
+        return ["intAddTail",]
     else:
         raise ParserError("Expected + or $.")
 
@@ -69,5 +69,5 @@ token_stream = Stream([
     [TOK_EOF, None]
 ])
 
-print(addInt(token_stream))
+print(intAdd(token_stream))
 #+end_src

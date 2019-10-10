@@ -47,43 +47,54 @@
 \begin{frame}<1-10>
   \begin{tikzpicture}[
     level distance=1cm,
-    level 1/.style={sibling distance=2cm},
-    level 2/.style={sibling distance=1cm},
+    sibling distance=8mm,
+    level 2/.style={sibling distance=8mm},
     ]
+    \def\E{\emph{E}}
     \begin{scope}[every node/.style={draw,fill=white},visible on=<1>]
-      \node (root) {+}
-         child {node (P){+}
-           child {node {+}
+      \node (root) {\E}
+         child {node {\E}
+           child {node {\E}
              child {node {1}}
+             child {node {+}}
              child {node {2}}
            }
-           child {node {3}};
+           child {node {+}}
+           child {node {3}}
          }
-         child {node {4}};
-         \draw (root) -- (P); % I have no idea why i need this
+         child {node {+}}
+         child {node {4}}
+         ;
+
 
          \node [below=3.2cm of root,draw=none] {Linksableitung};
 
     \end{scope}
-    \begin{scope}[every node/.style={draw,fill=white},visible on=<2>]
-      \node (root) {+}
-      child { node (P) {+}
+    \begin{scope}[every node/.style={draw,fill=white},visible on=<2>, level 1/.style={sibling distance=1.3cm}]
+      \node (root) {\E}
+      child { node (P) {\E}
         child {node {1}}
+        child {node {+}}
         child {node {2}}
       }
-      child {node {+}
+      child {node {+}}
+      child {node {\E}
         child {node {3}}
+        child {node {+}}
         child {node {4}}
       };
     \end{scope}
 
     \begin{scope}[every node/.style={draw,fill=white},visible on=<3>]
-      \node (root) {+}
+      \node (root) {\E}
          child {node {1}}
-         child {node {+}
+         child {node {+}}
+         child {node {\E}
            child {node {2}}
-           child {node {+}
+           child {node {+}}
+           child {node {\E}
              child {node {3}}
+             child {node {+}}
              child {node {4}}
            }};
 

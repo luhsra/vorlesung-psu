@@ -579,10 +579,28 @@ Diese erlauben es, dass auf der rechten Seite einer Regel ein Nicht-Terminal ste
 Dies erlaubt es, dass die eine kontextfreie Grammatik "Klammern zu zählen" kann, sie also korrekt balanciert Klammerungen erzeugt.
 
 Im Allgemeinen ist die Komplexität des "Wortproblems" (Prüfung ob ein Wort in der Sprache ist) für kontextfreie Sprachen kubisch{{{wikipedia_de(Cocke-Younger-Kasami-Algorithmus)}}}.
-Allerdings gibt es mit den **deterministischen kontextfreien Sprachen** eine Klasse von Sprachen, die in linearer Zeit, also viel viel schneller, erkennbar und damit parsebar ist.
-Daher versuchen alle Entwickler von Programmiersprachen in dieser Klasse zu bleiben.
+Allerdings gibt es mit den **deterministischen kontextfreien Sprachen** eine Klasse von Sprachen, die in linearer Zeit, also viel viel schneller, erkennbar sind.
+Daher sind eigentlich alle  Programmiersprachen in dieser Klasse zu finden, da das lößen des Wortproblems gleichbedeutend mit parsen ist.
 
+Um zu verstehen, was deterministisch im Fall von kontextfreien Sprachen bedeutet müssen wir uns **Ableitungsbäume** für kontextfreie Grammatiken anschauen.
+Bei Ableitungsbäumen entspricht jeder innere Knoten einem Nicht-Terminal, jedes Blatt entspricht einem Terminal.
+Die durchgeführten Ableitungen kann man von oben nach unten ablesen:
+die Kinder eines Nicht-Terminals entsprechen den Elementen der rechten Seite der angewendeten Regel.
+Die Blätter (Terminale), wenn wir sie von links nach rechts lesen, ergeben das erzeugte Wort.
+Der Ableitungsbaum ist also eine Vorschrift, wie die Regel einer Grammatik anzuwenden sind, damit ein bestimmtes Wort entsteht.
+Umgekehrt bedeutet dies auch, dass wir beim Lösen des Wortproblems einen Ableitungsbaum angeben müssen um zu Zeigen, dass das Wort in der Sprache ist. Das rekonstruieren des Ableitungsbaums nennt man auch **parsen**.
 
+Gibt es mehr als eine Möglichkeit einen Ableitungsbaum für ein gegebenes Wort zu rekonstruieren, ist die Grammatik mehrdeutig.
+In Falle einer mehrdeutigen Grammatik, versehen wir zwei der entstehenden Ableitungsbäume mit einem speziellen Namen: Die **Linksableitung** entsteht, wenn immer  das linkeste Nicht-Terminal zuerst abgeleitet wird; die **Rechtsableitung vice versa mit dem rechtesten Nicht-Terminal.
+
+Gibt es genau einen Ableitungsbaum für jedes Wort, so ist sie **eindeutig**.
+Diese Eindeutigkeit ist etwas, was wir bei Programmiersprachen auf jeden Fall haben wollen.
+Denn der Übersetzer soll die Struktur unseres Programms ja nicht einmal so und einmal anders erkennen.
+
+Noch strenger als "eindeutig", ist die Eigenschaft des **deterministisch**:
+Bei einer deterministischen Grammatik gibt es eine allgemeine Vorschrift, wie und in welcher Reihenfolge die Regeln angewendet werden müssen um einen Ableitungsbaum aus einem gegebenen Wort zu rekonstruieren[fn::Formaler: Deterministische kontextfreie Sprachen können mit deterministischen Kellerautomaten erkannt werden.].
+Zum Beispiel kann solch eine Vorschrift sein, dass man das Wort von links nach rechts durchgeht und am jeweils nächsten Zeichen (look-ahead) entscheidet welche Regel im Folgenden angewendet werden muss.
+Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setzen werden.
 
 ** Parser mit rekursivem Abstieg
 #+begin_src latex
@@ -649,8 +667,8 @@ Daher versuchen alle Entwickler von Programmiersprachen in dieser Klasse zu blei
         ]{lst/02-ll0-recursive.py}%
     \end{code}
     \vfill
-    \strut\only<5>{
-      \lstinline[style=PY]|addInt(Scanner("1+2+3"))|  $\Rightarrow$ \lstinline[style=PY]|('head', 1, ('tail', 2, ('tail', 3, None)))|
+    \strut\hspace{-5mm}\only<5>{
+      \lstinline[style=PY]|addInt(Scanner("1+2"))|  $\Rightarrow$ \lstinline[style=PY]|['intAdd',1,['intAddTail',2,['intAddTail',]]]|
     }
   \end{frame}
 
@@ -680,7 +698,38 @@ Daher versuchen alle Entwickler von Programmiersprachen in dieser Klasse zu blei
   \end{frame}
   #+end_src
 
+Wie bereits erwähnt kann man bei einer LL(1) Grammatik anhand des nächsten Zeichens **deterministisch** entscheiden, welche Regel der Grammatik angewendet werden soll.
+Um dies zu verstehen, müssen wir mehr darauf eingehen, wie ein Parser für eine LL(1) Sprache aussieht.
+Die einfachste Form eines LL(1) Parsers verwendet die Methode des **rekursiven Abstiegs** um aus einem Wort den Ableitungsbaum zu rekonstruieren.
+
+Bei einem solchen Parser wird für jedes Nicht-Terminal eine Funktion erzeugt, die genauso heißt wie das Nicht-Terminal.
+Diese Funktionen haben den Tokenstrom bzw.
+ein Scanner Objekt als Argument und können vorne aus diesem Strom Zeichen entnehmen (~read()~).
+Weiterhin können sie das erste Zeichen mittels ~peek()~ anschauen, ohne es zu entnehmen (look-ahead).
+Als Rückgabewert liefern diese Funktionen (partielle) Ableitungsbäume.
+
+Wenn wir eine solche Nicht-Terminal Funktion aufrufen, entscheidet sie anhand des aktuellen Look-aheads, welche Regel nun angewendet werden muss und konsumiert im Folgenden solange Token aus dem Strom, bis das Teilwort das zu dieser Regelanwendung gehört aus dem Tokenstrom entfernt ist.
+Ein solcher Aufruf ist also ein Art "rückwärtsableitung" auf der linken Seite des Tokenstroms.
+Die Funktion ordnet die Token so an, dass sie die Blätter des zurückgegebenen Ableitungsbaums sind.
+Um ein ganzes Programm zu parsen, rufen wir einfach nur die Funktion die dem Startsymbol entspricht auf.
+Im Folgenden können sie mit dem ~intAdd~ Parser aus den Vorlesungsfolien herumspielen.
+
 #+INCLUDE: ../lst/02-ll0-recursive.py
+
+Parser mit rekursivem Abstieg können entweder manuell erstellt werden, oder man verwendet einen LL(1)-Parsergenerator.
+Ein solcher Generator bekommt eine LL(1) Grammatik als Eingabe, analysisert die Struktur und die Eigenschaften der Grammatik und generiert ein entsprechendes Programm.
+Mit dieser Analyse von LL(1)-Grammatiken wollen wir uns nun genauer beschäftigen um zu verstehen, wie ein solcher Generator genau funktioniert.
+Dies wird Sie nicht nur in die Lage versetzen LL(1) Grammatiken zu formulieren, sondern auch selbst einen Parsergenerator zu schreiben. Es ist einfacher als sie befürchten!
+
+Die wichtigste Information, die wir aus einer LL(1) Grammatik extrahieren wollen sind die **PREDICT Mengen**:
+Für jede Regel der Grammatik gibt die zugehörige PREDICT Menge, die Terminale Symbolen enthält, an ob diese Regel genommen wird.
+Diese Mengen enthalten also genau jenen Token, anhand derer der Parser mit rekursivem Abstieg, anhand des Look-Aheads, seine Entscheidungen trifft.
+Vice Versa:
+Haben wir die PREDICT Mengen, so können wir daraus also leicht einen Parser konstruieren.
+
+Zusätzlich können wir Anhand der PREDICT Mengen auch prüfen, ob eine gegebene Grammatik eine LL(1) Grammatik ist.
+Überschneiden sich die PREDICT Mengen von zwei Regeln, die das gleiche Nicht-Terminal auf der linken Seite haben, auch nur in einem Zeichen, so liegt keine LL(1) Grammatik vor.
+Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung über die nächste anzuwendende Regel treffen[fn::YouTube: [[https://www.youtube.com/watch?v=x9CLfbEpwoE][Feuerzangebowle: Ostgoten]], die wissen auch nicht ganz genau wo sie hin müssen.].
 
 #+begin_src  latex
     \begin{frame}[fragile]{Parser-Generator für Parser mit rekursiven Abstieg}
