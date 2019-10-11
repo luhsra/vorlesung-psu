@@ -591,7 +591,7 @@ Der Ableitungsbaum ist also eine Vorschrift, wie die Regel einer Grammatik anzuw
 Umgekehrt bedeutet dies auch, dass wir beim Lösen des Wortproblems einen Ableitungsbaum angeben müssen um zu Zeigen, dass das Wort in der Sprache ist. Das rekonstruieren des Ableitungsbaums nennt man auch **parsen**.
 
 Gibt es mehr als eine Möglichkeit einen Ableitungsbaum für ein gegebenes Wort zu rekonstruieren, ist die Grammatik mehrdeutig.
-In Falle einer mehrdeutigen Grammatik, versehen wir zwei der entstehenden Ableitungsbäume mit einem speziellen Namen: Die **Linksableitung** entsteht, wenn immer  das linkeste Nicht-Terminal zuerst abgeleitet wird; die **Rechtsableitung vice versa mit dem rechtesten Nicht-Terminal.
+In Falle einer mehrdeutigen Grammatik, versehen wir zwei der entstehenden Ableitungsbäume mit einem speziellen Namen: Die **Linksableitung** entsteht, wenn immer  das linkeste Nicht-Terminal zuerst abgeleitet wird; die **Rechtsableitung** vice versa mit dem rechtesten Nicht-Terminal.
 
 Gibt es genau einen Ableitungsbaum für jedes Wort, so ist sie **eindeutig**.
 Diese Eindeutigkeit ist etwas, was wir bei Programmiersprachen auf jeden Fall haben wollen.
@@ -711,6 +711,9 @@ Als Rückgabewert liefern diese Funktionen (partielle) Ableitungsbäume.
 Wenn wir eine solche Nicht-Terminal Funktion aufrufen, entscheidet sie anhand des aktuellen Look-aheads, welche Regel nun angewendet werden muss und konsumiert im Folgenden solange Token aus dem Strom, bis das Teilwort das zu dieser Regelanwendung gehört aus dem Tokenstrom entfernt ist.
 Ein solcher Aufruf ist also ein Art "rückwärtsableitung" auf der linken Seite des Tokenstroms.
 Die Funktion ordnet die Token so an, dass sie die Blätter des zurückgegebenen Ableitungsbaums sind.
+
+Wird an einer Stelle auf der rechten Seite erwartet ein Nicht-Terminal, so ruft die Funktion **rekursiv** die entsprechende Parsefunktion auf und gibt den Rückgabewert als Unterbaum weiter. Es sind diese rekursiven Aufrufe, die dieser Klasse von Parsern ihren Namen geben!
+
 Um ein ganzes Programm zu parsen, rufen wir einfach nur die Funktion die dem Startsymbol entspricht auf.
 Im Folgenden können sie mit dem ~intAdd~ Parser aus den Vorlesungsfolien herumspielen.
 
@@ -758,13 +761,13 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
               # Die \PREDICT entscheidet ob eine Regel genommen wird
               for rule in NT.rules:
               ``!!    if token_stream.peek() in @@PREDICT(rule)@@:!!
-                  for symbol in NT.righthandside:
+                  for symbol in rule.righthandside:
                       if is_terminal(symbol):
               ``!!        ``@@..._load@@ = token_stream.read(expect=@@symbol.name@@)!!
                       else:
               ``!!        ``@@..._tree@@ = @@symbol.name@@(token_stream)!!
                   # Return Parse Tree
-              ``!!        return (@@rule.name@@, @@..._load@@, @@..._tree@@, @@...@@)!!
+              ``!!        return [@@NT.name@@, @@..._load@@, @@..._tree@@, @@...@@]!!
         \end{py}
       \end{code}
 
@@ -774,14 +777,33 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
     \end{frame}
 #+end_src
 
+Zunächst werden wir so tun, als hätten wir die PREDICT Mengen schon und wollen uns anschauen, wie der Parsergenerator den Code für den Parser erzeugt.
+Dafür hat der gezeigte Parsergenerator mehrere interne Datenstrukturen:
+Die Liste ~nonterminals~ enthält ein Objekt für jedes Nicht-Terminal der Grammatik.
+Jedes Nicht_Terminal ~NT~ hat einen Namen (~NT.name~) und eine Liste mit Regeln auf denen Linken Seite das Nicht-Terminal vorkommt (~NT.rules~)[fn::Diese Regeln für das Nicht-Terminal A nennt man auch *A-Produktionen*.].
+Jede Regel hat eine linke und eine rechte Seite (~rule.righthandside~).
+Die rechte Seite ist dabei eine Liste von Symbolen (Terminale und Nicht-Terminale), über die der Generator interieren kann.
+
+Um den gezeigten Generator zu verstehen, müssen sie auf die Einrückungen achten. Diese sind für den Parsergenerator (grau) und den generierten Code (gelb) unterschiedlich. Die gelben Zeilen sind vollständige Zeilen, die ausgegeben werden, die Einrückungen beziehen sich also auf den gelben linken Rand.
+
+Der Generator erzeugt für jedes Nicht-Terminal eine Funktion und benennt sie Anhand des Namens des Nicht-Terminals.
+Innerhalb der Funktion wird für jede Regel einen bedingten Block emitiert, die mit einem ~return~ Statement endet, das den Ableitungsbaum zurück geben wird.
+Die erzeugte Bedingung prüft ob das nächste Zeichen in der PREDICT Menge, die zur aktuellen Regel gehört, enthalten ist (~in~).
+Innerhalb des bedingten Blockes, werden, nacheinander, alle Symbole der rechten Seite aus dem Tokenstrom gelesen.
+Ist ein Symbol ein Terminal, so lässt der Generator den Parser das Zeichen direkt in der Funktion aus dem Strom konsumieren.
+Hierbei bekommt die ~read()~ Funktion das optionalen Argument ~expected=~, sodass sie prüft ob das vorderste Token wirklich von der entsprechenden Klasse ist. Ist dies nicht der Fall so wird ein Parserfehler geworfen.
+Ist das Symbol ein Nicht-Terminal, so delegieren wir das Parsen für diese Teil der rechten Seite an die entsprechende Funktion (rekursiver Abstieg).
+Weiterhin legt der Generator für jedes Symbol eine Variable an um das Token (Terminale) bzw. den Unterbaum (Nicht-Terminale) aufzufangen und zur Konstruktion des zurückgegebenen Baumes zu verwenden.
+
+Da der Parsergenerator eine Grammatik als Eingabe und einen Parser als Ausgabe hat, können wir ihn als Übersetzer Bezeichnen.
+Dabei akzeptiert der Generator alle Grammatiken der Klasse LL(1) und erzeugt ein Programm in der Programmiersprache Python.
+
 ** Analyse von LL(1) Grammatiken
 :PROPERTIES:
 :CUSTOM_ID: 02-ll1-analysis
 :END:
 
 #+begin_src latex
-
-
     \begin{frame}{\PREDICT: Berechnung von \EPS und \FIRST}
       \textbf{Bisher}: Die \PREDICT Menge fällt vom Himmel bzw. ist trivial.
       \bigskip
@@ -791,7 +813,7 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
         \ii $\EPS(\alpha) \equiv \textbf{ if } \alpha \Longrightarrow^* \epsilon \textbf{ then}\text{ true}\textbf{ else}\text{ false}$ \\\smallskip
         Kann aus dem Wort $\alpha$, durch Ableitung(en), das leere Wort entstehen?
         \medskip
-        \ii $\FIRST(\alpha) \equiv \{ c \mid c \in T, \alpha \Longrightarrow * c \beta\}$ \\\smallskip
+        \ii $\FIRST(\alpha) \equiv \{ c \mid c \in T, \alpha \Longrightarrow^* c \beta\}$ \\\smallskip
         Die Menge aller Terminale, die bei den Ableitungen  von $\alpha$ links auftreten.
         \ei
       }
@@ -850,7 +872,7 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
         \def\abox#1{\fbox{\scriptsize\strut#1}}
         \begin{tabular}{lll}\toprule
         A              & $\FOLLOW(A)$     & Beispielhafte Satzformen                         \\\midrule
-          term         & \{+,$\dashv$\}       & \abox{\NT{term}+1} \abox{1+\NT{term}$\dashv$ }                                 \\\midrule
+          term         & \{),$\dashv$\}       & \abox{(\NT{term})} \abox{\NT{term}$\dashv$ }                                 \\\midrule
           factor\_tail & \{),$\dashv$\}   & \abox{(1+\NT{factor\_tail})} \abox{1+\NT{factor\_tail} \textbf{$\dashv$}} \\\midrule
           factor       & \{+,),$\dashv$\} & \abox{1+\NT{factor}\textbf{+}3}
                                        \abox{(5+\NT{factor}\textbf{)}}
@@ -865,7 +887,7 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
 
 \begin{frame}[fragile]{\PREDICT $=$ \FIRST $\oplus$ \FOLLOW}
 \bi
-\ii {\small $PREDICT(A \rightarrow \alpha) \equiv \FIRST(\alpha) \cup (\textbf{if }\EPS(\alpha)\textbf{ then }\FOLLOW(\alpha)\textbf{ else }\emptyset ) $}{ \\
+\ii {\small $PREDICT(A \rightarrow \alpha) \equiv \FIRST(\alpha) \cup (\textbf{if }\EPS(\alpha)\textbf{ then }\FOLLOW(A)\textbf{ else }\emptyset ) $}{ \\
   \bigskip
   \textbf{Intuition}: Ein Zeichen c sagt eine Regel dann voraus wenn:
   \begin{enumerate}
@@ -886,7 +908,7 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
     \first%
     \grammarrule{\NT{factor\_tail}}{\EPSILON}                                    & ), $\dashv$        & 1         & $\emptyset$           & \multirow{-2}{*}{), $\dashv$}       \\\midrule
     \grammarrule{\NT{factor}}{Int}                                               & Int           & 0         & Int           &               \\
-    \grammarrule{\NT{factor}}{\alert<2>{trans(}\alert<3>{\NT{term})}}            & Ident, (      & 0         & Ident, (      & \multirow{-2}{*}{+, $\dashv$} \\\midrule
+    \grammarrule{\NT{factor}}{\alert<2>{trans(}\alert<3>{\NT{term})}}            & Ident, (      & 0         & Ident, (      & \multirow{-2}{*}{+, ), $\dashv$} \\\midrule
     \grammarrule{\NT{trans}}{Ident}                                              & Ident         & 0         & Ident         & \only<2>{\cellcolor{badbee!50}} \\
     \second%
     \grammarrule{\NT{trans}}{\EPSILON}                                           & (             & 1         & $\emptyset$           & \multirow{-2}{*}{(}            \\
@@ -899,8 +921,59 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
 \end{frame}
 #+end_src
 
+Nun wollen wir uns der Berechnung der PREDICT Mengen für die Regeln einer gegebene Grammatik zuwenden.
+Informell ausgedrückt stellen wir uns dabei die Frage: "Welche Regelanwendung führt dazu, dass wir im Tokenstrom das Zeichen sehen, was wir gerade sehen?"
+
+Falls eine rechte Seite nur ein einziges Terminal enthält, oder mit einem Terminal startet, ist die Sache ganz klar:
+Die PREDICT Menge dieser Regel hat nur ein Element, nämlich dieses erste Terminal der rechten Seite.
+Dies war zum Beispiel bei unserem ~intAdd~/~intAddTail~ Beispiel, ganz absichtlich der Fall[fn::Tatsächlich hat Grammatikklasse, bei der alle Produktionen mit einem Terminal starten einen eigenen Namen: Simple LL(1) oder SLL(1).].
+
+Steht an erster Stelle der rechten Seite ein Nicht-Terminal, wird die Sache komplizierter und wir müssen zwei Hilfsmengen (FIRST, FOLLOW) und ein Hilfsprädikat (EPS) einführen um die PREDICT Menge zu berechnen.
+Das Prädikat EPS wird genau dann wahr, wenn das übergebene (teilweise abgeleitete) Wort durch beliebig viele Ableitungen zum leeren Wort werden kann.
+Wir werden mittels EPS prüfen ob eine rechte Seite bzw. ein Prefix einer rechten Seite durch Ableitung "verschwinden" kann.
+
+Die FIRST Menge gibt an mit welchen Zeichen die Ableitung eines (partiell abgeleiteten) Wortes anfangen kann.
+Dies sieht nur auf den ersten Blick genau so aus, wie Definition der PREDICT Menge.
+Allerdings bezieht sich die FIRST Menge nur auf ein Wort ~a~ (wie es auf der rechten Seite auftritt), die PREDICT Menge auf eine Regel ~A->a~.
+Der Unterschied wird sichtbar, wenn das Wort ~a~, als ganzes, zum leeren Wort abgeleitet werden kann und quasi verschwindet:
+Die PREDICT Menge, muss dann noch weitere Zeichen enthalten, die nicht in der FIRST Menge enthalten sind, da die Regel dennoch zur Anwendung selektiert werden muss auch wenn ihre Produktion verschwindet.
+Nur so erhalten wir einen vollständigen und korrekten Ableitungsbaum.
+Im Beispiel, müssen wir für `trans` die Epsilon-Produktion auswählen, wenn wir `(` im Tokenstrom sehen.
+
+Um diesen Schritt von ~FIRST(a)~ auf ~PREDICT(A->a)~ zu machen, müssen wir die Grammatik als ganzes Analysieren und nicht nur die Ableitungen die aus der rechten Seite einer Regel folgen.
+Hierzu führen wir die FOLLOW Menge ein, die für jedes Nicht-Terminal A berechnet werden kann.
+Neben der formalen Definition (siehe Folie), kann man FOLLOW auch informell beschreiben:
+Welche Terminale können direkt **nach** einer vollständigen Ableitung von A in einem Wort folgen?
+So kann, im Beispiel, dem Nicht-Terminal ~trans~ in jeder beliebigen Ableitung nur das Token ~(~ folgen, da ~trans~ auf der rechten Seite nur in ~factor~ und vor einem ~(~ vorkommt.
+
+Etwas schwieriger ist ~factor_tail~.
+Man könnte zwar meinen, dass ~+~ Teil der FOLLOW Menge ist, da mittels dieser Regel die ganzen ~+~ erzeugt werden.
+Allerdings gibt es keine Satzform (partielle Ableitung) bei der bereits ein ~+~ rechts von ~factor_tail~ steht.
+Wenn man sich ansieht was in rechten Seiten rechts von ~factor_tail~ steht, kommt man dazu, dass ~factor_tail~ am Ende von seiner eigenen Regel und am Ende der ~term~ Regel steht.
+In beiden Fällen können wir, weil das Wort dort endet, nichts darüber lernen, was rechts von ~factor_tail~ stehen könnte.
+Daher müssen wir, bei ~term~ schauen was rechts davon stehen kann.
+Dies bringt uns dann zu der Erkenntnis, dass die FOLLOW Menge von ~factor_tail~ und ~term~ gleich ist.
+
+Die Berechnung der FOLLOW Mengen funktioniert also so, dass anhand der Nicht-Terminale die Regeln rücktwärts gehen und dort immer schauen, was rechts vom aktuellen Nicht-Terminal vorkommen könnte.
+Erreichen wir das Ende einer rechten Seite springen wir eine Stufe weiter zurück.
+Wir führen also eine *Tiefensuche* in den Regeln der Grammatik durch.
+Eine detailiertere Diskussion des Algorithmus zur Berechnung der FOLLOW Menge (sowie FIRST und EPS) werden wir in den Übungen durchführen.
+
+Mittels EPS, FIRST und FOLLOW, können wir nun die PREDICT Menge einer Regel ~A->a~ berechnen.
+Wenn die rechte Seite nicht verschwinden kann (EPS(a) ist ~False~), so müssen wir nur damit rechnen die Zeichen aus ~FIRST(a)~ zu sehen wenn wir die Regel anwenden sollen.
+Verschwindet die rechte Seite (~EPS(a) == True~), so müssen wir *zusätzlich* die Zeichen aus FOLLOW(A) erwarten.
+Wir verschmelzen also die FOLLOW Menge des Nicht-Terminals mit der FIRST Menge der Regel.
+
+Aus dem letzten Satz können wir auch direkt lernen, dass bei LL(1) Grammatiken immer nur eine Regel von allen A-Produktionen verschwinden darf.
+Sonst würden wir FOLLOW(A) zu zwei PREDICT Mengen hinzuschlagen und die Mengen wären daher nicht mehr schnittfrei.
+Dies ergibt auch intuitiv Sinn:
+Wenn wir bei A stehen und zwei Regeln zur Auswahl haben, die dieses A verschwinden lassen, woher sollen wir wissen welche wir auswählen sollen?
+Die Grammatik wäre nicht mehr deterministisch.
+
 ** COMMENT Tabellenbasierte Parser
-Vielleicht macht man das hier noch.
+
+Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
+
 ** Schwierigkeiten mit LL(1)
 :PROPERTIES:
 :CUSTOM_ID: 02-ll1-problems
@@ -1036,6 +1109,20 @@ Vielleicht macht man das hier noch.
   \end{frame}
 
 #+end_src
+
+Mit der Berechnung von PREDICT haben wir alles, was wir für unseren, vorher vorgestellten, Parsergenerator brauchen.
+Ist die Welt nun also eine bessere und wir können alles was wir von einer Programmiersprachensyntax verlangen in LL(1) ausdrücken?[fn::Rhetorische Frage.]
+Leider nicht, denn LL(1) Grammatiken haben einige Probleme, die wir im Weiteren Diskutieren wollen.
+Dennoch war die Beschäftigung mit LL(1) äußerst lohnend, weil wir gesehen haben wie man an die Analyse einer Grammatik herangehen kann, wie ein Parsergenerator im Prinzip arbeitet und wie der fertige Parser schlussendlich arbeitet.
+
+Das erste Problem sind *gemeinsame Prefixe*.
+Wenn zwei A-Produktionen mit dem gleichen Terminal starten, so haben sie ein solches gemeinsames Prefix.
+Wir könnten daher nicht mehr deterministisch entscheiden, welche der beiden Regeln wir auswählen sollen.
+Im Beispiel, wüssten wir, mit einem Token Look-Ahead (~Ident~), nicht ob wir die obere oder die untere Regel wählen sollten.
+Wir könnten das Problem zwar lösen indem wir uns ein weiteres Token Look-Ahead gönnen würden (~Ident :=~ vs. ~Ident (~), aber dann würden wir LL(1) Land verlassen und in LL(2) landen.
+
+Die andere Variante ist das Umformen der Regeln mittels *Linksfaktorisierung*. Dabei spalten wir die zweideutigen A-Produktionen auf indem wir ein weiteres ~_tail~ Nicht-Terminal einführen. Das orginale Nicht-Terminal (~stmt~) hat nur
+
 
 ** Abstrakter Syntaxbaum
 :PROPERTIES:
