@@ -35,21 +35,23 @@ $( document ).ready(function() {
             var url = window.location.href.match(/.*\//) + "index.html";
             $('<a href="'+url+'">[Index]</a>').appendTo('#table-of-contents');
             var url = window.location.href.replace('.html', '.slides.pdf');
-            $('<a href="'+url+'">[Folien,</a>').appendTo('#table-of-contents');
+            $('<span>[PDF: </span>').appendTo('#table-of-contents');
+            $('<a href="'+url+'">Folien,</a>').appendTo('#table-of-contents');
             var url = window.location.href.replace('.html', '.handout.pdf');
-            $('<a href="'+url+'"> Handout]</a>').appendTo('#table-of-contents');
-            var url = window.location.href.replace('.html', '.handout.html?print=true');
+            $('<a href="'+url+'"> Handout</a>').appendTo('#table-of-contents');
+            $('<span>]</span>').appendTo('#table-of-contents');
+            var url = window.location.href.replace('.html', '.html?print=true');
             $('<a href="'+url+'">[Druckversion]</a>').appendTo('#table-of-contents');
         }
 
         $('#footnotes').appendTo('.col-md-9');
 
-        $("img.slide").each(function (idx, img) {
-            $(img).click(function(e) {
+        $("div.carousel").each(function (idx, carousel) {
+            $(carousel).click(function(e) {
                 if(e.shiftKey || e.ctrlKey || e.altKey) {
-                    $(img).closest('.carousel').carousel('prev');
+                    $(carousel).carousel('prev');
                 } else {
-                    $(img).closest('.carousel').carousel('next');
+                    $(carousel).carousel('next');
                 }
                 return true;
             });

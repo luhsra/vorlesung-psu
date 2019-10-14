@@ -1,5 +1,6 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 02 - Syntaktische Analyse
+#+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 
@@ -181,20 +182,20 @@ der in Übersetzern verwendet wird.].
     \ei
   \end{frame}
 
-  \begin{frame}[t]{Scanner (oder Lexer)}
+  \begin{frame}<handout:1,3>[t]{Scanner (oder Lexer)}
     \signature{scanner\_next}{Stream[char]}{Token}
     \bi
-    \ii<2-> Der Scanner (auch Abtaster oder Lexer) erzeugt den Tokenstrom {
+    \ii<2-|handout:2-> Der Scanner (auch Abtaster oder Lexer) erzeugt den Tokenstrom {
       \bi
       \ii \texttt{scanner\_next} konsumiert Zeichen vom Anfang bis zum Ende eines Tokens.
       \ii Implementierung: \alert<3>{manuell} oder mittels Regulären Ausdrücken und Tooling
       \ei
     }
     \ei
-    \begin{code}<3->[tag=Py]
+    \begin{code}<3-|handout:3->[tag=Py]
       \lstinputlisting[style=PY,linerange={scanner0-scanner1,scanner2-scanner3}]{lst/02-scanner.py}
     \end{code}
-    \only<1|handout:0>{\begin{tikzpicture}[overlay,remember picture,box/.style={draw=srared,ultra thick}]
+    \only<1|handout:1>{\begin{tikzpicture}[overlay,remember picture,box/.style={draw=srared,ultra thick}]
         \node[fit=(sig-name),box,pin=-100:Funktionsname]{};
         \node[fit=(sig-input),box,pin=-90:Parameter]{};
         \node[fit=(sig-output),box,pin=-85:Rückgabewert]{};
@@ -302,7 +303,7 @@ Dezimalnotation handeln kann.
     \ei
   \end{frame}
 
-  \begin{frame}<handout:1,2,3,7,9,11>{Scanner als Kombination von Regulären Automaten}
+  \begin{frame}{Scanner als Kombination von Regulären Automaten}
     \animation[width=\linewidth]{1/1,2/2,3/3,4/4,5/5,6/6,7/7,8/8,9/9,10/10,11/11,12/12}{fig/02-scanner}
 
     \bi
@@ -480,7 +481,7 @@ Mehr zu den Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir in ei
       \ei
     }
     \ei%
-    \begin{tikzpicture}[remember picture,overlay,visible on=<2>]
+    \begin{tikzpicture}[remember picture,overlay,visible on=<2|handout:2>]
       \node[anchor=south east,inner sep=0,xshift=1cm] at (current page.south east) (yeah) {\includegraphics[width=4.5cm]{fig/yeah}};
       \node[anchor=south east,fill=safegreen!50,draw,xshift=1.2cm,yshift=6mm] at (yeah.south west) {\Huge $\mathcal{O}(n)$};
     \end{tikzpicture}
@@ -644,11 +645,11 @@ Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setz
         linerange={parser0-parser1},
         firstnumber=0,
         linebackgroundcolor={%
-          \btLstHL{}%
           \btLstHL<1>{2}%
           \btLstHL<3>{3-4}%
           \btLstHL<4>{5-6}%
           \btLstHL<5>{8}%
+          \btLstHL{}%
         }
         ]{lst/02-ll0-recursive.py}%
     \end{code}
@@ -657,17 +658,17 @@ Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setz
         linerange={parser2-parser3},
         firstnumber=0,
         linebackgroundcolor={%
-          \btLstHL{}%
           \btLstHL<1>{2-3}%
           \btLstHL<2>{5-6}%
           \btLstHL<3>{7-8}%
           \btLstHL<4>{9-10}%
           \btLstHL<5>{12}%
+          \btLstHL{}%
         }
         ]{lst/02-ll0-recursive.py}%
     \end{code}
     \vfill
-    \strut\hspace{-5mm}\only<5>{
+    \strut\hspace{-5mm}\only<5->{
       \lstinline[style=PY]|addInt(Scanner("1+2"))|  $\Rightarrow$ \lstinline[style=PY]|['intAdd',1,['intAddTail',2,['intAddTail',]]]|
     }
   \end{frame}
@@ -1042,11 +1043,10 @@ Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
     \ii<2-> \textbf{Definition}(Linksrekursiv): Mind. eine Regel hat folgende Ableitung. {
       \[ A \Longrightarrow^* A \alpha \]
     }
-    \ii<3-> \enquote{Reperatur} nur \alert{manchmal} möglich durch \emph{tail}-Umformung.\hfill{\scriptsize (LL(1)$\ll$LR(1))}\\{
-      \first\grammarrule{\NT{intAdd}}{Int \NT{intAddTail}}\second\PREDICT=\{Int\}\\
-      \first\grammarrule{\NT{intAddTail}}{+ Int}          \second\PREDICT=\{+\}\\
-      \first\grammarrule{\NT{intAddTail}}{\EPSILON}       \second\PREDICT=\{$\dashv$\}
-
+    \ii<3-> \enquote{Reperatur} nur \alert{manchmal} möglich.\hfill{\scriptsize (LL(1)$\ll$LR(1))}\\{
+      \first\grammarrule{\NT{intAdd}}{Int + intAdd}\\
+      \first\grammarrule{\NT{intAddTail}}{Int}     \\[3pt]
+      $\Rightarrow$ Umformung zur Rechtsrekursion + Linksfaktorisierung\\
     }
     \ei
   \end{frame}
@@ -1121,10 +1121,63 @@ Wir könnten daher nicht mehr deterministisch entscheiden, welche der beiden Reg
 Im Beispiel, wüssten wir, mit einem Token Look-Ahead (~Ident~), nicht ob wir die obere oder die untere Regel wählen sollten.
 Wir könnten das Problem zwar lösen indem wir uns ein weiteres Token Look-Ahead gönnen würden (~Ident :=~ vs. ~Ident (~), aber dann würden wir LL(1) Land verlassen und in LL(2) landen.
 
-Die andere Variante ist das Umformen der Regeln mittels *Linksfaktorisierung*. Dabei spalten wir die zweideutigen A-Produktionen auf indem wir ein weiteres ~_tail~ Nicht-Terminal einführen. Das orginale Nicht-Terminal (~stmt~) hat nur
+Die andere Variante ist das Umformen der Regeln mittels *Linksfaktorisierung*.
+Dabei spalten wir die zweideutigen A-Produktionen auf indem wir ein weiteres ~_tail~ Nicht-Terminal einführen.
+Das orginale Nicht-Terminal (~stmt~) hat nur noch eine Regel, die das gemeinsame Prefix konsumiert und mit dem ~_tail~ Symbol endet.
+In den ~_tail~-Regeln wird dann anhand der nun unterschiedlichen Prefixe entschieden, welche Regel zutrifft.
+
+Allerdings gibt es mit der Linksfaktorisierung auch ein Problem:
+Die umgeformte Grammatik ist nicht äquivalent zur orginalen Grammatik, die Regel mit dem gemeinsamen Prefix enthält[fn::Man kann an diesem Beispiel auch sehen, dass eine Sprachklassen und Grammatikklassen etwas unterschiedliches sind. Die gezeigte Sprache ist LL(1), aber die Grammatik die wir verwendet hatten war in LL(2). Durch die Umformung haben wir es geschafft eine Grammatik zu erzeugen die näher an der eigentlichen Klasse der Sprache ist.].
+Sie erzeugt zwar die gleiche formale Sprache, liefert aber andere Ableitungsbäume; etwas womit wir im Übersetzerbau umgehen müssen.
+
+Das zweite Problem von LL(1) Grammatiken ist, dass sie keine **Linksrekursion**[fn::Linksfaktorisierung != Linksrekursion] erlauben.
+Linksrekursion bedeutet, dass man durch Ableitung des Nicht-Terminals A zu einer Satzform kommt die wieder mit A beginnt.
+Da LL(1) Parser linksreduzierend sind, würde das bedeuten, dass wir immer wieder versuchen A zu reduzieren ohne ein einziges Terminal zu konsumieren; rekursiv; für immer.
+Der Parser würde sich also in einer Endlosrekursion fangen.
+
+Dass eine solche linksrekursive Grammatik nicht LL(1) sein kann, sehen wir auch an den PREDICT Mengen.
+Im Beispiel der linksrekursiven Variante von ~intAdd~ sind die PREDICT Mengen für die beiden Regeln von ~int~ nicht schnittfrei, womit der LL(1) Test fehl schlägt.
+Allerdings sehen wir auch, dass die linksrekursive Variante deutlich intuitiver auf zu schreiben ist, als bisher diskutierte nicht-linksrekrusive Variante, die zwei Nicht-Terminale braucht um die gleiche Sprache abzubilden.
+
+Widerum können wir (manchmal) die Grammatik heilen, indem wir ein zusätzliches Nicht-Terminal einführen. Dazu machen wir zuerst aus der Linksrekursion eine Rechtsrekursion.
+In der rechtsrekursiven Grammatik wächst das Wort nicht mehr an der linken Seite, sondern an der rechten Seite.
+Daher können wir, beim Parsen, Zeichen an der linken Seite konsumieren, bevor wir wieder zum rekursiven Nicht-Terminal kommen.
+Wir machen also Fortschritt (progress) und laufen nicht mehr unendlich lange.
+In der rechtsrekursiven Grammatik haben wir ein gemeinsames Prefix erzeugt, dass wir, wie gehabt, mit Linksfaktorisierung entfernen können.
+
+Das dritte Probelm von LL(1) Grammatiken ist, dass sie viele Nicht-Terminale enthalten und daher auch große Ableitungsbäume erzeugen.
+Noch schlimmer wird es dadurch, dass wir mit der Linksfaktorisierung Konstrukte zerreißen: semantisch zusammengehörenden Token werden nun in unterschiedlichen Unterbäumen abgespeichert.
+Bei der gezeigten Addition sind die Operanden keine direkten Geschwister mehr.
+
+Heutzutage haben wir, mit den modernen Parsergeneratoren, sehr gute Werkzeuge um Parser aus formalen Grammatiken zu erzeugen, die sowohl effizient sind als auch "schöne" Ableitungsbäume erzeugen und sich auf 50 Jahre Forschung im Berreich der Syntaxanalyse stützen.
+Diese Generatoren führen, neben der reinen Analyse und Generieurng, noch diverse Grammatikumformungen durch.
+Ebenfalls werden entsprechende Baumtransformationen auf den Ableitungsbäumen durchgeführt, sodass es garnicht zu diesen "hässlichen" Bäumen kommt.
+So ist der ~antlr~ Parsergenerator in der Version 4 in der Lage folgende Grammatik, inklusiver der Operatorpräzedenz, richtig zu einem Parser mit rekursivem Abstieg umzuformen:
+
+#+begin_example
+E -> E + E
+E -> E * E
+#+end_example
+
+In der Übung werden wir uns genauer mit LL(1) Parsergeneratoren und der Extraktion der EPS, FIRST und FOLLOW Mengen beschäftigen.
+Diese intensive Beschäftigung hat den Zweck Sie mehr in die Denke formal notierter Grammatiken einzuführen.
+Später, in der Praxis, sollten sie allerdings vermeiden ihre Parser, oder gar Parsergeneratoren, selbst zu schreiben. Mehr dazu im Exkurs über Parsing und Sicherheit.
+
+Das andere Thema, welches wir in der Vorlesung ganz ausgelassen haben, obwohl es für viele zum Kanon der Syntaxanalyse gehört sind die LR(1) Grammatiken.
+Diese Klasse von Grammatiken hat weder das Problem der gemeinsamen Prefixe, noch Schwierigkeiten mit Linksrekursion.
+Allerdings ist die Analyse und die Konstruktion dieser Parser deutlich aufwendiger zu verstehen als bei LL(1) Parsern.
+
+In a nutshell ist der Unterschied zwischen LL(k) und LR(k) in etwa folgender:
+Bei einem LL Parser muss immer anhand des Look-Aheads entschieden direkt werden welche Regel nun im folgenden angewendet werden muss.
+Dies bringt eben genau die Probleme, die wir bei einem gemeinsamen Prefix haben, mit sich:
+dort können wir diese eindeutige Entscheidung nicht sofort treffen.
+LR(k) Parser haben die Möglichkeit beliebige Zeit in einem Zustand des "sich noch nicht entschieden habens" (tristate) zu bleiben.
+Sie führen dazu (virtuell) eine Menge von möglichen Regeln mit sich, die mit jedem weiteren Token weiter eingeschränkt wird.
+Erst wenn diese Menge nur noch eine Regel enthält, wird sie angewendet.
+Wenn sie weiteres Interesse an LR(k) Parsern haben sei ihnen, neben der Lektüre des Drachenbuches, [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert ans Herz gelegt.
 
 
-** Abstrakter Syntaxbaum
+** TODO Abstrakter Syntaxbaum
 :PROPERTIES:
 :CUSTOM_ID: 02-ast
 :END:
@@ -1188,11 +1241,14 @@ Die andere Variante ist das Umformen der Regeln mittels *Linksfaktorisierung*. D
 Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
 
 
-** Probleme mit realen Sprachen
+** TODO Probleme mit realen Sprachen
+:PROPERTIES:
+:CUSTOM_ID: 02-real-language-problems
+:END:
 
 #+begin_src latex
 
-  \begin{frame}{Parsingprobleme mit realen Sprachen}
+  \begin{frame}<handout:2,3>{Parsingprobleme mit realen Sprachen}
     \bi
     \ii Sprachen mit optionalem \texttt{else}, können das \emph{dangling-else problem} haben.\\\medskip {
       \btSetNamedTab[1cm]{\first}%
@@ -1203,9 +1259,9 @@ Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
       \ii Grammatik ist \alert<1>{nicht} eindeutig! Wohin gehört bei \texttt{if-if-else} das \texttt{else}?\\
        Die Sprache muss definieren welche Variante gewählt wird.\\\medskip
          \begin{center}
-           \only<1>{\texttt{\tikznode[draw=white]{if A then \tikznode[draw=white]{if B then doAB();} else doX();} }}
-           \only<2>{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB(); else doX();}} }}
-           \only<3->{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB();} else doX();} }}
+           \only<1|handout:1>{\texttt{\tikznode[draw=white]{if A then \tikznode[draw=white]{if B then doAB();} else doX();} }}
+           \only<2|handout:2>{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB(); else doX();}} }}
+           \only<3-|handout:3->{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB();} else doX();} }}
 
 
        \end{center}
@@ -1279,7 +1335,7 @@ Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
 {{{wikipedia_en(The_lexer_hack)}}}
 
 Ganz so einfach ist das dann meist garnicht.....
-* Exkurs: Parsing und Sicherheit
+* TODO Exkurs: Parsing und Sicherheit
 :PROPERTIES:
 :CUSTOM_ID: 02-turing-trap
 :END:

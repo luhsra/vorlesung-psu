@@ -9,17 +9,18 @@
 
 (defun org-macro-headlines (file)
   (with-file-from-disk file
-    (let ((data  (org-element-parse-buffer 'headline))
+    (let ((parsetree  (org-element-parse-buffer 'headline))
 	  (res "") (sep ""))
-       (dolist (headline (cddr data))
-         (let ((id (org-element-property :CUSTOM_ID headline))
-               (tags (org-element-property :tags headline))
-               (title (org-element-property :title headline)))
-           (unless (or (not id) (member 'noexport tags))
-             (setq res (format "%s%s[[%s#%s][%s]]"
-                               res sep (s-replace ".org" ".html" file)
-			       id title))
-             (setq sep " - "))))
+      (org-element-map parsetree 'headline
+	(lambda (headline)
+          (let ((id (org-element-property :CUSTOM_ID headline))
+		(tags (org-element-property :tags headline))
+		(title (org-element-property :title headline)))
+            (unless (or (not id) (member 'noexport tags))
+              (setq res (format "%s%s[[%s#%s][%s]]"
+				res sep (s-replace ".org" ".html" file)
+				id title))
+              (setq sep " - ")))))
        res)))
 
 ;;; SRA-ADDON: Add INCLUDE to the search regexp

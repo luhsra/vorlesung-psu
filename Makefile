@@ -115,8 +115,8 @@ build/html/%/.split-stamp: build/%.pdf bin/split-pdf
 	bin/split-pdf $< $(patsubst %.pdf,%.topics,$<)
 	@touch $@
 
-build/html/%.html: %.org build/html/%.slides/.split-stamp bin/insert-carousels
-	bin/insert-carousels $< $(patsubst %.org,build/%.slides.topics,$<) \
+build/html/%.html: %.org build/html/%.handout/.split-stamp bin/insert-carousels
+	bin/insert-carousels $< $(patsubst %.org,build/%.handout.topics,$<) \
 		> $(patsubst %.org,build/%.org,$<)
 	${EC} -e "(org-export-to-html-file \"$$PWD/build/$<\" \"$$PWD/$@\")"
 

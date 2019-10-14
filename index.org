@@ -12,7 +12,6 @@ Abschnitte: {{{headlines(./01-einleitung.org)}}}
 
 Abschnitte: {{{headlines(./02-syntax.org)}}}
 
-
 * COMMENT[[file:02-syntax.org][ Sprachen: Typen]]
  - Primitiv, Strukturierte und Unstrukturierte Komposition, Funktionstypen, Typableitungen, Typschablonen, Kompatibilität
 * COMMENT [[file:04-namen.org][Sprachen: Namen]]

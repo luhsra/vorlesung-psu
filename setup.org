@@ -1,0 +1,3 @@
+#+STARTUP: content
+#+STARTUP: hideblocks
+#+COLUMNS: %50ITEM %CUSTOM_ID
