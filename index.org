@@ -12,8 +12,10 @@ Abschnitte: {{{headlines(./01-einleitung.org)}}}
 
 Abschnitte: {{{headlines(./02-syntax.org)}}}
 
-* COMMENT[[file:02-syntax.org][ Sprachen: Typen]]
- - Primitiv, Strukturierte und Unstrukturierte Komposition, Funktionstypen, Typableitungen, Typschablonen, Kompatibilität
+* [[file:03-typen.org][Sprachen: Typen]]
+
+Abschnitte: {{{headlines(./03-typen.org)}}}
+
 * COMMENT [[file:04-namen.org][Sprachen: Namen]]
    - Scoping, Statische und Dynamische Bindung, Type-directed Name Resolution, Overloading, Static and Dynamic Dispatch
    - Brujin Indices + Lexical Depth
