@@ -1375,7 +1375,44 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
 
 {{{wikipedia_en(The_lexer_hack)}}}
 
-Ganz so einfach ist das dann meist garnicht.....
+Nachdem wir sehr detailiert über Parser geredet haben, wollen wir nun wieder herauszoomen und uns auf unser eigentliches Ziel konzentrieren:
+Die Extraktion der Programmstruktur für eine real existierende Programmiersprache.
+Mit welchem Parsingalgorithmus das passiert ist uns im Grunde egal, haupsache es ist schnell, korrekt und eindeutig.
+Dabei gibt es allerdings einige Probleme, die entweder bereits in der Sprache angelegt sind oder die wir machen können wenn wir die formale Gramamtik aufschreiben.
+
+Einen klassichen Fehlern den man beim Erstellen einer Grammatik haben machen kann ist das dangling-else Problem.
+Dabei wird es bei einem doppelt geschachtelten ~if-else~ nicht klar ob der else-Zweig zum inneren oder zum äußeren ~if~ gehört.
+Dieses Problem kann nur auftreten, wenn die Sprache es erlaubt die Klammerung von Codeblöcken weg zu lassen falls man nur ein einzelnes Statement hat.
+Bei der angegeben Grammatik entsteht so das Problem, dass sie nicht eindeutig ist (also auch nicht LL(1)).
+Konstruiert man dennoch einen Parser, so würde ein linksreduzierender Parser die eine und ein rechtsreduzierender Parser die andere Variante finden. Daher muss eine Sprache, die die Auslassung der Codeblockklammerung erlaubt, genau definieren wie dieser Falls behandelt wird.
+Historisch gesehen wurde ein dangling-else Problem zum ersten Mal bei [[https://dl.acm.org/citation.cfm?doid=365813.365821][ALGOL-60]] erkannt.
+
+Ein anderes grundsätzliches Problem der Syntaxanalyse ist, dass wir manchmal nicht alle Notationsregeln der Sprache mit nur einem Zeichen Look-Ahead prüfen können.
+Beim Beispiel auf den Folien kommt das Problem zutage, dass bei Java manche Modifikatoren innerhalb einer Klassendefinition sowohl für Member als auch für Methoden (~public~) erlaubt sind, während dies bei anderen nicht der Fall ist (~abstract~ macht keinen Sinn für eine Membervariable).
+Da allerdings erst nach dem Identifier klar wird, ob ein Member oder eine Methode vorliegt, kann ein LL(1) Parser nicht entscheiden ob der Modifikator an dieser Stelle erlaubt ist oder nicht.
+Die Lösung hierfür ist das teilweise Aufschieben der Entscheidung über die syntaktische Korrektheit in die semantische Analyse.
+Der Parser erlaubt also beide gezeigten Programme, erzeugt einen AST, und eine spätere Prüfung schlägt der Memberdefinition alarm.
+
+Das dritte und schwerwiegenste Problem von Parsing ist, dass wir bisher die Unwahrheit über die kontextfreie Syntax von Programmiersprachen gesagt haben.
+Viele Sprachen sind nämlich nicht wirklich kontextfrei.
+Dies bedeutet, dass ein Unterbaum des Ableitungsbaums nicht nur von den überdeckten Token abhängt, sondern auch von der semantischen Interpretation anderer Programmteile.
+Oder anders gesagt:
+Das Parsen der meisten Sprachen ist nicht lokal machbar.
+
+Das klassiche Beispiel hierfür ist ~typedef~ aus der Programmiersprache C.
+Hiermit zeigt der Programmierer an, dass, ab der Stelle des ~typedefs~ ein Identifier nicht mehr als Variabelenname, sondern als Alias für einen anderen Typen interpretiert haben will.
+So ist führt der Ausdruck ~typedef char foo~ dazu, dass ~foo~ der Name eines Datentyps ist, der genau ein Byte groß ist und an jeder Stelle verwendet werden kann, an der auch ~char~ verwendet werden darf.
+
+Da aber einige Grammatikregel eine Unterscheidung treffen anhand des Wissens ob wir gerade auf den Namen einer Variable oder den Namen eines Typs schauen, reicht müssen wir an diesen Stellen wissen welche Typnamen es gibt.
+Man kann dieses Problem entweder mit einer Menge Formalismus{{{wikipedia_en(Attribute_grammar}}} erschlagen, oder man gibt die Kontextfreiheit zu einem gewissen Teil auf.
+
+Beim [[https://en.wikipedia.org/wiki/The_lexer_hack][Lexer Hack]], lässt man Parser und Scanner miteinander reden. Der Scanner führt eine Liste mit gerade aktiven Typnamen mit und gibt unterschiedliche Token für Typnamen und für Identifer an den Parser. Der Parser seinerseits teilt dem Scanner beim erkennen eines ~typedef~ mit, dass es einen neuen Typnamen gibt. Dies kann in der Reduktionsregel der Grammatik erfolgen:
+
+#+begin_example
+typedef_decl -> typedef type Ident  { scanner.typenames.add($3); return ('typedef', $3, $2); }
+#+end_example
+
+
 * TODO Exkurs: Parsing und Sicherheit
 :PROPERTIES:
 :CUSTOM_ID: 02-turing-trap
