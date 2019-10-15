@@ -44,6 +44,12 @@ $( document ).ready(function() {
             $('<a href="'+url+'">[Druckversion]</a>').appendTo('#table-of-contents');
         }
 
+        $("h2, h3").each(function(idx, headline) {
+            if (headline.id) {
+                $(headline).wrapAll('<a href="#'+headline.id+'"></a>');
+            }
+        });
+
         $('#footnotes').appendTo('.col-md-9');
 
         $("div.carousel").each(function (idx, carousel) {

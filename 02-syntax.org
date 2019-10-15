@@ -1177,7 +1177,7 @@ Erst wenn diese Menge nur noch eine Regel enthält, wird sie angewendet.
 Wenn sie weiteres Interesse an LR(k) Parsern haben sei ihnen, neben der Lektüre des Drachenbuches, [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert ans Herz gelegt.
 
 
-** TODO Abstrakter Syntaxbaum
+** Abstrakter Syntaxbaum
 :PROPERTIES:
 :CUSTOM_ID: 02-ast
 :END:
@@ -1238,7 +1238,48 @@ Wenn sie weiteres Interesse an LR(k) Parsern haben sei ihnen, neben der Lektüre
   \end{frame}
 #+end_src
 
-Wie kommt man vom Parse Baum zum Abstrakten Syntaxbaum
+Bisher haben wir nur davon gesprochen, dass unsere Parser Ableitungsbäume erzeugen bzw.
+aus dem gegebenen Programmtext rekonstruieren.
+Diese Ableitungsbäume haben alle Token, die der Scanner erkennt, als Blätter.
+Über diesen Blättern wird, für jede angewendete Grammatikregel, ein innerer Knoten erzeugt:
+Alle Elemente der rechten Regelseite werden als Kindsknoten unter einen, mit dem Nicht-Terminal markiertem, inneren Knoten gehängt.
+Der Wurzelknoten des Ableitungsbaum ist immer das nicht-terminale Startsymbol der Grammatik.
+
+Während des parsens unterscheidet man noch, ob man den Baum von den Blättern zur Wurzel (bottom-up) oder von der Wurzel zu den Blättern hin wachsen lässt.
+LL(1) Parser sind Top-Down Parser. LR(1) Parser sind Bottom-Up Parser.
+
+Allerdings sind diese Ableitungsbäume eher unpraktisch zu handhaben:
+Zum einen enthalten sie wirklich **alle** Token des Tokenstroms.
+Also auch jene Zeichen, die wir nur benutzt haben um dem Parser zu vermitteln was wir eigentlich wollen.
+Das Paradebeispiel hierfür ist explizite Klammerung.
+In einer perfekten Welt wüsste der Parser wie wir einen arithmetischen Ausdruck interpretiert haben wollen; in der Realität müssen wir Klammern verwenden, wenn wir mit der impliziten Klammerung von Punkt-vor-Strich nicht zufrieden sind.
+
+Aber es gibt in Ableitungsbäumen auch zu viele innere Knoten:
+Durch Regelumformungen und durch Einführung von zusätzlichen Nicht-Terminalen zur korrekten Erkennung der Operatorpräzedenz, kommen viele viele innere Knoten hinzu, die keinen Wert mehr im weiteren Verlauf des Übersetzungsvorgangs haben.
+
+Daher gibt es das Konzept des *Abstrakten Syntaxbaums* (AST).
+Der AST ist ein vom Ableitungsbaum abgeleiteter Baum, der die essentielle Struktur des Programms erfasst und, wie es der Scanner auch schon gemacht hat, nur noch die wesentliche Information an die späteren Übersetzerstufen liefert.
+Was genau wesentlich bedeutet hängt stark von der Sprache ab.
+
+Um den AST zu generieren haben wir prinzipiell zwei Möglichkeiten:
+Entweder falten wird den vollständig aufgebauten Ableitungsbaum mittels Baumtransformationen zusammen und kompaktifizieren dabei, oder wir lassen den Parser den AST direkt erzeugen.
+Für letzteres müssen wir dem Parsergenerator mitteilen, wie diese AST Konstruktion von statten gehen soll.
+Wir brauchen also zusätzliche Informationen in der Grammatik, die nicht erkannte formale Sprache verändert, aber dem Generator zusätzliche Informationen liefert. Den Weg den die meisten Generatoren hier gehen ist eine **Reduktionsaktion** anzugeben:
+
+#+begin_example
+varDef -> var Ident = expr  { return ("varDef", $2, $3) }
+#+end_example
+
+Die Aktion (in geschweiften Klammern), wird als Rückgabewert der Parsefunktionen eingesetzt, nachdem die Pattern ($1,$2,...) durch die Elemente der rechten Seite ersetzt wurden. Im Folienbeispiel würde die Funktion für ~varDef~ dann so ausehen:
+
+#+begin_src python
+  def varDef(token_stream):
+      if token_stream.peek() == TOK_VAR:
+          # ...
+          return ("varDef", t_id, expr_tree)
+#+end_src
+
+Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
 
 
 ** TODO Probleme mit realen Sprachen

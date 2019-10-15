@@ -43,6 +43,10 @@ a.carousel-control-prev, a.carousel-control-next {
     cursor: pointer;
 }
 
+.headlineref {
+    text-style: normal;
+}
+
 button.execute {
     display: inline;
     position: relative;
