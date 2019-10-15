@@ -1282,7 +1282,7 @@ Die Aktion (in geschweiften Klammern), wird als Rückgabewert der Parsefunktione
 Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
 
 
-** TODO Probleme mit realen Sprachen
+** Probleme mit realen Sprachen
 :PROPERTIES:
 :CUSTOM_ID: 02-real-language-problems
 :END:
@@ -1393,7 +1393,7 @@ Da allerdings erst nach dem Identifier klar wird, ob ein Member oder eine Method
 Die Lösung hierfür ist das teilweise Aufschieben der Entscheidung über die syntaktische Korrektheit in die semantische Analyse.
 Der Parser erlaubt also beide gezeigten Programme, erzeugt einen AST, und eine spätere Prüfung schlägt der Memberdefinition alarm.
 
-Das dritte und schwerwiegenste Problem von Parsing ist, dass wir bisher die Unwahrheit über die kontextfreie Syntax von Programmiersprachen gesagt haben.
+Das dritte und schwerwiegenste Problem von Parsing ist, dass wir bisher die Unwahrheit über die kontextfreie Syntax von Programmiersprachen gesagt haben[fn::Stackoverflow: [[https://stackoverflow.com/questions/41415006/which-contemporary-computer-languages-are-ll1][Which contemporary computer languages are LL(1)?]]].
 Viele Sprachen sind nämlich nicht wirklich kontextfrei.
 Dies bedeutet, dass ein Unterbaum des Ableitungsbaums nicht nur von den überdeckten Token abhängt, sondern auch von der semantischen Interpretation anderer Programmteile.
 Oder anders gesagt:
@@ -1413,7 +1413,7 @@ typedef_decl -> typedef type Ident  { scanner.typenames.add($3); return ('typede
 #+end_example
 
 
-* TODO Exkurs: Parsing und Sicherheit
+* Exkurs: Parsing und Sicherheit
 :PROPERTIES:
 :CUSTOM_ID: 02-turing-trap
 :END:
@@ -1480,13 +1480,30 @@ typedef_decl -> typedef type Ident  { scanner.typenames.add($3); return ('typede
 
 #+end_src
 
+Ein weiteres Problem, dass ganz eng mit Parsen verbunden ist, ist die Validierung von Usereingaben und die damit verbundenen Sicherheitsimplikatonen.
+Jede Form von Informationsextraktion aus einer Zeichenkette ist Parsing.
+Daher sind Parser die ersten, die mit möglicherweise schadhaften und gefährlichen Eingaben konforntiert sind.
+Hat der Parser eine Sicherheitslücke, so ist diese besonders einfach aus zu nützen, da der Angreifer an keiner anderen Instanz vorbei muss.
 
+Daher ist es nicht nur vom Programmieraufwand her korrekt gedacht einen Parsergenerator zu verwenden, sondern häufig auch vom Sicherheitsstandpunkt:
+Dabei hilft die genaue Spezifikation der erwartete Eingaben als formale Grammatik, nicht einen Parser für das Austauschformat zu generieren, sondern auch Format genau zu beschreiben.
+Mittels Grammatikanalysen kann man dann sogar nachweisen, dass die Grammatik determinsitisch parsebar ist.
 
-C++ Templates are Turin Complete: http://port70.net/~nsz/c/c%2B%2B/turing.pdf
+Das andere sicherheitsrelevante Thema beim Validieren von Zeichenketten ist, dass man sehr schnell an den Punkt kommt dass die Validierung der Eingabe an sich schon eine virtuelle Maschine darstellt und vielleicht Turing-vollständig ist.
+Es geht also um Situationen, bei dem die Struktur eines Programms selbst ein Programm ist, dass vom Übersetzer während der Übersetzungszeit ausgeführt wird, während er versucht nachzuweisen, dass das Programm valide ist.
+Der Übersetzer wird also selbst zum Sprachprozessor für dieses Meta-Programm.
 
-https://stackoverflow.com/a/41418423/4099367
-https://stackoverflow.com/questions/41415006/which-contemporary-computer-languages-are-ll1
+Das bekannteste Beispiel hierfür sind C++ Templates:
+Mit C++ Templates kann der Programmierer Datentypen definieren, die parametrisch von anderen Datentypen abhängen.
+Ein Beispiel für einen solchen Datentyp ist die doppelt verkettete Liste von Integern (~std::deque<int>~).
+Jetzt muss der Übersetzer allerdings diese parametrischen Datentypen vollständig expandieren um zu prüfen ob alle Typen korrekt verwendet wurden.
+Da aber auch Templatetypen Argumente für Templatetypen sein können, hat man alle Elemente zusammen um ein Programm zu schreiben: Rekursion und Abbruchbedingungen.
+Es wurde sogar nachgewiesen, dass C++ Templates wirklich [[http://port70.net/~nsz/c/c%2B%2B/turing.pdf][Turing-vollständig]] sind indem eine Turing Maschine mittels C++ Templates erstellt wurde.
 
+Jetzt hat es sich im Falle von C++ Templates herausgestellt, dass eine solche Flexibilität in der Sprache viele Möglichkeiten bietet elegante Programme zu schreiben.
+Allerdings möchten Sie nicht aus Versehen in die Falle tappen, dass jemand auf ihrem Parser für Netzwerkpackete Bitcoins minen kann.
+Mit [[http://langsec.org/occupy/][LANGSEC]], gibt es sogar eine Forschungsrichtung, die sich auf genau diese sprachlich formale Sicht der Sicherheit konzentriert.
+Ihre Forderung ist [[https://www.youtube.com/watch?v=2qXmPTQ7HFM][Context-Free or Regular!]]
 
 * Zusammenfassung
 #+begin_src latex

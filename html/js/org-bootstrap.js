@@ -96,5 +96,11 @@ $( document ).ready(function() {
             selector_eval_ruby: '.src-ruby',
             eval_idle_msec: 100
         };
+
+        requestAnimationFrame(function() {
+            if (location.hash) {
+                $(document).scrollTop( $(location.hash).offset().top );
+            }
+        });
     }
 });
