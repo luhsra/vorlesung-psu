@@ -1406,11 +1406,12 @@ So ist führt der Ausdruck ~typedef char foo~ dazu, dass ~foo~ der Name eines Da
 Da aber einige Grammatikregel eine Unterscheidung treffen anhand des Wissens ob wir gerade auf den Namen einer Variable oder den Namen eines Typs schauen, reicht müssen wir an diesen Stellen wissen welche Typnamen es gibt.
 Man kann dieses Problem entweder mit einer Menge Formalismus{{{wikipedia_en(Attribute_grammar}}} erschlagen, oder man gibt die Kontextfreiheit zu einem gewissen Teil auf.
 
-Beim [[https://en.wikipedia.org/wiki/The_lexer_hack][Lexer Hack]], lässt man Parser und Scanner miteinander reden. Der Scanner führt eine Liste mit gerade aktiven Typnamen mit und gibt unterschiedliche Token für Typnamen und für Identifer an den Parser. Der Parser seinerseits teilt dem Scanner beim erkennen eines ~typedef~ mit, dass es einen neuen Typnamen gibt. Dies kann in der Reduktionsregel der Grammatik erfolgen:
+Beim [[https://en.wikipedia.org/wiki/The_lexer_hack][Lexer Hack]], lässt man Parser und Scanner miteinander reden. Der Scanner führt eine Liste mit gerade aktiven Typnamen mit und gibt unterschiedliche Token für Typnamen und für Identifer an den Parser. Der Parser seinerseits teilt dem Scanner beim erkennen eines ~typedef~ mit, dass es einen neuen Typnamen gibt[fn::https://blogs.gnome.org/otte/2019/10/17/riddle-me-this/]. Dies kann in der Reduktionsregel der Grammatik erfolgen:
 
 #+begin_example
 typedef_decl -> typedef type Ident  { scanner.typenames.add($3); return ('typedef', $3, $2); }
 #+end_example
+
 
 
 * Exkurs: Parsing und Sicherheit

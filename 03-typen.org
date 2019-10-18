@@ -16,7 +16,12 @@
 
 * Gedanken zu dieser Vorlesung                                     :noexport:
 
-* Was sind Typen?
+Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
+ - Typen sind immer da. Schreibt man sie auf, werden sie Freunde. [effektiv]
+ - Typen sind _die_ Informationsquelle für den Übersetzer.        [effizient]
+
+
+* Was ist ein "Typ"?
 :PROPERTIES:
 :CUSTOM_ID: 03-einleitung
 :END:
@@ -27,4 +32,44 @@
   \maketitle
 \end{frame}
 #+end_src
+- Was bieten Typen?
+  - Context
+  - Sicherheitsnetz
+  - Lesbarkeit
+  => Typen sind Freunde
+
+- Was ist ein Typ?
+  - Structural: Die Beschreibung eines Typs, wie sie von Typkonstruktoren erzeugt wird
+  - Abstractional: Die Operationen die ein Typ bereitstellt
+  - Denotional: Eine Menge von Objekten (Domain)
+
+- Wie treten Typen auf?
+  - Stark und Schwach Typisierte Sprachen
+  - Statischer vs. Dynamischer Typ
+  - Explizit vs. Implizit
+
+- Wie vergleichen wir Typen?
+  - Gleichheit und Kompatibilität
+  - Namensgleicheit und Strukturgleichheit
+  - Typalias und abgeleiteter Typ
+
+* Klassen von Typen
+- Skalare Typen
+  - bool
+  - enums
+  - integer/floats & subrange types
+
+- Zusammengesetzte Typen
+  - Pointer
+  - Records
+  - Unions
+  - Arrays
+  - Sets & Listen
+
+* Polymorphe Typen
+- Subtype Polymorphismus
+- Parametrische Typen
+- Co/Contravarianz
+- Type Traits
+
 * Zusammenfassung
