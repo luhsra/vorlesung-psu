@@ -183,6 +183,15 @@
     \ignorespacesafterend%
   }
 
+  \usepackage{xparse}
+  \usepackage{realboxes}
+  \DeclareDocumentCommand{\codebox}{O{luhlightgray!50}}{\Colorbox{#1}}
+  \DeclareDocumentCommand{\codeinline}{D<>{1-}O{}v}{%
+    \only<#1>{%
+      \codebox{\csname lstinline\endcsname[#2]!#3!}%
+    }%
+  }
+
   \lstdefinelanguage[riscv]{Assembler}{
     morestring=[b]",
     morekeywords=[1]{bne, beq, blt, bltu, bge, bgeu, jal, jalr, auipc, lb, lh, lw, ld, lbu, lhu, lwu, sb, sh, sw, sd, amoadd_w, amoxor_w, amoswap_w, amoand_w, amoor_w, amomin_w, amominu_w, amomax_w, amomaxu_w, amoadd_d, amoswap_d, amoxor_d, amoand_d, amoor_d, amomin_d, amominu_d, amomax_d, amomaxu_d, lr_w, lr_d, sc_w, sc_d, lui, addi, slti , sltiu, andi, ori, xori, slli, srli, srai, add, sub, slt, sltu, and, or, xor, sll, srl, sra, addiw, slliw, srliw, sraiw, addw, subw, sllw, srlw, sraw, mul, mulh, mulhu, mulhsu, mulw, div, divu, rem, remu, divw, divuw, remw, remuw, fence, fence_i, sfence_vm, scall, sbreak, sret, mrts, wfi, csrrw, csrrs, csrrc, csrrwi, csrrsi, csrrci
@@ -407,15 +416,35 @@
   \end{frame}
 }
 \newcommand{\signature}[4][sig]{%
-  \begin{center}\ttfamily
-    \tikz[remember picture,baseline]\node[anchor=base](#1-name){#2};%
-    ::%
-    \tikz[remember picture,baseline]\node[anchor=base](#1-input){#3};
-    $\longrightarrow$%
-    \tikz[remember picture,baseline]\node[anchor=base](#1-output){#4};
-  \end{center}
+  \mbox{
+  \tikz[remember picture,baseline]\node[anchor=base](#1-name){#2};%
+  \texttt{::}%
+  \tikz[remember picture,baseline]\node[anchor=base](#1-input){#3};
+  $\mapsto$%
+  \tikz[remember picture,baseline]\node[anchor=base](#1-output){#4};
+  }
 }
 
 \newcommand{\tikznode}[2][]{%
   \tikz[baseline]\node[anchor=base,#1]{#2};%
+}
+
+\newsavebox{\@overlaybox}
+\newenvironment<>{overlaybox}[1][]{%
+  % We set the overlay tikz node in the next shipout routine.
+  % Thereby, we do not produce a \leavemode after the lrbox
+  \only#2{%
+    \AtBeginShipoutNext{%
+      \AtBeginShipoutUpperLeftForeground{%
+        \begin{tikzpicture}[remember picture, overlay]%
+          \node[fill=white,draw] at (current page.center) [#1] {\usebox{\@overlaybox}};
+        \end{tikzpicture}%
+      }%
+    }%
+  }%
+  % Produce the @conclusionoverlay
+  \setbox\@overlaybox=\vbox\bgroup%
+}{%
+  \egroup%
+  \global\setbox\@overlaybox=\copy\@overlaybox\relax%
 }

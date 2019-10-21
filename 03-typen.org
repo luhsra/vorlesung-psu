@@ -27,10 +27,258 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 :END:
 
 #+begin_src latex
-\subtitle{{{{subtitle()}}}}
-\begin{frame}
-  \maketitle
-\end{frame}
+  \subtitle{{{{subtitle()}}}}
+  \begin{frame}
+    \maketitle
+  \end{frame}
+
+  \begin{frame}{Wieso sollte ich mich mit Typen beschäftigen?}
+    \begin{center}
+      \includegraphics[page=10,width=0.6\linewidth]{fig/01-overview-small}
+    \end{center}
+    \bi
+    \ii Typen sind das Rückgrat moderner Programmiersprachen. {
+      \bi
+      \ii Je mehr das Typsystem abfängt, desto weniger muss man denken.
+      \ii Das Typsystem ist eine wichtige Quelle für automatische Optimierungen.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Was bieten einem Typen?}
+    \bi
+    \ii Typen bieten \textbf{Kontext} und transportieren Informationen quer zum AST.{
+      \bi
+      \ii Ohne Typen:  Wir müssten die Operation immer ganz genau angeben.\\
+          {
+            \hfill\codeinline{var a,b; ... float32_add(a, b)}
+            \hfill\codeinline[style=C,morekeywords={int32_t}]{int32_t a, b; .... a+b}
+            \hfill\mbox{}
+          }
+          \ii Mit Typen: Der Übersetzer wählt die passende Operation entsprechend.
+      \ei
+    }\bigskip
+    \ii Typen \textbf{schützen vor Bugs} und verhindern invalide Aktionen. {
+      \bi
+      \ii \codeinline{Cat k1; ... k1 = Dog();} $\Rightarrow$ \enquote{Type mismatch: Cannot assign 'Dog' to 'Cat'}\\[0.5ex]
+      \ii Mit Typen macht ein Programmierer Zusicherungen über eine Objekt.
+      \ei
+    }
+    \bigskip
+    \ii Typen \textbf{verbessern die Lesbarkeit} von Code und sind Dokumentation. {
+      \bi
+      \ii Mit statisch Typen kommunizieren wir Intention und angedachte Verwendung.
+      \ii Eine gute API ist bereits anhand der Typnamen verständlich:{\\[1ex]
+        \begin{center}
+          \codeinline<1>[style=C]{____ regex_match(________, ___________, _____________)}%
+          \codeinline<2->[style=C,morekeywords={bool,regex_t,regex_flags_t}]{bool regex_match(regex_t*, const char*, regex_flags_t)}
+        \end{center}
+      }
+      \ei
+    }
+    \ei
+    \onslide<3->{
+      \medskip
+      \Large \alert{$\Rightarrow$ Typen sind Freunde und Helfer in der Not!}
+    }
+  \end{frame}
+
+  \begin{frame}[fragile]{Was bedeutet ein Typ? Wie interpretieren wir Typen?}
+    \bi
+    \ii \structure{Strukturell}: Es gibt eingebaute und daraus kombinierte Typen.{
+      \bi
+      \ii Eingebaute Typen: \lstinline[style=C,morekeywords={int32_t}]{bool, int, int32_t, float, double, char, ...}
+      \ii Kompositionen: Referenzen (\codeinline|char *|= Pointer auf \texttt{char}), Arrays (\codeinline|int[10]|).
+      \ii \enquote{Wie baue ich meine Datenstrukturen aus einfacheren Datentypen?}
+      \ei
+    }\medskip
+    \ii \structure{Denotationell}: Typen sind Mengen von Objekten. {
+      \bi
+      \ii Der Typ \codeinline{uint16_t} \emph{ist} die Menge aller positiver Ganzahlen $0\le x < 65536$.
+      \ii Typen sind Prädikate über die Mengen-Mitgliedschaft \signature{T}{object}{bool}
+      \ii \enquote{Welche Regeln und Invarianten gelten für die Objekte hinter diesem Typ?}
+      \ei
+    }\medskip
+    \ii \structure{Abstraktional}: Ein Typ ist ein Interface von konsistenten Operationen.{
+      \bi
+      \ii \codeinline{int32_t} ist das Interface $\{\texttt{+}_{int32_t}, \texttt{-}_{int32_t}, \texttt{*}_{int32_t}, \ldots\}$
+      \ii Der Typ \codeinline{stack_t} besteht aus drei Operationen: \{\texttt{push()}, \texttt{pop()}, \texttt{empty()}\}
+      \ii \enquote{Mit welchen Operationen kann ich Objekte dieses Typs manipulieren?}
+      \ei
+    }
+    \ei
+    \onslide<2->{
+      \bigskip\alert{Alle drei Sichtweisen sind nützlich und keine ist richtiger als die andere.}
+    }
+
+  \end{frame}
+
+
+  \begin{frame}[t,fragile]{Typausdrücke: Strukturelle Notation für Typen}
+    \bi
+    \ii Wir könnnen Typen strukturell als \structure{Typausdrücke} aufschreiben.{
+      \bi
+      \ii Komplexere Typen durch die wiederholte Anwendung von \structure{Typkonstruktoren}.\\
+      $T$ ist die Menge aller valider Typausdrücke. (Rekursiv!){
+        \begin{center}\smallskip
+          \signature{pair}{$T \times T$}{T}
+  \smallskip
+        \end{center}
+      }
+      \ii \codeinline{pair<int, set<char>>}:\enquote{Ein Paar aus Ganzzahl und einer Menge von Zeichen}
+      \ii Mit Typausdrücken wird das formeller: \texttt{pair(int, set(char))}
+      \ei
+    }\bigskip
+    \ii Typausdrücke sind \alert{Bäume} und Konstruktoren erzeugen innere Knoten.{
+      \begin{columns}
+        \begin{column}{0.84\textwidth}
+          \bi
+          \ii Typausdrücke sind strukturell sehr ähnlich zu AST Unterbäumen
+          \ii Umwandlung von AST Knoten durch rekursiven Besucher
+          \ii Nicht nur Built-In Typen als Blätter: \texttt{array(int, 2)}
+          \ei
+        \end{column}\hfill
+        \begin{column}{0.15\textwidth}
+          \begin{tikzpicture}[small tree,transform canvas={scale=0.8}]
+            \node {\emph{pair}}
+            child { node {int} }
+            child { node {set}
+              child { node {char} }
+            };
+          \end{tikzpicture}
+        \end{column}
+      \end{columns}
+    }
+   \ei
+  \end{frame}
+
+  \begin{frame}{Typsysteme: Verwendung von Typen in der Sprache}
+    \bi
+    \ii Typsicherheit
+    \ei
+
+  \end{frame}
+
+  \begin{frame}[fragile]{Typsysteme: Starke vs. Schwache Typisierung}
+    \begin{center}\SAMPLE{\Large
+      "Wie strikt forciert die Sprache ihr Typsystem?"
+    }\end{center}
+
+    \bi
+    \ii Das Typsystem einer Programmiersprache heisst stark typisiert, wenn: {
+      \be
+      \ii Es gibt unterschiedliche Typen.
+      \ii Implizite (automatische) Konvertierung nur zwischen ähnlichen Typen.
+      \ii Explizite Typekonvertierungen sind der Regelfall.
+      \ee
+    }\bigskip
+    \ii Python ist ein Beispiel für eine stärker typisierten Sprache. {
+      \bi
+      \ii Jedes Objekt hat genau einen Typ, der bei der Erstellung festgelegt wird.
+      \ii Wenige implizite Konvertierung. Zum Beispiel: \texttt{int}$\rightarrow$\texttt{float}: \codeinline{1+4.5} $\Rightarrow 5.5$
+      \ii Konvertierungen explizit sichtbar: \codeinline{int("23")} $\Rightarrow 23$, \codeinline{str([1,2])} $\Rightarrow$ \texttt{"[1, 2]"}
+      \ei
+    }\medskip
+    \ii Beispiele für schwache Typisierung{
+      \bi
+      \ii TCL: Alles ist ein String. Jede Operation interpretiert den String anders.
+      \ii PHP ($<7$): Implizite Konvertierung von \texttt{str}$\rightarrow$\texttt{int}: \codeinline{"23"+4}$\Rightarrow$ 27
+      \ii C: Arrays werden, falls nötig, zu einem Pointer auf ihr erstes Element.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[t,fragile]{Typsysteme: Statische vs. Dynamische Typisierung}
+    \begin{center}\SAMPLE{\Large
+      "Werden Typen statisch im Quellcode annotiert?"
+    }\end{center}
+
+    \bi
+    \ii Statische Typisierung: C, C++, Rust, Java, Haskell,\ldots{
+      \bi
+      \ii Bei jeder Definition/Deklaration wird ein statischer Typ festgelegt.
+      \ii Variablen können niemals ein Objekt falschen Typs beinhalten.
+      \ii Variablen und Funktionen bekommen einen Typ: \codeinline{pair<int, int> foo}{
+        \begin{center}
+          \includegraphics[page=2,width=0.7\textwidth]{fig/03-static-types}
+        \end{center}
+      }
+      \ei
+    }\medskip
+    \ii Dynamische Typisierung: Python, PHP, JavaScript, Lisp, \ldots {
+      \bi
+      \ii Variablen haben keine fest assoziierten Typen.
+      \ii Nur die Objekte, die in den Variablen \enquote{leben}, haben eine Typ.
+      \ei
+      \begin{center}
+        \includegraphics[page=1,width=0.7\textwidth]{fig/03-static-types}
+      \end{center}
+    }
+    \ei
+    \begin{overlaybox}<2>[draw=srared,ultra thick,drop shadow,inner sep=1em]
+      Die Frage nach \enquote{Statisch} oder \enquote{Dynamisch} ist eine der wichtigsten Fragen bei Programmiersprachen und beim Übersetzerbau!\\[1ex]
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \STRUCTURE{Statisch}
+          \bii
+          \ii Vor der Laufzeit.
+          \ii Im Übersetzer.
+          \ii Im Quellcode notiert.
+          \ii Entscheidung ohne Ausführung.
+          \ii Später Kostenlos.
+          \eii
+        \end{column}\hfill
+        \begin{column}{0.49\textwidth}
+          \STRUCTURE{Dynamisch}
+          \bii
+          \ii Während Laufzeit.
+          \ii In der virtuellen Maschine.
+          \ii Im Maschinenezustand.
+          \ii Enscheidung bei Auführung.
+          \ii Ausführungskosten.
+          \eii
+        \end{column}
+      \end{columns}
+
+    \end{overlaybox}
+  \end{frame}
+
+  \begin{frame}[fragile]{Typsysteme: Explizite vs. Implizite Typisierung}
+      \begin{center}\SAMPLE{\Large
+      "Muss ich alle statischen Typen hinschreiben?"
+    }\end{center}
+
+    \bi
+    \ii Statische Typisierung erhöht die Menge an \emph{explizit} getippten Zeichen.{
+      \begin{code}[tag=C++03]
+        \begin{CPP}
+          std::vector<int> vec;
+          for (std::vector<int>::iterator it : vec) {...}
+        \end{CPP}
+      \end{code}
+      \bi
+      \ii Teilweise wäre der Datentyp aus dem Kontext heraus klar.
+      \ii Beim Programmierer entsteht das Gefühl von Boilerplate:\\
+      \enquote{Der Übersetzer weiß das doch eh! Warum muss ich das hinschreibeb?}
+      \ei
+    }\medskip
+    \ii Implizite Typisierung und \textbf{Typinferenz} macht das Leben einfacher.{
+        \begin{code}[tag=C++11]
+        \begin{CPP}
+          std::vector<int> vec;
+          for (auto it : vec) {...}
+        \end{CPP}
+      \end{code}
+      \bi
+      \ii Der Übersetzer errechnet den Typen für \texttt{it} aus dem Kontext.
+      \ii Fortgeschrittene Typinferenz mittels Unifikation möglich (später.)
+      \ei
+    }
+    \ei
+
+  \end{frame}
 #+end_src
 - Was bieten Typen?
   - Context
