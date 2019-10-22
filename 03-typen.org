@@ -352,7 +352,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
         \bi
         \ii Universeller Zeiger in C garantiert nichts (\codeinline{T*})
         \ii C++ Referenzen zeigen immer auf valides Objekt (\codeinline[style=CPP]{T&})
-        \ii Für jedes Objekt maximal ein \textbf{eindeutigen Zeiger} (\codeinline[style=CPP]{std::unique_ptr<T>})
+        \ii Für jedes Objekt, maximal ein \textbf{eindeutiger Zeiger} (\codeinline[style=CPP]{std::unique_ptr<T>})
         \ei
       }
       \ei
@@ -366,7 +366,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     }
     \ei
   \end{frame}
-
 #+end_src
 
 - Skalare Typen
@@ -376,14 +375,62 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   - Funktionstypen
 
 #+begin_src latex
-\begin{frame}{Zusammengesetzte Typen: Records und Unions}
-\end{frame}
+  %%ONLY%%
+  \begin{frame}[fragile]{Zusammengesetzte Typen: Records und Unions}
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=C]
+          \begin{C}
+            typedef struct {
+              int    feld_1;
+              double feld_2;
+            } foo_t;
+          \end{C}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}<2->{0.49\textwidth}
+        \begin{code}[tag=C]
+          \begin{C}
+            union {
+              int    feld_1;
+              double feld_2;
+            };
+          \end{C}
+        \end{code}
+      \end{column}
+    \end{columns}
 
-\begin{frame}{Zusammengesetzte Typen: Listen und Sets}
-\end{frame}
+    \bi
+    \ii Record sind das Produkt von heterogenen (unterschiedlichen) Typen {
+      \bi
+      \ii Die einzelnen Komponenten eines Records heissen Felder
+      \ii Jedes Feld hat einen eigenen Typ und (normalerweise) einen Namen.
+      \ii Minimales Interface: \siginline{dot\_operator}{record(..., (name, T), ...) $\times$ name}{T}
+      \ei
+    }
+    \medskip
+    \ii Records kommen in fast allen Sprachen in diversen Geschmäckern vor: {
+      \bi
+      \ii Java Klassen sind auch Records, aber noch viel viel mehr...
+      \ii Fortran90: Der Übersetzer darf Felder umsortieren um Speicher zu sparen
+      \ii Haskell: Tupel sind so etwas wie Records ohne Feldnamen
+      \ei
+    }
+    \medskip
+    \ii<2-> Bei Unions (Variant Records) ist maximal ein Feld gültig {
+      \bi
+      \ii Alle Felder des Records nehmen den gleichen Speicher ein.
+      \ii Unions sind oft die einzige (erlaubte) Möglichkeit das Typsystem zu umgehen
+      \ei
+    }
+    \ei
+  \end{frame}
 
-\begin{frame}{Zusammengesetzte Typen: Arrays}
-\end{frame}
+  \begin{frame}{Zusammengesetzte Typen: Listen und Sets}
+  \end{frame}
+
+  \begin{frame}{Zusammengesetzte Typen: Arrays}
+  \end{frame}
 
 #+end_src
 - Zusammengesetzte Typen
