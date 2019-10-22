@@ -1,0 +1,17 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node (label-types) {Typen};
+    \node[right=2 of label-types] (label-objects) {Objekte};
+    \draw ($(label-types.north east)!0.5!(label-objects.north west)$) -- coordinate[pos=0.75](middle) ++(down:1.5cm);
+
+    \node[left=0.5 of middle,draw,fill=safeblue!20] {pointer \tikz[baseline]\node[anchor=base,draw,fill=safegreen!40]{int};};
+
+    \node[right=0.5 of middle,draw,fill=safeblue!20] (addr) {0x1234};
+    \node[right=1 of addr,  draw,fill=safegreen!40] (value) {500};
+    \draw[->] (addr) -- (value);
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

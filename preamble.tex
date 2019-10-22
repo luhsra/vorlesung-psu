@@ -455,6 +455,17 @@
   }
 }
 
+% Signaturen
+\newcommand{\siginline}[4][\scriptsize]{%
+  \Colorbox{badbee!20}{#1#2\hspace{1ex}\texttt{::}\hspace{1ex}#3\hspace{1ex}$\mapsto$\hspace{1ex}#4}%
+}
+
+% Typausdrücke
+\colorlet{typecolor}{safegreen!30}
+\newcommand{\typeinline}[2][\scriptsize]{%
+  \Colorbox{typecolor}{#1#2}%
+}
+
 \newcommand{\tikznode}[2][]{%
   \tikz[baseline]\node[anchor=base,#1]{#2};%
 }

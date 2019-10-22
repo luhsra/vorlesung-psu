@@ -94,7 +94,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \bi
     \ii \structure{Strukturell}: Es gibt eingebaute und daraus kombinierte Typen.{
       \bi
-      \ii Eingebaute Typen: \lstinline[style=C,morekeywords={int32_t}]{bool, int, int32_t, float, double, char, ...}
+      \ii Eingebaute Typen: \lstinline[style=C,morekeywords={int32_t,bool}]{bool, int, int32_t, float, double, char, ...}
       \ii Kompositionen: Referenzen (\codeinline|char *|= Pointer auf \texttt{char}), Arrays (\codeinline|int[10]|).
       \ii \enquote{Wie baue ich meine Datenstrukturen aus einfacheren Datentypen?}
       \ei
@@ -102,7 +102,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \ii \structure{Denotationell}: Typen $T$ sind Mengen von Objekten. {
       \bi
       \ii Der Typ \codeinline{uint16_t} \emph{ist} die Menge aller positiver Ganzahlen $0\le x < 65536$.
-      \ii Typen sind Prädikate über die Mengen-Mitgliedschaft \signature{T}{object}{bool}
+      \ii Typen sind Prädikate über die Mengen-Mitgliedschaft \siginline{T}{object}{bool}
       \ii \enquote{Welche Regeln und Invarianten gelten für die Objekte hinter diesem Typ?}
       \ei
     }\medskip
@@ -132,8 +132,8 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   \smallskip
         \end{center}
       }
-      \ii \codeinline{pair<int, set<char>>}:\enquote{Ein Paar aus Ganzzahl und einer Menge von Zeichen}
-      \ii Mit Typausdrücken wird das formeller: \texttt{pair(int, set(char))}
+      \ii \enquote{Ein Paar aus Ganzzahl und einer Menge von Zeichen}
+      \ii Mit Typausdrücken wird das formeller: \typeinline{pair(int, set(char))}
       \ei
     }\bigskip
     \ii Typausdrücke sind \alert{Bäume} und Konstruktoren erzeugen innere Knoten.{
@@ -142,7 +142,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
           \bi
           \ii Typausdrücke sind strukturell sehr ähnlich zu AST Unterbäumen
           \ii Umwandlung von AST Knoten durch rekursiven Besucher
-          \ii Nicht nur Built-In Typen als Blätter: \texttt{array(int, 2)}
+          \ii Nicht nur Built-In Typen als Blätter: \typeinline{array(int, 2)}
           \ei
         \end{column}\hfill
         \begin{column}{0.15\textwidth}
@@ -193,7 +193,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
           \end{code}
 
           Beide Definition liefern in Pascal:
-          \codeinline{record(("a", integer), ("b", integer))}
+          \typeinline{record(("a", integer), ("b", integer))}
         \end{column}\hfill
         \begin{column}<3->{0.49\textwidth}
           \begin{code}[tag=Pascal]
@@ -237,7 +237,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \end{code}
     \end{column}\hfill
     \begin{column}{0.49\textwidth}
-      \begin{code}
+      \begin{code}[background color=typecolor]
         \begin{py}
           record(("next", pointer(
             record(("next", ...)))
@@ -254,7 +254,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
       \bi
       \ii Berechnung der Typausdrücke stoppt an benannten Typen.\\
-          \codeinline{type list = record(("next", pointer(type("list"))))}
+          \typeinline{type list = record(("next", pointer(type("list"))))}
       \ei
 
       \hspace{1ex}\includegraphics[width=0.7\textwidth]{fig/03-name-equivalence}
@@ -266,7 +266,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \bi
     \ii Mit benannten Typen und Namensäquivalenz: Aliasproblematik {
       \bi
-      \ii (C) \codeinline{typedef old_type new_type}: Sind dies zwei Namen für den gleichen Typ?
+      \ii \codeinline{typedef old_type new_type} (C): Sind dies zwei Namen für den gleichen Typ?
       \ii Nach strikter Namensäquivalenz: Zwei echt unterschiedliche Typen.\\[.5ex]{
         \begin{code}[tag=C]
           \begin{C}
@@ -305,6 +305,69 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 * Klassen von Typen
 
+#+begin_src latex
+  \dividerframe{Klassen von Typen}
+
+  \begin{frame}[fragile]{Skalare Typen: Aufzählungen und Zahlen}
+    \bi
+    \ii Skalare Typen beschreiben nicht-weiter zerlegbare Objekte{
+      \bi
+      \ii Kein Teil eines Skalaren Objekts macht eigenständig Sinn.
+      \ii Diskreter Wertebereich, oft mit totaler Ordnung
+      \ei
+    }\bigskip
+    \ii<2-> Aufzählungen oder Enumerations (\codeinline[style=C]{enum{wert0, wert1, ...}}){
+      \bi
+      \ii Explizite Angabe des Werteberreichs: \hfill\codeinline{enum {red, green, blue}}
+      \ii Wahrheitswerte sind ein häufiger Spezialfall: \hfill\codeinline{typedef enum{false, true} bool;}
+      \ii Closed-World Assumption ist manchmal schädlich: \hfill\codeinline{enum {female, male}}
+      \ei
+    }\bigskip
+    \ii<2-> Numerische Typen: Ganzzahlen, Fliesskommazahlen, und Dezimalzahlen{
+      \bi
+      \ii Endlicher, aber meist sehr großer Wertebereich (\codeinline{uint32_t}: $0 \le n < 2^{32}$)
+      \ii Speicherung mit (\codeinline{signed}) und ohne (\codeinline{unsigned)} Vorzeichen
+      \ii Sehr oft Übereinstimmung mit den Wortbreiten der realen Maschine
+      \ii Manche Sprachen erlauben explizite Einschränkung des Wertebereichs:\\[.5ex]{
+        \begin{code}[tag=Pascal]
+          \begin{pascal}
+            type water_temperature = 273..373 (* Kelvin *)
+          \end{pascal}
+        \end{code}
+      }
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[t,fragile]{Skalare Typen: Zeiger und Funktionen}
+    \bi
+    \ii Zeiger sind gespeicherte Referenzen auf Objekte vom Basistyp {
+      \begin{center}
+        \includegraphics[width=0.5\textwidth]{fig/03-pointers}
+      \end{center}
+      \bi
+      \ii Minimales Interface (abstraktional): \siginline{dereference}{pointer(T)}{T}
+      \ii Verschiedene Zeigertypen geben unterschiedliche Referenzen{
+        \bi
+        \ii Universeller Zeiger in C garantiert nichts (\codeinline{T*})
+        \ii C++ Referenzen zeigen immer auf valides Objekt (\codeinline[style=CPP]{T&})
+        \ii Für jedes Objekt maximal ein \textbf{eindeutigen Zeiger} (\codeinline[style=CPP]{std::unique_ptr<T>})
+        \ei
+      }
+      \ei
+    }\medskip
+    \ii<2-> Funktionstypen beschreiben den Rückgabetyp und die Parametertypen\\{
+      \bi
+      \ii Strukturell: Typausdruck für \codeinline{strlen} ist \typeinline{func(size\_t, pointer(char))}
+      \ii Abstraktional: \siginline{call}{func(R,\ldots)}{R} (\enquote{Funktionen sind aufrufbar})
+      \ii Denotational: Maschinencode der Funktion ist ein Objekt dieser Typen.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+#+end_src
 
 - Skalare Typen
   - bool
@@ -312,6 +375,17 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   - integer/floats & subrange types
   - Funktionstypen
 
+#+begin_src latex
+\begin{frame}{Zusammengesetzte Typen: Records und Unions}
+\end{frame}
+
+\begin{frame}{Zusammengesetzte Typen: Listen und Sets}
+\end{frame}
+
+\begin{frame}{Zusammengesetzte Typen: Arrays}
+\end{frame}
+
+#+end_src
 - Zusammengesetzte Typen
   - Pointer
   - Records
