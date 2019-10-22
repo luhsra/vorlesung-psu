@@ -1,0 +1,23 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every node/.style={inner sep=2pt,font=\footnotesize}]
+      \pgfdeclarelayer{bg1}
+      \pgfdeclarelayer{bg2}
+      \pgfdeclarelayer{foreground}
+      \pgfsetlayers{bg2,bg1,main,foreground}
+
+      \node[draw] (list) {type list};
+      \node[right=2 of list,inner sep=0] (record) {record};
+      \node[below=0.2 of record,xshift=2ex] (next) {"next"=};
+      \node[right=0.1 of next] (pointer) {pointer};
+
+      \node[right=0 of pointer,draw,on layer=foreground, fill=badbee!30] (type) {type("list")};
+      \node[draw, fit=(pointer) (type),on layer=bg1, fill=luhblue!30] (pointer-whole) {};
+      \node[draw, fit=(record) (next) (pointer-whole),on layer=bg2,fill=safegreen!30] (record-box){};
+
+      \draw[->] (list) -- (list-|record-box.west);
+      \draw[->,dashed] (type) -- ++(down:6mm) -| (list);
+  \end{tikzpicture}
+\end{frame}
+\end{document}

@@ -1,0 +1,41 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}<1-2>
+    \tikzset{
+      value/.style={fill=badbee!20,draw}
+    }
+    \node[draw](a){variable:foo};
+
+
+    \begin{scope}[visible on=<2>]
+      \node [anchor=east,fill=luhblue!20,draw]
+      at ($(a)+(-135:10mm)$) (label){\scriptsize pair(int, int)};
+      \draw[ultra thin] (a) -- (label);
+    \end{scope}
+
+    \begin{scope}[visible on=<1>]
+      \node[value,xshift=-2em] at (label) (str) {"bar"};
+      \draw[dashed,->] (a) -- (str);
+    \end{scope}
+
+
+    \node[value,right=2.5 of a](v){(0, 0)};
+    \node[value,right=0.2 of v](v2){(34, 123)};
+    \node[value,right=0.2 of v2](v3){(3, 14)};
+    \node[right=0.2 of v3](v4){\ldots};
+
+
+    \node[left=0 of v]{\Huge\{};
+    \node[right=0 of v4]{\Huge\}};
+    \node[below=0.1 of v2,fill=luhblue!20,draw](vtype){\scriptsize pair(int,int)};
+    \draw(vtype) --(v);
+    \draw(vtype) --(v2);
+    \draw(vtype) --(v3);
+
+
+
+    \draw[->] (a) to[bend left=4] (v);
+    \end{tikzpicture}
+\end{frame}
+\end{document}

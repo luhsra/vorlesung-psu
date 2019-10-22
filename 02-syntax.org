@@ -1006,7 +1006,7 @@ Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
               child { node {:=} }
               child { node {\emph{expr}}}
               ;
-          \end{tikzpicture}
+          \end{tikzpicture}\
         \end{column}
         \begin{column}{0.49\textwidth}
           \begin{tikzpicture}[small tree,level distance=8mm]

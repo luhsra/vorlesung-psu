@@ -107,7 +107,7 @@
 %****************************************************************
 %** tikz stuff
 \usepackage{tikz}
-\usetikzlibrary{tikzmark,arrows,fit,calc,positioning}
+\usetikzlibrary{tikzmark,arrows,fit,calc,positioning,sra}
 \usepackage{pgfkeys}
 \tikzset{
   small tree/.style={
@@ -263,6 +263,28 @@
     moredelim=**[is][\color{orange}]{@@}{@@},
     moredelim=**[is][\color{srared}]{@@@}{@@@},
   }
+  \lstdefinestyle{haskell}{
+    style=basestyle,
+    language={haskell},
+    includerangemarker=false,
+    rangeprefix={\#},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
+  \lstdefinestyle{pascal}{
+    style=basestyle,
+    language={pascal},
+    includerangemarker=false,
+    rangeprefix={\#},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
   \lstdefinestyle{text}{
     style=basestyle,
     moredelim=**[is][\bfseries]{`}{`},
@@ -298,7 +320,15 @@
   \lstset{style=C, autogobble, #1}
 } {}
 
-\lstnewenvironment{stdout}[1][]{
+\lstnewenvironment{pascal}[1][]{
+  \lstset{style=pascal, autogobble, #1}
+} {}
+
+\lstnewenvironment{haskell}[1][]{
+  \lstset{style=haskell, autogobble, #1}
+} {}
+
+\lstnewenvironment{codetext}[1][]{
   \lstset{style=text, autogobble, #1}
 } {}
 

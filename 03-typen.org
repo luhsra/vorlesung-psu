@@ -84,6 +84,12 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     }
   \end{frame}
 
+  #+end_src
+- Einordnung in die Vorlesung
+- Vorteile von Typen
+
+#+begin_src latex
+\dividerframe{Grundbegriffe\\für\\Typen}
   \begin{frame}[fragile]{Was bedeutet ein Typ? Wie interpretieren wir Typen?}
     \bi
     \ii \structure{Strukturell}: Es gibt eingebaute und daraus kombinierte Typen.{
@@ -93,7 +99,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ii \enquote{Wie baue ich meine Datenstrukturen aus einfacheren Datentypen?}
       \ei
     }\medskip
-    \ii \structure{Denotationell}: Typen sind Mengen von Objekten. {
+    \ii \structure{Denotationell}: Typen $T$ sind Mengen von Objekten. {
       \bi
       \ii Der Typ \codeinline{uint16_t} \emph{ist} die Menge aller positiver Ganzahlen $0\le x < 65536$.
       \ii Typen sind Prädikate über die Mengen-Mitgliedschaft \signature{T}{object}{bool}
@@ -152,7 +158,176 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     }
    \ei
   \end{frame}
+  #+end_src
+- Struktur, Denotationell, Abstationell
+- Typausdrücke
 
+#+begin_src latex
+  \begin{frame}[fragile]{Äquivalenz von Typen}
+    \bi
+    \ii Oft gestellte Frage bei Sprachen: Wann sind zwei Typen äquivalent?{
+      \bi
+      \ii \textbf{Äquivalenz ist}: Ununterscheidbarkeit unter einem bestimmten Aspekt.
+      \ii \sample{Beispiel}: "abc" und "foo" sind äquivalent im Speicherverbrauch.
+      \ii Unterschiedliche Sprachen verwenden unterschiedliche Äquivalenzen!
+      \ei
+    }\bigskip
+    \ii<2-> \structure{Strukturelle Äquivalenz}: Gleicher Typausdruck = Gleicher Typ{
+      \bi
+      \ii Typnamen sind nur Abkürzung für den definierten Typausdruck
+      \ei
+      \vspace{-2ex}
+      \begin{columns}[t]
+        \begin{column}{0.49\textwidth}
+          \begin{code}[tag=Pascal]
+            \begin{pascal}
+              type R1 = record
+                 a, b : integer;
+              end;
+
+              type R2 = record
+                 a : integer;
+                 b : integer;
+              end;
+            \end{pascal}
+          \end{code}
+
+          Beide Definition liefern in Pascal:
+          \codeinline{record(("a", integer), ("b", integer))}
+        \end{column}\hfill
+        \begin{column}<3->{0.49\textwidth}
+          \begin{code}[tag=Pascal]
+            \begin{pascal}
+              type student = record
+                 name: string;
+                 age: integer;
+              end;
+
+              type school = record
+                 name: string;
+                 age: integer;
+              end;
+            \end{pascal}
+          \end{code}
+
+          Mit reiner struktureller Äquivalenz sind beide Typen unterscheidbar.
+          Sollten sie das sein?
+        \end{column}
+      \end{columns}
+
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[t,fragile]{Namensäquivalenz von Typen}
+    \bi
+    \ii Rekursive Typdefinitionen sind ein Problem für strukturelle Äquivalenz.{
+      \bi
+      \ii Ersetzt man jedes Auftreten eins Typnamens durch den Typausdruck, kommt man zu einer endlos tiefen Verschachtelung:
+      \ei
+      \vspace{-2ex}
+  \begin{columns}[t]
+    \begin{column}{0.49\textwidth}
+      \begin{code}[tag=C]
+        \begin{C}
+          struct list {
+            struct list *next;
+          }
+        \end{C}
+      \end{code}
+    \end{column}\hfill
+    \begin{column}{0.49\textwidth}
+      \begin{code}
+        \begin{py}
+          record(("next", pointer(
+            record(("next", ...)))
+          ))
+        \end{py}
+      \end{code}
+    \end{column}
+  \end{columns}
+    }\bigskip
+    \ii<2-> \structure{Namensäquivalenz}: Jede Typdefinition erzeugt einen neuen Typen{
+      \begin{quote}
+        Wenn der Enwickler sich den Aufwand treibt zwei Definitionen zu schreiben, wird er schon Unterschiedliches gemeint haben.
+      \end{quote}
+
+      \bi
+      \ii Berechnung der Typausdrücke stoppt an benannten Typen.\\
+          \codeinline{type list = record(("next", pointer(type("list"))))}
+      \ei
+
+      \hspace{1ex}\includegraphics[width=0.7\textwidth]{fig/03-name-equivalence}
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Typnamen und Typaliase}
+    \bi
+    \ii Mit benannten Typen und Namensäquivalenz: Aliasproblematik {
+      \bi
+      \ii (C) \codeinline{typedef old_type new_type}: Sind dies zwei Namen für den gleichen Typ?
+      \ii Nach strikter Namensäquivalenz: Zwei echt unterschiedliche Typen.\\[.5ex]{
+        \begin{code}[tag=C]
+          \begin{C}
+            typedef double celsius_t;
+            typedef double fahrenheit_t;
+            void heating_set(celsius_t);
+
+            // Namensäquivalenz:   Übersetzerfehler
+            // Strukturäquivalenz: Gegrillte Zimmerpflanzen
+            fahrenheit_t target = (fahrenheit_t) 100;
+            heating_set(target);
+          \end{C}
+        \end{code}
+      }
+      \ii C macht nur für \codeinline[style=C]{struct}s Namensäquivalenz, ansonsten Strukturäquivalenz
+      \ei
+    }\medskip
+    \ii<2> Manche Sprachen: Sowohl Typaliase als auch \textbf{abgeleiteten Typen}\\[.5ex]{
+      \begin{code}[tag=Haskell]
+        \begin{haskell}
+          type    X =       Char    -- X ist nur ein zweiter Name
+          newtype Y = MakeY Char    -- Y ist ein separater Typ
+                                    -- MakeY :: Char -> Y
+          a :: X;   a = 'a'
+          b :: Y;   b = (MakeY 'a')
+        \end{haskell}
+      \end{code}
+    }
+    \ei
+  \end{frame}
+  #+end_src
+- Wie vergleichen wir Typen?
+  - Gleichheit
+  - Namensgleicheit und Strukturgleichheit
+  - Typalias und abgeleiteter Typ
+
+* Klassen von Typen
+
+
+- Skalare Typen
+  - bool
+  - enums
+  - integer/floats & subrange types
+  - Funktionstypen
+
+- Zusammengesetzte Typen
+  - Pointer
+  - Records
+  - Unions
+  - Arrays
+  - Sets & Listen
+
+* Polymorphe Typen
+- Subtype Polymorphismus
+- Kompatibilität von Typen (Neben der Äquivalenz gibt es noch die Kompatibilität)
+- Parametrische Typen
+- Co/Contravarianz
+- Type Traits
+
+* Typsysteme in Programmiersprachen
+#+begin_src  latex
   \begin{frame}{Typsysteme: Verwendung von Typen in der Sprache}
     \bi
     \ii Typsicherheit
@@ -280,44 +455,5 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
   \end{frame}
 #+end_src
-- Was bieten Typen?
-  - Context
-  - Sicherheitsnetz
-  - Lesbarkeit
-  => Typen sind Freunde
-
-- Was ist ein Typ?
-  - Structural: Die Beschreibung eines Typs, wie sie von Typkonstruktoren erzeugt wird
-  - Abstractional: Die Operationen die ein Typ bereitstellt
-  - Denotional: Eine Menge von Objekten (Domain)
-
-- Wie treten Typen auf?
-  - Stark und Schwach Typisierte Sprachen
-  - Statischer vs. Dynamischer Typ
-  - Explizit vs. Implizit
-
-- Wie vergleichen wir Typen?
-  - Gleichheit und Kompatibilität
-  - Namensgleicheit und Strukturgleichheit
-  - Typalias und abgeleiteter Typ
-
-* Klassen von Typen
-- Skalare Typen
-  - bool
-  - enums
-  - integer/floats & subrange types
-
-- Zusammengesetzte Typen
-  - Pointer
-  - Records
-  - Unions
-  - Arrays
-  - Sets & Listen
-
-* Polymorphe Typen
-- Subtype Polymorphismus
-- Parametrische Typen
-- Co/Contravarianz
-- Type Traits
 
 * Zusammenfassung
