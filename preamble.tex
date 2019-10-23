@@ -274,6 +274,17 @@
     moredelim=**[is][\color{orange}]{@@}{@@},
     moredelim=**[is][\color{srared}]{@@@}{@@@},
   }
+  \lstdefinestyle{java}{
+    style=basestyle,
+    language={java},
+    includerangemarker=false,
+    rangeprefix={\#},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
   \lstdefinestyle{pascal}{
     style=basestyle,
     language={pascal},
@@ -326,6 +337,10 @@
 
 \lstnewenvironment{haskell}[1][]{
   \lstset{style=haskell, autogobble, #1}
+} {}
+
+\lstnewenvironment{java}[1][]{
+  \lstset{style=java, autogobble, #1}
 } {}
 
 \lstnewenvironment{codetext}[1][]{
