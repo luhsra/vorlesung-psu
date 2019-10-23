@@ -376,7 +376,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 #+begin_src latex
   %%ONLY%%
-  \begin{frame}[fragile]{Zusammengesetzte Typen: Records und Unions}
+  \begin{frame}[fragile]{Zusammengesetzte Typen: Records}
     \begin{columns}
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=C]
@@ -401,14 +401,13 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \end{columns}
 
     \bi
-    \ii Record sind das Produkt von heterogenen (unterschiedlichen) Typen {
+    \ii Records subsumieren endlich viele, jedoch heterogen getypte, Elemente{
       \bi
-      \ii Die einzelnen Komponenten eines Records heissen Felder
-      \ii Jedes Feld hat einen eigenen Typ und (normalerweise) einen Namen.
+      \ii Die einzelnen Elemente heißen Felder und haben einen Typ und einen Namen
+      \ii Namen müssen normalerweise statische Bezeichner sein
       \ii Minimales Interface: \siginline{dot\_operator}{record(..., (name, T), ...) $\times$ name}{T}
       \ei
-    }
-    \medskip
+    }\medskip
     \ii Records kommen in fast allen Sprachen in diversen Geschmäckern vor: {
       \bi
       \ii Java Klassen sind auch Records, aber noch viel viel mehr...
@@ -417,7 +416,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ei
     }
     \medskip
-    \ii<2-> Bei Unions (Variant Records) ist maximal ein Feld gültig {
+    \ii<2-> Bei varianten Records (Unions) ist maximal ein Feld gültig {
       \bi
       \ii Alle Felder des Records nehmen den gleichen Speicher ein.
       \ii Unions sind oft die einzige (erlaubte) Möglichkeit das Typsystem zu umgehen
@@ -426,10 +425,99 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \ei
   \end{frame}
 
-  \begin{frame}{Zusammengesetzte Typen: Listen und Sets}
+  \begin{frame}[fragile]{Zusammengesetzte Typen: Sequenzen}
+    \begin{columns}[b]
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=Haskell]
+          \begin{haskell}[basicstyle=\scriptsize\ttfamily]
+            a = [2, 3] -- `\typeinline{list(int)}`
+            b = 1 : a  -- = cons(1, [2, 3])
+            T = tail b -- `\typeinline{list(int)}`, [2,3]
+            H = head b -- `\typeinline{int}`, 1
+          \end{haskell}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=C]
+          \begin{C}
+            struct list {
+              int          value;
+              struct list *next;
+            };
+          \end{C}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii Sequenztypen sind homogen getypte und (un)geordnete Container  {
+      \bi
+      \ii Bekanntester Sequenztyp ist die (einfach verkettete) Liste: \typeinline{list(T)}
+      \ii Minimales Interface: Nur Zugriff auf das erste Element und die Restelemente:\\
+         \siginline{head}{list(T)}{T} \siginline{tail}{list(T)}{list(T)}
+      \ei
+    }\medskip
+    \ii Listen sind rekursive definiert und werden oft mit Records nachgebaut{
+      \bi
+      \ii Die Restliste ist selbst wieder eine Liste oder \codebox{nil} (Leere Liste)
+      \ii Mittels einem rekursivem Record kann man Listentypen emulieren
+      \ei
+    }\medskip
+    \ii Abweichungen von strikter Homogenität und Einfügeordnung möglich{
+      \bi
+      \ii Python Listen (\codeinline{[1, "x", 3.4]}) garantieren nur minimalen Typ: \typeinline{list(object)}
+      \ii Sets sind ungeordnete Mengen (Java: \codeinline[style=Java]{HashSet<Integer>})
+      \ei
+    }
+    \ei
   \end{frame}
 
-  \begin{frame}{Zusammengesetzte Typen: Arrays}
+  \begin{frame}[fragile]{Zusammengesetzte Typen: Abbildungen}
+      \begin{columns}[b]
+        \begin{column}{0.49\textwidth}
+          \begin{code}[tag=C]
+            \begin{CPP}[basicstyle=\scriptsize\ttfamily]
+              // `\typeinline{array(int,10)}`, `\typeinline{map(int,int)}`
+              int rgb[10];
+              // `\typeinline{map(int, map(int, int))}`
+              char matrix[20][20];
+          \end{CPP}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}<2->{0.49\textwidth}
+        \begin{code}[tag=C++]
+          \begin{CPP}[basicstyle=\scriptsize\ttfamily]
+            std::map<std::string, int> x;
+            x["y"] = 23;
+            x["z"] = x.at("y") + 100;
+          \end{CPP}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii Abbildungstypen: Zuordnung zwischen einem Index- und einer Wertetyp{
+      \bi
+      \ii Indexmenge und Wertemengen sind homogen getypt
+      \ii Vordefiniert-beschränkte oder dynamisch-wachsende Abbildungsgröße
+      \ii Wahlfreier Zugriff mit dynamischen Index \siginline{get}{map(K, V) $\times$ K}{V}
+      \ei
+    }\medskip
+    \ii Arrays sind die einfachste (und effizienteste) Abbildung {
+      \bi
+      \ii Indextyp ist immer \typeinline{int}, Indexmenge ist zusammenhängend und beschränkt
+      \ii Effizienter Elementzugriff und dichte Speicherung möglich
+      \ii Manche Sprachen erlauben variabel lange Zeilen in mehrdimensionalen Arrays
+      \ei
+    }\medskip
+    \ii<2-> Assoziative Arrays wachsen und erlauben beliebige Indextypen{
+      \bi
+      \ii Namen: Dictionary (Python), Hash (Ruby), Table (Lua), Map (Rust, C++)
+      \ii In Skriptsprachen wird oft die Homogenität aufgegeben: \typeinline{map(object,object)}
+      \ei
+    }
+    \ei
+
   \end{frame}
 
 #+end_src
