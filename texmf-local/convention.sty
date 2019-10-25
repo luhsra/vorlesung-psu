@@ -1,6 +1,8 @@
 \colorlet{principlecolor}{luhblue!30}
 \colorlet{paradigmcolor}{luhblue!60}
 \colorlet{compilercolor}{safegreen!40}
+\colorlet{codecolor}{luhlightgray!50}
+
 
 \newcommand{\grammarrule}[2]{%
   \begingroup%
@@ -16,3 +18,12 @@
 \newcommand{\FIRST}{\textsc{FIRST}\xspace}
 \newcommand{\EPS}{\textsc{EPS}\xspace}
 \newcommand{\FOLLOW}{\textsc{FOLLOW}\xspace}
+
+\tikzset{
+  lecture circle/.style={
+    circle,
+    draw,fill=black,
+    inner sep=2pt,align=center,
+    font=\color{white}\bfseries,
+  },
+}

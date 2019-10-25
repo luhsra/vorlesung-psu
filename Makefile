@@ -6,6 +6,8 @@ ORG=$(filter-out export-prologue.org, $(filter-out setup.org, $(shell echo *.org
 PDF=$(foreach i,${ORG_PDF},$(patsubst %.org,build/%.slides.pdf,${i}))
 HTML=$(foreach i,${ORG},$(patsubst %.org,build/html/%.html,${i}))
 
+LATEXMK=latexmk -pdf
+
 export TEXINPUTS := ./texmf-local//:./texmf//:${TEXINPUTS}
 
 all: slides html
@@ -31,7 +33,7 @@ texmf/ls-R:
 # Building the figures is only a precondition for this makefile. This is the easy part.
 fig/%.pdf: fig/%.tex texmf-local/lecturefig.cls
 	@${MAKE} build
-	latexmk -pdf $< -outdir=build
+	${LATEXMK} $< -outdir=build
 	@cp $(patsubst fig/%,build/%,$@) $@
 
 define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung
@@ -102,7 +104,7 @@ build/tangle/%.html: %.org
 
 
 build/%.pdf: build/%.tex
-	latexmk -pdf $< -outdir=build
+	${LATEXMK} $< -outdir=build
 	@cp $@ build/html
 
 ################################################################

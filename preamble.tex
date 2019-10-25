@@ -148,7 +148,7 @@
 %** code blocks **************************************************************
 
   \makeatletter
-  \setbeamercolor{code}{fg=black,bg=luhlightgray!50}
+  \setbeamercolor{code}{fg=black,bg=codecolor}
 
   \define@key{beamercolbox}{text width}{\pgfmathsetlengthmacro{\beamer@colbox@wd}{#1}}
   \define@key{beamercolbox}{text height}{\pgfmathsetlengthmacro{\beamer@colbox@ht}{#1}}
@@ -185,7 +185,7 @@
 
   \usepackage{xparse}
   \usepackage{realboxes}
-  \DeclareDocumentCommand{\codebox}{O{luhlightgray!50}}{\Colorbox{#1}}
+  \DeclareDocumentCommand{\codebox}{O{codecolor}}{\Colorbox{#1}}
   \DeclareDocumentCommand{\codeinline}{D<>{1-}O{}v}{%
     \only<#1>{%
       \codebox{\csname lstinline\endcsname[#2]!#3!}%
@@ -235,9 +235,9 @@
   }
   \lstdefinestyle{ASM}{
     style=basestyle,
-		mathescape=false,
+    mathescape=false,
     language={[riscv]Assembler},
-		keywords={.macro, .endm},
+    keywords={.macro, .endm},
     moredelim=**[is][\bfseries]{`}{`},
     moredelim=**[is][\slshape]{``}{``},
     moredelim=**[is][\color{orange}]{@@}{@@},

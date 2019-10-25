@@ -375,7 +375,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   - Funktionstypen
 
 #+begin_src latex
-  \begin{frame}[fragile]{Zusammengesetzte Typen: Records}
+  \begin{frame}[fragile]{Zusammengesetzte Typen: Strukturen}
     \begin{columns}
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=C]
@@ -527,14 +527,11 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   - Arrays
   - Sets & Listen
 
+FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch ist: Record+Struct oder
+
+* Polymorphismus
 #+begin_src latex
-#+end_src
-
-- Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch ist: Record+Struct oder
-
-* Polymorphe Typen
-#+begin_src latex
-
+%%ONLY%%
   \dividerframe{Polymorphismus}
 
   \begin{frame}[fragile]{Polymorphismus macht Code flexibel}
@@ -549,18 +546,18 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ii Abstractional: \siginline{lengthIntList}{list(int)}{int} \siginline{lengthFloatList}{list(float)}{int}
       \ei
     }\medskip
-    \ii Typsysteme die immer strikt anhand der Gleicheit prüfen sind \ALERT{inflexibel} {
+    \ii \structure{Monomorphe Typsysteme} beachten nur Äquivalenz und sind \ALERT{inflexibel} {
       \bi
       \ii Codeduplikaten: \codeinline{printX_2D()}, \codeinline{isEven_u8()}, \codeinline{lenghtFoobarList()}
       \ii Ständige explizite Konvertierungen zwischen ähnlichen Typen:\\
           \codeinline[style=C]{struct point3D x; struct point2D x_ = {x.x, x.y};}
       \ei
     }\medskip
-    \ii Polymorphismus fängt diese Ähnlichkeit zwischen Typen ein{
+    \ii Polymorphismus erlaubt es ähnliche anstatt nur gleicher Typen zu haben{
       \bi
-      \ii Ein Typ kann viele Gestalten haben (Griechisch: poly=many, morph=form)
-      \ii Polymorpher Code darf sich nur auf die Gemeinsamkeit verlassen
-      \ii Subtype Polymorphismus, Parametrischer Polymorphismus, Ad-Hoc Poly....
+      \ii Polymorpher Code darf sich nur auf die Gemeinsamkeiten verlassen
+      \ii Subtypes: \enquote{Jeder 3D Punkt ist auch ein 2D Punkt}
+      \ii Parametrisch: \enquote{Funktion verarbeitet alle Listen unabhängig vom Elementtyp}
       \ei
     }
     \ei
@@ -595,23 +592,22 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     }\medskip
     \ii \enquote{Sicher} hat dabei viele unterschiedliche Interpretationen{
       \bi
-      \ii Speicher: Ich kann der Sprache keine Katze als Segelschiff unterschieben.
+      \ii Speicher: Die T1 Datenstruktur ist kompatibel zur T2 Datenstruktur.
       \ii Abstraktionen: T1 kann in jedem Context wie T2 verwendet werden.
       \ii Semantik: T1 verhält sich in jedem Context entsprechend wie T2.
       \ei
     }
-    \ii<2> \alert{Keine} Typsystem kann alles abfangen und komplette Sicherheit bieten{
+    \ii<2> \alert{Kein} Typsystem kann alles abfangen und komplette Sicherheit bieten{
     \vspace{-2ex}
   \begin{columns}[t]
     \begin{column}{0.49\textwidth}
       \begin{code}[tag=Base.java]
         \begin{java}
-          public class Base {
+          class Base {
             public MyObj alloc() {
               return new MyObj(23);
             };
           }
-
         \end{java}
       \end{code}
 
@@ -619,8 +615,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \begin{column}{0.49\textwidth}
       \begin{code}[tag=Derived.java]
         \begin{java}
-          public class Derived
-              : public Base {
+          class Derived extends Base {
             public MyObj alloc() {
               eraseUserDisk();
               return null;
@@ -633,27 +628,137 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   \end{columns}
   }
   \ei
-
   \end{frame}
 
-  \begin{frame}{Subtype Polymorphismus}
-  \end{frame}
+  #+end_src
 
-  \begin{frame}{Parametrische Typen}
-  \end{frame}
+#+begin_src latex
+    %%ONLY%%
+    \begin{frame}{Arten des Polymorphismus}
+      \btAnimation[width=\textwidth]{center, padding, range=1-2:<1->}{fig/03-polymorphismus}
+    \end{frame}
 
-  \begin{frame}{Covarianz, Invarianz und Contravarianz}
-  \end{frame}
+    \begin{frame}[t,fragile]{Inklusionspolymorphismus: Subtypen}
+      \begin{btBlock}[type=alert]{\ALERT{Ziel:} Behandlung unterschiedlicher Typen \textbf{ohne} Konvertierung}
+        Der Code für Supertypen solls auch Subtypen verarbeiten können.
+      \end{btBlock}
 
+      \begin{btBlock}{Subtypen sind Subsets: $S \subseteq T$}
+        Da ein Typ T die Menge seiner Objekte (denotational), ist ein Subtyp S eine Untermenge vom (Super)typ T. Jedes S ist auch ein T.
+      \end{btBlock}
 
-  \begin{frame}{Type Traits}
-  \end{frame}
+      \bigskip
+      \bi
+      \ii<2-> \structure{Subranges}: Subtyping durch Einschränkung des Werteberreichs {
+        \bi
+        \ii Ada: \codeinline[]{subtype percent_t is integer range 0..100;}
+        \ii Wer \codeinline{integer} verarbeiten kann, kann auch \codeinline{percent_t} verarbeiten.
+        \ei
 
-  \begin{frame}{Rust: Type-Trait Objects}
+        \begin{code}[tag=Pascal]
+          \begin{pascal}[style=smaller]
+            type percent_t = 0..100;
+            procedure PrintInteger(j : integer);
+            ...
+            var completed : percent_t;
+            completed := 37;
+            PrintInteger(completed);
+          \end{pascal}
+        \end{code}
+      }
+      \ei
+    \end{frame}
 
-  \end{frame}
+    \begin{frame}[fragile]{Subtyping durch Vererbung (Strukturerweiterung)}
+
+      \medskip
+
+      \bi
+        \ii Vererbung ist auch Subtyping, \emph{obwohl} Objekte unterschiedlich sind.{%
+          \bi
+          \ii Abgeleitete Klassen erben alle Felder der Elternklasse und fügen nur etwas zu. {
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{code}[tag=C++]
+            \begin{CPP}[style=smaller]
+              struct Base {
+                int x;
+              };
+            \end{CPP}
+          \end{code}\\
+          \typeinline{type Base = record(("x", int))}
+        \end{column}\hfill
+        \begin{column}{0.49\textwidth}
+          \begin{code}[tag=C++]
+            \begin{CPP}[style=smaller]
+              struct Derived : public Base {
+                int y;
+              };
+            \end{CPP}
+          \end{code}\\
+          \typeinline{type Derived = record(("x", int), ("y", int))}
+        \end{column}
+      \end{columns}\medskip
+          }
+          \ii<2-> Wir können das \enquote{Vergessen} von Felder beim \codeinline{Derived} $\subseteq$ \codeinline{Base} erlauben.\\
+               \ALERT{$\Rightarrow$}  \codeinline{Derived} ist ein Subtyp von \codeinline{Base}.
+          \ei
+        }\medskip
+        \ii<3-> Bei C++ wird die Kompatibilität sofort am Assembler sichtbar.{
+          \bi
+          \ii Geerbte Felder werden \enquote{vorne} eingefügt: \codeinline{offsetoff(Derived, x) == 0}
+          \ei
+        \begin{columns}
+          \begin{column}{0.49\textwidth}
+            \begin{code}[tag=C++]
+              \begin{CPP}
+                int getX(Base* o) {
+                  return o->x;
+                }
+
+                int getY(Derived* o) {
+                  return o->y;
+                }
+              \end{CPP}
+            \end{code}
+          \end{column}\hfill
+          \begin{column}{0.49\textwidth}
+            \begin{code}[tag=RV32]
+              \begin{asm}
+                getX: # (Base * a0)
+                   lw   a0, 0(a0)
+                   ret
+
+                getY: # (Derived * a0):
+                   lw   a0, 4(a0)
+                   ret
+              \end{asm}
+            \end{code}
+          \end{column}
+        \end{columns}
+        }
+        \ei
+    \end{frame}
+
+    \begin{frame}{Parametrischer Polymorphismus}
+    \end{frame}
+
+    \begin{frame}{Covarianz, Invarianz und Contravarianz}
+    \end{frame}
+
 #+end_src
 
+#+begin_src latex
+\begin{frame}{Type Traits}
+\end{frame}
+
+\begin{frame}{Rust: Type-Trait Objects}
+\end{frame}
+#+end_src
+
+
+
+http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
 * Typsysteme in Programmiersprachen
 #+begin_src  latex
   \begin{frame}{Typsysteme: Verwendung von Typen in der Sprache}
