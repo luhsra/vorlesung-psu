@@ -531,7 +531,6 @@ FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch i
 
 * Polymorphismus
 #+begin_src latex
-%%ONLY%%
   \dividerframe{Polymorphismus}
 
   \begin{frame}[fragile]{Polymorphismus macht Code flexibel}
@@ -596,7 +595,7 @@ FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch i
       \ii Abstraktionen: T1 kann in jedem Context wie T2 verwendet werden.
       \ii Semantik: T1 verhält sich in jedem Context entsprechend wie T2.
       \ei
-    }
+    }\medskip
     \ii<2> \alert{Kein} Typsystem kann alles abfangen und komplette Sicherheit bieten{
     \vspace{-2ex}
   \begin{columns}[t]
@@ -633,12 +632,12 @@ FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch i
   #+end_src
 
 #+begin_src latex
-    %%ONLY%%
+
     \begin{frame}{Arten des Polymorphismus}
       \btAnimation[width=\textwidth]{center, padding, range=1-2:<1->}{fig/03-polymorphismus}
     \end{frame}
 
-    \begin{frame}[t,fragile]{Inklusionspolymorphismus: Subtypen}
+    \begin{frame}[t,fragile]{Inklusion: Subtypen}
       \begin{btBlock}[type=alert]{\ALERT{Ziel:} Behandlung unterschiedlicher Typen \textbf{ohne} Konvertierung}
         Der Code für Supertypen solls auch Subtypen verarbeiten können.
       \end{btBlock}
@@ -669,7 +668,7 @@ FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch i
       \ei
     \end{frame}
 
-    \begin{frame}[fragile]{Subtyping durch Vererbung (Strukturerweiterung)}
+    \begin{frame}[fragile]{Inklusion: Subtyping durch Vererbung}
 
       \medskip
 
@@ -738,27 +737,187 @@ FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch i
         \end{columns}
         }
         \ei
+      \end{frame}
+
+    \begin{frame}[fragile]{Parametrisch: Generische Typen}
+      \textbf{Bisher:} Alle Typkonstruktoren waren vorgegeben (\typeinline{record()}, \typeinline{map()})
+      \medskip
+
+      \bi
+      \ii Parametrischer Polymorphismus erlaubt eigene Konstruktoren {
+        \bi
+        \ii Erinnerung: Konstruktoren sind Typ$^n$$\rightarrow$Typ Funktionen: \siginline{map}{$T \times T$}{$T$}
+        \ii Wir führen Typvariablen in der Sprache ein um Typausdrücke zu \enquote{speichern}.
+        \ii Trivialste Sicht: Eigene Typkonstruktoren sind Aliase:\\[1ex]{
+
+          \begin{columns}
+            \begin{column}{0.49\textwidth}
+              \begin{code}[tag=Java]
+                \begin{java}
+                  public class Pair<A> {
+                    public A f;
+                    public A s;
+                  }
+                \end{java}
+              \end{code}
+            \end{column}\hfill
+            \begin{column}{0.49\textwidth}
+              \typeinline{Pair(A) := record(("f", A), ("s", A))}\\[1ex]
+              \typeinline{type IntPair \btDefTab = Pair(int)}\\[-0.22ex]
+                                       \hspace{4.2em}\typeinline{= record(("a", int"), ("b", int))}
+            \end{column}
+          \end{columns}
+
+        }
+        \ei
+      }\bigskip
+      \ii<2-> Mit eigenen Konstruktoren lässt sich Schreibarbeit sparen.{
+        \begin{columns}
+          \begin{column}{0.49\textwidth}\lstset{style=CPP,basicstyle=\ttfamily\scriptsize}
+            \bi
+            \ii \codeinline{class intLst { int v; intLst* n }}
+            \ii \codeinline{class charLst { char v; charLst* n }}
+            \ii \codeinline{class boolLst { bool v; boolLst* n }}
+            \ei
+          \end{column}\hfill
+          \begin{column}{0.49\textwidth}
+            \begin{code}[tag=C++]
+            \begin{CPP}[basicstyle=\ttfamily\scriptsize]
+              template<typename T>
+              class List<T> {
+                T        v;
+                List<T>* n;
+              };
+            \end{CPP}
+          \end{code}
+          \end{column}
+        \end{columns}
+      }
+
+      \ei
     \end{frame}
 
-    \begin{frame}{Parametrischer Polymorphismus}
+    \begin{frame}{Parametrisch: Typkonstruktoren werden selbst Typen}
+      \begin{btBlock}[type=alert]{Generische Typen als First-Class Citizens}
+        Die Stärke von parametrischem Polymorphismus ist, dass generische Typen nicht nur als Aliase sind, \ALERT{sondern} vollwertige Typen.
+      \end{btBlock}
+      \medskip
+
+      \bi
+      \ii Variablen, Parameter und Rückgabewerte können generisch Typ haben.{
+        \bi
+        \ii Listenlängen sind unabhängig vom Elementtyp: \siginline{length}{List[N]}{int}
+        \ii Mehrfach auftrendende Typvariablen, propagieren Typen zur rechten Seite:\\
+        \siginline{concat}{List[N] $\times$ List[N]}{List[N]}
+        \ei
+      }\medskip
+      \ii Der generische Typ ist kompatibel mit all seinen \textbf{konkreten Instanzen}{
+        \bi
+        \ii Im Gegensatz zu Vererbung gibt es (potentiell) unendlich viele Instanzen.
+        \ii \typeinline{Pair(A)} ist kompatibel mit \typeinline{Pair(int)}, \typeinline{Pair(bool)}, \ldots
+        \ii Wie die einzelnen Instanzen zueinander stehen ist deutlich schwieriger.
+        \ei
+      }
+      \ei
     \end{frame}
 
-    \begin{frame}{Covarianz, Invarianz und Contravarianz}
+    \bgroup
+    \def\codebox#1{\Colorbox{codecolor}{\scriptsize #1}}
+    \begin{frame}{Instanztypen: Covarianz, Contravarianz, und Invarianz}
+      Bei der Kombination von Subtyping und parametrischen Polymorphismus können die Instanztypen \codebox{K[N]} unterschiedlich kompatibel sein:\\[1ex]
+
+    \bi
+    \ii \structure{Kovarianz}: Kompatibilität läuft entlang der Spezialisierungsrichtung{
+      \bi
+      \ii Möglich, wenn \codebox{K[N]} nur Quelle für Instanzen von \codebox{N} ist.
+      \ii \codebox{Baker[Cake]} ist Subtyp von \codebox{Baker[Bread]}.\tikzmark{x}
+      \ii Jedoch: \codebox{Baker[Bread]} ist inkompatibel mit \siginline{eatAll}{Baker[Cake]}{$\bot$}
+      \ei
+    }\bigskip
+    \ii<2-> \structure{Kontravarianz}: Kompatibilität läuft entgegen der Spezialisierung{
+      \bi
+      \ii Möglich, wenn der \codebox{K[N]} nur Senke für Instanzen von \codebox{N} ist.
+      \ii \codebox{Customer[Bread]} ist Subtyp von \codebox{Customer[Cake]}.
+      \ii Jedoch: \codebox{Customer[Cake]} ist inkompatibel mit \siginline{feed}{Customer[Bread]}{$\bot$}
+      \ei
+    }\bigskip
+    \ii<3-> \structure{Invarianz}: Instanztypen sind inkompatibel zueinander{
+      \bi
+      \ii Fallback, wenn \codebox{K[N]} sowohl Quelle als auch Senke sind.
+      \ii Alle Instanzen von (veränderbaren) \codebox{Tüte[N]} sind inkompatibel zueinander.
+      \ei
+    }
+    \ei
+    \OrangeBox[putat={(4.5cm, 5cm)},visible on=<1>,align=left]{\footnotesize
+      \codebox{Cake} ist ein spezielles (erbt von) \codebox{Bread}.\\
+      \codebox{Baker[T]} bäckt Gebäck vom Typ T.\\
+      \codebox{Customer[T]} kauft Gebäck vom Typ T.
+    }
     \end{frame}
+    \egroup
+
+
 
 #+end_src
+http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
 
 #+begin_src latex
-\begin{frame}{Type Traits}
-\end{frame}
+  \begin{frame}[fragile]{Type Traits: \enquote{Typen von Typparametern}}
+    \OrangeBox{\codebox{Baker[Car]} ist sinnlos: Autos backt man nicht bei 180 Grad Umluft.}
+    \bigskip
 
-\begin{frame}{Rust: Type-Trait Objects}
-\end{frame}
+    \bi
+    \ii Generische Typen können Einschränkungen für ihre Parameter haben.{
+      \bi
+      \ii Meta-Typen  kann  strukturell, abstraktional und denotional auffassen.
+      \ii \structure{Strukturell}:   Typparameter muss bestimmtes Feld haben.
+      \ii \structure{Abstraktional}: Typparameter muss ein bestimmtes Interface haben.
+      \ii \structure{Denotional}:    Typparameter muss Subtyp von bestimmter Klasse sein.
+      \ei
+    }\bigskip
+
+    \begin{columns}<2->[t]
+      \begin{column}{0.49\textwidth}
+        \textbf{Beispiel}: Generics bei Java
+
+        \begin{code}
+          \begin{java}[style=smaller]
+            class Baker<T extends Bread> {
+              void bake(T b) {
+                oven.heat(b.degrees());
+              }
+            }
+          \end{java}
+        \end{code}
+
+        Ein \codebox{Baker} kann nur\\ Unterklassen von
+        \codebox{Bread} backen.
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \textbf{Beispiel}: Type Traits in Rust
+
+        \begin{code}[]
+          \begin{rust}
+            pub trait Bakable {
+              fn degrees(&self) -> f64;
+            }
+
+            impl Bakable for Cake {
+              fn degrees(&self) -> f64 {
+                return 180;
+              }
+            }
+            fn bake<T: Bakable>(b: T);
+          \end{rust}
+        \end{code}
+      \end{column}
+    \end{columns}
+    \ei
+  \end{frame}
 #+end_src
 
 
 
-http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
 * Typsysteme in Programmiersprachen
 #+begin_src  latex
   \begin{frame}{Typsysteme: Verwendung von Typen in der Sprache}
@@ -855,7 +1014,7 @@ http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
 
   \begin{frame}[fragile]{Typsysteme: Explizite vs. Implizite Typisierung}
       \begin{center}\SAMPLE{\Large
-      "Muss ich alle statischen Typen hinschreiben?"
+      "Muss ich alle Typen wirklich hinschreiben?"
     }\end{center}
 
     \bi
