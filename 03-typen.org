@@ -916,14 +916,30 @@ http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
   \end{frame}
 #+end_src
 
-
-
 * Typsysteme in Programmiersprachen
 #+begin_src  latex
+%%ONLY%%
   \begin{frame}{Typsysteme: Verwendung von Typen in der Sprache}
     \bi
-    \ii Typsicherheit
+    \ii Das \STRUCTURE{Typesystem} einer Sprache, beschreibt wie diese Typen verwendet.{
+      \bi
+      \ii Welche eingebauten Typen und Typkonstruktoren stehen bereit?
+      \ii Wie ist die Äquivalenz und Kompatibilität von Typen definiert?
+      \ii Ist das Typsystem monomorph oder enthält es Polymorphismus?
+      \ei
+    }\bigskip
+    \ii Darüber hinaus haben Typsysteme weitere charakteristische Eigenschaften:{
+      \bi
+      \ii \STRUCTURE{Typsicherheit}:   Kann ich das Typssytem (unbemerkt) umgehen?
+      \ii \STRUCTURE{Dynamik}:         Zu welchem Zeitpunkt werden die Typen geprüft?
+      \ii \STRUCTURE{Automatisierung}: Wieviel Arbeit nimmt der Übersetzer uns ab?
+      \ei
+    }
     \ei
+
+    \begin{btBlock}<2->{Handreichung für den effektiven Neuling}
+      Um eine Sprache effektiv zu erlernen, muss ich das Typsystem der neuen Programmiersprache prägnant beschreiben und mit bereits bekannten Sprachen vergleichen können.
+    \end{btBlock}
 
   \end{frame}
 
@@ -1044,7 +1060,6 @@ http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
       \ei
     }
     \ei
-
   \end{frame}
 #+end_src
 
