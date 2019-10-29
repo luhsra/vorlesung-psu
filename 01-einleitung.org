@@ -871,13 +871,13 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
         \end{column}
         \hfill
         \begin{column}{0.4\textwidth}\ttfamily
-          \begin{stdout}
+          \begin{codetext}
           (i,j) = (7, 35)
                   (7, 28)
                   (7, 21)
                   (7, 14)
                   (7, 7)
-          \end{stdout}
+          \end{codetext}
         \end{column}
       \end{columns}
        }\pause
@@ -890,10 +890,10 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
         \end{column}
         \hfill
         \begin{column}{0.4\textwidth}
-          \begin{stdout}
+          \begin{codetext}
           (i,j) = (7, 35)
                   (0, 7)
-          \end{stdout}
+          \end{codetext}
         \end{column}
       \end{columns}
     }

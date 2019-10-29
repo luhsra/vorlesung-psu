@@ -431,6 +431,9 @@ typedef struct {
 Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), sondern auch Typen, die nicht-äquivalent sind aber den selben Typausdruck haben, mittels ~type~ anzulegen.
 
 * Typische Typen
+:PROPERTIES:
+:CUSTOM_ID: 03-basic-types
+:END:
 
 #+begin_src latex
   \dividerframe{Typische Typen}
@@ -657,6 +660,9 @@ Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), 
 FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch ist: Record+Struct oder
 
 * Polymorphismus
+:PROPERTIES:
+:CUSTOM_ID: 03-polymorphism
+:END:
 #+begin_src latex
   \dividerframe{Polymorphismus}
 
@@ -1044,6 +1050,9 @@ http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
 #+end_src
 
 * Typsysteme in Programmiersprachen
+:PROPERTIES:
+:CUSTOM_ID: 03-typesystems
+:END:
 #+begin_src  latex
   \begin{frame}{Typsysteme: Verwendung von Typen in der Sprache}
     \bi
