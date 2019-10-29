@@ -63,7 +63,7 @@ $( document ).ready(function() {
             });
         });
 
-        $("pre.src").each(function (idx, block) {
+        $("pre.src-python").each(function (idx, block) {
             var button = $('<button class="execute">Load Interpreter</button>');
             button.insertBefore(block);
             button.click(function(e) {

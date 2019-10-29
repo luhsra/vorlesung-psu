@@ -270,6 +270,16 @@
     moredelim=**[is][\color{orange}]{@@}{@@},
     moredelim=**[is][\color{srared}]{@@@}{@@@},
   }
+  \lstdefinestyle{ada}{
+    style=basestyle,
+    language={ada},
+    morekeywords={inline},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
   \lstdefinestyle{rust}{
     style=basestyle,
     language={Rust},
@@ -388,6 +398,10 @@
 
 \lstnewenvironment{java}[1][]{
   \lstset{style=java, autogobble, #1}
+} {}
+
+\lstnewenvironment{ada}[1][]{
+  \lstset{style=ada, autogobble, #1}
 } {}
 
 \lstnewenvironment{codetext}[1][]{

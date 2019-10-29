@@ -46,7 +46,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \ei
   \end{frame}
 
-  \begin{frame}[fragile]{Was bieten einem Typen?}
+  \begin{frame}<handout:1-2>[fragile]{Was bieten einem Typen?}
     \bi
     \ii Typen bieten \textbf{Kontext} und transportieren Informationen quer zum AST.{
       \bi
@@ -71,22 +71,54 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ii Mit statisch Typen kommunizieren wir Intention und angedachte Verwendung.
       \ii Eine gute API ist bereits anhand der Typnamen verständlich:{\\[1ex]
         \begin{center}
-          \codeinline<1>[style=C]{____ regex_match(________, ___________, _____________)}%
-          \codeinline<2->[style=C,morekeywords={bool,regex_t,regex_flags_t}]{bool regex_match(regex_t*, const char*, regex_flags_t)}
+          \codeinline<1|handout:1>[style=C]{____ regex_match(________, ___________, _____________)}%
+          \codeinline<2-|handout:2>[style=C,morekeywords={bool,regex_t,regex_flags_t}]{bool regex_match(regex_t*, const char*, regex_flags_t)}
         \end{center}
       }
       \ei
     }
     \ei
-    \onslide<3->{
+    \onslide<3-|handout:2>{
       \medskip
       \Large \alert{$\Rightarrow$ Typen sind Freunde und Helfer in der Not!}
     }
   \end{frame}
 
   #+end_src
-- Einordnung in die Vorlesung
-- Vorteile von Typen
+
+Diese Vorlesung ist der erste Teil unserer Top-Down Betrachtung von Programmiersprachen.
+Dabei wollen wir uns insgesamt 4 Themen herausgreifen (Typen, Namen, Operationen und Objekte), die in der einen oder anderen Form in jeder Programmiersprache vorkommen.
+In Zuge dieser Betrachtungen sollen Sie lernen, dass es grundlegende Prinzipien in Programmiersprachen gibt, die immer wieder, in unterschiedlichen Kombinationen und Geschmacksrichtungen, auftreten.
+Der Ingeneur baut eben doch immer das was er kennt, bzw.
+er verlässt sich auf bewährte Konzepte, die häufig durch einen reichen Korpus an theoretischen Überlegungen fußen.
+
+In dieser Vorlesung wollen wir uns mit dem Aspekt der Typen in Programmiersprachen beschäftigen.
+Dabei wollen wir uns zunächst überlegen, was Typen, ganz [[https://de.wikipedia.org/wiki/Essentialismus][essentialistisch]], sind und was die einfachsten Ausprägungen des Konzepts "Typen" sind.
+Dies beinhaltet, zum Beispiel, die Ganzzahl- und Zeigertypen, aber auch Record und Array Typen.
+Darauf aufbauend, werden wir uns dem Bereich der *Polymorphie* zuwenden, der ganz essentiell für unsere modernen Programmiersprachen ist.
+Mit diesen polymorphen Typen können wir uns ein, potentiell unendliches, Universum von Typkombinationen definieren, das dabei hilft unsere Programme sauber zu strukturieren und uns vor uns selbst und unseren Bugs schützt.
+Am Ende dieser Vorlesungseinheit werden wir uns anschauen, wie die Typen, die wir in den vorherigen Kapiteln konstruiert haben, in Programmiersprachen zu einem *Typsystem*  kombiniert werden.
+
+Diese Vorlesung über Typen ist deswegen so spannend, weil moderne Programmiersprachen, wie C++ oder Rust, sehr ausgefeilte Typsstyeme besitzen, die gewissermaßen das Rückrat dieser Sprachen bilden. Nur mit Hilfe dieser rigurosen Typssysteme, die vom Übersetzer vor der Laufzeit durchgesetzt werden, ist es möglich große Programme mit vielen Entwicklern gleichzeit zu entwerfen. Typen sind dabei ein Kommunikationsmittel zwischen einem einzelnen Entwickler und der Maschine, und zwischen Entwicklern. In beiden Fällen verwendet der Programmierer die Typannotationen um zu Kommunizieren: "Beim Anlegen dieser Variable habe ich mir gedacht, dass folgende Eigenschaften und Invarianten gelten sollten".
+
+Wenn der Entwickler mit dem Übersetzer kommuniziert, sind zwei Aspekte von Typen im Vordergrund: Der querschneidende Informationsfluss und das explizit machen von Erwartungen.
+
+Im Kapitel über Parsing haben wir gelernt, dass wir die Syntax unserer Maschinenprogramme kontextfrei extrahieren und als Baum darstellen können.
+Der große Nachteil von Bäumen ist allerdings, dass sie streng hierarchisch sind.
+Folgt man also nur den Kanten eines Baums, so können Informationen nur zwischen Elementen und ihren umschlossenen Kindern fließen.
+Es ist jedoch nicht möglich, dass Informationen von ganz vorne, nach ganz hinten, ohne besuchen der Wurzel, durchgereicht werden.
+Dies zeigt sich im Folienbeispiel mit dem ~float32_add~:
+Würde man nur den Baumkanten folgen, so wüssten wir für ~a~ und ~b~ nicht, welche Additionsoperation wir genau verwenden sollten.
+In dieser Situation kommen uns Typen zur Hilfe:
+Durch die statische Typannotation wird der Variable an der Definitionsstelle (~int32_t a~) ein Kontext in den Rucksack gepackt, den sie an jeder Verwendungsstelle (~a+b~) mit sich herum trägt. Aus diesem Kontext, der durch die Typen etabliert wird, kann der Übersetzer dann die passende Operation auswählen. Wir haben also einen Link, der Quer zum Baum geht, eingerichtet. Wie genau die Regeln für diese Links aussehen, werden wir im Kapitel über die semantische Analyse sehen.
+
+Der zweite Vorteil von Typen ist, dass sie uns dabei helfen Bugs zu vermeiden.
+Denn, in dem Rucksack der Variable steht nicht nur, welche Operationen an der Variable hängen, sondern auch welche Objekte gültige Belegungen für diese Variable sind.
+Im Beispiel kann der Übersetzer herausfinden, dass wir ~k1~ keinen ~Dog~ zuweisen können, da Hunde und Katzen ganz unterschiedliche Typen sind. Mit der Typannotation ~Cat k1~ macht der Programmierer die Zusicherung, dass diese Variable zu jedem Zeitpunkt, über die gesamte Laufzeit des Programms, immer nur Katzen gespeichert sind.
+
+Der dritte Vorteil von Typen, betrifft die Kommunikation mit anderen Menschen. Ohne die Angabe von Typen, muss der lesende Programmierer sich überlegen, welcher Art die gespeicherten Objekte sind. Mit Typen, die vielleicht sogar noch, wie im Beispiel, sprechende Namen haben, ist es deutlich einfacher ein Programm zu verstehen.
+
+Zusammengefasst möchte ich also sagen: sehen sie Typen und das Typssystem ihrer Programmiersprache nicht als Feind, der sie davon abhält sich auszudrücken, sondern als Freund und Helfer in der Not, der Sie davon abhält dumme Dinge zu tun.
 
 #+begin_src latex
 \dividerframe{Grundbegriffe\\für\\Typen}
@@ -159,8 +191,67 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
    \ei
   \end{frame}
   #+end_src
-- Struktur, Denotationell, Abstationell
-- Typausdrücke
+
+Als ersten Schritt unserer Betrachtung über Typen, werden wir uns die Frage stellen: "Was ist so ein Typ überhaupt?" Was ist also, wenn wir all die Spezifika von einzelnen Sprachen wegabstrahieren, die Essenz von Typen? Welche Definition legen wir an, um alle Typen in allen Programmiersprachen zu erfassen? Dazu gibt es allerdings nicht nur eine definitive Antwort, sondern drei verschiedene Sichtweisen (Strukturell, Denotationell, und Abstraktional), die alle nützlich sind und verschiedene Aspekte beleuchten.
+
+Die ~strukturelle~ Interpretation von Typen ist eine sehr technische heransgehensweise an das Problem.
+Sie beantwortet die Frage "Was sind Typen?"
+damit, dass alles das ein Typ ist, was ich nach den Regeln der Typkomposition bauen kann.
+Das ist in etwa so, wie wir sagen können, dass positive Ganzzahlen jene mathetmatischen Objekte sind, die ich durch fortwärendes Inkrementieren, ausgehend von der ~1~, erzeugen kann.
+Oder, dass all jenes ein Brot ist, was ich durch Mischen und Backen von Mehl mit Wasser erzeugen kann (später kommen wir wieder auf das Brotthema zurück, versprochen!).
+Im Falle von Typen kommt dieses konstrukive Argument dann zu so Schlüssen wie "Pointer auf ~char~" ist ein Typ, weil ~char~ ein Typ ist und "Pointer auf X" eine Kompositionsregel für Typen ist.
+
+Bei der strukturellen Interpretation bilden *Typausdrücke* eine zentrale Rolle.
+Sie beschreiben, wie wir komplexere Typen aus einfachen Typen mittels der Anwendung von *Typkonstruktoren* erstellen.
+Dabei muss die Sprache eine Menge von eingebauten *Basistypen* (built-in types) mit bringen, die in bereits definiert sind, bevor ein einziges Zeichen Code interpretiert wurde.
+Häufig enthält diese initiale Bevölkerung der Menge (T) aller Typen bereits Ganzzahlentypen, Zeichentypen und ein Typ für Wahrheitswerte.
+
+Typkonstruktoren sind dann Funktionen, die eins oder mehrere Elemente der Typmenge als Argumente bekommen und einen neuen Typausdruck erzeugen, der wieder Teil der Menge T wird.
+Dabei mag es den geneigten Leser verwundern, dass wir nicht den Rückgabewert der Typkonstruktoren angeben, sondern den noch nicht ausgewerteten Ausdruck. Dies tun wir, da uns nicht konkrete Bitrepresentation von Typen in einem konkreten Übersetzer interessiert, sondern wie diese Typen gebildet werden. Unser "Pointer auf char" voneben würden wir also als ~pointer(char)~ aufschreiben. Um dies zu verdeutlichen, wollen wir uns kurz ein Stück Python anschauen, mit dem wir diese strukturelle Interpretation betrachen können:
+
+#+INCLUDE: ../lst/03-type-basic.py
+
+In diesem minimalsten Typssystem, sehen wir schon mehrere Dinge: Die Existenz von Built-in Types, die Anwesenheit von Typkonstruktoren, und den Unterschied zwischen dem Typausdruck (~POINTER(CHAR)~) und der Kodierung des Typens als Objekts ~(100, 1)~. Prinzipiell können wir mit diesem Typssystem schon unendlich viele Typen erzeugen, indem wir die Konstruktoren, wie ~POINTER~ immer und immer wieder anwenden. Dabei entstehen immer tiefer geschachtelte Typausdrücke.
+
+Zur stukturellen Sicht gehört auch, dass wir diese Typausdrücke, aufgrund ihrere Schachtelung, als Baum aufmalen können. Dabei sehen sie stukturell sehr ähnlich zu unserem AST aus dem letzten Kapitel aus; einem Fakt den wir im Kapitel über die semantische Analyse noch einmal begegenen werden.
+
+Die zweite Brille auf Typen ist die *denotationelle* Sicht auf Typen.
+Mit diesem Blick definieren wir einen Typ als ein Prädikat über alle möglichen (imaginären und realen) Objekte (~object~) des Unversums. Sagt das Prädikat "ja" so ist das Objekt von diesem Typen, sagt es nein, so liegt es außerhalb der Umschlossenen Objektmenge des Typen. Mit dieser Brille sind Typen viel viel flexibler gefasst als mit der rein strukturellen Sicht, weil wir einfach irgendein Prädikat angeben müssen um einen Typen zu definieren. So kann die Menge aller geraden Zahlen ein eigener Typ ~int_even~ sein:
+
+#+begin_src python
+  def int_even(obj):
+      if type(obj) is int and (obj % 2) == 0:
+          return True
+      return False
+
+  objects = [1, 2, 3, "foo", True, [1,2,3]] # + range(4, 20)
+  # Zermelo Fraenkel: [ obj | obj <- objects, int_even(obj)
+  print [obj for obj in objects if int_even(obj)]
+#+end_src
+
+Hier nutzen wir das Prädikat um eine Liste von Objekten auf jene Objekte zu filtern, die vom entsprechenden Typen sind. Beachten sie, wie wir in unserem Prädikat die Python Primitive ~type()~ verwendet haben um unser Prädikat aus einem Basistypen abzuleiten.
+
+Wenn wir die Regeln eines denotationell definierten Typs strukturierter Aufschreiben als mittels einer Python Funktion, so kann ein Übersetzer daraus auch Eigenschaften der Objektmenge herleiten. So könnte der Optimierer bei der Addition zweier ~int_even~ Variablen wissen, dass das Ergebnis auch wieder ~int_even~ sein wird.
+
+Die dritte Interpretation von Typen ist die ~abstraktionale Sicht~.
+Dabei wird ein Typ definiert als eine Menge von validen Operationen auf Objekten des Typ.
+Hier wird die Idee des Typkontexts, die wir vorhin aufgegriffen haben (Rucksack), besonders deutlich.
+Der Typ *ist* sein Interface, egal wie dieses Interface implementiert ist. Eine Beispiel für die abstraktionale Definition von Typen sind die Interfaces in Java:
+
+#+begin_src java
+  interface Object2D {
+      float area();
+  }
+
+  class MyMain {
+      public static void main(String[] args) {
+          Object2D obj = ....;
+          obj.area();
+      }
+  }
+#+end_src
+
+Hier definieren wir das Interface ~Object2D~, welches durch die Methode ~float area()~ festgelegt ist. Im späteren Verlauf, können wir dann Variablen anlegen, die alle Objekte aufnehmen können, die dieses Interface implementieren. Durch Nutzung des Interface Typs, haben wir über die Variable ~obj~ die Garantie, dass es eine ~area()~ Methode gibt, die eine Fließkommazahl liefert.
 
 #+begin_src latex
   \begin{frame}[fragile]{Äquivalenz von Typen}
@@ -285,28 +376,64 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ei
     }\medskip
     \ii<2> Manche Sprachen: Sowohl Typaliase als auch \textbf{abgeleiteten Typen}\\[.5ex]{
-      \begin{code}[tag=Haskell]
-        \begin{haskell}
-          type    X =       Char    -- X ist nur ein zweiter Name
-          newtype Y = MakeY Char    -- Y ist ein separater Typ
-                                    -- MakeY :: Char -> Y
-          a :: X;   a = 'a'
-          b :: Y;   b = (MakeY 'a')
-        \end{haskell}
+      \begin{code}[tag=ADA]
+        \begin{ada}
+           subtype mode_t is integer;        -- Typalias für Integer
+           type celsius_t is new integer;    -- Eigener Typ
+           type fahrenheit_t is new integer; -- Eigener Typ
+        \end{ada}
       \end{code}
     }
     \ei
   \end{frame}
   #+end_src
-- Wie vergleichen wir Typen?
-  - Gleichheit
-  - Namensgleicheit und Strukturgleichheit
-  - Typalias und abgeleiteter Typ
 
-* Klassen von Typen
+Mit unseren drei Brillen haben nur eins geschafft: Wir haben Typen geschaffen, aber bisher können wir mit ihnen nichts anstellen. Ziemlich nutzlose und faule mathematische Objekte so wie sie sind, sich einfach wild von uns erzeugen lassen. Daher wollen wir nun, neben den Typkonstruktoren, weitere Operationen definieren, die auf unserer Typmenge arbeitet. Möglichst nützliche.
+
+Die wahrscheinlich wichtigste Frage für einen Übersetzer ist, ob zwei gegebene Typen *Äquivalent* sind.
+Also ob sie das gleiche bedeuten.
+Wenn zwei Typen äquivalent sind, so sind ihre Objekte aus Sicht des Typssystems nicht unterscheidbar, vollständig kompatibel zueinander und sowieso best-friends-forever.
+Oder um es etwas ausgewählter zu formulieren:
+Typäquivalenz ist die strikteste Relation zwischen zwei Typen.
+Dabei gibt es zwei unterschiedliche Arten der Typäquivalenz, die in Programmiersprachen auftreten können:
+Die Strukturäquivalenz und die Namensäquivalenz.
+
+Bei der *Strukturäquivalenz* sind zwei Typen äquivalent, wenn sie den gleichen Typausdruck haben. Wenn wir in einem Programm einen Typnamen verwenden (Pascal ~type NAME = ...~), so ist das nur eine Abkürzung für den Typausdruck auf der rechten Seite, der NAME selbst wird beim Vergleich ignoriert. Weiterhin werden unterschiedliche Notationen, solange sie zum selben Typausdruck führen, als äquivalent angesehen.
+
+Diese sehr technische Art der Äquivalenz hat allerdings einige gravierende Nachteile, weswegen sie heute kaum noch verwendet wird. Das erste ist, dass es zu einer zufälligen, nicht intendierten Äquivalenz kommen kann, wenn zwei Typen ausversehen die gleiche Strukur haben. So ist der Typ ~student~ und der Typ ~school~ auf den Folien in Pascal, welches strukturelle Äquivalenz verwendet, gleich, obwohl die Intention ganz deutlich, durch zwei Typdefinition, war, dass der Programmierer unterschiedliches meinte.
+
+Das zweite Problem struktureller Äquivalenz sind *rekursive Datentypen*.
+Solche rekursiven Typen können auftreten, wenn wir Typen einen Namen geben können und diesen Namen in der Definition des Typs selbst verwenden.
+Das Paradebeispiel eines rekursiven Typs, den wir auch schon im Parsing Kapitel besprochen haben, ist die verkettete Liste, bei der jedes Listenelment einen Pointer auf eine (Rest-)Liste beinhaltet.
+Das Problem entsteht dann, wenn wir jedes Auftreten des Typnamens einfach durch den Erzeugten Typausdruck ersetzen wollen, weil dann ein endlos tief geschachtelter Typausdruck für diese doch sehr einfache Liste entsteht. Zwar wäre eine endlose Struktur für den Mathematiker erstmal in Ordnung, doch man muss einige Tricks[[fn::[[https://dl.acm.org/citation.cfm?id=1061632][The Equivalence of Modes and the Equivalence of Finite Automata]]] anwenden um dies auf einem endlichen Rechner darzustellen.
+
+Aufgrund dieser Probleme mit struktureller Äquivalenz verwenden die meisten modernen Sprachen *Namensäquivalenz*.
+Die Idee dabei ist, dass jede Definition eines Typs, egal wie der Typ strukturiert ist, ein eigener Typ ist, der nur äquivalent zu sich selbst ist.
+Wenn der Programmierer sich schon die Mühe macht einen Namen auszusuchen, dann sollten wir immerhin sagen, dass dieser Typ was besonderes ist!
+
+Immer wenn ein Typname in einem Typausdruck verwendet wird, speichern wir dort nur den Namen, nicht den referenzierten Typ selbst, womit unser Typausdruck, selbst für rekursive Typen, wieder ein hübscher hierarchischer Baum wird.
+
+
+Zusammen mit Namensäquivalenz kommt dann sofort die Frage auf, ob wir *Aliase* von Typen erstellen können:
+Ein Typalias ist ein zweiter Typname der den gleichen Typen (nicht nur den gleichen Typausdruck) referenziert und damit voll äquivalent ist.
+So kann man in der Sprache C, die für Records Namensäquivalenz verwendet, mittels ~typedef~ einen Typalias erzeugen. In C ist ~typedef~ sogar die einzige Methode einen neuen Typnamen zu definieren{{{see(02-real-language-problems, Lexer Hack)}}}.
+
+Es ist wichtig zu verstehen, dass alle ~typedef~ auf den gleichen Typausdruck äquivalent sind und keine Unterscheidung machen. Dies bedeutet, dass (auf den Folien) ~celsius_t~ und ~fahrenheit_t~ der gleiche Typ (~double~) sind. Daher kann uns der Übersetzer nicht dabei helfen eine Fehlverwendung von ~heating_set~ zu erkennen. Ein ähnlicher Fehler hat die Menscheit schon einen [[https://en.wikipedia.org/wiki/Mars_Climate_Orbiter#Cause_of_failure][Mars Climate Orbiter]] gekostet.
+
+Eine Möglichkeit dies in C zu lösen sind Records mit nur einem Feld. Da für ~struct~ Namensäquivalenz gilt, kann man auf diese Art nicht-äquivalente Typen erzeugen, bei denen der Übersetzer prüft ob wir sie ausversehen vermischen. Zum Beispiel verwendet der [[https://github.com/spotify/linux/blob/master/include/linux/types.h][Linux Kern]] eine Typdefinition für ~atomic_t~ mit der verhindert wird, dass man ausversehen einen atomaren Datentyp mittels ~++~ hochzählt, sondern eine spezielle API ~atomic_add(int i, atomic_t *v)~ verwendet.
+
+#+begin_src C
+typedef struct {
+	volatile int counter;
+} atomic_t;
+#+end_src
+
+Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), sondern auch Typen, die nicht-äquivalent sind aber den selben Typausdruck haben, mittels ~type~ anzulegen.
+
+* Typische Typen
 
 #+begin_src latex
-  \dividerframe{Klassen von Typen}
+  \dividerframe{Typische Typen}
 
   \begin{frame}[fragile]{Skalare Typen: Aufzählungen und Zahlen}
     \bi
@@ -798,7 +925,7 @@ FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch i
     \end{frame}
 
     \begin{frame}{Parametrisch: Typkonstruktoren werden selbst Typen}
-      \begin{btBlock}[type=alert]{Generische Typen als First-Class Citizens}
+      \begin{btBlock}{Generische Typen als First-Class Citizens}
         Die Stärke von parametrischem Polymorphismus ist, dass generische Typen nicht nur als Aliase sind, \ALERT{sondern} vollwertige Typen.
       \end{btBlock}
       \medskip
@@ -918,7 +1045,6 @@ http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
 
 * Typsysteme in Programmiersprachen
 #+begin_src  latex
-%%ONLY%%
   \begin{frame}{Typsysteme: Verwendung von Typen in der Sprache}
     \bi
     \ii Das \STRUCTURE{Typesystem} einer Sprache, beschreibt wie diese Typen verwendet.{
@@ -1064,3 +1190,9 @@ http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf
 #+end_src
 
 * Zusammenfassung
+
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+    FIXME
+  \end{frame}
+#+end_src

@@ -1,5 +1,7 @@
 (setq user-init-file (or load-file-name (buffer-file-name)))
 (setq load-dir (file-name-directory user-init-file))
+(setq org-sra-src-dir (file-name-directory (directory-file-name load-dir)))
+
 (add-to-list 'load-path load-dir)
 
 (require 'package)

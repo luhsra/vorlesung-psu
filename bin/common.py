@@ -1,7 +1,7 @@
 import shlex
 
 def normalize_topic(topic):
-    return topic.replace("?", "").replace(" ", "_").lower()
+    return topic.replace("?", "").replace(" ", "_").replace('"', "_").lower()
 
 def parse_block_src(line):
     if "#+begin_src" in line.lower():
