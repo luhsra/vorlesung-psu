@@ -1,0 +1,58 @@
+\documentclass{lecturefig}
+\usetikzlibrary{trees}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    code/.style={fill=codecolor,font=\ttfamily\footnotesize,align=left},
+    level 1/.style={sibling distance=6.5cm},
+    level 2/.style={sibling distance=3cm},
+    lecture/.style={
+      label={[visible on=<2->, lecture circle,inner sep=1pt,anchor=mid]north west:\scriptsize #1},
+    },
+    ]
+    \tikzset{every child/.style={execute at begin node={\strut}}}
+    \node[]
+       {Polymorphismus}
+       child { node (universal) {universell}
+         child {
+           node (inclusion) {Inklusion}
+         }
+         child {
+           node[] (parametric) {Parametrisch}
+         }
+       }
+       child { node (ad-hoc) {ad-hoc}
+         child {
+           node[] (overloading) {Überladung}
+         }
+         child {
+           node[] (coercion) {Coercion}
+         }
+       };
+
+       \node[code,below=.1 of inclusion,align=left,lecture=3] (inclusion-code) {
+         class Derived\\
+         \hspace{2ex}: public Base
+       };
+
+       \node[code,below=.1 of parametric,align=left,lecture=3] (parametric-code) {
+         uint32\_t\\length(List[N])
+       };
+
+       \node[code,below=.1 of overloading,align=left,lecture=4] (overloading-code) {
+         do(Point2D p);\\
+         do(Point3D p);
+       };
+
+       \node[code,below=.1 of coercion,align=left,lecture=5] (coercion-code) {
+         3 + 4.0
+       };
+
+       \node[fit=(universal) (inclusion-code) (parametric-code), draw, thick,srared, visible on=<2>]{};
+       \node[fit=(overloading) (overloading-code), draw,thick,srared, visible on=<3>]{};
+       \node[fit=(coercion) (coercion-code), draw,thick,srared, visible on=<4>]{};
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
