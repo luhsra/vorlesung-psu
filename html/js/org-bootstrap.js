@@ -46,7 +46,7 @@ $( document ).ready(function() {
 
         $("h2, h3").each(function(idx, headline) {
             if (headline.id) {
-                $(headline).wrapAll('<a href="#'+headline.id+'"></a>');
+                $('<a class="headlineref"  href="#'+headline.id+'">&#128279;</a>').appendTo(headline);
             }
         });
 

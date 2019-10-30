@@ -435,6 +435,28 @@ Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), 
 :CUSTOM_ID: 03-basic-types
 :END:
 
+Nachdem wir eine Idee davon haben, wie man den Begriff des Typen definiert und was man prinzipiell damit machen kann, wollen wir uns nun einige Typen anschauen, die ganz "typisch" sind und in vielen Programmiersprachen vorkommen.
+Diese Typen sind ein Basisset was man als Programmierer von einer Sprache erwartet bzw.
+erwarten darf.
+Dennoch ist es so, dass nicht jede Sprache diese Typen als built-in Typen bereit stellt, sondern sie durch Bibliotheken der Typemengen hinzugefügt wird.
+So ist es zum Beispiel typisch, dass der Listentyp nicht in die Sprache eingebaut ist, sondern mittels einer rekursiven Struktur als einfach verkettete Liste "nachgebaut" wird.
+An dieser Stelle merken wir bereits, wie die Komposition von built-in Typen uns erlaubt neue Abstraktionen auf bereits Bestehendem zu schaffen.
+
+Die Klasse der geläufigen Typen (um nicht immer typische Typen schreiben zu müssen), lässt sich grob in zwei Kategorien aufteilen.
+Zum einen haben wir die *skalaren Typen* die genau ein Objekt beschreiben, dass sich nicht weiter sinnvoll unterteilen lässt.
+Die Objekte der skalaren Typen werden also immer "als ganzes" im Program herum gereicht und verwendet.
+Im Gegensatz dazu gibt es die *zusammengesetzen Typen*, die sich aus mehreren, erstmal logisch unabhängigen Objekten, zusammensetzen.
+Bei diesen Typen ist es möglich, dass ein Teil des Objekts herausgelößt vom Rest betrachtet und herumgereicht werden kann.
+
+Bei einigen Typen lässt sich darüber streiten, ob sie nun skalar oder zusammengesetzt sind.
+So kann ein Typ technisch zusammengesetzt sein (weil er als Record implementiert ist), aber dennoch intentional skalar sein, weil er nur als Einheit herum gereicht werden soll.
+Ein Beispiel hierfür ist der C++ [[https://de.cppreference.com/w/cpp/memory/shared_ptr][~std::shared_ptr~]].
+
+** Skalare Typen
+:PROPERTIES:
+:CUSTOM_ID: 03-scalar-types
+:END:
+
 #+begin_src latex
   \dividerframe{Typische Typen}
 
@@ -470,6 +492,53 @@ Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), 
     \ei
   \end{frame}
 
+  #+end_src
+
+Die wichtigsten skalaren Typen sind die *numerischen Typen*, die wir verwenden um Zahlen dazustellen und die in ihrem Abstraktionenrucksack die arithmetischen Operationen mit sich herum tragen.
+Durch diese Typen scheint ganz häufig die technische Informatik und die Implementierung von arithmetischen Operationen auf dem realen Prozessor durch.
+So haben die ganzen Zahlen häufig einen endlichen Wertebereich, der sich an der Granularität des Speichers (1 Bytes sind 8 Bit) und der Wortbreite (8, 16, 32, 64 Bit) orientiert.
+Wir finden mit diesen Typen also Typen wieder, die auch die reale Maschine versteht und *effizient* speichern und verarbeiten kann.
+Neben der Anzahl der verfügbaren Bits ist für den Wertebreich der ganzzahligen Typen noch wichtig, ob sie mit Vorzeichen (~signed~) oder ohne Vorzeichen (~unsigned~) gespeichert werden sollen.
+Häufig definiert hier die Programmiersprache noch, dass vorzeichenbehaftete Ganzzahlen im Zweierkomplement gespeichert werden, weil hierfür effiziente Hardwareoperationen zur Verfügung stehen.
+
+Ein wichtiger Punkt bei diesen numerischen Typen ist die Frage:
+Was passiert eigentlich, wenn der Wertebereich überschritten wird.
+Also was passiert, wenn ich bei einem ~int8_t~, der gerade den Wert 128 hat eins aufaddiere?
+An dieser Stelle kann sich eine Programmiersprache sehr unterschiedliche Entscheidungen treffen:
+Die eine Möglichkeit ist, dass sie ein Überlaufverhalten definiert und bestimmt dass ~(int8_t)128++~ zum Wert -127 führt.
+Dadurch klopfen wir allerdings auch fest, dass die ganzen Zahlen das Verhalten des Zweierkomplements zeigen müssen.
+Soll ein Programm nun aber auf einer Einerkomplementmaschine ausgeführt werden, so muss der Übersetzer das Verhalten des Zweierkomplements aufwändig emulieren um die versprochene Sprachsemantik zu erfüllen.
+Die andere Möglichkeit, die zum Beispiel von C gewählt wird, ist den Ganzzahlüberlauf als *undefiniertes Verhalten* zu markieren.
+Dies bedeutet, dass der Übersetzer frei entscheiden kann, was passiert, wenn eine vorzeichenbehaftete Ganzzahl überläuft. Auf diese Weise können Ganzzahlen sowohl auf einem Rechner mit Einerkomplement als auch auf einem Zweierkomplementrechner effizient verarbeitet werden[fn::Integer Overflows sind allerdings ein schwerwiegendes Problem in real existierender Software.
+[[http://www.cs.utah.edu/~regehr/papers/tosem15.pdf][Understanding Integer Overflow in C/C++]], Dietz et. al., TOSEM 2015].
+
+Neben den ganzzahligen Typen gibt es dann normalerweise noch Fließkommazahlen mit einfacher Genauigkeit (~float~, 32 Bit) und doppelter Genauigkeit (~double~, 64 Bit).
+Diese Fliesskommazahlen haben ein wechselnde Genauigkeit über ihren ganzen Wertebreich, weswegen für Finanzanwendungen noch Festkomma- und Dezimalzahltypen zur Verfügung stehen können.
+Bei den Dezimalzahlen mit festen Komma gibt der Typ dann nicht die Anzahl der verwendeten Bits an, sondern wieviele Dezimalstellen vor und nach dem Komma präzise gespeichert werden. So kann der Typ ~DECIMAL(6,2)~ in der MySQL Datenbank alle Zahlen von -9999.99 bis 9999.99 auf den Cent genau speichern.
+
+Neben den Zahlen mit endlichem Wertebereich gibt es auch noch die ~bignum~ Typen. Bei diesem Typen garantiert die Sprache, dass es niemals zu einem Überlauf kommt. Technisch werden, wenn die Zahl überlaufen sollte einfach mehr Speicher allokiert. Ein Beispiel für so eine Sprache, die implizit von Ganzzahlen endlicher Länge auf ~bignums~ wechselt ist Python:
+
+#+begin_src python
+import sys
+MAX_INT = sys.maxsize # Der größte Integer der als <type 'int'> dargestellt werden kann.
+# <type 'int'> hat endliche Länge
+# <type 'long'> ist ein Bignum
+print [type(1), type(MAX_INT), type(MAX_INT+1), type((MAX_INT+1)-1)]
+#+end_src
+
+Neben den numerischen Typen gibt es dann noch die Aufzählungstypen, bei denen der Entwickler selbst einen Typ als eine menge diskreter Werte definieren kann.
+Diese Typen sind nützlich, wenn eine Menge von Werten mit lesbaren Namen versehen werden soll.
+Häufig garantiert die Sprachsemantik dann noch, dass die Elemente dieser Aufzähl eine totale Ordnung haben und man, im Beispiel ~red < green~ machen kann.
+Dies rührt daher, dass die Aufzählungstypen normalerweise auf Ganzzahlen abgebildet werden.
+Bei manchen Sprachen ist die Abstraktion der Aufzählungstypen allerdings löchrig und man kann einer Variable vom Aufzählungstyp auch einen Wert zuweisen, der nicht in der Aufzählung vorkommt:
+
+#+begin_src C
+typedef enum {red, green, blue} color_t;
+
+color_t invalid_color = 1000;
+#+end_src
+
+#+begin_src latex
   \begin{frame}[t,fragile]{Skalare Typen: Zeiger und Funktionen}
     \bi
     \ii Zeiger sind gespeicherte Referenzen auf Objekte vom Basistyp {
@@ -490,7 +559,7 @@ Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), 
     \ii<2-> Funktionstypen beschreiben den Rückgabetyp und die Parametertypen\\{
       \bi
       \ii Strukturell: Typausdruck für \codeinline{strlen} ist \typeinline{func(size\_t, pointer(char))}
-      \ii Abstraktional: \siginline{call}{func(R,\ldots)}{R} (\enquote{Funktionen sind aufrufbar})
+      \ii Abstraktional: \siginline{call}{func(R,\ldots) $\times$ \ldots}{R} (\enquote{Funktionen sind aufrufbar})
       \ii Denotational: Maschinencode der Funktion ist ein Objekt dieser Typen.
       \ei
     }
@@ -498,11 +567,63 @@ Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), 
   \end{frame}
 #+end_src
 
-- Skalare Typen
-  - bool
-  - enums
-  - integer/floats & subrange types
-  - Funktionstypen
+Weiterhin sind auch die Zeiger- bzw.
+*Referenztypen* skalar.
+Die Objekte dieser Typen sind nicht an sich nützlich, sondern sie enthalten Referenzen auf andere Objekte.
+Im Beispiel ist der Wert ~0x1234~ das Zeigerobjekt selbst und es referenziert das Objekt ~500~.
+Um diese Referenzierung ins Typssystem einzubinden, sagt ein Zeigertyp häufig nicht nur "ich bin eine Referenz", sondern auch "Ich bin eine Referenz auf ein Objekt vom Typ X.
+In unserem Fall haben wir einen ~pointer(int)~ vor uns; das referenzierte Objekt ist also immer eine Ganzahl, niemals aber ein double.
+
+Als kleinste Menge an Abstraktionen muss ein Zeigertyp, um nützlich zu sein, dereferenziert werden können.
+Durch das dereferenzieren kommen wir zur Laufzeit zum referenzierten Objekt.
+Spannend an diesem ~dereference~ Interface ist seine parametrische Schreibweise, bei der die Signatur andeutet, dass der Pointee-Type T aus dem Typausdruck ~pointer(T)~ ausgepackt und als Rückgabetyp verwendet wird.
+Mehr zu dieser Art der Typmuster werden wir im Unterkapitel über Polymorphie lernen.
+
+In Sprachen kann es Unterschiedliche Arten von Referenztypen geben, die, neben der reinen Objektreferenzieren, noch weitere Eigenschaften haben.
+So gibt der C++ Referenztyp ~T&~ die Garantie, dass immer ein valides Objekt referenziert ist.
+Der ~std::unique_ptr~ stellt sicher, dass es immer nur eine Referenz für das referenzierte Objekt zu einem Zeitpunkt gibt.
+Dies bedeutet, dass der Besitzer des ~std::unique_ptr~ auch das Objekt alleinig "besitzt".
+
+Im Zoo der skalaren Typen spielen die Funktionstypen eine ganz zentrale Rolle, wenn auch eine sehr sonderbare, denn Funktionsobjekte können nicht verändert werden und nur ganz wenige Sprachen erlauben das Anlegen neuer Funktionsobjekte zur Laufzeit (JavaScript und Python sind Beispiele hierfür).
+Ein Funktionstype beschreibt das Interface, dass eine Funktion aufweißt:
+Also welche Typen haben die Parameter, und was ist der Rückgabetyp.
+Jede Funktion hat einen Funktionstyp, der direkt aus ihrere Signatur, durch weglassen der Parameternamen, berechnet werden kann.
+Die einzige Operation auf einem Funktionstyp ist der Aufrufoperator ~call~, der eine Funktion mit ihrer Argumentliste füttert und den Rückgabewert, korrekt getypt mit ~R~, zurückliefert.
+
+Eigentlich können wir Funktionstypen nicht verwenden um Variablen zu typen: da wir keine neuen Funktionsobjekte anlegen können, können wir sie auch nicht zuweisen bzw. kopieren. Daher können wir höchstens einen Zeiger auf ein Funktionsobjekt, einen *Funktionszeiger*, herumreichenn: ~pointer(func(size_t, pointer(char)))~.
+Da diese strikte Trennung zwischen Funktion und Funktionszeiger allerdings eher müßig ist, wird häufig nicht besonders Trennscharf zwischen Funktion und Funktionspointer unterschieden.
+
+Ein anderer wichtiger Aspekt, der nicht offensichtlich ist, aber der eigentlich aus der Orthogonalität von Typkonstruktoren hervorgeht ist, dass wir Funktionstypen definieren können für Funktionen die (Zeiger auf) Funktionen zurückgeben:
+~func(func(size_t, pointer(char)), int)~.
+Dieser Typausdruck besagt, dass die Funktion einen ~int~ übergeben bekommt und eine Funktion vom Typ ~func(size_t, pointer(char))~ zurückliefert.
+Zumindest in C ist die Syntax für solche Funktionen allerdings mehr als unintuitiv, weshalb man dort lieber ein ~typedef~ verwenden sollte:
+
+#+begin_src C
+#include <string.h>
+
+size_t (*func(int param)) (const char* ) {
+    return &strlen;
+}
+
+typedef size_t (*func_ptr_t)(const char*);
+
+func_ptr_t func2(int param) {
+    return &strlen;
+}
+#+end_src
+
+In Sprachen in Funktionen als Rückgabewert häufiger vorkommt gibt es deutlich intuitivere Notationen für solche Funktionstypen. In Haskell Notation wäre diese Funktion dann:
+
+#+begin_src haskell
+  func:: int -> const char* -> size_t
+  -- '->' ist Rechtsbindend und daher äquivalent zu:
+  func:: int -> (const char * -> size_t)
+#+end_src
+
+** Zusammengesetzte Typen
+:PROPERTIES:
+:CUSTOM_ID: 03-composite-types
+:END:
 
 #+begin_src latex
   \begin{frame}[fragile]{Zusammengesetzte Typen: Strukturen}
@@ -553,7 +674,50 @@ Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), 
     }
     \ei
   \end{frame}
+  #+end_src
 
+
+Die anderen geläufigen Typen sind die zusammengesetzten Typen.
+Die Objekte dieser Typen bestehen aus mehrere Subkomponenten/Elementen zusammen, die auch herausgelößt Sinn ergeben.
+So hat eine Liste viele Listenelemente; jedes einzelne Listenelement ergibt auch ohne die Liste einen Sinn.
+Es gibt, ganz allgemein gesprochen, drei verschiedene Kategorien von komponierenden Typen:
+Strukturen, Sequenzen und Abbildungen.
+
+Bei den *Strukturtypen* sind die Subkomponenten /eindeutig/ benannt (~name~), aber ihre Anzahl ist endlich und Teil des Typausdrucks.
+Durch diese eindeutige Benennung der Elemente ist zu jedem Zeitpunkt eine eindeutige Wiederauffindbarkeit, anhand des Strukturtyps und des gegebenen Namens, gewährleistet.
+Das Wiederauslesen der Elemente geschieht durch den ~dot_operator~, der den Typausdruck des Strukturtypen inspiziert:
+Auf Ebene der Objekte, holt der Operator das Element mit dem entsprechenden Namen heraus und gibt es zurück.
+Auf Ebene der Typen, hat der Operator den Elementtyp mit dem entsprechenden Namen als Rückgabetypen.
+Wenn der Rückggabetyp des ~dot_operators~ eindeutig und zur Übersetzungszeit festgelegt sein soll, was für die meisten übersetzten Sprachen der Fall ist, so muss der ~name~ eine Konstante sein.
+Etwas was dadruch erreicht wird, dass man Bezeichner als Strukturtypnamen verwendet.
+Alle anderen Regeln, die für Strukturtypen gelten, wie dass die Elemente in einer gewissen Ordnung gespeichert werden, sind sprachspezifisch.
+
+Um das ganze etwas plastischer zu machen, wollen wir uns ansehen wie C ~struct~ Typen auf unser Modell von Strukturtypen passen:
+
+#+begin_src C
+  typedef struct {
+     int    feld_1;
+     double feld_2;
+  } foo_t ;
+  // type foo_t
+  //    = record((int,    field_1),
+  //             (double, field_2))
+
+  ...
+  struct foo var;
+  var.feld_1 = 1;    // dot_operator(foo_t, feld_1) -> int
+  var.feld_2 = 1.5;  // dot_operator(foo_t, feld_2) -> double
+#+end_src
+
+Der Strukturtyp hat zwei Elemente mit den Namen "feld_1" und "feld_2; beide Elemente haben unterschiedliche Typen (int, double).
+Der ~dot_operator~ ist als ~.~ in der Sprache als Infixoperator eingebaut und als zweites Argument werden Bezeichner verwendet, wie sie aus dem Scanner fallen.
+
+Es gibt zwei geläufige Sonderformen von Strukturtypen:
+Tupel und variante Records.
+Bei Tupeln sind die Elemente nur implizit über ihre Position im Tupel benannt; der Benutzer muss sich keinen expliziten Namen ausdenken.
+Bei Varianten Records, in C ~union~, ist zur Laufzeit immer nur ein Element gültig und alle Elemente teilen sich den gleichen Speicherplatz.
+
+  #+begin_src latex
   \begin{frame}[fragile]{Zusammengesetzte Typen: Sequenzen}
     \begin{columns}[b]
       \begin{column}{0.49\textwidth}
@@ -601,7 +765,22 @@ Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), 
     \ei
   \end{frame}
 
-  \begin{frame}[fragile]{Zusammengesetzte Typen: Abbildungen}
+  #+end_src
+
+Der zweite geläufige zusammengesetzte Typ sind *Sequenzen*.
+Bei Sequenzen erlauben wir, dass die Anzahl der Elemente zur Laufzeit variabel und potentiell unendlich ist.
+Um dennoch eine eindeutige Typisierung zu bekommen, verlangen wir, dass alle Elemente der Sequenz den gleichen Typ haben.
+Um auf die Elemente von Sequenzen zugreifen zu können, muss die Sequenz 2 Operationen (~head~, ~tail~) anbieten.
+Dabei liefert ~head~ ein Element, bei geordneten Sequenzen das erste, und ~tail eine Sequenz mit allen anderen Elementen zurück.
+
+Die einfachste Variante eines Sequenztyps ist die einfach verkettete Liste, über die wir schon genug geredet haben.
+Aber auch andere Sequenzen wie eine priorisierte Warteschlange (Java:
+~PriorityQueue<T>~)oder eine ungeordnete Menge (Java:
+~HashSet<T>~) fallen in die Kategorie Sequenzen.
+In jedem Fall können wir eins ums andere Element aus der Sequenz entfernen und sind uns immer sicher ein Objekt vom Typ T in Händen zu halten.
+
+#+begin_src latex
+   \begin{frame}[fragile]{Zusammengesetzte Typen: Abbildungen}
       \begin{columns}[b]
         \begin{column}{0.49\textwidth}
           \begin{code}[tag=C]
@@ -648,16 +827,35 @@ Andere Sprachen, wie Ada erlauben es nicht nur Typaliase anzulegen (~subtype~), 
     \ei
 
   \end{frame}
-
 #+end_src
-- Zusammengesetzte Typen
-  - Pointer
-  - Records
-  - Unions
-  - Arrays
-  - Sets & Listen
 
-FIXME: - Was tun, wenn meine Sprache einen Typ nicht anbietet? Minimale Wunsch ist: Record+Struct oder
+Die dritte Variante von zusammengesetzten Typen sind die *Abbildungstypen*.
+Ihr Typkonstruktor ~map(K,V)~ bekommt (mindestens) zwei Typen als Argument, die die Indexmenge (~K~) und die Wertemenge (~V~) der Abbildung typisieren.
+Beide Mengen sind, wie bei den Sequenzen, homogen typisiert.
+Der Zugriff auf die Elemente von Abbildungen erfolgt, anderes als bei Sequenzen, wahlfrei durch ~get()~, welches aus einem Abbildungsobjekt und einem Objekt der Indexmenge das vorher zugewiesene Objekt der Wertemenge liefert.
+Da sowohl Indices als auch Werte homogen getypt sind, ist die Signatur von ~get()~ Anhand des Typausdrucks des Abbildungstypen eindeutig.
+Etwas informeller Ausgedrückt: Mit Abbildungen kann ich etwas unter einem Index speicher, und unter dem gleichen Index wiederfinden.
+
+Der wohl geläufigste Abbildungstyp, den man zuerst nicht als solchen identifiziert, ist das *Array*.
+Bei Arrays ist der Datentyp der Indexmenge auf ~int~ festgelegt ist, die Indexmenge kompakt (ohne Lücken) ist, und beim Erstelen der Abbildungsobjekte angegeben werden muss. Dies geschieht durch die Angabe der Arraygröße und den Startindex.
+Häufig ist der Startindex noch per Sprachregel, wie bei C, auf 0 festgetackert.
+Allerdings wird die Zugehörigkeit von Arrays zu den Abbildungstypen klarer, wenn wir uns anschauen, das Sprachen, wie Pascal, gibt die es dem Programmierer erlauben den Startindex frei zu wählen. Wenn wir einen Verein mit mindestens 3, aber maximal 100 Mitgliedern typisieren wollen können wir dort schreiben:
+
+#+begin_src pascal
+type verein_t = array[3..100] of mitglied_t;
+#+end_src
+
+Die ander geläufige Variante von Abbildungstypen sind die *assoziativen Arrays*, bei denen der Benutzer den Datentyp der Indexmenge frei wählen kann.
+Diese assoziativen Arrays sind unter sehr vielen Namen bekannt, funktionieren aber eigentlich immer ziemlich gleich.
+Eine Besonderheit sind viele Skriptsprachen, bei denen die Homogenitätsanforderung, sowohl für die Indices als auch für die Werte, aufgehoben wird.
+Aus Sicht des Typsystems hat die Abbildung also den Typ ~map(object, object)~:
+Wir stecken Objekte von irgendwelchen Typen rein, und vielleicht finden wir ein assoziiertes Objekt von irgendeinem anderen Typ.
+
+Der geneigte Leser wird sich da Fragen:
+Was ist eigentlich der Unterschied zwischen einer Struktur und einer Abbildung?
+Die Antwort darauf ist, dass im ganz allgemeinen Fall ~get()~ und ~dot_operator()~ das gleiche sein können.
+Normalerweise lassen wir aber beim ~dot_operator~ nur konstante Namen zu, während wir bei ~get()~ den Index dynamisch berechnen können.
+Es gibt, mit Lua, sogar eine Programmiersprache, die nur einen solchen flexiblen Abbildungsttypen anbietet und sowohl Sequenzen als auch Strukturen nur Sonderfälle sind von Abbildungen sind.
 
 * Polymorphismus
 :PROPERTIES:

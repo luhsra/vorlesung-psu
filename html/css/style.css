@@ -43,8 +43,11 @@ a.carousel-control-prev, a.carousel-control-next {
     cursor: pointer;
 }
 
-.headlineref {
-    text-style: normal;
+a.headlineref:link {
+    text-decoration: none;
+    padding-left: 1em;
+    background: none;
+    text-size: 80%;
 }
 
 button.execute {
