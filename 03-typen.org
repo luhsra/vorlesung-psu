@@ -1293,11 +1293,29 @@ Allerdings ist es deutlich schwieriger zu sagen, wie es um die Typkompatibilitä
 Ist zum Beispiel ~List[int]~ kompatibel zu ~List[float]~?
 Dies hängt maßgeblich davon ab, wie die übergebenen Typen zueinander stehen.
 Sind diese in keinster Weise kompatibel, so können wir auch davon ausgehen, dass die daraus instanziierten Listentypen kompatibel zueinander sind. Eine ~List[Pferd]~ und eine ~List[Brötchen]~ sind sicherlich nicht durcheinander substituierbar. Beim einen kommen Pferde, beim anderen mal Brötchen raus; beide haben nichts miteinander gemein.
+Verwenden wir allerdings Subtypen im generischen Typ kommt es zu drei verschiedenen Fällen: Kovarianz, Kontravarianz und Invarianz.
 
+Bei der Kovariant sind die intantierten Typen in der gleichen Richtung kompatibel, wie der übergebene Typ.
+Im Beispiel ist Cake kompatibel mit Bread (~Cake~ -> ~Bread~) und der dazugehörige Bäcker ist ein die gleiche Richtung kompatibel:
+~Baker[Cake]~ -> ~Baker[Bread]~.
+In Umgangsprache würde man sagen:
+Jeder Kuchenbäcker ist auch ein Brotbäcker, weil Kuchen spezielle Brote sind.
+Diese Art der Kompatibilität tritt ein, wenn der generische Typ nur Quelle für Objekte des Subtyps sind, da jedes enspringende Objekt sofort als Objekt der Oberklasse interpretiert werden kann.
+Etwas anschaulicher können wir bei der Methode jeder Methode des Bäckers, der Cake zurückliefert (~Cake Baker[Cake]::bake()~) einen Cast zu ~Bread~ vorlagern:
+~((Bread) Baker[Cake]::bake())~.
 
+Der umgekehrte Fall tritt ein, wenn der generische Typ nur eine Senke für parametrische Objekte ist.
+In diesem Fall können wir Kontravarianz annehmen, bei der die Kompatibilität genau entgegen der Vererbungsrichtung geht: ~Customer[Bread]~ -> ~Customer[Cake]~.
+Bei der Kontravarianz ist das Argument zur plausibilisierung genau umgekehrt: Der generische Typ ist an seinen Methodenargumenten Senke und dort können wir die passenden Casts einfügen:
+Der Subtyp ~Customer[Bread]::eat(Bread *)~ ist kompatibel mit allen Aufrufen bei denen wir einen ~Cake~ übergeben: ~Customer[Bread]::eat( (Bread) cake);~.
+
+Ist der generische Typ sowohl Quelle, als auch Senke für parametrische Objekte, so können wir keine Kompatibilität annehmen. In diesem Fall sind die instantiierten Typen Invariant und inkompatibel zueinander.
+
+Das Theme von Kovarianz, Kontravarianz und Invarianz ist eigentlich noch allgemeiner als nur das Zusammenspiel von Subtypen und parametrischem Polymorphismus.
+Es erstreckt sich auf weitere Aspekte von Typssystemen, die wir hier allerdings nicht weiter besprechen werden. Das verbindende ist immer: Kovarianz bedeutet das Kompatibilität entlang der Vererbungsrichtung stattfindet; Kontravarianz bedeutet, dass es entgegen der Vererbungsrichtung geschieht.
 
 #+begin_src latex
-  \begin{frame}[fragile]{Type Traits: \enquote{Typen von Typparametern}}
+  \begin{frame}[fragile]{\enquote{Typen von Typen}: Parameterbeschränkungen}
     \OrangeBox{\codebox{Baker[Car]} ist sinnlos: Autos backt man nicht bei 180 Grad Umluft.}
     \bigskip
 
@@ -1350,6 +1368,27 @@ Sind diese in keinster Weise kompatibel, so können wir auch davon ausgehen, das
     \ei
   \end{frame}
 #+end_src
+
+Zunächst haben wir gesagt, dass jeder Typausdruck als Parameter für einen generischen Typen herhalten kann.
+Für viele generische Typen, vor allem für Containertypen (~List[N]~), macht dies auch durchaus Sinn.
+Allerdings gilt dies nicht für alle generischen Typen:
+Zum Beispiel, wenn der generische Typ die Operationen des Parametertypen verwendet (und nicht nur seine Objekte herumreicht), so ist es nötig, dass der übergebene Typ auch diese Operationen bereitstellt.
+Im Beispiel könnte man sagen: Der ~Baker[T]~ wird seine Gebäcke ~T~ fragen bei welcher Temperatur sie gebacken werden wollen (~T::degrees()~). Da ein ~Car~ allerdings diese Schnittstelle nicht anbietet ist der Typ ~Baker[Car]~ quatsch.
+
+Um dieses Problem anzugehen bieten viele polymorphe Typsysteme noch die Möglichkeiten Einschränkungen für Typparameter anzugeben.
+So ist es bei Java möglich zu fordern dass ein Parameter Unter- (oder Überklasse) einer bestimmten Klasse sein muss (~T extends Bread~).
+Es wird also entlang der Vererbungshierarchie ein Einschränkung der möglichen Belegungen von ~T~ vorgenommen.
+
+Wenn wir jetzt einen Schritt zurück treten und uns die denotationale Interpretation von Typen (Typen sind ihre Objektmenge) in Erinnerung rufen, so sehen wir dass wir nur Typen über Typen geschaffen haben.
+~T extends Bread~ ist ein Typ eine Menge an Typen als Objektmenge hat.
+
+Syntaktisch noch deutlicher kann man dies bei Rust und Type Traits sehen:
+Dort wird der Typtyp explizit angelegt und ~trait~ genannt.
+Im Fall von Rust ist dieser Trait noch mit einem gebotenem Interface verbunden.
+Mittels ~impl~ können Typen explizit zur Objektmenge des Traits hinzugefügt werden (wobei das Interface entsprechend implementiert werden muss).
+Wenn wir uns jetzt die Signatur von ~fn bake~ anschauen, dann sehen wir die parallele Konstruktion in der Parameterliste des Typen und der Funktion:
+~Bakable~ ist der Typ des Typparameters ~T~, und ~T~ ist der Typ des (echten) Parameters ~b~.
+Wir müssen uns nur die spitzen Klammern ~<>~ als runde Vorstellen ~()~.
 
 * Typsysteme in Programmiersprachen
 :PROPERTIES:
