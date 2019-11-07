@@ -9,7 +9,7 @@ class ParserError(RuntimeError):
 
 class Stream:
     """Eine (ineffiziente) Abstraktion fuer einen Eingabestrom aus Tokens,
-       die es erlaubt ein einzelnes Zeichen in die Zukunft zu blicken
+       die es erlaubt, ein einzelnes Zeichen in die Zukunft zu blicken.
        (look-ahead).
     """
     def __init__(self, data):
@@ -21,7 +21,7 @@ class Stream:
             return self.data[0][0]
 
     def read(self, expected=None):
-        """Consumes the first token and returns it. If `expected' is given
+        """Consumes the first token and returns it. If `expected' is given,
            the token type is checked and a ParserError is thrown in case."""
         token = self.data.pop(0)
         if expected is not None and token[0] != expected:

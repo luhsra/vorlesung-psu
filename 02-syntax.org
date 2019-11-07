@@ -90,40 +90,40 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
 
 Ein Übersetzer für
-(Maschinen)programme{{{see(01-ebenenmodell,Ebenenmodell)}}} wird
+(Maschinen-)Programme{{{see(01-ebenenmodell,Ebenenmodell)}}} wird
 meistens mit einer, oft sehr langen, Zeichenkette konfrontiert, von
-der der Programmierer behauptet es wäre ein valides Programm. Da der
-Programmier beim kodieren wahrscheinlich unter Zeitdruck stand, faul
-war, oder einfach ein anderes Verständnis von Ästhethik hat, darf der
+der der Programmierer behauptet, es wäre ein valides Programm. Da der
+Programmier beim Kodieren wahrscheinlich unter Zeitdruck stand, faul
+war, oder einfach ein anderes Verständnis von Ästhetik hat, darf der
 Übersetzer kreative Formatierungen und allerhöchstens die Erfüllung
-der minimalen Sprachregeln erwarten. Er muss also heraus finden, ob
+der minimalen Sprachregeln erwarten. Er muss also herausfinden, ob
 diese Zeichenkette ein valides Programm der erwarteten Sprache
 darstellt oder ob es fehlerhaft ist.
 
 Der erste Schritt dieser akribischen Untersuchung des Quellprogramms
 ist die *Syntaktische Analyse* oder *Syntaxanalyse*. Diese ist
 Vergleichbar mit der Rechtschreib- und Grammatikprüfung bei
-normalsprachlichen Texten, bei er es zunächst auch nur darum geht ob
+normalsprachlichen Texten, bei der es zunächst auch nur darum geht, ob
 alle Worte richtig geschrieben und die Regeln der Satzstruktur
-eingehalten wurde. Dabei überprüft die Syntaxanalyse ebensowenig den
+eingehalten wurde. Dabei überprüft die Syntaxanalyse ebenso wenig den
 Sinn eines Satzes, welchen man auch als seine *Semantik* bezeichnen
 kann, wie dies ein Rechtschreibprogramm tut.
 
 Ein Beispiel, im Kontext von Programmiersprachen, für den Unterschied
-zwischen Syntax und Semantik ist das folgende Python Programm. Es
+zwischen Syntax und Semantik ist das folgende Pythonprogramm. Es
 stellt zwar ein syntaktisch korrektes Programm dar, ist also nach den
-Regeln der Sprache aufgeschrieben worden, aber es macht ergibt keinen
+Regeln der Sprache aufgeschrieben worden, aber es ergibt keinen
 Sinn, weil die Variable ~undef_variable~ nicht definiert wurde.
-Versuchen sie im interaktiven Interpreter, der auch eine Syntaxanalyse
-durchführt wie ein Übersetzer, einen Syntaxfehler zu provozieren.
+Versuchen Sie im interaktiven Interpreter, der wie ein Übersetzer auch eine Syntaxanalyse
+durchführt, einen Syntaxfehler zu provozieren.
 
 #+begin_src python
 foo = undef_variable + 3
 #+end_src
 
-Um zu Prüfen ob ein gegebenes Programm wirklich zum Maschinenmodell
-passt, wird es demnach nicht ausreichen seine Syntaktische Korrektheit
-zu prüfen. Aber es ist ein erster, wichtiger Schritt.
+Um zu prüfen, ob ein gegebenes Programm wirklich zum Maschinenmodell
+passt, wird es demnach nicht ausreichen, seine syntaktische Korrektheit
+zu prüfen. Aber es ist ein erster wichtiger Schritt.
 
 Als Seiteneffekt der Syntaktischen Analyse bekommen wir auch noch den
 *abstrakten Syntaxbaum* oder AST (engl. abstract syntax tree). Dieser
@@ -138,16 +138,17 @@ Für den Informatiker ist die Beschäftigung mit dem Thema Scannen und
 Parsen aus mehreren Gründen sehr lohnend: Durch den direkten Vergleich
 von Programmtext und AST sieht man, dass die konkrete Syntax einer
 Programmiersprache relativ egal ist, hauptsächlich mit Ästhetik,
-Klarheit und leichter Verständlichkeit zusammehängt, und vom
-Übersetzer bereits im ersten Schritt weg gewischt wird. Dennoch ist
-die Extraktion von Strukturen aus einer Zeichenkette ein immer wieder
-kehrendes Thema der Informatik, die nicht nur bei Programmiersprachen
-auftritt, sondern, zum Beispiel, auch bei Dateiformaten oder Netzwerkprotokollen.
+Klarheit und leichter Verständlichkeit zusammenhängt, und vom
+Übersetzer bereits im ersten Schritt weggewischt wird. Dennoch ist
+die Extraktion von Strukturen aus einer Zeichenkette ein immer
+wiederkehrendes Thema der Informatik, das nicht nur bei
+Programmiersprachen auftritt, sondern, zum Beispiel, auch bei
+Dateiformaten oder Netzwerkprotokollen.
 
 Daher hat die Informatik auch eine Reihe von präzisen Formalismen
-entwickelt (Reguläre und Kontextfreie Sprachen) mit Hilfe derer man
+entwickelt (reguläre und kontextfreie Sprachen), mit Hilfe derer man
 solche Problem erfassen und angehen kann. Mit dieser Formalisierung
-kam auch die Möglichkeit Werkzeuge zu bauen, die einem dabei helfen
+kam auch die Möglichkeit Werkzeuge zu bauen, die einem dabei helfen,
 Werkzeuge zur Syntaxanalyse zu erstellen
 (Parsergeneratoren)[fn::Parsergeneratoren werden auch
 Compiler-Compiler genannt, da sie Übersetzer sind, die Code erzeugen,
@@ -167,15 +168,15 @@ der in Übersetzern verwendet wird.].
     \ii<2-> Gruppierung von Zeichen zu sprachspezifischen Bausteinen (Token) {
       \bi
       \ii Token haben eine \emph{Klasse} (func) und ggf. eine \emph{Nutzlast} (\texttt{"fnord"}, 23).
-      \ii Tokenstrom enthält keine Leerzeichen oder Kommentare.
+      \ii Der Tokenstrom enthält keine Leerzeichen oder Kommentare.
       \ii Unterschiedliche Schreibweisen (0x17, 23, 027, 0b10111) sind vereinheitlicht.
-      \ii Gemeinsame Prefixe werden zum längsten Match aufgelößt (\texttt{fn} vs. \texttt{fnord})
+      \ii Gemeinsame Präfixe werden zum längsten Match aufgelöst (\texttt{fn} vs. \texttt{fnord}).
       \ei
     }\medskip
     \ii<3-> Ziele der Abstraktion vom einzelnen Zeichen zum Token{
       \bi
       \ii \alert{Komplexitätsreduktion:} Es gibt immer weniger Token als Zeichen.
-      \ii \alert{Fokusierung} auf die Sprachelemente, nicht auf ihre Schreibweise.
+      \ii \alert{Fokussierung} auf die Sprachelemente, nicht auf ihre Schreibweise.
       \ii \alert{Vereinfachung} des Parsens durch weniger Sonderfälle (Kommentare).
       \ei
     }
@@ -187,10 +188,10 @@ der in Übersetzern verwendet wird.].
        \signature{scanner\_next}{Stream[char]}{Token}
     \end{center}
     \bi
-    \ii<2-|handout:2-> Der Scanner (auch Abtaster oder Lexer) erzeugt den Tokenstrom {
+    \ii<2-|handout:2-> Der Scanner (auch Abtaster oder Lexer) erzeugt den Tokenstrom. {
       \bi
       \ii \texttt{scanner\_next} konsumiert Zeichen vom Anfang bis zum Ende eines Tokens.
-      \ii Implementierung: \alert<3>{manuell} oder mittels Regulären Ausdrücken und Tooling
+      \ii Implementierung: \alert<3>{manuell} oder mittels regulärer Ausdrücke und Tooling
       \ei
     }
     \ei
@@ -206,73 +207,73 @@ der in Übersetzern verwendet wird.].
   \end{frame}
 #+end_src
 
-Die Eingabe unseres Übersetzer ist eine Zeichenkette, die der
-Programmier auf der Tastatur mühsam eingetippt und dann in einer Datei
-gespeichert hat. In dem Prozess des kodierens hat der Programmierer
-die Programmstruktur, die in seinem Geist enstanden ist, in diese Zeichenkette *serialisiert*.
+Die Eingabe unseres Übersetzers ist eine Zeichenkette, die der
+Programmierer mühsam auf der Tastatur eingetippt und dann in einer Datei
+gespeichert hat. In dem Prozess des Kodierens hat der Programmierer
+die Programmstruktur, die in seinem Geist entstanden ist, in diese Zeichenkette *serialisiert*.
 
 Als ersten Schritt wollen wir die Zeichenkette in einen linearen
 *Tokenstrom* aus sprachspezifischen Elementen, wie Schlüsselwörter und
-Identifier, verwandeln. Dazu läuft der *Scanner* (= *Lexer*) einmal(!)
-über die Zeichenkette und emitiert, immer wenn ein vollständiges
+Bezeichner, verwandeln. Dazu läuft der *Scanner* (= *Lexer*) einmal(!)
+über die Zeichenkette und emittiert, immer wenn ein vollständiges
 Sprachelement, was häufig aus mehr als einem Zeichen besteht, gelesen
 wurde, ein einzelnes *Token*. Diese Token haben immer eine Tokenklasse
-(z.B. Identifier oder "offnende runde Klammer") und manchmal eine
+(z.B. Bezeichner oder "öffnende runde Klammer") und manchmal eine
 Nutzlast. In dieser Nutzlast transportiert der Scanner weitere
-Informationen zum Token zu den Nachfolgenden Übersetzerstufen. So
-haben beispielsweise alle Identifier die kleine Tokenklasse
+Informationen zum Token zu den nachfolgenden Übersetzerstufen. So
+haben beispielsweise alle Bezeichner die kleine Tokenklasse
 (~identifier~) und tragen die überspannten Zeichen aus der Eingabe
-(das Lexem) als Identifiername als Nutzlast mit sich herum.
+(das Lexem) als Bezeichnername als Nutzlast mit sich herum.
 
-Durch den Prozess des Scannens elimieren wir Leerzeichen und jegliche
+Durch den Prozess des Scannens eliminieren wir Leerzeichen und jegliche
 Codeformatierung, wir vereinheitlichen unterschiedliche Schreibweisen
 des gleichen Sprachelements und wir reduzieren die Anzahl der zu
-verarbeitenden Objekte erheblich. Dies macht Übersetzerbauer das Leben
-in folgenden erheblich einfacher, weil der Rest der Syntaxanalyse
+verarbeitenden Objekte erheblich. Dies macht Übersetzerbauern das Leben
+im Folgenden erheblich einfacher, weil der Rest der Syntaxanalyse
 deutlich schneller ablaufen kann und wir viele Sonderfälle der Sprache
 bereits abgedeckt haben. So würden wir beispielsweise einen deutlich
 aufwendigeren Parser benötigen, wenn wir erst dort Kommentare, die überall
 im Quellcode auftauchen können, behandeln würden.
 
-Um einen Scanner für eine Sprache zu erstellen haben wir prinzipiell
+Um einen Scanner für eine Sprache zu erstellen, haben wir prinzipiell
 zwei Möglichkeiten: Entweder wir kodieren eine entsprechende Funktion
 manuell oder wir leiten einen Scanner von einer Menge regulärer
 Ausdrücke mit Hilfe eines Generators ab. Der manuelle Ansatz wird auch
-*ad-hoc* Ansatz genannt, da die kodierung als ein normales Programm
-keinem Formalismus folgt. Dies hat den Nachteil, dass es schwierig ist
-einen korrekten Scanner mit der Hand zu schreiben, aber es bringt auch
+*ad-hoc* Ansatz genannt, da die Kodierung als ein normales Programm
+keinem Formalismus folgt. Dies hat den Nachteil, dass es schwierig ist,
+einen korrekten Scanner von Hand zu schreiben, aber es bringt auch
 den Vorteil, dass man an jeder Stelle Sonderbehandlungen einbauen
 kann, mit sich.
 
 In beiden Fällen benutzt der Scanner zwei Operationen auf dem
-Eingabestrom: *read()* konsumiert ein Zeichen vom Anfang gibt es
-zurück, *peek()* gibt dasselbe Zeichen zurück ohne es zu konsumieren.
+Eingabestrom: *read()* konsumiert ein Zeichen vom Anfang und gibt es
+zurück, *peek()* gibt dasselbe Zeichen zurück, ohne es zu konsumieren.
 Insbesondere letzteres, das Vorausschauen, oder *look-ahead*, im
 Zeichenstrom ist ein Konzept, welches uns beim Parser wieder begegnen
-wird. Eine wichtige Eigenschaft von Scannern und Parsern ist es wie
+wird. Eine wichtige Eigenschaft von Scannern und Parsern ist es, wie
 viele Zeichen der Vorausschau benötigt werden. Die meisten Sprachen
 kommen mit einem Scanner aus, der nur ein einzelnes Zeichen Vorschau
 benötigt[fn::Fortran ist ein trauriges Gegenbeispiel:
 [[http://shape-of-code.coding-guidelines.com/2009/12/20/parsing-fortran-95/]]
 ].
 
-Im Beispiel [fn::Vollständiger Scanner: [[file:./lst/02-scanner.py]]],
-liefert die Funktion ~scanner_next()~ bei jedem Aufruf eine 2-Elementige
+Im Beispiel[fn::Vollständiger Scanner: [[file:./lst/02-scanner.py]]]
+liefert die Funktion ~scanner_next()~ bei jedem Aufruf eine 2-elementige
 Liste, bestehend aus Tokentyp und Nutzlast, zurück. Die Funktion
-überspringt zunächst alle Leerzeichen und Tabulatorzeichen, bevor die
+überspringt zunächst alle Leer- und Tabulatorzeichen, bevor die
 eigentliche Tokenerkennung startet. Dieser Beispielscanner erkennt nur
-Ganzzahlen, allerding ist es möglich diese Zahlen in binärer
+Ganzzahlen, allerdings ist es möglich diese Zahlen in binärer
 (~0b111~), oktaler (~0777~), oder hexadezimaler Schreibweise zu
 erkennen. Hierfür erkennt der Scanner, ob ein entsprechendes Präfix
-vorliegt (z.B. ~0x~ für hexadezimal) und ließt dannach ensprechend der
+vorliegt (z.B. ~0x~ für hexadezimal) und liest danach entsprechend der
 erkannten Notation solange Zeichen aus der entsprechenden Klasse
-zulässiger Zeichen (~stream.read_many()~).
+zulässiger Zeichen, bis ein unzulässiges Zeichen erreicht wird (~stream.read_many()~).
 
 #+INCLUDE: ../lst/02-scanner.py
 
 An diesem Beispiel ist es wichtig zu erkennen, dass das Zeichen ~0~
 ein *gemeinsames* Präfix ist und erst mit dem zweiten Zeichen (~b~,
-~x~, oder eine Oktalzahl) wirklich feststeht welche Notation an dieser
+~x~, oder eine Oktalzahl) wirklich feststeht, welche Notation an dieser
 Stelle vorliegt. Mit jedem weiteren gelesenen Zeichen, wird hier die
 Menge der möglichen Notationen weiter eingeschränkt. So ist ab der
 ersten gelesenen ~0~ klar, dass es sich nicht mehr um eine Zahl in
@@ -290,11 +291,11 @@ Dezimalnotation handeln kann.
       \ii Wiederholung:      \btUseTab \emph{hexliteral} $\rightarrow$ \emph{hexprefix} \emph{hexdigit} \emph{hexdigit}*\hfill(Kleene Stern)
       \ei
     }\medskip
-    \ii Reguläre Ausdrücke sind eine Kurzschreibweise für diese Grammatiken {
+    \ii Reguläre Ausdrücke sind eine Kurzschreibweise für diese Grammatiken. {
       \bi
-      \ii Für hexadezimale Zahlen: 0x[0-9a0-f][0-9a-f]*
+      \ii Für hexadezimale Zahlen: 0x[0-9a-f][0-9a-f]*
       \ii Verwendung zum Pattern Matching in Texten (\texttt{grep(1)}, Py: \texttt{import re}, \ldots)
-      \ii Effizient Implementierbar in $\mathcal{O}(n)$, wenn $n$ die Eingabelänge
+      \ii Effizient implementierbar in $\mathcal{O}(n)$, wenn $n$ die Eingabelänge
       \ei
     }
     \ii<2-> Darstellung und Implementierung: (nicht-)deterministische Automaten {\medskip
@@ -309,7 +310,7 @@ Dezimalnotation handeln kann.
     \animation[width=\linewidth]{1/1,2/2,3/3,4/4,5/5,6/6,7/7,8/8,9/9,10/10,11/11,12/12}{fig/02-scanner}
 
     \bi
-    \ii Automaten parallel über die Eingabe ausführen.{
+    \ii Automaten parallel über die Eingabe ausführen{
       \bi
       \ii Longest Possible Match, Konfliktauflösung bei mehrfachem Match
       \ii Simulation des NFA, Umwandlung in \emph{determinstic finite automata} (\texttt{flex(1)})
@@ -320,27 +321,27 @@ Dezimalnotation handeln kann.
 
 #+end_src
 
-Für Schritt der Tokenerkennung aus einem Zeichenstrom hat
+Für den Schritt der Tokenerkennung aus einem Zeichenstrom hat sich
 herausgestellt, dass der Rückgriff auf formale Konzepte aus der
-theoretischen Informatik höchst lohnend ist und das man mit *regulären
+theoretischen Informatik höchst lohnend ist und, dass man mit *regulären
 Grammatiken* die Token der meisten Programmiersprachen hervorragend
-beschreiben kann. Daher wollen wir nun der ad-hoc Implementierung ~scanner_next()~ aus dem Beispiel, einen formaleren Hintergrund geben.
+beschreiben kann. Daher wollen wir nun der ad-hoc Implementierung ~scanner_next()~ aus dem Beispiel einen formaleren Hintergrund geben.
 
 Zu Beginn müssen wir uns daran erinnern, was Grammatiken überhaupt
 waren. Die theoretische Informatikvorlesung ist lange her, und die
 Erinnerung bereits verschommen. Zunächst ist eine (formale) Grammatik
-ein Regelsatz, der beschreibt wie man, beginnend von einem
-*Startsymbol*, über einen iterativen *Textersetzungsprozess*, zu einer
+ein Regelsatz, der beschreibt, wie man, beginnend von einem
+*Startsymbol*, über einen iterativen *Textersetzungsprozess* zu einer
 Zeichenkette kommt. Zu jedem Zeitpunkt besteht die Zeichenkette aus
 einer Reihe von *terminalen* und *nicht-terminalen* Symbolen und die
 Ersetzung wird solange wiederholt, bis nur noch terminale Symbole
 übrig sind. Die Ersetzung an sich erfolgt durch eine Menge von Regel,
 die ein Muster erkennt und durch ein anderes Muster ersetzt. Alle
-Zeichenketten, die abgeleitet werden können nennt man die zugehörige
+Zeichenketten, die abgeleitet werden können, nennt man die zugehörige
 (formale) Sprache[fn::Verwechslungsgefahr: Formale Sprachen sind etwas
 anderes als Programmiersprachen und sie haben nichts mit einem
 Maschinenmodell zu tun. Das Skript unterscheidet daher strikt zwischen
-formalen Sprachen und (einfach nur) Sprachen]. Im folgenden leiten
+formalen Sprachen und (einfach nur) Sprachen.]. Im Folgenden leiten
 wir, Zeile für Zeile, die Zeichenkette ~0xa2c~ aus dem Startsymbol
 ~hexliteral~ her:
 
@@ -355,8 +356,8 @@ hexprefix hexdigit hexdigit*
 #+end_example
 
 Je nachdem wie die Regeln einer Grammatik strukturiert sind, werden
-Grammatiken in unterschiedliche Klassen eingeteilt
-{{{wikipedia_de(Chomsky-Hierarchie)}}}. Eine der einfachsten Klassen, die
+Grammatiken in unterschiedliche Klassen eingeteilt{{{wikipedia_de(Chomsky-Hierarchie)}}}.
+Eine der einfachsten Klassen, die
 besonders wünschenswerte Eigenschaften hat, ist die Klasse der
 *regulären Grammatiken*. Bei ihr gilt, dass auf der rechten Seite nur
 ein einzelnes nicht-Terminal stehen darf. Dies bedeutet, dass die
@@ -364,35 +365,35 @@ Regel *kontextfrei* ist, da das nicht-Terminal, egal in welchem
 Kontext es steht, immer gleich ersetzt wird. Weiterhin muss für
 reguläre Grammatiken gelten, dass sie nicht rekursiv sind. Dies
 bedeutet, dass man durch wiederholte Anwendung der Regel nie mehr zum
-selben nicht-Terminal kommen darf. Beim Parsen werden wird
-*kontextfreie* Grammatiken verwenden, die genau diese Einschränkung
+selben nicht-Terminal kommen darf. Beim Parsen werden wir
+*kontextfreie* Grammatiken verwenden, die letztere Einschränkung
 nicht erfüllen und daher nicht regulär sind.
 
-Das Angenehme an regulären Grammatiken ist, dass man sehr leicht ein
-Programm ableiten kann, dass erkennt ob eine gegebene Zeichenkette von
+Das Angenehme an regulären Grammatiken ist, dass man sehr einfach ein
+Programm ableiten kann, das erkennt, ob eine gegebene Zeichenkette von
 der Grammatik erzeugt werden könnte. Wir drehen also die Richtung der
 Grammatik um, erzeugen keine Zeichenketten mehr, sondern konsumieren
 sie. Genau das, was wir für unseren Scanner brauchen.
 
 Für das Erkennen einer regulären Sprache konstruiert man aus den
-Grammatikregeln einen *endlichen Automaten* der die Zeichenkette
-elementweise konsumiert. An jeder Kante des Automaten gibt es einen
+Grammatikregeln einen *endlichen Automaten*, der die Zeichenkette
+elementweise konsumiert. An jeder Kante des Automaten gibt es eine
 Bedingung (engl. Guard), die angibt, bei welchen gelesenen Zeichen die
 Transition möglich ist. Ist die Entscheidung, welche Transition
 genommen wird, zu irgendeinem Zeitpunkt nicht eindeutig, so ist der
-Automat *nicht-determinisitisch*. Erreichen wir beim Zeichen
-konsumieren einen einen akzeptierenden Zustand, so haben wir ein Wort
+Automat *nicht-deterministisch*. Erreichen wir beim Zeichen
+Konsumieren einen akzeptierenden Zustand, so haben wir ein Wort
 der formalen Sprache erkannt. Allerdings können akzeptierende Zustände
-auch wieder Verlassen um noch längere Worte der Sprache zu Erkennen.
+auch wieder verlassen werden, um noch längere Worte der Sprache zu erkennen.
 Im Fall der Hexadezimalzahlen dürfen am Ende noch beliebig viele
 Zeichen aus der Klasse ~[0-9a-fA-F]~ auftauchen.
 
 Im Kontext eines Scanners bedeutet das Erreichen eines akzeptierenden
 Zustandes, dass wir ein valides Token gefunden haben. Allerdings
-könnte dieses Token auch das Prefix eines längeren Tokens sein. So ist
-zwar ~0xa2~ eine valide hexadezimale Zahl, aber es ist auch das Prefix
+könnte dieses Token auch das Präfix eines längeren Tokens sein. So ist
+zwar ~0xa2~ eine valide hexadezimale Zahl, aber es ist auch das Präfix
 für das Wort ~0xa2c~. Für Scanner wollen wir /immer/ jenes Token
-finden, das maximale Länge hat (*longest possible match*).
+finden, das die maximale Länge hat (*longest possible match*).
 
 
 Da es in einer Programmiersprache unterschiedliche Arten von Token
@@ -402,29 +403,29 @@ lassen wir "einfach" all diese Automaten parallel laufen und füttern
 jedes gelesene Zeichen in alle Automaten gleichzeitig, sodass jeder
 Automat eine Transition macht. Hat ein Automat zu einem Zeitpunkt
 keine valide Transition, so fällt er aus (Folien: er wird grau) und
-wird nicht weiter mit Zeichen gefüttert. Erreich einer der Automaten
-einen akzeptierenden Zustand so merken wir uns das erkannte Wort (auch
-Lexem genannt). Wir füttern die Automaten so lange mit Zeichen bis
-auch der letzte von ihnen ausgefallen ist und geben das letzt
+wird nicht weiter mit Zeichen gefüttert. Erreicht einer der Automaten
+einen akzeptierenden Zustand, so merken wir uns das erkannte Wort (auch
+Lexem genannt). Wir füttern die Automaten so lange mit Zeichen, bis
+auch der letzte von ihnen ausgefallen ist und geben das zuletzt
 gefundene Wort als Token zurück.
 
-Dieses parallel Ausführen von endlichen Automaten können wir entweder
-tatsächlich durchführen oder können, was effizienter ist, einen
-kombinerten Automaten konstruieren: Dazu fügt man einen weiteren
+Dieses parallele Ausführen von endlichen Automaten können wir entweder
+tatsächlich durchführen oder wir können, was effizienter ist, einen
+kombinierten Automaten konstruieren: Dazu fügt man einen weiteren
 Startzustand ein, der über Epsilon-Transitionen die Startzustände der
-einzelnen Token erreichen kann (was den kombierten Automaten immer
+einzelnen Token erreichen kann (was den kombinierten Automaten immer
 nicht-deterministisch macht). Mittels der [[https://de.wikipedia.org/wiki/Potenzmengenkonstruktion][Potenzmengenkonstruktion]]
-leitet man den Equivalenten determinsitischen Automaten her.
+leitet man den äquivalenten deterministischen Automaten her.
 
 Zurück zu den weniger theoretischen Aspekten des Scannens.
-Im Beispiel auf den Folien, ist eine Situation abgebildet, bei der das Schlüsselwort ~fn~ das Prefix für den Identifier ~fnord~ ist und zum gleichen Zeitpunkt (~fn~) zwei Automaten das Lexem als valides Wort erkennen würden.
-In solchen Fällen müssen wir zusätzliche Regeln angeben welcher der Tokentypen den Vorrang hat.
-Für Programmiersprachen müssen Schlüsselwörter immer hörere Priorität als Identifier haben, solange der Identifier nicht länger ist.
-Dies ist der Grund, wieso Sie Schlüsselwörter nicht als Variabelennamen verwenden können und diese daher auch oft als *reservierte* Wörter genannt werden.
+Im Beispiel auf den Folien ist eine Situation abgebildet, bei der das Schlüsselwort ~fn~ das Präfix für den Bezeichner ~fnord~ ist und zum gleichen Zeitpunkt (~fn~) zwei Automaten das Lexem als valides Wort erkennen würden.
+In solchen Fällen müssen wir durch zusätzliche Regeln angeben, welcher der Tokentypen den Vorrang hat.
+Für Programmiersprachen müssen Schlüsselwörter immer höhere Prioritäten als Bezeichner haben, solange der Bezeichner nicht länger ist.
+Dies ist der Grund, wieso Sie Schlüsselwörter nicht als Variablennamen verwenden können und diese daher auch oft als *reservierte* Wörter genannt werden.
 
 Da die manuelle Konstruktion von endlichen Automaten und deren Kombination müßig ist, gibt es Programme, die aus einer Menge von regulären Ausdrücken einen Scanner erzeugen.
 Ein solches Programm ist [[https://www.cs.virginia.edu/~cr4bd/flex-manual/][flex(1)]].
-Sollten sie später einen Lexer brauchen, der *schnell* und *korrekt* eine Zeichenkette in Tokens zerlegt, so zögern sie nicht und nehmen sie einen Scannergenerator zur Hand!
+Sollten Sie später einen Lexer brauchen, der *schnell* und *korrekt* eine Zeichenkette in Tokens zerlegt, so zögern Sie nicht und nehmen Sie einen Scannergenerator zur Hand!
 Mehr zu den Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir in einem kleinen Exkurs am Ende dieser Vorlesung kennen.
 
 * Parser und der Syntaxbaum
@@ -437,7 +438,7 @@ Mehr zu den Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir in ei
 
   \begin{frame}<handout:2>{Blockstruktur und Klammerung}
     \bi
-    \ii \textbf{Erinnerung}: Wir wollen Syntaxbaum aus Tokenstrom erzeugen
+    \ii \textbf{Erinnerung}: wir wollen Syntaxbaum aus Tokenstrom erzeugen
     \bigskip
     \ii Programmiersprachen enthalten \emph{geschachtelte} oder \emph{rekursive} Konstrukte{%
       \bi
@@ -447,7 +448,7 @@ Mehr zu den Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir in ei
       \ii Grammatik:             \btUseTab \grammarrule{\NT{expr}}{ ( \NT{expr} ) \OR  \NT{expr} + \NT{expr}}
       \ei
     }\medskip
-    \ii<2-> Bäume eignen sich diese Strukture zu erfassen!{
+    \ii<2-> Bäume eignen sich, diese Strukture zu erfassen!{
       \includegraphics[width=0.45\linewidth,page=2]{fig/02-tree}\hfill
       \includegraphics[width=0.45\linewidth,page=3]{fig/02-tree}
       \bi
@@ -460,7 +461,7 @@ Mehr zu den Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir in ei
 
   \begin{frame}<handout:1-2>[t]{Wiederholung: Kontextfreie Grammatiken}
     \bi
-    \ii Reguläre Grammatiken nicht fähig rekursive Strukturen zu erfassen.\\
+    \ii Reguläre Grammatiken nicht fähig rekursive Strukturen zu erfassen\\
     \enquote{Klammernzählen} ist verboten: \grammarrule{\NT{A}}{( \NT{A} ) \OR \EPSILON}
     \bigskip
     \ii Kontextfreie Sprachen werden von Typ-2 Grammatiken erzeugt.{
@@ -493,7 +494,7 @@ Mehr zu den Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir in ei
     \bi
     \ii Kontextfrei bedeutet nicht direkt, dass der Baum eindeutig ist.{
       \bi
-      \ii Linksableitung: Das linkeste Nichtterminal wird zuerst abgeleitet.
+      \ii Linksableitung: Das linkeste Nicht-Terminal wird zuerst abgeleitet.
       \ei
       \medskip
       \begin{center}
@@ -524,15 +525,15 @@ Die syntaktische Analyse hat zwei primäre Ziele:
 (1) Die Überprüfung der syntaktischen Regeln der Sprache, also ob das Programm richtig notiert wurde.
 (2) Die Befüllung einer geeigneten Datenstruktur mit der extrahierten Struktur des Programms.
 
-Für beide Ziele stellt sich die Frage, welcher Natur die syntaktischen Konstrukte in echten Programmiersprachen sind?
+Für beide Ziele stellt sich die Frage, welcher Natur die syntaktischen Konstrukte in echten Programmiersprachen sind.
 Hierbei fällt schnell auf, dass viele Konstrukte geschachtelt vorkommen können:
-Dies bedeutet, dass ein Kontrukt von einem Konstrukt anderer Art umschlossen auftreten kann. So umschließt ein Funktionsrumpf eine oder mehrere Programmanweisungen.
+Dies bedeutet, dass ein Konstrukt von einem Konstrukt anderer Art umschlossen auftreten kann. So umschließt ein Funktionsrumpf eine oder mehrere Programmanweisungen.
 Es ist sogar recht häufig, dass ein Konstrukt von einem Konstrukt gleicher Art umschlossen auftreten darf, und damit **rekursiv** ist.
-Dabei ist der arithmetische Ausdruck das Paradebeispiel, bei dem die Schachtelung entweder explzit durch Klammern oder implizit durch die Operatorpräzedenz notiert wird.
+Dabei ist der arithmetische Ausdruck das Paradebeispiel, bei dem die Schachtelung entweder explizit durch Klammern oder implizit durch die Operatorpräzedenz notiert wird.
 
-Um der geschachtelten Natur von Programmiersprachen Rechnung zu tragen,  benötigen wir also eine Datenstruktur, die ebenfalls rekursiv ist.
+Um der geschachtelten Natur von Programmiersprachen Rechnung zu tragen, benötigen wir also eine Datenstruktur, die ebenfalls rekursiv ist.
 Die bedeutet, dass eine Instanz dieser Datenstruktur weitere, kleinere, Instanzen der gleichen Datenstruktur enthalten kann.
-Die einfachste Rekursive Datenstruktur, die in Frage kommt ist die einfach verkettete Liste:
+Die einfachste rekursive Datenstruktur, die in Frage kommt, ist die einfach verkettete Liste:
 
 #+begin_src C
 struct list {
@@ -541,23 +542,23 @@ struct list {
 };
 #+end_src
 
-Bei dieser einfach verketteten Liste, ist das nachfolgende Element `next` widerum eine einfach verkettete Liste (oder `NULL`).
+Bei dieser einfach verketteten Liste ist das nachfolgende Element ~next~ wiederum eine einfach verkettete Liste (oder ~NULL~).
 Allerdings enthält jedes Element einer Liste maximal eine weitere Liste.
-Da wir bereits, bei den Anweisungen und dem Funktionsrumpf, erkannt haben das ein Sprachkonstrukt mehrere "Kinder" haben kann, ist sofort klar, dass die verkettete Liste ungeeignet für unsere Zwecke ist.
+Da wir bereits, bei den Anweisungen und dem Funktionsrumpf, erkannt haben, dass ein Sprachkonstrukt mehrere "Kinder" haben kann, ist sofort klar, dass die verkettete Liste ungeeignet für unsere Zwecke ist.
 
 Daher müssen wir auf die nächst mächtigere Klasse von Datenstruktur, nämlich die der **Bäume**, wechseln.
-Bäume sind hervorragend geeignet die syntaktische Struktur von Programmen zu erfassen:
-Sie sind rekursiv, da jedes Kind eines Knoten widerum ein Unterbaum ist; dabei sind Blätter sind trivale Bäume.
+Bäume sind hervorragend geeignet, die syntaktische Struktur von Programmen zu erfassen:
+Sie sind rekursiv, da jedes Kind eines Knotens wiederum ein Unterbaum ist; dabei sind Blätter sind triviale Bäume.
 
 Für unser Beispiel der arithmetischen Ausdrücke zeigt ein innerer Knoten an, welche Operation ausgeführt werden soll.
 Die Kinder dieses Knotens sind die Operanden, die verrechnet werden sollen.
 Da Operationen in der Regel nicht kommutativ sind, ist die Reihenfolge der Kinder wichtig.
 
-Für die Speicherung von Bäumen, können wir dann doch wieder Listen verwenden, solange wir Listen als Listenelemente zulassen.
+Für die Speicherung von Bäumen können wir dann doch wieder Listen verwenden, solange wir Listen als Listenelemente zulassen.
 Dabei speichern wir immer im ersten Element einer Liste den aktuellen Knoten; alle weiteren Listenelemente sind die Kinder.
-Der Baum für den arithmetrischen Ausdruck `1*2+3/4` wäre dann[fn::In Lisp wäre es (+ (* 1 2) (/ 3 4)).
+Der Baum für den arithmetischen Ausdruck ~1*2+3/4~ wäre dann[fn::In Lisp wäre es (+ (* 1 2) (/ 3 4)).
 In dieser Programmiersprache, die von Studierenden aufgrund ihrer immensen Menge an Klammerung gehassten wird, werden Programme direkt in einer solchen Listennotation notiert. Es gibt nur wenige weitere syntaktische Regeln.
-Dies erklärt auch ihre Beliebtheit bei Übersetzerbauern: Man kommt mit einem sehr einfachen Parser aus. Wenn sie also über die folgenden Abschnitte stöhnen, denken Sie daran: Mit Lisp wäre das alles nicht nötig]:
+Dies erklärt auch ihre Beliebtheit bei Übersetzerbauern: Man kommt mit einem sehr einfachen Parser aus. Wenn Sie also über die folgenden Abschnitte stöhnen, denken Sie daran: Mit Lisp wäre das alles nicht nötig.]:
 
 #+begin_src python
 def node(tree):
@@ -570,28 +571,28 @@ tree = ['+', ['*', [1], [2]], ['/', [3], [4]]]
 print(children(tree))
 #+end_src
 
-Im Kapitel über Scanner haben wir bereits formale Grammatiken und formale Sprachen als eine Methode kennen gelernt, Regeln von Programmiersprachen zu notieren. Mit dieser Erfolgsgeschichte im Rücken, können wir uns nun daran machen auch die weiteren Sprachregeln formal auf zu schreiben.
+Im Kapitel über Scanner haben wir bereits formale Grammatiken und formale Sprachen als eine Methode kennen gelernt, Regeln von Programmiersprachen zu notieren. Mit dieser Erfolgsgeschichte im Rücken, können wir uns nun daran machen auch die weiteren Sprachregeln formal aufzuschreiben.
 
 Hierbei stellt allerdings die erwähnte rekursive Natur von Programmiersprachen ein Hindernis dar:
 Bei regulären Sprachen haben wir explizit verboten, dass Regeln sich selbst referenzieren, also rekursiv sind.
-Daher sind Typ-3 Grammatiken **nicht**[fn::Dies ist auch der Grund, wieso man mit Regexen kein HTML parsen kann.
-Versuchen sie es nicht, es wird immer scheitern bzw.
+Daher sind Typ-3-Grammatiken **nicht**[fn::Dies ist auch der Grund, wieso man mit Regexen kein HTML parsen kann.
+Versuchen Sie es nicht, es wird immer scheitern bzw.
 ein Hack bleiben.]
-geeignet um Programme zu parsen und wir müssen auf die Typ-2 Grammatiken, also die **Kontextfreien Sprachen** wechseln.
+geeignet, um Programme zu parsen und wir müssen auf die Typ-2 Grammatiken, also die **kontextfreien Sprachen** wechseln.
 Diese erlauben es, dass auf der rechten Seite einer Regel ein Nicht-Terminal stehen darf, welches (direkt oder indirekt) zur linken Seite abgeleitet werden kann.
 Dies erlaubt es, dass die eine kontextfreie Grammatik "Klammern zu zählen" kann, sie also korrekt balanciert Klammerungen erzeugt.
 
-Im Allgemeinen ist die Komplexität des "Wortproblems" (Prüfung ob ein Wort in der Sprache ist) für kontextfreie Sprachen kubisch{{{wikipedia_de(Cocke-Younger-Kasami-Algorithmus)}}}.
+Im Allgemeinen ist die Komplexität des "Wortproblems" (Prüfung, ob ein Wort in der Sprache ist) für kontextfreie Sprachen kubisch{{{wikipedia_de(Cocke-Younger-Kasami-Algorithmus)}}}.
 Allerdings gibt es mit den **deterministischen kontextfreien Sprachen** eine Klasse von Sprachen, die in linearer Zeit, also viel viel schneller, erkennbar sind.
-Daher sind eigentlich alle  Programmiersprachen in dieser Klasse zu finden, da das lößen des Wortproblems gleichbedeutend mit parsen ist.
+Daher sind eigentlich alle  Programmiersprachen in dieser Klasse zu finden, da das Lösen des Wortproblems gleichbedeutend mit parsen ist.
 
-Um zu verstehen, was deterministisch im Fall von kontextfreien Sprachen bedeutet müssen wir uns **Ableitungsbäume** für kontextfreie Grammatiken anschauen.
+Um zu verstehen, was deterministisch im Fall von kontextfreien Sprachen bedeutet, müssen wir uns **Ableitungsbäume** für kontextfreie Grammatiken anschauen.
 Bei Ableitungsbäumen entspricht jeder innere Knoten einem Nicht-Terminal, jedes Blatt entspricht einem Terminal.
 Die durchgeführten Ableitungen kann man von oben nach unten ablesen:
-die Kinder eines Nicht-Terminals entsprechen den Elementen der rechten Seite der angewendeten Regel.
+Die Kinder eines Nicht-Terminals entsprechen den Elementen der rechten Seite der angewendeten Regel.
 Die Blätter (Terminale), wenn wir sie von links nach rechts lesen, ergeben das erzeugte Wort.
-Der Ableitungsbaum ist also eine Vorschrift, wie die Regel einer Grammatik anzuwenden sind, damit ein bestimmtes Wort entsteht.
-Umgekehrt bedeutet dies auch, dass wir beim Lösen des Wortproblems einen Ableitungsbaum angeben müssen um zu Zeigen, dass das Wort in der Sprache ist. Das rekonstruieren des Ableitungsbaums nennt man auch **parsen**.
+Der Ableitungsbaum ist also eine Vorschrift, wie die Regel einer Grammatik anzuwenden ist, damit ein bestimmtes Wort entsteht.
+Umgekehrt bedeutet dies auch, dass wir beim Lösen des Wortproblems einen Ableitungsbaum angeben müssen, um zu zeigen, dass das Wort in der Sprache ist. Das rekonstruieren des Ableitungsbaums nennt man auch **parsen**.
 
 Gibt es mehr als eine Möglichkeit einen Ableitungsbaum für ein gegebenes Wort zu rekonstruieren, ist die Grammatik mehrdeutig.
 In Falle einer mehrdeutigen Grammatik, versehen wir zwei der entstehenden Ableitungsbäume mit einem speziellen Namen: Die **Linksableitung** entsteht, wenn immer  das linkeste Nicht-Terminal zuerst abgeleitet wird; die **Rechtsableitung** vice versa mit dem rechtesten Nicht-Terminal.
@@ -601,8 +602,8 @@ Diese Eindeutigkeit ist etwas, was wir bei Programmiersprachen auf jeden Fall ha
 Denn der Übersetzer soll die Struktur unseres Programms ja nicht einmal so und einmal anders erkennen.
 
 Noch strenger als "eindeutig", ist die Eigenschaft des **deterministisch**:
-Bei einer deterministischen Grammatik gibt es eine allgemeine Vorschrift, wie und in welcher Reihenfolge die Regeln angewendet werden müssen um einen Ableitungsbaum aus einem gegebenen Wort zu rekonstruieren[fn::Formaler: Deterministische kontextfreie Sprachen können mit deterministischen Kellerautomaten erkannt werden.].
-Zum Beispiel kann solch eine Vorschrift sein, dass man das Wort von links nach rechts durchgeht und am jeweils nächsten Zeichen (look-ahead) entscheidet welche Regel im Folgenden angewendet werden muss.
+Bei einer deterministischen Grammatik gibt es eine allgemeine Vorschrift, wie und in welcher Reihenfolge die Regeln angewendet werden müssen, um einen Ableitungsbaum aus einem gegebenen Wort zu rekonstruieren[fn::Formaler: Deterministische kontextfreie Sprachen können mit deterministischen Kellerautomaten erkannt werden.].
+Zum Beispiel kann solch eine Vorschrift sein, dass man das Wort von links nach rechts durchgeht und am jeweils nächsten Zeichen (look-ahead) entscheidet, welche Regel im Folgenden angewendet werden muss.
 Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setzen werden.
 
 ** Parser mit rekursivem Abstieg
@@ -624,7 +625,7 @@ Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setz
   \end{columns}
   \medskip
   \bi
-  \ii Diese Sprachklasse kann mit \emph{rekursivem Abstieg} geparst werden {
+  \ii Diese Sprachklasse kann mit \emph{rekursivem Abstieg} geparst werden. {
     \btUseExtraItemSep
     \bi
     \ii Eine Funktion für jedes Nicht-Terminal:\\\lstinline[style=PY]|def intAddTail(token_stream)|
@@ -675,9 +676,9 @@ Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setz
     }
   \end{frame}
 
-  \begin{frame}{LL(1): \PREDICT Mengen}
+  \begin{frame}{LL(1): \PREDICT-Mengen}
 
-    Für jede \textbf{Regel} enthält die \PREDICT Menge jene Token/Terminale, die im Look-Ahead dazu führen, dass die Regel angewendet wird.
+    Für jede \textbf{Regel} enthält die \PREDICT-Menge jene Token/Terminale, die im Look-Ahead dazu führen, dass die Regel angewendet wird.
       \[ \PREDICT(A \rightarrow a) \in T^n\]
 
   \begin{center}
@@ -696,55 +697,55 @@ Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setz
 
 
   \begin{alertblock}{Test: Ist eine Grammatik in LL(1)?}
-    Alle \PREDICT Mengen mit der gleichen \textbf{linken} Seite müssen schnittfrei sein. Für jedes Nicht-Terminal ist Regelauswahl eindeutig.
+    Alle \PREDICT-Mengen mit der gleichen \textbf{linken} Seite müssen schnittfrei sein. Für jedes Nicht-Terminal ist Regelauswahl eindeutig.
   \end{alertblock}
   \end{frame}
   #+end_src
 
-Wie bereits erwähnt kann man bei einer LL(1) Grammatik anhand des nächsten Zeichens **deterministisch** entscheiden, welche Regel der Grammatik angewendet werden soll.
-Um dies zu verstehen, müssen wir mehr darauf eingehen, wie ein Parser für eine LL(1) Sprache aussieht.
-Die einfachste Form eines LL(1) Parsers verwendet die Methode des **rekursiven Abstiegs** um aus einem Wort den Ableitungsbaum zu rekonstruieren.
+Wie bereits erwähnt, kann man bei einer LL(1)-Grammatik anhand des nächsten Zeichens **deterministisch** entscheiden, welche Regel der Grammatik angewendet werden soll.
+Um dies zu verstehen, müssen wir mehr darauf eingehen, wie ein Parser für eine LL(1)-Sprache aussieht.
+Die einfachste Form eines LL(1)-Parsers verwendet die Methode des **rekursiven Abstiegs**, um aus einem Wort den Ableitungsbaum zu rekonstruieren.
 
 Bei einem solchen Parser wird für jedes Nicht-Terminal eine Funktion erzeugt, die genauso heißt wie das Nicht-Terminal.
 Diese Funktionen haben den Tokenstrom bzw.
-ein Scanner Objekt als Argument und können vorne aus diesem Strom Zeichen entnehmen (~read()~).
+ein Scanner-Objekt als Argument und können vorne aus diesem Strom Zeichen entnehmen (~read()~).
 Weiterhin können sie das erste Zeichen mittels ~peek()~ anschauen, ohne es zu entnehmen (look-ahead).
 Als Rückgabewert liefern diese Funktionen (partielle) Ableitungsbäume.
 
-Wenn wir eine solche Nicht-Terminal Funktion aufrufen, entscheidet sie anhand des aktuellen Look-aheads, welche Regel nun angewendet werden muss und konsumiert im Folgenden solange Token aus dem Strom, bis das Teilwort das zu dieser Regelanwendung gehört aus dem Tokenstrom entfernt ist.
-Ein solcher Aufruf ist also ein Art "rückwärtsableitung" auf der linken Seite des Tokenstroms.
+Wenn wir eine solche Nicht-Terminal-Funktion aufrufen, entscheidet sie anhand des aktuellen Look-aheads, welche Regel nun angewendet werden muss und konsumiert im Folgenden solange Token aus dem Strom, bis das Teilwort, das zu dieser Regelanwendung gehört, aus dem Tokenstrom entfernt ist.
+Ein solcher Aufruf ist also ein Art "Rückwärtsableitung" auf der linken Seite des Tokenstroms.
 Die Funktion ordnet die Token so an, dass sie die Blätter des zurückgegebenen Ableitungsbaums sind.
 
-Wird an einer Stelle auf der rechten Seite erwartet ein Nicht-Terminal, so ruft die Funktion **rekursiv** die entsprechende Parsefunktion auf und gibt den Rückgabewert als Unterbaum weiter. Es sind diese rekursiven Aufrufe, die dieser Klasse von Parsern ihren Namen geben!
+Wird an einer Stelle auf der rechten Seite ein Nicht-Terminal erwartet, so ruft die Funktion **rekursiv** die entsprechende Parsefunktion auf und gibt den Rückgabewert als Unterbaum weiter. Es sind diese rekursiven Aufrufe, die dieser Klasse von Parsern ihren Namen geben!
 
-Um ein ganzes Programm zu parsen, rufen wir einfach nur die Funktion die dem Startsymbol entspricht auf.
-Im Folgenden können sie mit dem ~intAdd~ Parser aus den Vorlesungsfolien herumspielen.
+Um ein ganzes Programm zu parsen, rufen wir einfach nur die Funktion, die dem Startsymbol entspricht, auf.
+Im Folgenden können Sie mit dem ~intAdd~-Parser aus den Vorlesungsfolien herumspielen.
 
 #+INCLUDE: ../lst/02-ll0-recursive.py
 
 Parser mit rekursivem Abstieg können entweder manuell erstellt werden, oder man verwendet einen LL(1)-Parsergenerator.
-Ein solcher Generator bekommt eine LL(1) Grammatik als Eingabe, analysisert die Struktur und die Eigenschaften der Grammatik und generiert ein entsprechendes Programm.
-Mit dieser Analyse von LL(1)-Grammatiken wollen wir uns nun genauer beschäftigen um zu verstehen, wie ein solcher Generator genau funktioniert.
-Dies wird Sie nicht nur in die Lage versetzen LL(1) Grammatiken zu formulieren, sondern auch selbst einen Parsergenerator zu schreiben. Es ist einfacher als sie befürchten!
+Ein solcher Generator bekommt eine LL(1)-Grammatik als Eingabe, analysiert die Struktur und die Eigenschaften der Grammatik und generiert ein entsprechendes Programm.
+Mit dieser Analyse von LL(1)-Grammatiken wollen wir uns nun genauer beschäftigen, um zu verstehen, wie ein solcher Generator genau funktioniert.
+Dies wird Sie nicht nur in die Lage versetzen LL(1)-Grammatiken zu formulieren, sondern auch selbst einen Parsergenerator zu schreiben. Es ist einfacher, als Sie befürchten!
 
-Die wichtigste Information, die wir aus einer LL(1) Grammatik extrahieren wollen sind die **PREDICT Mengen**:
-Für jede Regel der Grammatik gibt die zugehörige PREDICT Menge, die Terminale Symbolen enthält, an ob diese Regel genommen wird.
-Diese Mengen enthalten also genau jenen Token, anhand derer der Parser mit rekursivem Abstieg, anhand des Look-Aheads, seine Entscheidungen trifft.
+Die wichtigste Information, die wir aus einer LL(1)-Grammatik extrahieren wollen, sind die **PREDICT-Mengen**:
+Für jede Regel der Grammatik gibt die zugehörige PREDICT-Menge, die terminale Symbolen enthält, an, ob diese Regel genommen wird.
+Diese Mengen enthalten also genau jenen Token, anhand dessen der Parser mit rekursivem Abstieg, anhand des Look-Aheads, seine Entscheidungen trifft.
 Vice Versa:
-Haben wir die PREDICT Mengen, so können wir daraus also leicht einen Parser konstruieren.
+Haben wir die PREDICT-Mengen, so können wir daraus also einfach einen Parser konstruieren.
 
-Zusätzlich können wir Anhand der PREDICT Mengen auch prüfen, ob eine gegebene Grammatik eine LL(1) Grammatik ist.
-Überschneiden sich die PREDICT Mengen von zwei Regeln, die das gleiche Nicht-Terminal auf der linken Seite haben, auch nur in einem Zeichen, so liegt keine LL(1) Grammatik vor.
-Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung über die nächste anzuwendende Regel treffen[fn::YouTube: [[https://www.youtube.com/watch?v=x9CLfbEpwoE][Feuerzangebowle: Ostgoten]], die wissen auch nicht ganz genau wo sie hin müssen.].
+Zusätzlich können wir anhand der PREDICT-Mengen auch prüfen, ob eine gegebene Grammatik eine LL(1)-Grammatik ist.
+Überschneiden sich die PREDICT-Mengen von zwei Regeln, die das gleiche Nicht-Terminal auf der linken Seite haben, auch nur in einem Zeichen, so liegt keine LL(1)-Grammatik vor.
+Im Parser mit rekursivem Abstieg könnten wir keine deterministische Entscheidung über die nächste anzuwendende Regel treffen[fn::YouTube: [[https://www.youtube.com/watch?v=x9CLfbEpwoE][Feuerzangebowle: Ostgoten]], die wissen auch nicht ganz genau, wo sie hin müssen.].
 
 #+begin_src  latex
-    \begin{frame}[fragile]{Parser-Generator für Parser mit rekursiven Abstieg}
+    \begin{frame}[fragile]{Parser-Generator für Parser mit rekursivem Abstieg}
       \bi
-      \ii Mit den \PREDICT Mengen können wir einen LL(1)-Parser generieren.{
+      \ii Mit den \PREDICT-Mengen können wir einen LL(1)-Parser generieren.{
         \bi
-        \ii Der Parser-Generator (Grau) iteriert über Nicht-Terminale und Regel.
-        \ii Er erzeugt und emitiert, mittels Codeschablonen (Gelb), die Zeilen des Parsers.
-        \ii Innerhalb der Schablonen werden Ersetzungen (Grün) vorgenommen.
+        \ii Der Parser-Generator (grau) iteriert über Nicht-Terminale und Regeln.
+        \ii Er erzeugt und emittiert, mittels Codeschablonen (gelb), die Zeilen des Parsers.
+        \ii Innerhalb der Schablonen werden Ersetzungen (grün) vorgenommen.
         \ei
       }
       \ei
@@ -758,10 +759,10 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
       \def\meta{\btHL[draw]}
       \begin{code}[]
         \begin{py}[style=meta]
-          # Für jedes Nicht-Terminal erzeugen wir eine Funktion
+          # Für jedes Nicht-Terminal erzeugen wir eine Funktion.
           for NT in nonterminals:
               ``!!def @@NT.name@@(token_stream):!!
-              # Die \PREDICT entscheidet ob eine Regel genommen wird
+              # Die \PREDICT entscheidet, ob eine Regel genommen wird.
               for rule in NT.rules:
               ``!!    if token_stream.peek() in @@PREDICT(rule)@@:!!
                   for symbol in rule.righthandside:
@@ -780,38 +781,38 @@ Im Parser mit rekursivem Abstieg könnten wir keine determinstische Entscheidung
     \end{frame}
 #+end_src
 
-Zunächst werden wir so tun, als hätten wir die PREDICT Mengen schon und wollen uns anschauen, wie der Parsergenerator den Code für den Parser erzeugt.
+Zunächst werden wir so tun, als hätten wir die PREDICT-Mengen schon und wollen uns anschauen, wie der Parsergenerator den Code für den Parser erzeugt.
 Dafür hat der gezeigte Parsergenerator mehrere interne Datenstrukturen:
 Die Liste ~nonterminals~ enthält ein Objekt für jedes Nicht-Terminal der Grammatik.
-Jedes Nicht_Terminal ~NT~ hat einen Namen (~NT.name~) und eine Liste mit Regeln auf denen Linken Seite das Nicht-Terminal vorkommt (~NT.rules~)[fn::Diese Regeln für das Nicht-Terminal A nennt man auch *A-Produktionen*.].
+Jedes Nicht-Terminal ~NT~ hat einen Namen (~NT.name~) und eine Liste mit Regeln, auf deren linken Seite das Nicht-Terminal vorkommt (~NT.rules~)[fn::Diese Regeln für das Nicht-Terminal A nennt man auch *A-Produktionen*.].
 Jede Regel hat eine linke und eine rechte Seite (~rule.righthandside~).
-Die rechte Seite ist dabei eine Liste von Symbolen (Terminale und Nicht-Terminale), über die der Generator interieren kann.
+Die rechte Seite ist dabei eine Liste von Symbolen (Terminale und Nicht-Terminale), über die der Generator iterieren kann.
 
-Um den gezeigten Generator zu verstehen, müssen sie auf die Einrückungen achten. Diese sind für den Parsergenerator (grau) und den generierten Code (gelb) unterschiedlich. Die gelben Zeilen sind vollständige Zeilen, die ausgegeben werden, die Einrückungen beziehen sich also auf den gelben linken Rand.
+Um den gezeigten Generator zu verstehen, müssen Sie auf die Einrückungen achten. Diese sind für den Parsergenerator (grau) und den generierten Code (gelb) unterschiedlich. Die gelben Zeilen sind vollständige Zeilen, die ausgegeben werden, die Einrückungen beziehen sich also auf den gelben linken Rand.
 
-Der Generator erzeugt für jedes Nicht-Terminal eine Funktion und benennt sie Anhand des Namens des Nicht-Terminals.
-Innerhalb der Funktion wird für jede Regel einen bedingten Block emitiert, die mit einem ~return~ Statement endet, das den Ableitungsbaum zurück geben wird.
-Die erzeugte Bedingung prüft ob das nächste Zeichen in der PREDICT Menge, die zur aktuellen Regel gehört, enthalten ist (~in~).
-Innerhalb des bedingten Blockes, werden, nacheinander, alle Symbole der rechten Seite aus dem Tokenstrom gelesen.
+Der Generator erzeugt für jedes Nicht-Terminal eine Funktion und benennt sie anhand des Namens des Nicht-Terminals.
+Innerhalb der Funktion wird für jede Regel ein bedingter Block emittiert, der mit einem ~return~ Statement endet, das den Ableitungsbaum zurückgeben wird.
+Die erzeugte Bedingung prüft, ob das nächste Zeichen in der PREDICT-Menge, die zur aktuellen Regel gehört, enthalten ist (~in~).
+Innerhalb des bedingten Blockes werden, nacheinander, alle Symbole der rechten Seite aus dem Tokenstrom gelesen.
 Ist ein Symbol ein Terminal, so lässt der Generator den Parser das Zeichen direkt in der Funktion aus dem Strom konsumieren.
-Hierbei bekommt die ~read()~ Funktion das optionalen Argument ~expected=~, sodass sie prüft ob das vorderste Token wirklich von der entsprechenden Klasse ist. Ist dies nicht der Fall so wird ein Parserfehler geworfen.
+Hierbei bekommt die ~read()~ Funktion das optionale Argument ~expected=~, sodass sie prüft, ob das vorderste Token wirklich von der entsprechenden Klasse ist. Ist dies nicht der Fall, so wird ein Parserfehler geworfen.
 Ist das Symbol ein Nicht-Terminal, so delegieren wir das Parsen für diese Teil der rechten Seite an die entsprechende Funktion (rekursiver Abstieg).
-Weiterhin legt der Generator für jedes Symbol eine Variable an um das Token (Terminale) bzw. den Unterbaum (Nicht-Terminale) aufzufangen und zur Konstruktion des zurückgegebenen Baumes zu verwenden.
+Weiterhin legt der Generator für jedes Symbol eine Variable an, um das Token (Terminale) bzw. den Unterbaum (Nicht-Terminale) aufzufangen und zur Konstruktion des zurückgegebenen Baumes zu verwenden.
 
-Da der Parsergenerator eine Grammatik als Eingabe und einen Parser als Ausgabe hat, können wir ihn als Übersetzer Bezeichnen.
+Da der Parsergenerator eine Grammatik als Eingabe und einen Parser als Ausgabe hat, können wir ihn als Übersetzer bezeichnen.
 Dabei akzeptiert der Generator alle Grammatiken der Klasse LL(1) und erzeugt ein Programm in der Programmiersprache Python.
 
-** Analyse von LL(1) Grammatiken
+** Analyse von LL(1)-Grammatiken
 :PROPERTIES:
 :CUSTOM_ID: 02-ll1-analysis
 :END:
 
 #+begin_src latex
     \begin{frame}{\PREDICT: Berechnung von \EPS und \FIRST}
-      \textbf{Bisher}: Die \PREDICT Menge fällt vom Himmel bzw. ist trivial.
+      \textbf{Bisher}: Die \PREDICT-Menge fällt vom Himmel bzw. ist trivial.
       \bigskip
       \bi
-      \ii Berechnung von \PREDICT, mittels \EPS, \FIRST und \FOLLOW.{\medskip
+      \ii Berechnung von \PREDICT mittels \EPS, \FIRST und \FOLLOW.{\medskip
         \bi
         \ii $\EPS(\alpha) \equiv \textbf{ if } \alpha \Longrightarrow^* \epsilon \textbf{ then}\text{ true}\textbf{ else}\text{ false}$ \\\smallskip
         Kann aus dem Wort $\alpha$, durch Ableitung(en), das leere Wort entstehen?
@@ -847,7 +848,7 @@ Dabei akzeptiert der Generator alle Grammatiken der Klasse LL(1) und erzeugt ein
       \ei
     \end{frame}
 
-    \begin{frame}[fragile]{\PREDICT: Berechnung der \FOLLOW Menge}
+    \begin{frame}[fragile]{\PREDICT: Berechnung der \FOLLOW-Menge}
       \bi
     \ii $\FOLLOW(A) \equiv \{ c \mid c \in T, S \Longrightarrow^+ \alpha A c \beta \}${\smallskip
         \bi
@@ -892,10 +893,10 @@ Dabei akzeptiert der Generator alle Grammatiken der Klasse LL(1) und erzeugt ein
 \bi
 \ii {\small $PREDICT(A \rightarrow \alpha) \equiv \FIRST(\alpha) \cup (\textbf{if }\EPS(\alpha)\textbf{ then }\FOLLOW(A)\textbf{ else }\emptyset ) $}{ \\
   \bigskip
-  \textbf{Intuition}: Ein Zeichen c sagt eine Regel dann voraus wenn:
+  \textbf{Intuition}: Ein Zeichen c sagt eine Regel dann voraus, wenn:
   \begin{enumerate}
   \item Die Ableitung der rechten Seite mit dem Zeichen c startet (\FIRST).
-  \item Die rechte Seite $\alpha$ kann $\epsilon$ werden, daher muss man auf die Zeichen schauen die der Regel folgen können (\FOLLOW).
+  \item Die rechte Seite $\alpha$ kann $\epsilon$ werden, daher muss man auf die Zeichen schauen, die der Regel folgen können (\FOLLOW).
   \end{enumerate}
   \begin{center}
   \def\first{}
@@ -924,53 +925,53 @@ Dabei akzeptiert der Generator alle Grammatiken der Klasse LL(1) und erzeugt ein
 \end{frame}
 #+end_src
 
-Nun wollen wir uns der Berechnung der PREDICT Mengen für die Regeln einer gegebene Grammatik zuwenden.
+Nun wollen wir uns der Berechnung der PREDICT-Mengen für die Regeln einer gegebene Grammatik zuwenden.
 Informell ausgedrückt stellen wir uns dabei die Frage: "Welche Regelanwendung führt dazu, dass wir im Tokenstrom das Zeichen sehen, was wir gerade sehen?"
 
 Falls eine rechte Seite nur ein einziges Terminal enthält, oder mit einem Terminal startet, ist die Sache ganz klar:
-Die PREDICT Menge dieser Regel hat nur ein Element, nämlich dieses erste Terminal der rechten Seite.
-Dies war zum Beispiel bei unserem ~intAdd~/~intAddTail~ Beispiel, ganz absichtlich der Fall[fn::Tatsächlich hat Grammatikklasse, bei der alle Produktionen mit einem Terminal starten einen eigenen Namen: Simple LL(1) oder SLL(1).].
+Die PREDICT-Menge dieser Regel hat nur ein Element, nämlich dieses erste Terminal der rechten Seite.
+Dies war zum Beispiel bei unserem ~intAdd~/~intAddTail~-Beispiel ganz absichtlich der Fall[fn::Tatsächlich hat die Grammatikklasse, bei der alle Produktionen mit einem Terminal starten, einen eigenen Namen: Simple LL(1) oder SLL(1).].
 
-Steht an erster Stelle der rechten Seite ein Nicht-Terminal, wird die Sache komplizierter und wir müssen zwei Hilfsmengen (FIRST, FOLLOW) und ein Hilfsprädikat (EPS) einführen um die PREDICT Menge zu berechnen.
+Steht an erster Stelle der rechten Seite ein Nicht-Terminal, wird die Sache komplizierter und wir müssen zwei Hilfsmengen (FIRST und FOLLOW) und ein Hilfsprädikat (EPS) einführen, um die PREDICT-Menge zu berechnen.
 Das Prädikat EPS wird genau dann wahr, wenn das übergebene (teilweise abgeleitete) Wort durch beliebig viele Ableitungen zum leeren Wort werden kann.
-Wir werden mittels EPS prüfen ob eine rechte Seite bzw. ein Prefix einer rechten Seite durch Ableitung "verschwinden" kann.
+Wir werden mittels EPS prüfen, ob eine rechte Seite bzw. ein Präfix einer rechten Seite durch Ableitung "verschwinden" kann.
 
-Die FIRST Menge gibt an mit welchen Zeichen die Ableitung eines (partiell abgeleiteten) Wortes anfangen kann.
-Dies sieht nur auf den ersten Blick genau so aus, wie Definition der PREDICT Menge.
-Allerdings bezieht sich die FIRST Menge nur auf ein Wort ~a~ (wie es auf der rechten Seite auftritt), die PREDICT Menge auf eine Regel ~A->a~.
-Der Unterschied wird sichtbar, wenn das Wort ~a~, als ganzes, zum leeren Wort abgeleitet werden kann und quasi verschwindet:
-Die PREDICT Menge, muss dann noch weitere Zeichen enthalten, die nicht in der FIRST Menge enthalten sind, da die Regel dennoch zur Anwendung selektiert werden muss auch wenn ihre Produktion verschwindet.
+Die FIRST-Menge gibt an, mit welchen Zeichen die Ableitung eines (partiell abgeleiteten) Wortes anfangen kann.
+Dies sieht nur auf den ersten Blick genau so aus wie die Definition der PREDICT-Menge.
+Allerdings bezieht sich die FIRST-Menge nur auf ein Wort ~a~ (wie es auf der rechten Seite auftritt), die PREDICT-Menge auf eine Regel ~A->a~.
+Der Unterschied wird sichtbar, wenn das Wort ~a~, als Ganzes, zum leeren Wort abgeleitet werden kann und quasi verschwindet:
+Die PREDICT-Menge muss dann noch weitere Zeichen enthalten, die nicht in der FIRST-Menge enthalten sind, da die Regel dennoch zur Anwendung selektiert werden muss, auch wenn ihre Produktion verschwindet.
 Nur so erhalten wir einen vollständigen und korrekten Ableitungsbaum.
-Im Beispiel, müssen wir für `trans` die Epsilon-Produktion auswählen, wenn wir `(` im Tokenstrom sehen.
+Im Beispiel, müssen wir für ~trans~ die Epsilon-Produktion auswählen, wenn wir ~(~ im Tokenstrom sehen.
 
-Um diesen Schritt von ~FIRST(a)~ auf ~PREDICT(A->a)~ zu machen, müssen wir die Grammatik als ganzes Analysieren und nicht nur die Ableitungen die aus der rechten Seite einer Regel folgen.
-Hierzu führen wir die FOLLOW Menge ein, die für jedes Nicht-Terminal A berechnet werden kann.
+Um diesen Schritt von ~FIRST(a)~ auf ~PREDICT(A->a)~ zu machen, müssen wir die Grammatik als Ganzes analysieren und nicht nur die Ableitungen, die aus der rechten Seite einer Regel folgen.
+Hierzu führen wir die FOLLOW-Menge ein, die für jedes Nicht-Terminal A berechnet werden kann.
 Neben der formalen Definition (siehe Folie), kann man FOLLOW auch informell beschreiben:
 Welche Terminale können direkt **nach** einer vollständigen Ableitung von A in einem Wort folgen?
 So kann, im Beispiel, dem Nicht-Terminal ~trans~ in jeder beliebigen Ableitung nur das Token ~(~ folgen, da ~trans~ auf der rechten Seite nur in ~factor~ und vor einem ~(~ vorkommt.
 
 Etwas schwieriger ist ~factor_tail~.
-Man könnte zwar meinen, dass ~+~ Teil der FOLLOW Menge ist, da mittels dieser Regel die ganzen ~+~ erzeugt werden.
-Allerdings gibt es keine Satzform (partielle Ableitung) bei der bereits ein ~+~ rechts von ~factor_tail~ steht.
-Wenn man sich ansieht was in rechten Seiten rechts von ~factor_tail~ steht, kommt man dazu, dass ~factor_tail~ am Ende von seiner eigenen Regel und am Ende der ~term~ Regel steht.
+Man könnte zwar meinen, dass ~+~ Teil der FOLLOW-Menge ist, da mittels dieser Regel die ganzen ~+~ erzeugt werden.
+Allerdings gibt es keine Satzform (partielle Ableitung), bei der bereits ein ~+~ rechts von ~factor_tail~ steht.
+Wenn man sich ansieht was, in rechten Seiten rechts von ~factor_tail~ steht, kommt man dazu, dass ~factor_tail~ am Ende von seiner eigenen Regel und am Ende der ~term~ Regel steht.
 In beiden Fällen können wir, weil das Wort dort endet, nichts darüber lernen, was rechts von ~factor_tail~ stehen könnte.
 Daher müssen wir, bei ~term~ schauen was rechts davon stehen kann.
-Dies bringt uns dann zu der Erkenntnis, dass die FOLLOW Menge von ~factor_tail~ und ~term~ gleich ist.
+Dies bringt uns dann zu der Erkenntnis, dass die FOLLOW-Menge von ~factor_tail~ und ~term~ gleich ist.
 
-Die Berechnung der FOLLOW Mengen funktioniert also so, dass anhand der Nicht-Terminale die Regeln rücktwärts gehen und dort immer schauen, was rechts vom aktuellen Nicht-Terminal vorkommen könnte.
-Erreichen wir das Ende einer rechten Seite springen wir eine Stufe weiter zurück.
+Die Berechnung der FOLLOW-Mengen funktioniert also so, dass anhand der Nicht-Terminale die Regeln rückwärts gehen und dort immer schauen, was rechts vom aktuellen Nicht-Terminal vorkommen könnte.
+Erreichen wir das Ende einer rechten Seite, springen wir eine Stufe weiter zurück.
 Wir führen also eine *Tiefensuche* in den Regeln der Grammatik durch.
-Eine detailiertere Diskussion des Algorithmus zur Berechnung der FOLLOW Menge (sowie FIRST und EPS) werden wir in den Übungen durchführen.
+Eine detailliertere Diskussion des Algorithmus zur Berechnung der FOLLOW-Menge (sowie FIRST und EPS) werden wir in den Übungen durchführen.
 
-Mittels EPS, FIRST und FOLLOW, können wir nun die PREDICT Menge einer Regel ~A->a~ berechnen.
-Wenn die rechte Seite nicht verschwinden kann (EPS(a) ist ~False~), so müssen wir nur damit rechnen die Zeichen aus ~FIRST(a)~ zu sehen wenn wir die Regel anwenden sollen.
+Mittels EPS, FIRST und FOLLOW können wir nun die PREDICT-Menge einer Regel ~A->a~ berechnen.
+Wenn die rechte Seite nicht verschwinden kann (EPS(a) ist ~False~), so müssen wir nur damit rechnen, die Zeichen aus ~FIRST(a)~ zu sehen, wenn wir die Regel anwenden sollen.
 Verschwindet die rechte Seite (~EPS(a) == True~), so müssen wir *zusätzlich* die Zeichen aus FOLLOW(A) erwarten.
-Wir verschmelzen also die FOLLOW Menge des Nicht-Terminals mit der FIRST Menge der Regel.
+Wir verschmelzen also die FOLLOW-Menge des Nicht-Terminals mit der FIRST-Menge der Regel.
 
-Aus dem letzten Satz können wir auch direkt lernen, dass bei LL(1) Grammatiken immer nur eine Regel von allen A-Produktionen verschwinden darf.
-Sonst würden wir FOLLOW(A) zu zwei PREDICT Mengen hinzuschlagen und die Mengen wären daher nicht mehr schnittfrei.
+Aus dem letzten Satz können wir auch direkt lernen, dass bei LL(1)-Grammatiken immer nur eine Regel von allen A-Produktionen verschwinden darf.
+Sonst würden wir FOLLOW(A) zu zwei PREDICT-Mengen hinzuschlagen und die Mengen wären daher nicht mehr schnittfrei.
 Dies ergibt auch intuitiv Sinn:
-Wenn wir bei A stehen und zwei Regeln zur Auswahl haben, die dieses A verschwinden lassen, woher sollen wir wissen welche wir auswählen sollen?
+Wenn wir bei A stehen und zwei Regeln zur Auswahl haben, die dieses A verschwinden lassen, woher sollen wir wissen, welche wir auswählen sollen?
 Die Grammatik wäre nicht mehr deterministisch.
 
 ** COMMENT Tabellenbasierte Parser
@@ -983,10 +984,10 @@ Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
 :END:
 #+begin_src latex
 
-  \begin{frame}<handout:2>{LL(1)-Probleme: Gemeinsame Prefixe}
+  \begin{frame}<handout:2>{LL(1)-Probleme: Gemeinsame Präfixe}
     \bi
-    \ii \textbf{Erinnerung:} Nur wenn alle \PREDICT Mengen mit der gleichen linken Seite (=A-Produktionen) schnittfrei sind, ist die Grammatik LL(1).\medskip
-    \ii Oft haben zwei A-Produktionen das gleiche Prefix und ein Look-Ahead von einem Token würde nicht reichen. \\{\smallskip
+    \ii \textbf{Erinnerung:} Nur, wenn alle \PREDICT-Mengen mit der gleichen linken Seite (=A-Produktionen) schnittfrei sind, ist die Grammatik LL(1).\medskip
+    \ii Oft haben zwei A-Produktionen das gleiche Präfix und ein Look-Ahead von einem Token würde nicht reichen. \\{\smallskip
       \btSetNamedTab[1cm]{\first}%
       \btSetNamedTab[6.5cm]{\second}%
       \first \grammarrule{\NT{stmt}}{\alert<1>{Ident} := \NT{expr}}   \second \PREDICT=\{Ident\}\\
@@ -997,7 +998,7 @@ Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
         \first \grammarrule{\NT{stmt\_tail}}{:= \NT{expr} }             \second\PREDICT=\{:=\}\\
         \first \grammarrule{\NT{stmt\_tail}}{( \NT{argument\_list} )}   \second\PREDICT=\{(\}
     }\medskip
-    \ii<2-> Linksfaktorisierte Grammatik ist \alert{nicht} equivalent! (Syntaxbäume){\medskip
+    \ii<2-> Linksfaktorisierte Grammatik ist \alert{nicht} äquivalent! (Syntaxbäume){\medskip
       \begin{columns}
         \begin{column}{0.49\textwidth}
           \begin{tikzpicture}[small tree]
@@ -1032,7 +1033,7 @@ Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
       \first\grammarrule{\NT{intAdd}}{Int}\second\PREDICT=\{Int\}\\
       \first\grammarrule{\NT{intAdd}}{\NT{intAdd} + Int}\second\PREDICT=\{Int\}
     }\medskip
-    \ii \textbf{Informell}: Der Parser mit rekursivem Abstieg weiß nicht welche Regel er anwenden soll, wenn er einen Int sieht bzw. kommt in eine endlose Rekursion, wenn er die zweite Regel auswählt.{%
+    \ii \textbf{Informell}: Der Parser mit rekursivem Abstieg weiß nicht, welche Regel er anwenden soll, wenn er einen Int sieht bzw. kommt in eine endlose Rekursion, wenn er die zweite Regel auswählt.{%
       \begin{code}[]
         \begin{py}[]
           def addInt(token_stream):
@@ -1045,7 +1046,7 @@ Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
     \ii<2-> \textbf{Definition}(Linksrekursiv): Mind. eine Regel hat folgende Ableitung. {
       \[ A \Longrightarrow^* A \alpha \]
     }
-    \ii<3-> \enquote{Reperatur} nur \alert{manchmal} möglich.\hfill{\scriptsize (LL(1)$\ll$LR(1))}\\{
+    \ii<3-> \enquote{Reparatur} nur \alert{manchmal} möglich.\hfill{\scriptsize (LL(1)$\ll$LR(1))}\\{
       \first\grammarrule{\NT{intAdd}}{Int + intAdd}\\
       \first\grammarrule{\NT{intAddTail}}{Int}     \\[3pt]
       $\Rightarrow$ Umformung zur Rechtsrekursion + Linksfaktorisierung\\
@@ -1089,9 +1090,9 @@ Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
     }
     \ii Parsergeneratoren können diese Probleme verstecken. ($\Rightarrow$ \texttt{antlr})
     \bigskip
-    \ii<2> \textbf{Alternativ}: Verwendunng der mächtigeren Sprachklasse LR(1). {
+    \ii<2> \textbf{Alternativ}: Verwendung der mächtigeren Sprachklasse LR(1). {
       \bi
-      \ii LR(1) erlaubt gemeinsame Prefixe und Linksrekursion.
+      \ii LR(1) erlaubt gemeinsame Präfixe und Linksrekursion.
       \ii Konstruktion von LR(1) Parsern ist komplexer ($\Rightarrow$ Parsergenerator)
       \ii Parser sind Tabellen-gestützte Automaten mit explizitem Stapelspeicher.
       \ei
@@ -1099,84 +1100,84 @@ Vielleicht macht man das hier noch. Man könnte es wenigstens im Skript machen.
     \ei
   \end{frame}
 
-  \begin{frame}{Einordnung von kontexfreien Grammatiken}
+  \begin{frame}{Einordnung von kontextfreien Grammatiken}
     \vspace{-1em}
     \begin{center}
       \animation[width=\textwidth]{1/1,2/2}{fig/02-complexities}
     \end{center}
       \bi
       \ii Theorie von kontextfreien Grammatiken und Parsern ist gut erforscht.
-      \ii<2> Moderne Generatoren akzeptieren beinahe jede ktfr. detr. Grammatik und liefern gute Fehlermeldungen. \textbf{Nutzen sie diese!}
+      \ii<2> Moderne Generatoren akzeptieren beinahe jede ktfr. detr. Grammatik und liefern gute Fehlermeldungen. \textbf{Nutzen Sie diese!}
       \ei
   \end{frame}
 
 #+end_src
 
 Mit der Berechnung von PREDICT haben wir alles, was wir für unseren, vorher vorgestellten, Parsergenerator brauchen.
-Ist die Welt nun also eine bessere und wir können alles was wir von einer Programmiersprachensyntax verlangen in LL(1) ausdrücken?[fn::Rhetorische Frage.]
-Leider nicht, denn LL(1) Grammatiken haben einige Probleme, die wir im Weiteren Diskutieren wollen.
-Dennoch war die Beschäftigung mit LL(1) äußerst lohnend, weil wir gesehen haben wie man an die Analyse einer Grammatik herangehen kann, wie ein Parsergenerator im Prinzip arbeitet und wie der fertige Parser schlussendlich arbeitet.
+Ist die Welt nun also eine bessere und wir können alles, was wir von einer Programmiersprachensyntax verlangen, in LL(1) ausdrücken?[fn::Rhetorische Frage.]
+Leider nicht, denn LL(1)-Grammatiken haben einige Probleme, die wir im Weiteren diskutieren wollen.
+Dennoch war die Beschäftigung mit LL(1) äußerst lohnend, weil wir gesehen haben, wie man an die Analyse einer Grammatik herangehen kann, wie ein Parsergenerator im Prinzip arbeitet und wie der fertige Parser schlussendlich arbeitet.
 
-Das erste Problem sind *gemeinsame Prefixe*.
-Wenn zwei A-Produktionen mit dem gleichen Terminal starten, so haben sie ein solches gemeinsames Prefix.
+Das erste Problem sind *gemeinsame Präfixe*.
+Wenn zwei A-Produktionen mit dem gleichen Terminal starten, so haben sie ein solches gemeinsames Präfix.
 Wir könnten daher nicht mehr deterministisch entscheiden, welche der beiden Regeln wir auswählen sollen.
-Im Beispiel, wüssten wir, mit einem Token Look-Ahead (~Ident~), nicht ob wir die obere oder die untere Regel wählen sollten.
-Wir könnten das Problem zwar lösen indem wir uns ein weiteres Token Look-Ahead gönnen würden (~Ident :=~ vs. ~Ident (~), aber dann würden wir LL(1) Land verlassen und in LL(2) landen.
+Im Beispiel wüssten wir mit einem Token Look-Ahead (~Ident~) nicht, ob wir die obere oder die untere Regel wählen sollten.
+Wir könnten das Problem zwar lösen, indem wir uns ein weiteres Token Look-Ahead gönnen würden (~Ident :=~ vs. ~Ident (~), aber dann würden wir LL(1)-Land verlassen und in LL(2) landen.
 
 Die andere Variante ist das Umformen der Regeln mittels *Linksfaktorisierung*.
-Dabei spalten wir die zweideutigen A-Produktionen auf indem wir ein weiteres ~_tail~ Nicht-Terminal einführen.
-Das orginale Nicht-Terminal (~stmt~) hat nur noch eine Regel, die das gemeinsame Prefix konsumiert und mit dem ~_tail~ Symbol endet.
-In den ~_tail~-Regeln wird dann anhand der nun unterschiedlichen Prefixe entschieden, welche Regel zutrifft.
+Dabei spalten wir die zweideutigen A-Produktionen auf, indem wir ein weiteres ~_tail~ Nicht-Terminal einführen.
+Das originale Nicht-Terminal (~stmt~) hat nur noch eine Regel, die das gemeinsame Präfix konsumiert und mit dem ~_tail~ Symbol endet.
+In den ~_tail~-Regeln wird dann anhand der nun unterschiedlichen Präfixe entschieden, welche Regel zutrifft.
 
 Allerdings gibt es mit der Linksfaktorisierung auch ein Problem:
-Die umgeformte Grammatik ist nicht äquivalent zur orginalen Grammatik, die Regel mit dem gemeinsamen Prefix enthält[fn::Man kann an diesem Beispiel auch sehen, dass eine Sprachklassen und Grammatikklassen etwas unterschiedliches sind. Die gezeigte Sprache ist LL(1), aber die Grammatik die wir verwendet hatten war in LL(2). Durch die Umformung haben wir es geschafft eine Grammatik zu erzeugen die näher an der eigentlichen Klasse der Sprache ist.].
+Die umgeformte Grammatik ist nicht äquivalent zur originalen Grammatik, die die Regel mit dem gemeinsamen Präfix enthält[fn::Man kann an diesem Beispiel auch sehen, dass Sprachklassen und Grammatikklassen etwas unterschiedliches sind. Die gezeigte Sprache ist LL(1), aber die Grammatik, die wir verwendet hatten, war in LL(2). Durch die Umformung haben wir es geschafft, eine Grammatik zu erzeugen, die näher an der eigentlichen Klasse der Sprache ist.].
 Sie erzeugt zwar die gleiche formale Sprache, liefert aber andere Ableitungsbäume; etwas womit wir im Übersetzerbau umgehen müssen.
 
-Das zweite Problem von LL(1) Grammatiken ist, dass sie keine **Linksrekursion**[fn::Linksfaktorisierung != Linksrekursion] erlauben.
-Linksrekursion bedeutet, dass man durch Ableitung des Nicht-Terminals A zu einer Satzform kommt die wieder mit A beginnt.
-Da LL(1) Parser linksreduzierend sind, würde das bedeuten, dass wir immer wieder versuchen A zu reduzieren ohne ein einziges Terminal zu konsumieren; rekursiv; für immer.
+Das zweite Problem von LL(1)-Grammatiken ist, dass sie keine **Linksrekursion**[fn::Linksfaktorisierung != Linksrekursion] erlauben.
+Linksrekursion bedeutet, dass man durch Ableitung des Nicht-Terminals A zu einer Satzform kommt, die wieder mit A beginnt.
+Da LL(1)-Parser linksreduzierend sind, würde das bedeuten, dass wir immer wieder versuchen A zu reduzieren, ohne ein einziges Terminal zu konsumieren; rekursiv; für immer.
 Der Parser würde sich also in einer Endlosrekursion fangen.
 
-Dass eine solche linksrekursive Grammatik nicht LL(1) sein kann, sehen wir auch an den PREDICT Mengen.
-Im Beispiel der linksrekursiven Variante von ~intAdd~ sind die PREDICT Mengen für die beiden Regeln von ~int~ nicht schnittfrei, womit der LL(1) Test fehl schlägt.
-Allerdings sehen wir auch, dass die linksrekursive Variante deutlich intuitiver auf zu schreiben ist, als bisher diskutierte nicht-linksrekrusive Variante, die zwei Nicht-Terminale braucht um die gleiche Sprache abzubilden.
+Dass eine solche linksrekursive Grammatik nicht LL(1) sein kann, sehen wir auch an den PREDICT-Mengen.
+Im Beispiel der linksrekursiven Variante von ~intAdd~ sind die PREDICT-Mengen für die beiden Regeln von ~int~ nicht schnittfrei, womit der LL(1)-Test fehlschlägt.
+Allerdings sehen wir auch, dass die linksrekursive Variante deutlich intuitiver aufzuschreiben ist als die bisher diskutierte nicht-linksrekrusive Variante, die zwei Nicht-Terminale braucht, um die gleiche Sprache abzubilden.
 
-Widerum können wir (manchmal) die Grammatik heilen, indem wir ein zusätzliches Nicht-Terminal einführen. Dazu machen wir zuerst aus der Linksrekursion eine Rechtsrekursion.
-In der rechtsrekursiven Grammatik wächst das Wort nicht mehr an der linken Seite, sondern an der rechten Seite.
-Daher können wir, beim Parsen, Zeichen an der linken Seite konsumieren, bevor wir wieder zum rekursiven Nicht-Terminal kommen.
+Wiederum können wir (manchmal) die Grammatik heilen, indem wir ein zusätzliches Nicht-Terminal einführen. Dazu machen wir zuerst aus der Linksrekursion eine Rechtsrekursion.
+In der rechtsrekursiven Grammatik wächst das Wort nicht mehr an der linken Seite sondern an der rechten Seite.
+Daher können wir beim Parsen Zeichen an der linken Seite konsumieren, bevor wir wieder zum rekursiven Nicht-Terminal kommen.
 Wir machen also Fortschritt (progress) und laufen nicht mehr unendlich lange.
-In der rechtsrekursiven Grammatik haben wir ein gemeinsames Prefix erzeugt, dass wir, wie gehabt, mit Linksfaktorisierung entfernen können.
+In der rechtsrekursiven Grammatik haben wir ein gemeinsames Präfix erzeugt, das wir, wie gehabt, mit Linksfaktorisierung entfernen können.
 
-Das dritte Probelm von LL(1) Grammatiken ist, dass sie viele Nicht-Terminale enthalten und daher auch große Ableitungsbäume erzeugen.
-Noch schlimmer wird es dadurch, dass wir mit der Linksfaktorisierung Konstrukte zerreißen: semantisch zusammengehörenden Token werden nun in unterschiedlichen Unterbäumen abgespeichert.
+Das dritte Problem von LL(1)-Grammatiken ist, dass sie viele Nicht-Terminale enthalten und daher auch große Ableitungsbäume erzeugen.
+Noch schlimmer wird es dadurch, dass wir mit der Linksfaktorisierung Konstrukte zerreißen: Semantisch zusammengehörenden Token werden nun in unterschiedlichen Unterbäumen abgespeichert.
 Bei der gezeigten Addition sind die Operanden keine direkten Geschwister mehr.
 
-Heutzutage haben wir, mit den modernen Parsergeneratoren, sehr gute Werkzeuge um Parser aus formalen Grammatiken zu erzeugen, die sowohl effizient sind als auch "schöne" Ableitungsbäume erzeugen und sich auf 50 Jahre Forschung im Berreich der Syntaxanalyse stützen.
-Diese Generatoren führen, neben der reinen Analyse und Generieurng, noch diverse Grammatikumformungen durch.
-Ebenfalls werden entsprechende Baumtransformationen auf den Ableitungsbäumen durchgeführt, sodass es garnicht zu diesen "hässlichen" Bäumen kommt.
-So ist der ~antlr~ Parsergenerator in der Version 4 in der Lage folgende Grammatik, inklusiver der Operatorpräzedenz, richtig zu einem Parser mit rekursivem Abstieg umzuformen:
+Heutzutage haben wir mit den modernen Parsergeneratoren sehr gute Werkzeuge, um Parser aus formalen Grammatiken zu erzeugen, die sowohl effizient sind, als auch "schöne" Ableitungsbäume erzeugen und sich auf 50 Jahre Forschung im Bereich der Syntaxanalyse stützen.
+Diese Generatoren führen, neben der reinen Analyse und Generierung, noch diverse Grammatikumformungen durch.
+Ebenfalls werden entsprechende Baumtransformationen auf den Ableitungsbäumen durchgeführt, sodass es gar nicht zu diesen "hässlichen" Bäumen kommt.
+So ist der ~antlr~ Parsergenerator in der Version 4 in der Lage, folgende Grammatik, inklusive der Operatorpräzedenz, richtig zu einem Parser mit rekursivem Abstieg umzuformen:
 
 #+begin_example
 E -> E + E
 E -> E * E
 #+end_example
 
-In der Übung werden wir uns genauer mit LL(1) Parsergeneratoren und der Extraktion der EPS, FIRST und FOLLOW Mengen beschäftigen.
-Diese intensive Beschäftigung hat den Zweck Sie mehr in die Denke formal notierter Grammatiken einzuführen.
-Später, in der Praxis, sollten sie allerdings vermeiden ihre Parser, oder gar Parsergeneratoren, selbst zu schreiben. Mehr dazu im Exkurs über Parsing und Sicherheit.
+In der Übung werden wir uns genauer mit LL(1)-Parsergeneratoren und der Extraktion der EPS-, FIRST- und FOLLOW-Mengen beschäftigen.
+Diese intensive Beschäftigung hat den Zweck, Sie mehr in die Denke formal notierter Grammatiken einzuführen.
+Später, in der Praxis, sollten Sie allerdings vermeiden ihre Parser, oder gar Parsergeneratoren, selbst zu schreiben. Mehr dazu im Exkurs über Parsing und Sicherheit.
 
-Das andere Thema, welches wir in der Vorlesung ganz ausgelassen haben, obwohl es für viele zum Kanon der Syntaxanalyse gehört sind die LR(1) Grammatiken.
-Diese Klasse von Grammatiken hat weder das Problem der gemeinsamen Prefixe, noch Schwierigkeiten mit Linksrekursion.
-Allerdings ist die Analyse und die Konstruktion dieser Parser deutlich aufwendiger zu verstehen als bei LL(1) Parsern.
+Das andere Thema, welches wir in der Vorlesung ganz ausgelassen haben, obwohl es für viele zum Kanon der Syntaxanalyse gehört, sind die LR(1)-Grammatiken.
+Diese Klasse von Grammatiken hat weder das Problem der gemeinsamen Präfixe noch Schwierigkeiten mit Linksrekursion.
+Allerdings ist die Analyse und die Konstruktion dieser Parser deutlich aufwendiger zu verstehen als bei LL(1)-Parsern.
 
 In a nutshell ist der Unterschied zwischen LL(k) und LR(k) in etwa folgender:
-Bei einem LL Parser muss immer anhand des Look-Aheads entschieden direkt werden welche Regel nun im folgenden angewendet werden muss.
-Dies bringt eben genau die Probleme, die wir bei einem gemeinsamen Prefix haben, mit sich:
-dort können wir diese eindeutige Entscheidung nicht sofort treffen.
-LR(k) Parser haben die Möglichkeit beliebige Zeit in einem Zustand des "sich noch nicht entschieden habens" (tristate) zu bleiben.
+Bei einem LL Parser muss immer anhand des Look-Aheads direkt entschieden werden, welche Regel nun im Folgenden angewendet werden muss.
+Dies bringt eben genau die Probleme, die wir bei einem gemeinsamen Präfix haben, mit sich:
+Dort können wir diese eindeutige Entscheidung nicht sofort treffen.
+LR(k)-Parser haben die Möglichkeit, beliebige Zeit in einem Zustand des "sich noch nicht entschieden habens" (tristate) zu bleiben.
 Sie führen dazu (virtuell) eine Menge von möglichen Regeln mit sich, die mit jedem weiteren Token weiter eingeschränkt wird.
 Erst wenn diese Menge nur noch eine Regel enthält, wird sie angewendet.
-Wenn sie weiteres Interesse an LR(k) Parsern haben sei ihnen, neben der Lektüre des Drachenbuches, [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert ans Herz gelegt.
+Wenn Sie weiteres Interesse an LR(k)-Parsern haben, sei Ihnen, neben der Lektüre des Drachenbuches, [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert ans Herz gelegt.
 
 
 ** Abstrakter Syntaxbaum
@@ -1205,7 +1206,7 @@ Wenn sie weiteres Interesse an LR(k) Parsern haben sei ihnen, neben der Lektüre
                 # varDef -> var Ident = expr
                 ...
                 expr_tree = expr(token_stream)
-                # Ableitungsbaum als Python Tupel
+                # Ableitungsbaum als Python-Tupel
                 return ("varDef", t_var, t_id, t_eq, expr_tree)
       \end{py}
     \end{code}
@@ -1215,10 +1216,10 @@ Wenn sie weiteres Interesse an LR(k) Parsern haben sei ihnen, neben der Lektüre
 
   \begin{frame}<handout:2>{Abstrakte Syntaxbaum}
     \bi
-    \ii Oft ist der Ableitungsbaum zu detailiert. {
+    \ii Oft ist der Ableitungsbaum zu detailliert. {
       \bi
       \ii Viele Token sind nur für den Parser (Klammerung).
-      \ii Regelumgeforumgen, um die Grammatik parsebar zu machen (Faktorisierung)
+      \ii Regelumformungen, um die Grammatik parsebar zu machen (Faktorisierung)
       \ii Präzedenz von Operatoren wird über hierarchische Regeln ausgedrückt.
       \ei
     }
@@ -1245,28 +1246,28 @@ aus dem gegebenen Programmtext rekonstruieren.
 Diese Ableitungsbäume haben alle Token, die der Scanner erkennt, als Blätter.
 Über diesen Blättern wird, für jede angewendete Grammatikregel, ein innerer Knoten erzeugt:
 Alle Elemente der rechten Regelseite werden als Kindsknoten unter einen, mit dem Nicht-Terminal markiertem, inneren Knoten gehängt.
-Der Wurzelknoten des Ableitungsbaum ist immer das nicht-terminale Startsymbol der Grammatik.
+Der Wurzelknoten des Ableitungsbaums ist immer das nicht-terminale Startsymbol der Grammatik.
 
-Während des parsens unterscheidet man noch, ob man den Baum von den Blättern zur Wurzel (bottom-up) oder von der Wurzel zu den Blättern hin wachsen lässt.
-LL(1) Parser sind Top-Down Parser. LR(1) Parser sind Bottom-Up Parser.
+Während des Parsens unterscheidet man noch, ob man den Baum von den Blättern zur Wurzel (bottom-up) oder von der Wurzel zu den Blättern (top-down) hin wachsen lässt.
+LL(1)-Parser sind Top-Down-Parser. LR(1)-Parser sind Bottom-Up-Parser.
 
 Allerdings sind diese Ableitungsbäume eher unpraktisch zu handhaben:
 Zum einen enthalten sie wirklich **alle** Token des Tokenstroms.
-Also auch jene Zeichen, die wir nur benutzt haben um dem Parser zu vermitteln was wir eigentlich wollen.
+Also auch jene Zeichen, die wir nur benutzt haben, um dem Parser zu vermitteln, was wir eigentlich wollen.
 Das Paradebeispiel hierfür ist explizite Klammerung.
-In einer perfekten Welt wüsste der Parser wie wir einen arithmetischen Ausdruck interpretiert haben wollen; in der Realität müssen wir Klammern verwenden, wenn wir mit der impliziten Klammerung von Punkt-vor-Strich nicht zufrieden sind.
+In einer perfekten Welt wüsste der Parser, wie wir einen arithmetischen Ausdruck interpretiert haben wollen; in der Realität müssen wir Klammern verwenden, wenn wir mit der impliziten Klammerung von Punkt-vor-Strich nicht zufrieden sind.
 
 Aber es gibt in Ableitungsbäumen auch zu viele innere Knoten:
 Durch Regelumformungen und durch Einführung von zusätzlichen Nicht-Terminalen zur korrekten Erkennung der Operatorpräzedenz, kommen viele viele innere Knoten hinzu, die keinen Wert mehr im weiteren Verlauf des Übersetzungsvorgangs haben.
 
 Daher gibt es das Konzept des *Abstrakten Syntaxbaums* (AST).
 Der AST ist ein vom Ableitungsbaum abgeleiteter Baum, der die essentielle Struktur des Programms erfasst und, wie es der Scanner auch schon gemacht hat, nur noch die wesentliche Information an die späteren Übersetzerstufen liefert.
-Was genau wesentlich bedeutet hängt stark von der Sprache ab.
+Was genau wesentlich bedeutet, hängt stark von der Sprache ab.
 
-Um den AST zu generieren haben wir prinzipiell zwei Möglichkeiten:
+Um den AST zu generieren, haben wir prinzipiell zwei Möglichkeiten:
 Entweder falten wird den vollständig aufgebauten Ableitungsbaum mittels Baumtransformationen zusammen und kompaktifizieren dabei, oder wir lassen den Parser den AST direkt erzeugen.
-Für letzteres müssen wir dem Parsergenerator mitteilen, wie diese AST Konstruktion von statten gehen soll.
-Wir brauchen also zusätzliche Informationen in der Grammatik, die nicht erkannte formale Sprache verändert, aber dem Generator zusätzliche Informationen liefert. Den Weg den die meisten Generatoren hier gehen ist eine **Reduktionsaktion** anzugeben:
+Für letzteres müssen wir dem Parsergenerator mitteilen, wie diese AST-Konstruktion von statten gehen soll.
+Wir brauchen also zusätzliche Informationen in der Grammatik, die nicht die erkannte formale Sprache verändert, aber dem Generator zusätzliche Informationen liefert. Den Weg, den die meisten Generatoren hier gehen ist eine **Reduktionsaktion** anzugeben:
 
 #+begin_example
 varDef -> var Ident = expr  { return ("varDef", $2, $3) }
@@ -1293,14 +1294,14 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
 
   \begin{frame}<handout:2,3>{Parsingprobleme mit realen Sprachen}
     \bi
-    \ii Sprachen mit optionalem \texttt{else}, können das \emph{dangling-else problem} haben.\\\medskip {
+    \ii Sprachen mit optionalem \texttt{else} können das \emph{dangling-else problem} haben.\\\medskip {
       \btSetNamedTab[1cm]{\first}%
       \first\grammarrule{\NT{stmt}}{\K{if} \NT{condition} \NT{then\_clause} \NT{else\_clause} \OR \K{\{} \NT{stmt\_list} \K{\}} \OR\ldots}\\
       \first\grammarrule{\NT{then\_stmt}}{\K{then} \NT{stmt}}\\
       \first\grammarrule{\NT{else\_stmt}}{\K{else} \NT{stmt} \OR \EPSILON}
       \bi
       \ii Grammatik ist \alert<1>{nicht} eindeutig! Wohin gehört bei \texttt{if-if-else} das \texttt{else}?\\
-       Die Sprache muss definieren welche Variante gewählt wird.\\\medskip
+       Die Sprache muss definieren, welche Variante gewählt wird.\\\medskip
          \begin{center}
            \only<1|handout:1>{\texttt{\tikznode[draw=white]{if A then \tikznode[draw=white]{if B then doAB();} else doX();} }}
            \only<2|handout:2>{\texttt{\tikznode[draw,fill=badbee!50]{if A then \tikznode[draw,fill=safegreen!50]{if B then doAB(); else doX();}} }}
@@ -1312,7 +1313,7 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
      \ei
    }
    \medskip
-   \ii<4-> Oft reicht ein Token Look-Ahead nicht aus das Konstrukt zu erkennen. {
+   \ii<4-> Oft reicht ein Token Look-Ahead nicht aus, um das Konstrukt zu erkennen. {
    \bi
    \ii Java: Felder und Methoden erlauben unterschiedliche Modifer: \\\medskip{
      \btSetNamedTab[5mm]{\first}%
@@ -1321,13 +1322,13 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
        Syntaxfehler lässt sich nicht\\[1ex]
      \first\texttt{\colorbox{badbee!50}{\strut public}\colorbox{srared!50}{\strut abstract} int foo() \{\ldots\} } \second am \enquote{\texttt{abstract}} erkennen.
    }\medskip
-   \ii Wir lassen beliebige Modifer zu, akzeptieren invalide Programme, und verschieben das Probelm auf die Semantische Analyse.
+   \ii Wir lassen beliebige Modifier zu, akzeptieren invalide Programme, und verschieben das Problem auf die semantische Analyse.
    \ei
    }
    \ei
   \end{frame}
 
-  \begin{frame}[fragile]{Paringprobleme mit realen Sprachen: \texttt{typedef}}
+  \begin{frame}[fragile]{Parsingprobleme mit realen Sprachen: \texttt{typedef}}
     \bi
     \ii Die Definition von eigenen Typnamen führt zu kontextsensitivität.{\\\smallskip
       \btSetNamedTab[5mm]{\first}%
@@ -1361,10 +1362,10 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
         \end{column}
       \end{columns}
     }\medskip
-    \ii<2-> \enquote{Lösung}: Der Lexer Hack vermeidet kontextsensitives  Parsing.{
+    \ii<2-> \enquote{Lösung}: Der Lexer Hack vermeidet kontextsensitives Parsing.{
       \bi
       \ii Der Scanner führt eine Liste von bereits definierten Typnamen mit.
-      \ii Er emitiert unterschiedliche Token für Typname und Identifier.
+      \ii Er emittiert unterschiedliche Token für Typname und Bezeichner.
       \ii Nun ist allerdings der Scanner kontextsensitiv!
       \ei
     }
@@ -1379,36 +1380,36 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
 
 Nachdem wir sehr detailiert über Parser geredet haben, wollen wir nun wieder herauszoomen und uns auf unser eigentliches Ziel konzentrieren:
 Die Extraktion der Programmstruktur für eine real existierende Programmiersprache.
-Mit welchem Parsingalgorithmus das passiert ist uns im Grunde egal, haupsache es ist schnell, korrekt und eindeutig.
-Dabei gibt es allerdings einige Probleme, die entweder bereits in der Sprache angelegt sind oder die wir machen können wenn wir die formale Gramamtik aufschreiben.
+Mit welchem Parsingalgorithmus das passiert, ist uns im Grunde egal, hauptsache es ist schnell, korrekt und eindeutig.
+Dabei gibt es allerdings einige Probleme, die entweder bereits in der Sprache angelegt sind oder die wir machen können, wenn wir die formale Grammatik aufschreiben.
 
-Einen klassichen Fehlern den man beim Erstellen einer Grammatik haben machen kann ist das dangling-else Problem.
-Dabei wird es bei einem doppelt geschachtelten ~if-else~ nicht klar ob der else-Zweig zum inneren oder zum äußeren ~if~ gehört.
-Dieses Problem kann nur auftreten, wenn die Sprache es erlaubt die Klammerung von Codeblöcken weg zu lassen falls man nur ein einzelnes Statement hat.
+Einen klassischen Fehler, den man beim Erstellen einer Grammatik machen kann, ist das dangling-else Problem.
+Dabei wird bei einem doppelt geschachtelten ~if-else~ nicht klar, ob der else-Zweig zum inneren oder zum äußeren ~if~ gehört.
+Dieses Problem kann nur auftreten, wenn die Sprache es erlaubt, die Klammerung von Codeblöcken wegzulassen, falls man nur ein einzelnes Statement hat.
 Bei der angegeben Grammatik entsteht so das Problem, dass sie nicht eindeutig ist (also auch nicht LL(1)).
-Konstruiert man dennoch einen Parser, so würde ein linksreduzierender Parser die eine und ein rechtsreduzierender Parser die andere Variante finden. Daher muss eine Sprache, die die Auslassung der Codeblockklammerung erlaubt, genau definieren wie dieser Falls behandelt wird.
+Konstruiert man dennoch einen Parser, so würde ein linksreduzierender Parser die eine und ein rechtsreduzierender Parser die andere Variante finden. Daher muss eine Sprache, die die Auslassung der Codeblockklammerung erlaubt, genau definieren, wie dieser Fall behandelt wird.
 Historisch gesehen wurde ein dangling-else Problem zum ersten Mal bei [[https://dl.acm.org/citation.cfm?doid=365813.365821][ALGOL-60]] erkannt.
 
 Ein anderes grundsätzliches Problem der Syntaxanalyse ist, dass wir manchmal nicht alle Notationsregeln der Sprache mit nur einem Zeichen Look-Ahead prüfen können.
 Beim Beispiel auf den Folien kommt das Problem zutage, dass bei Java manche Modifikatoren innerhalb einer Klassendefinition sowohl für Member als auch für Methoden (~public~) erlaubt sind, während dies bei anderen nicht der Fall ist (~abstract~ macht keinen Sinn für eine Membervariable).
-Da allerdings erst nach dem Identifier klar wird, ob ein Member oder eine Methode vorliegt, kann ein LL(1) Parser nicht entscheiden ob der Modifikator an dieser Stelle erlaubt ist oder nicht.
+Da allerdings erst nach dem Bezeichner klar wird, ob ein Member oder eine Methode vorliegt, kann ein LL(1)-Parser nicht entscheiden, ob der Modifikator an dieser Stelle erlaubt ist oder nicht.
 Die Lösung hierfür ist das teilweise Aufschieben der Entscheidung über die syntaktische Korrektheit in die semantische Analyse.
-Der Parser erlaubt also beide gezeigten Programme, erzeugt einen AST, und eine spätere Prüfung schlägt der Memberdefinition alarm.
+Der Parser erlaubt also beide gezeigten Programme, erzeugt einen AST, und eine spätere Prüfung schlägt der Memberdefinition Alarm.
 
-Das dritte und schwerwiegenste Problem von Parsing ist, dass wir bisher die Unwahrheit über die kontextfreie Syntax von Programmiersprachen gesagt haben[fn::Stackoverflow: [[https://stackoverflow.com/questions/41415006/which-contemporary-computer-languages-are-ll1][Which contemporary computer languages are LL(1)?]]].
+Das dritte und schwerwiegendste Problem von Parsing ist, dass wir bisher die Unwahrheit über die kontextfreie Syntax von Programmiersprachen gesagt haben[fn::Stackoverflow: [[https://stackoverflow.com/questions/41415006/which-contemporary-computer-languages-are-ll1][Which contemporary computer languages are LL(1)?]]].
 Viele Sprachen sind nämlich nicht wirklich kontextfrei.
 Dies bedeutet, dass ein Unterbaum des Ableitungsbaums nicht nur von den überdeckten Token abhängt, sondern auch von der semantischen Interpretation anderer Programmteile.
 Oder anders gesagt:
 Das Parsen der meisten Sprachen ist nicht lokal machbar.
 
-Das klassiche Beispiel hierfür ist ~typedef~ aus der Programmiersprache C.
-Hiermit zeigt der Programmierer an, dass, ab der Stelle des ~typedefs~ ein Identifier nicht mehr als Variabelenname, sondern als Alias für einen anderen Typen interpretiert haben will.
-So ist führt der Ausdruck ~typedef char foo~ dazu, dass ~foo~ der Name eines Datentyps ist, der genau ein Byte groß ist und an jeder Stelle verwendet werden kann, an der auch ~char~ verwendet werden darf.
+Das klassische Beispiel hierfür ist ~typedef~ aus der Programmiersprache C.
+Hiermit zeigt der Programmierer an, dass ab der Stelle des ~typedefs~ ein Bezeichner nicht mehr als Variablenname, sondern als Alias für einen anderen Typen interpretiert werden soll.
+So führt der Ausdruck ~typedef char foo~ dazu, dass ~foo~ der Name eines Datentyps ist, der genau ein Byte groß ist und an jeder Stelle verwendet werden kann, an der auch ~char~ verwendet werden darf.
 
-Da aber einige Grammatikregel eine Unterscheidung treffen anhand des Wissens ob wir gerade auf den Namen einer Variable oder den Namen eines Typs schauen, reicht müssen wir an diesen Stellen wissen welche Typnamen es gibt.
+Da aber einige Grammatikregeln anhand des Wissens, ob wir gerade auf den Namen einer Variable oder den Namen eines Typs schauen, eine Unterscheidung treffen, müssen wir an diesen Stellen wissen, welche Typnamen es gibt.
 Man kann dieses Problem entweder mit einer Menge Formalismus{{{wikipedia_en(Attribute_grammar}}} erschlagen, oder man gibt die Kontextfreiheit zu einem gewissen Teil auf.
 
-Beim [[https://en.wikipedia.org/wiki/The_lexer_hack][Lexer Hack]], lässt man Parser und Scanner miteinander reden. Der Scanner führt eine Liste mit gerade aktiven Typnamen mit und gibt unterschiedliche Token für Typnamen und für Identifer an den Parser. Der Parser seinerseits teilt dem Scanner beim erkennen eines ~typedef~ mit, dass es einen neuen Typnamen gibt[fn::https://blogs.gnome.org/otte/2019/10/17/riddle-me-this/]. Dies kann in der Reduktionsregel der Grammatik erfolgen:
+Beim [[https://en.wikipedia.org/wiki/The_lexer_hack][Lexer Hack]], lässt man Parser und Scanner miteinander reden. Der Scanner führt eine Liste mit gerade aktiven Typnamen mit und gibt unterschiedliche Token für Typnamen und für Bezeichner an den Parser. Der Parser seinerseits teilt dem Scanner beim Erkennen eines ~typedef~ mit, dass es einen neuen Typnamen gibt[fn::https://blogs.gnome.org/otte/2019/10/17/riddle-me-this/]. Dies kann in der Reduktionsregel der Grammatik erfolgen:
 
 #+begin_example
 typedef_decl -> typedef type Ident  { scanner.typenames.add($3); return ('typedef', $3, $2); }
@@ -1426,11 +1427,11 @@ typedef_decl -> typedef type Ident  { scanner.typenames.add($3); return ('typede
 
   \begin{frame}[fragile]{Parser als Einfallstore für Angreifer}
     \bi
-    \ii Nutzer, wie auch Angreifer, schicken Anfragen als Zeichenstrom {
+    \ii Nutzer, wie auch Angreifer, schicken Anfragen als Zeichenstrom. {
       \bi
       \ii Parser extrahieren Typ, Argumente und strukturierte Daten.
-      \ii Komplexe Protokoll und Dateiformate (ASN.1, PDF, JPEG)
-      \ii Die Eingaben müssen validiert und transfomiert werden (XML: XSD, XSLT)
+      \ii Komplexe Protokoll- und Dateiformate (ASN.1, PDF, JPEG)
+      \ii Die Eingaben müssen validiert und transformiert werden (XML: XSD, XSLT)
       \ei
     }\medskip
     \ii Kleine (Programmier-)sprachen sind überall{
@@ -1439,34 +1440,34 @@ typedef_decl -> typedef type Ident  { scanner.typenames.add($3); return ('typede
       \ii Browser: HTML5, JavaScript, CSS, RDF, Embedded SVG, MathML, \ldots
       \ei
     }\medskip
-    \ii Handgeschreibene für komplexe Formate neigen zu Schwachstellen.{
+    \ii Handgeschriebene für komplexe Formate neigen zu Schwachstellen.{
       \bi
       \ii DNP3: Kommunikationsprotokoll im US Stromnetz ($> 100$ Seiten Standard)
       \ii Untersuchung von 20 DNP3 Implementierung durch Fuzzing (2013-2014)
-      \ii 31 bekannte Schwachstellen in DNP3 Parsern.
+      \ii 31 bekannte Schwachstellen in DNP3 Parsern
       \ei
     }\medskip
     \ei
 
     \pause
-    \hspace{-5mm}\Large\ALERT{(Benutzer)Eingaben sind Lava! Parsergeneratoren!}
+    \hspace{-5mm}\Large\ALERT{(Benutzer-)Eingaben sind Lava! Parsergeneratoren!}
 
   \end{frame}
 
   \begin{frame}{Ungewollt Turing-Vollständig: Eingabevalidierung}
     \bi
-    \ii Syntaktische (und semantische) Analyse validieren eine Eingabe.{
+    \ii Syntaktische (und semantische) Analysen validieren eine Eingabe.{
       \bi
-      \ii Dazu wenden sie, teils komplexe, Regel auf die Eingabedaten an.
-      \ii Was wenn diese Regel so komplex sind, dass eine virtuelle Maschine entsteht?
+      \ii Dazu wenden sie, teils komplexe, Regeln auf die Eingabedaten an.
+      \ii Was, wenn diese Regeln so komplex sind, dass eine virtuelle Maschine entsteht?
       \ii Der Übersetzer selbst wird zum Sprachprozessor.
       \ei
     }\medskip
-    \ii \enquote{C++ Templates are Turing Complete}, Veldhuizen, 2003 {
+    \ii \enquote{C++-Templates are Turing Complete}, Veldhuizen, 2003 {
       \bi
       \ii Erlauben ein flexible Definition von Datentypen; aber auch Berechnung von $\pi$.
       \ii Maschinenmodell: Typen sind Objekte, Rekursive Templates die Operationen.
-      \ii Es gibt sogar Standardbibliotheken zur C++ Template Programmierung.
+      \ii Es gibt sogar Standardbibliotheken zur C++-Template-Programmierung.
       \ei
     }
     \ei
@@ -1483,36 +1484,36 @@ typedef_decl -> typedef type Ident  { scanner.typenames.add($3); return ('typede
 
 #+end_src
 
-Ein weiteres Problem, dass ganz eng mit Parsen verbunden ist, ist die Validierung von Usereingaben und die damit verbundenen Sicherheitsimplikatonen.
+Ein weiteres Problem, dass ganz eng mit Parsen verbunden ist, ist die Validierung von Benutzereingaben und die damit verbundenen Sicherheitsimplikationen.
 Jede Form von Informationsextraktion aus einer Zeichenkette ist Parsing.
-Daher sind Parser die ersten, die mit möglicherweise schadhaften und gefährlichen Eingaben konforntiert sind.
-Hat der Parser eine Sicherheitslücke, so ist diese besonders einfach aus zu nützen, da der Angreifer an keiner anderen Instanz vorbei muss.
+Daher sind Parser die ersten, die mit möglicherweise schadhaften und gefährlichen Eingaben konfrontiert sind.
+Hat der Parser eine Sicherheitslücke, so ist diese besonders einfach auszunutzen, da der Angreifer an keiner anderen Instanz vorbei muss.
 
 Daher ist es nicht nur vom Programmieraufwand her korrekt gedacht einen Parsergenerator zu verwenden, sondern häufig auch vom Sicherheitsstandpunkt:
-Dabei hilft die genaue Spezifikation der erwartete Eingaben als formale Grammatik, nicht einen Parser für das Austauschformat zu generieren, sondern auch Format genau zu beschreiben.
-Mittels Grammatikanalysen kann man dann sogar nachweisen, dass die Grammatik determinsitisch parsebar ist.
+Dabei hilft die genaue Spezifikation der erwartete Eingaben als formale Grammatik nicht nur einen Parser für das Austauschformat zu generieren, sondern auch das Format genau zu beschreiben.
+Mittels Grammatikanalysen kann man dann sogar nachweisen, dass die Grammatik deterministisch parsebar ist.
 
-Das andere sicherheitsrelevante Thema beim Validieren von Zeichenketten ist, dass man sehr schnell an den Punkt kommt dass die Validierung der Eingabe an sich schon eine virtuelle Maschine darstellt und vielleicht Turing-vollständig ist.
-Es geht also um Situationen, bei dem die Struktur eines Programms selbst ein Programm ist, dass vom Übersetzer während der Übersetzungszeit ausgeführt wird, während er versucht nachzuweisen, dass das Programm valide ist.
+Das andere sicherheitsrelevante Thema beim Validieren von Zeichenketten ist, dass man sehr schnell an den Punkt kommt, dass die Validierung der Eingabe an sich schon eine virtuelle Maschine darstellt und vielleicht Turing-vollständig ist.
+Es geht also um Situationen, bei denen die Struktur eines Programms selbst ein Programm ist, dass vom Übersetzer während der Übersetzungszeit ausgeführt wird, während er versucht nachzuweisen, dass das Programm valide ist.
 Der Übersetzer wird also selbst zum Sprachprozessor für dieses Meta-Programm.
 
-Das bekannteste Beispiel hierfür sind C++ Templates:
+Das bekannteste Beispiel hierfür sind C++-Templates:
 Mit C++ Templates kann der Programmierer Datentypen definieren, die parametrisch von anderen Datentypen abhängen.
 Ein Beispiel für einen solchen Datentyp ist die doppelt verkettete Liste von Integern (~std::deque<int>~).
-Jetzt muss der Übersetzer allerdings diese parametrischen Datentypen vollständig expandieren um zu prüfen ob alle Typen korrekt verwendet wurden.
-Da aber auch Templatetypen Argumente für Templatetypen sein können, hat man alle Elemente zusammen um ein Programm zu schreiben: Rekursion und Abbruchbedingungen.
-Es wurde sogar nachgewiesen, dass C++ Templates wirklich [[http://port70.net/~nsz/c/c%2B%2B/turing.pdf][Turing-vollständig]] sind indem eine Turing Maschine mittels C++ Templates erstellt wurde.
+Jetzt muss der Übersetzer allerdings diese parametrischen Datentypen vollständig expandieren, um zu prüfen, ob alle Typen korrekt verwendet wurden.
+Da aber auch Templatetypen Argumente für Templatetypen sein können, hat man alle Elemente zusammen, um ein Programm zu schreiben: Rekursion und Abbruchbedingungen.
+Es wurde sogar nachgewiesen, dass C++-Templates wirklich [[http://port70.net/~nsz/c/c%2B%2B/turing.pdf][Turing-vollständig]] sind, indem eine Turingmaschine mittels C++-Templates erstellt wurde.
 
-Jetzt hat es sich im Falle von C++ Templates herausgestellt, dass eine solche Flexibilität in der Sprache viele Möglichkeiten bietet elegante Programme zu schreiben.
-Allerdings möchten Sie nicht aus Versehen in die Falle tappen, dass jemand auf ihrem Parser für Netzwerkpackete Bitcoins minen kann.
-Mit [[http://langsec.org/occupy/][LANGSEC]], gibt es sogar eine Forschungsrichtung, die sich auf genau diese sprachlich formale Sicht der Sicherheit konzentriert.
+Jetzt hat es sich im Falle von C++-Templates herausgestellt, dass eine solche Flexibilität in der Sprache viele Möglichkeiten bietet, elegante Programme zu schreiben.
+Allerdings möchten Sie nicht aus Versehen in die Falle tappen, dass jemand auf Ihrem Parser für Netzwerkpakete Bitcoins minen kann.
+Mit [[http://langsec.org/occupy/][LANGSEC]] gibt es sogar eine Forschungsrichtung, die sich auf genau diese sprachlich formale Sicht der Sicherheit konzentriert.
 Ihre Forderung ist [[https://www.youtube.com/watch?v=2qXmPTQ7HFM][Context-Free or Regular!]]
 
 * Zusammenfassung
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
-    \ii Die Syntaktische Analyse extrahiert die Struktur eines Programms {
+    \ii Die syntaktische Analyse extrahiert die Struktur eines Programms {
       \bi
       \ii Die rekursive Natur von Bäumen eignet sich Schachtelungen zu greifen.
       \ii Syntaktische Korrektheit ist notwendig, jedoch nicht hinreichend.
@@ -1521,13 +1522,13 @@ Ihre Forderung ist [[https://www.youtube.com/watch?v=2qXmPTQ7HFM][Context-Free o
     \ii Scanner (Lexer) partitionieren den Zeichenstrom in einen Tokenstrom. {
       \bi
       \ii Token haben eine Klasse und eine Nutzlast: \texttt{(Int, 23)}
-      \ii Zerteilung mittels Regulären Ausdrücken und endlichen Zustandsautomaten.
+      \ii Zerteilung mittels regulärer Ausdrücke und endlichen Zustandsautomaten
       \ei
     }\medskip
     \ii Parser ordnen die Token, mittels Grammatikregeln, in einem Baum an. {
       \bi
       \ii Die Sprachklasse LL(1) kann mittels rekursivem Abstieg erkannt werden.
-      \ii Die PREDICT Menge und der Look-Aheads entscheiden die nächste Regel.
+      \ii Die PREDICT-Menge und der Look-Ahead entscheiden die nächste Regel.
       \ii Im Parsebaum sind alle Token Blätter und alle Regeln Knoten.
       \ei
     }\medskip
