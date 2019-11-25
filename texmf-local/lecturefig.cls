@@ -49,3 +49,7 @@
   >=Stealth,
   every tikzpicture/.style={\sffamily},
 }
+
+\newcommand{\tikznode}[2][]{%
+  \tikz[baseline]\node[anchor=base,#1]{#2};%
+}

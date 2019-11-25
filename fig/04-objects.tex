@@ -1,0 +1,30 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture]
+    \node[align=left,draw,
+          font=\footnotesize,
+          rectangle split,
+          rectangle split parts = 2,
+          ] (object) {
+            Objekt @ 0x1000
+            \nodepart{two}
+            Typ: \texttt{object\_t}\\
+            \tikznode[name=x,fill=badbee!50,rectangle split parts=1]{.x = 23;}\\
+            .y = "foo"};
+
+
+    \node[left=1.5 of object.text west,draw](addr){\texttt{(object\_t*) 0x1000}};
+    \draw[->] (addr) -- (object.text west);
+
+    \node[left=1.5 of object.west,draw](addr){\texttt{(int *) 0x1004}};
+    \draw[->] (addr) -- (x.west);
+
+    \node[right=1.5 of object.text east,draw](def){\texttt{object\_t obj}};
+    \draw[->] (def) -- (object.text east);
+
+    \node[right=1.5 of object.east,draw](def){\texttt{obj.x}};
+    \draw[->] (def) -- (x.east);
+  \end{tikzpicture}
+\end{frame}
+\end{document}
