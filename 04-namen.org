@@ -293,7 +293,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 ** Einschränkung der Sichtbarkeit
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}{Einschränkung der Sichtbarkeit}
     \begin{btBlock}[type=alert]{\ALERT{Ziel:} Wir wollen Interna der Implementierung verstecken}
       Zum Zwecke des \textbf{Information Hiding} wollen wir manche Namen nur \alert{innerhalb} eines Namensraumes sichtbar machen.
@@ -329,6 +328,41 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
         \ei
       \end{column}
     \end{columns}
+  \end{frame}
+
+
+  %%ONLY%%
+  \begin{frame}[fragile]{Fallbeispiel: Java Packages}
+    \begin{columns}
+      \begin{column}{0.35\textwidth}
+        \begin{code}[]
+          \begin{java}
+            package N;
+            public class A {
+              public static
+                void f1() { }
+            }
+          \end{java}
+        \end{code}
+
+        \begin{code}[]
+          \begin{java}
+            package M;
+            import N.A;
+
+            class B {
+              static void f2() {
+                A.f1();
+              }
+            }
+          \end{java}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.60\textwidth}
+        \btAnimation[width=\textwidth]{1:<1>}{fig/04-java-packages}
+      \end{column}
+    \end{columns}
+
   \end{frame}
 #+end_src
 - introduce `export[public]', `export[protected]'

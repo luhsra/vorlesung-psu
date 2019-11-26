@@ -1,0 +1,29 @@
+\documentclass{lecturefig}
+
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \begin{SCOPE}[text={\LET N=},private]{N}
+      \begin{SCOPE}[text={\LETe A=},private]{A}
+        \LINE[] (f1) {\LETe f1};
+      \end{SCOPE}
+    \end{SCOPE}
+    \LINE [] (@) {};
+    \begin{SCOPE}[text={\LET M=},private]{M}
+      \LINE[] (import) {\IMPORT ::N::A};
+      \begin{SCOPE}[text={\LET B=},private]{B}
+        \begin{SCOPE}[text={\LET f2=},private]{f2}
+          \LINE[] (use) {A::f2};
+        \end{SCOPE}
+      \end{SCOPE}
+    \end{SCOPE}
+    \draw (N-start.east) -- ++(20:1cm) node[align=left,anchor=west] (@) {Pakete und Klassen sind\\ per default \texttt{private}};
+    \draw (A-start.east) -- (@);
+    \draw (f1.east) -- ++(-20:1cm) node[align=left,anchor=west] (@) {\texttt{public} macht Namen\\ dennoch sichtbar};
+    \draw (import.east) -- ++(20:1cm) node[align=left,anchor=west] (@) {Java verwendet "\texttt{.}"};
+
+    \draw (f2-start.east) -- ++(-50:1cm) node[align=left,anchor=west] (@) {Lokale Variablen sind nicht\\von außen sichtbar};
+\end{tikzpicture}
+\end{frame}
+\end{document}
