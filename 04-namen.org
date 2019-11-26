@@ -1,0 +1,356 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 04 - Namen
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+
+Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
+ - Die Regeln der Namensauflösung etablieren die Links zwischen Definition und  Benutzung [effektiv]
+ - Dynamische Namensauflösung kostet immer Laufzeit                                       [effizient]
+
+
+* Was ist ein "Name"?
+:PROPERTIES:
+:CUSTOM_ID: 04-einleitung
+:END:
+
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \begin{frame}
+    \maketitle
+  \end{frame}
+
+  \begin{frame}{Wieso sollte ich mich mit Namen beschäftigen?}
+    \begin{center}
+      \includegraphics[page=11,width=0.6\linewidth]{fig/01-overview-small}
+    \end{center}
+    \bi
+    \ii Die Namensauflösung ist grundlegend für das Programmverständnis{
+      \bi
+      \ii Namen etablieren \structure{Querverbindungen} zu Laufzeitobjekten kontextsensitiv.
+      \ii Das informatische Grundprinzip von \structure{Information Hiding} hängt an Namen.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \lstdefinestyle{defuse}{
+    style=nohighlighting,
+    moredelim=**[is][{\btHL[fill=safegreen!50]<2-3>}]{!}{!},
+    moredelim=**[is][{\btHL[fill=safeblue!50]<3>}]{@}{@},
+    moredelim=**[is][{\btHL[fill=safeblue!50]<3->}]{^u}{^},
+    moredelim=**[is][{\btHL[fill=safegreen!50]<3->}]{^d}{^},
+    escapechar=`,
+  }
+  \begin{frame}[fragile]{"Motivierendes" Beispiel: C++}
+    \def\p#1{\tikzmark{p#1}}
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+  \begin{code}[]
+    \begin{CPP}[style=defuse]
+      namespace `\p5`^dA^`\p{55}` {
+        typedef int !type_t!;
+        class ^dB^`\p6` {
+          private:   @int@ !x!;
+          protected: @int@ `\p7`^dy^;
+          public:    @int@ !z!;
+            virtual @type_t@ !func!();
+        };
+      }
+
+      class `\p3`^dC^`\p{34}` : public `\p4`^uA::B^ {
+        virtual @A::type_t@ !func!();
+      };
+
+      using !ret_t! = @A::type_t@;
+    \end{CPP}
+  \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=C++]
+          \begin{CPP}[style=defuse]
+            @ret_t@ @A::B::@!func!() {
+              return @this@->@x@;
+            }
+
+            @ret_t@ `\p2`^uC::^!func!() {
+              return `\p1`^uy^`\p8`;
+            }
+
+            @int@ !main!() {
+              @A::B@ *!obj! = new @C@();
+              @obj@->@z@ = 42;
+              return @obj@->@func@();
+            }
+          \end{CPP}
+        \end{code}
+      \end{column}
+    \end{columns}
+    \begin{tikzpicture}[remember picture,overlay]
+      \only<4->{
+        \draw[thick,srared,->] (pic cs:p1) --(pic cs:p2);
+        \draw[thick,srared,->] (pic cs:p2) --($(pic cs:p34)+(up:2pt)$);
+        \draw[thick,srared,->] (pic cs:p34) --(pic cs:p4);
+        \draw[thick,srared,->] (pic cs:p4) --(pic cs:p55);
+        \draw[thick,srared,->] (pic cs:p5) --(pic cs:p6);
+        \draw[thick,srared,->] (pic cs:p6) --(pic cs:p7);
+      }
+      \only<5->{
+        \draw[ultra thin] (pic cs:p8) -- ++(-45:2em) node[align=left,anchor=west,fill=badbee!50] {type = int\\addr = this + 4;};
+      }
+    \end{tikzpicture}
+    \medskip
+    \bi
+    \ii Namen werden überall im Programm \strut\only<2->{\colorbox{safegreen!50}}{deklariert} und \only<3->{\colorbox{safeblue!50}}{referenziert}.
+    \ii<4-> Die \textbf{Namensauflösung} verbindet den Namen mit dem Objekt.
+    \ii<5-> \colorbox{badbee!50}{Information}sfluss entlang dieser Kanten quer zum AST
+    \ei
+  \end{frame}
+
+  \begin{frame}{Grundbegriffe: Namen und Namensauflößung}
+    \begin{center}
+      \btImage[text width=0.8\textwidth,align=center,]{fig/04-objects}
+    \end{center}
+
+    \bi
+    \ii \STRUCTURE{Name}: Symbolische und Statische Objektreferenz im Programmcode{
+      \bi
+      \ii \structure{Abstraktion}: Namen ersetzen die Verwendung konkreter Speicheradressen
+      \ii \structure{Dokumentation}: Namen transportieren Informationen zwischen Entwicklern
+      \ii \structure{Querverbindung}: Referenz von Deklarationen quer zum AST
+      \ei
+    }\medskip
+    \ii<2-> \STRUCTURE{Namensauflösung}: Adresse für referenziertes Objekt berechnen. {
+      \bi
+      \ii Wird vom Übersetzer teilweise vorbereitet oder schon ganz durchgeführt.
+      \ii Essentieller Teil der semantischen Analyse (\texttt{name 'x' is not defined})
+      \ii Sowohl statischen (Bezeichner), als auch dynamische (Pointer), Informationen
+      \ei
+    }
+    \ei
+
+    \medskip
+    \OrangeBox<3->{
+      Im Übersetzer suchen wir (oft) nur die \textbf{Definitionstelle} einer Variable
+    }
+  \end{frame}
+  #+end_src
+
+#+begin_src latex
+  \begin{frame}[t]{Grundbegriffe: Definition, Deklaration, Namensraum}
+    \btAnimation[]{center,range=1-3:<1->}{fig/04-scopes}
+    \bi
+    \ii \structure{Definition} eines Namens für einen AST Knoten\hfill\only<2->{\texttt{\LET <NAME>}} {
+      \bi
+      \ii Um AST Knoten (Variable) wieder zu finden, geben wir ihnen \alert{einen} Namen.
+      \ii Geht einher mit der Allokation eines Objekts (Variablendefinition).
+      \ei
+    }\smallskip
+    \ii \structure{Deklaration} eines entfernten Namens\hfill\only<2->{\texttt{\DECL <NAME>}}{
+      \bi
+      \ii Bekanntmachung, dass es einen AST Knoten mit diesem Namen gibt.
+      \ii Notwendig bei getrennter Übersetzung (C/C++) und mehreren Quelldateien.
+      \ii Jede Definition ist auch eine Deklaration.
+      \ei
+    }\smallskip
+    \ii \structure{Namensraum} ist ein Container für deklarierte Namen \hfill\only<2->{\texttt{\{...\}}}{
+      \bi
+      \ii Beschränken die Gültigkeit eines deklarierten Namens
+      \ii \structure{Schachtelung}: Ein Namensraum kann auch weitere Namensräume beinhalten .
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
+* Namensräume und Namensauflösung
+** Implizite Namensauflösung
+#+begin_src latex
+  \begin{frame}{Implizite Namensauflösung}
+    \begin{columns}
+      \begin{column}{0.3\textwidth}
+        \btAnimation[width=\textwidth]{range=1-4:<1->}{fig/04-closest-match}
+      \end{column}\hfill
+      \begin{column}{0.65\textwidth}
+        \bi
+        \ii \enquote{Definition before Use}{
+          \bi
+          \ii Deklaration in einem umgebenden Namensraum.
+          \ii Reihenfolge von Deklaration und Referenz teilweise egal.
+          \ei
+        }\medskip
+        \ii<2-> \enquote{Closest-nested scope rule}{
+          \bi
+          \ii Suche nach Deklarationen von Innen nach Außen
+          \ii Bei mehreren Möglichkeiten: Nimm die Innerste.
+          \ii Im AST: Wir suchen von unten nach oben.
+          \ei
+        }\medskip
+        \ii<3-> Deklarationen können \structure{verdeckt} werden {
+          \bi
+          \ii Innere Deklarationen verdecken die Äußeren
+          \ii Die äußere Deklaration bleibt \structure{gültig}, ist aber innen nicht mehr \structure{sichtbar}.
+          \ei
+        }
+        \ei
+      \end{column}
+    \end{columns}
+  \end{frame}
+  #+end_src
+** Explizite Namensräume
+#+begin_src latex
+  \begin{frame}[fragile]{Explizite Namensräume}
+    \begin{btBlock}[type=alert]{\ALERT{Problem:} Referenzen nur entlang des ASTs möglich}
+      Die implizite Namensauflösung erlaubt uns nur Namen zu referenzieren, die direkt über uns im AST sind. Namen aus einem anderen Namensraum (NS) sind nicht erreichbar
+    \end{btBlock}
+    \medskip
+    \begin{columns}
+      \begin{column}{0.25\textwidth}
+        \btAnimation[width=\textwidth]{range=1-3:<1->,3:<4->}{fig/04-explicit-namespace}
+      \end{column}\hfill
+      \begin{column}{0.70\textwidth}
+        \bi
+        \ii<2-> NS bekommt Namen im umgebenden NS {
+          \bi
+          \ii Namen aus einem NS anfordern mit \enquote{\texttt{::}}
+          \ii Der Trenner \texttt{::} ist wie das \enquote{\texttt{/}} bei Pfaden
+          \ii \alert<2>{Grundlegende Erweiterung} des Namensraumkonzepts
+          \ei
+        }
+        \ii<3-> Impliziter Wurzelnamensraum {
+          \bi
+          \ii Ermöglicht es alle Namensräume zu adressieren
+          \ii Vollständig qualifizierter Pfad ist eindeutig
+          \ei
+        }
+        \ii<4-> In C++: \enquote{\texttt{\LET <X>=...}} = \enquote{\texttt{namespace <X>}}{
+          \begin{code}[tag=C++]
+            \begin{CPP}
+              namespace N { namespace M {
+                  int A;
+              } }
+            \end{CPP}
+          \end{code}
+        }
+        \ei
+      \end{column}
+    \end{columns}
+
+  \end{frame}
+#+end_src
+- Expliziter Auflösungspfad (Qualified Name)
+
+** Import von Namen
+#+begin_src latex
+  \begin{frame}[fragile]{Import von entfernten Namen}
+    \begin{btBlock}[type=alert]{\ALERT{Problem:} Explizite Auflößungspfade sind zu lange}
+      Ständig den vollständigen Namen (\texttt{::A::B::C}) einer entfernten Deklaration zu verwenden ist umständlich viel Schreibarbeit.
+    \end{btBlock}
+  \medskip
+    \begin{columns}
+      \begin{column}{0.29\textwidth}
+        \btAnimation[width=\textwidth]{range=1-4:<1->,4:<5->}{fig/04-import}
+      \end{column}\hfill
+      \begin{column}{0.67\textwidth}
+        \bi
+        \ii Jeder NS hat verschiedene Namensmengen {
+          \bi
+          \ii Die direkt deklarierten Namen
+          \ii Die implizit sichtbaren Namen
+          \ii Den Wurzelnamensraum
+          \ei
+        }\smallskip
+        \ii<2-> Viele Sprachen erlauben \structure{Import} von Namen{
+          \bi
+          \ii \codeinline{import <NAME>} erweitert die deklarierten Namen
+          \ii Explizite Namensliste oder Importe mit \codeinline{*}
+          \ii Importe geschehen oft implizit (z.B. Vererbung)
+          \ei
+        }\smallskip
+        \ii<4-> Importe sind (erstmal) transitiv {
+          \bi
+          \ii Importiere Namen können importiert werden
+          \ii \codeinline{import ::X::*} enthält auch \codeinline{::N::M::B}
+          \ei
+        }
+        \ei
+      \end{column}
+    \end{columns}
+  \end{frame}
+#+end_src
+
+** Einschränkung der Sichtbarkeit
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}{Einschränkung der Sichtbarkeit}
+    \begin{btBlock}[type=alert]{\ALERT{Ziel:} Wir wollen Interna der Implementierung verstecken}
+      Zum Zwecke des \textbf{Information Hiding} wollen wir manche Namen nur \alert{innerhalb} eines Namensraumes sichtbar machen.
+    \end{btBlock}
+    \smallskip
+
+    \bi
+    \ii<2-> Definitionen bekommen ein weiteres Attribut\hfill\texttt{\LETi <NAME>}{
+      \bi
+      \ii Interne Definitionen können nur über implizite Auflößung gefunden werden.
+      \ii Name wird unsichtbar für alles außerhalb des aktuellen NS
+      \ii Wir können interne Namen ändern ohne externe Komponenten anzufassen.
+      \ei
+    }
+    \ei
+    \begin{columns}<3->
+      \begin{column}{0.22\textwidth}
+        \btAnimation[width=\textwidth]{center,range=1-2:<3->}{fig/04-private}
+      \end{column}\hfill
+      \begin{column}{0.72\textwidth}
+        \bi
+        \ii Zugriff auf einen internen Namen ist nicht erlaubt\\[0.5ex]{
+          Übersetzer findet zwar die Definition, meldet aber aufgrund des Attributs einen Fehler.
+          \smallskip
+        }
+        \ii Interne Namen werden beim Import übersprungen.
+        \ii<4-> Namensräume können Standardattribute haben{
+          \bi
+          \ii \texttt{\LETi} macht einen Namen nur intern sichtbar
+          \ii \texttt{\LETe} macht einen Namen auch extern sichtbar
+          \ei
+        }
+        \ei
+      \end{column}
+    \end{columns}
+  \end{frame}
+#+end_src
+- introduce `export[public]', `export[protected]'
+- Export und Importliste
+
+- Erster Haltepunkt: Module
+
+
+** Statische vs. Dynamische Namensauflösung
+- Diskussion zu Binding Time ('::' vs '.')
+- Pointer
+- Records
+  - public, private, protected
+
+** Function-Call Frames
+- Lokale Variablen
+- Dynamisches Scoping
+- Geschachtelte Funktionsdeklarationen
+
+* Overloading und Dynamic Dispatch
+** Aliase und Uneindeutige Auflösung
+** Einfluss von Dynamischen Typen
+- Single Dispatch
+- Multiple Dispatch
+* Summary

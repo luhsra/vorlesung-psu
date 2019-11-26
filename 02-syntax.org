@@ -221,9 +221,9 @@ wurde, ein einzelnes *Token*. Diese Token haben immer eine Tokenklasse
 (z.B. Bezeichner oder "öffnende runde Klammer") und manchmal eine
 Nutzlast. In dieser Nutzlast transportiert der Scanner weitere
 Informationen zum Token zu den nachfolgenden Übersetzerstufen. So
-haben beispielsweise alle Bezeichner die kleine Tokenklasse
-(~identifier~) und tragen die überspannten Zeichen aus der Eingabe
-(das Lexem) als Bezeichnername als Nutzlast mit sich herum.
+haben beispielsweise alle Bezeichner die gleiche Tokenklasse
+(~identifier~) und tragen die überdeckten Zeichen aus der Eingabe
+(das Lexem) als Nutzlast (z.B., Bezeichnername) mit sich herum.
 
 Durch den Prozess des Scannens eliminieren wir Leerzeichen und jegliche
 Codeformatierung, wir vereinheitlichen unterschiedliche Schreibweisen
@@ -580,7 +580,7 @@ Versuchen Sie es nicht, es wird immer scheitern bzw.
 ein Hack bleiben.]
 geeignet, um Programme zu parsen und wir müssen auf die Typ-2 Grammatiken, also die **kontextfreien Sprachen** wechseln.
 Diese erlauben es, dass auf der rechten Seite einer Regel ein Nicht-Terminal stehen darf, welches (direkt oder indirekt) zur linken Seite abgeleitet werden kann.
-Dies erlaubt es, dass die eine kontextfreie Grammatik "Klammern zu zählen" kann, sie also korrekt balanciert Klammerungen erzeugt.
+Dies erlaubt es, dass eine kontextfreie Grammatik "Klammern zählen" kann, sie erzeugt also korrekt balanciert Klammerungen.
 
 Im Allgemeinen ist die Komplexität des "Wortproblems" (Prüfung, ob ein Wort in der Sprache ist) für kontextfreie Sprachen kubisch{{{wikipedia_de(Cocke-Younger-Kasami-Algorithmus)}}}.
 Allerdings gibt es mit den **deterministischen kontextfreien Sprachen** eine Klasse von Sprachen, die in linearer Zeit, also viel viel schneller, erkennbar sind.
@@ -893,10 +893,10 @@ Dabei akzeptiert der Generator alle Grammatiken der Klasse LL(1) und erzeugt ein
 \bi
 \ii {\small $PREDICT(A \rightarrow \alpha) \equiv \FIRST(\alpha) \cup (\textbf{if }\EPS(\alpha)\textbf{ then }\FOLLOW(A)\textbf{ else }\emptyset ) $}{ \\
   \bigskip
-  \textbf{Intuition}: Ein Zeichen c sagt eine Regel dann voraus, wenn:
+  \textbf{Intuition}: Ein Terminal c sagt eine Regel dann voraus, wenn:
   \begin{enumerate}
-  \item Die Ableitung der rechten Seite mit dem Zeichen c startet (\FIRST).
-  \item Die rechte Seite $\alpha$ kann $\epsilon$ werden, daher muss man auf die Zeichen schauen, die der Regel folgen können (\FOLLOW).
+  \item Die Ableitung der rechten Seite mit dem Terminal c startet (\FIRST).
+  \item Die rechte Seite $\alpha$ kann $\epsilon$ werden, daher muss man auf die Terminal schauen, die der Regel folgen können (\FOLLOW).
   \end{enumerate}
   \begin{center}
   \def\first{}
@@ -926,7 +926,7 @@ Dabei akzeptiert der Generator alle Grammatiken der Klasse LL(1) und erzeugt ein
 #+end_src
 
 Nun wollen wir uns der Berechnung der PREDICT-Mengen für die Regeln einer gegebene Grammatik zuwenden.
-Informell ausgedrückt stellen wir uns dabei die Frage: "Welche Regelanwendung führt dazu, dass wir im Tokenstrom das Zeichen sehen, was wir gerade sehen?"
+Informell ausgedrückt stellen wir uns dabei die Frage: "Welche Regelanwendung einer Regel führt dazu, dass wir im Tokenstrom das Zeichen sehen, was wir sehen?"
 
 Falls eine rechte Seite nur ein einziges Terminal enthält, oder mit einem Terminal startet, ist die Sache ganz klar:
 Die PREDICT-Menge dieser Regel hat nur ein Element, nämlich dieses erste Terminal der rechten Seite.
@@ -1345,7 +1345,7 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
               int foo(int a) {};
               ...
               // Funktionsname in Klammern
-              (foo)(bar); // = foo(bar);
+              (foo)(bar); // = foo(bar)
             \end{C}
           \end{code}
         \end{column}

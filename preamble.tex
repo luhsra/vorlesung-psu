@@ -527,26 +527,10 @@
     \end{center}
   \end{frame}
 }
-\newcommand{\signature}[4][sig]{%
-  \mbox{
-  \tikz[remember picture,baseline]\node[anchor=base](#1-name){#2};%
-  \texttt{::}%
-  \tikz[remember picture,baseline]\node[anchor=base](#1-input){#3};
-  $\mapsto$%
-  \tikz[remember picture,baseline]\node[anchor=base](#1-output){#4};
-  }
-}
 
-% Signaturen
-\newcommand{\siginline}[4][\scriptsize]{%
-  \Colorbox{badbee!20}{#1#2\hspace{1ex}\texttt{::}\hspace{1ex}#3\hspace{1ex}$\mapsto$\hspace{1ex}#4}%
-}
+\usepackage{fig/03-common}
+\usepackage{fig/04-common}
 
-% Typausdrücke
-\colorlet{typecolor}{safegreen!30}
-\newcommand{\typeinline}[2][\scriptsize]{%
-  \colorbox{typecolor}{#1#2}%
-}
 
 \newcommand{\tikznode}[2][]{%
   \tikz[baseline]\node[anchor=base,#1]{#2};%

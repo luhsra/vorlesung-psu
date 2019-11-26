@@ -1,59 +1,25 @@
 \documentclass{lecturefig}
-\usetikzlibrary{chains}
+\usepackage{fig/04-common}
 \begin{document}
-\tikzset{
-  line/.style={
-    font=\ttfamily,
-  },
-  comment/.style={
-    label={[anchor=east]east:\C{#1}}
-  },
-  text/.store in=\tikztext,
-}
-\def\tikztext{}
-
-\newcommand\LINE[1][]{
-  \node[text width=5cm, on chain, inner sep=2\pgflinewidth] (@) {\strut};
-  \node[line, ,xshift=\theindentdepth em, text width=5cm-\theindentdepth em,
-        anchor=west, at=(@.west),#1]
-}
-\def\C#1{\hfill\bgroup\color{gray}/* #1 */\egroup}
-\newcounter{indentdepth}
-\newenvironment{SCOPE}[2][]{
-  \LINE[#1] (#2-start) {\tikztext\{};%
-  \def\SCOPEOPTS{#1}%
-  \def\SCOPENAME{#2}%
-  \addtocounter{indentdepth}{1}%
-}{
-  \addtocounter{indentdepth}{-1}%
-  \LINE (\SCOPENAME-end) {\}};%
-  \node[fit=(\SCOPENAME-start) (\SCOPENAME-end),inner sep=0] (\SCOPENAME) {};
-}
-
-\begin{frame}
+\begin{frame}<1-3>
   \begin{tikzpicture}[start chain=going below,node distance=0cm]
-    \begin{SCOPE}{A}
-      \LINE[] (def) {let A};
-      \LINE[]       {let B};
-      \LINE[] (use) {A};
-      \draw[->] (use.west) -- (use.west -| A-start.west) |- (def);
+    \begin{SCOPE}[onslide=<1>{text={void foo()\space}},onslide=<3>{fill=badbee!50}]{A}
+      \LINE[] (def) {\alt<1>{int A;}{\only<3>{\colorbox{badbee!50}}{\LET}\alt<3>{\colorbox{letcolor}}{\space}{A}}};
+      \LINE[] (decl)   {\alt<1>{extern int B;}{\DECL B}};
+      \LINE[onslide=<3>{fill=refcolor}] (use) {A};
     \end{SCOPE}
+
+    \begin{onlyenv}<3>
+
+    \draw[->] (use.west) -- (use.west -| A-start-line.west) |- node[pos=0.25,left,anchor=east,align=left]{Namens-\\auflösung} (def);
+
+    \draw[->] (A-start.west) ++(east:3cm) coordinate(@)
+               -- ++(east:1cm) node[right,anchor=west]{Namensraum};
+    \draw[->] (def.east-|@)  -- ++(east:1cm) node[right,anchor=west]{Definition};
+    \draw[->] (decl.east-|@)  -- ++(east:1cm) node[right,anchor=west]{Deklaration};
+    \draw[->] (use.east-|@)    -- ++(east:1cm) node[right,anchor=west]{Referenz};
+    \end{onlyenv}
   \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
-  \begin{tikzpicture}[start chain=going below,node distance=0cm]
-    \begin{SCOPE}{A}
-      \LINE[onslide=<1>{draw},comment={$A_1$}] (def-A) {let A};
-      \begin{SCOPE}{B}
-        \LINE[onslide=<2>{draw,comment={$A_2$}}] (def-B) {let \only<1>{B}\only<2>{A}};
-        \begin{SCOPE}{C}
-          \LINE[draw] (use) {A};
-          \only<1>{\draw[->] (use.west) -- (use.west -| A-start.west) |- (def-A);}
-          \only<2>{\draw[->] (use.west) -- (use.west -| A-start.west) |- (def-B);}
-        \end{SCOPE}
-      \end{SCOPE}
-    \end{SCOPE}
-  \end{tikzpicture}
-\end{frame}
 \end{document}

@@ -1,0 +1,43 @@
+\usetikzlibrary{chains}
+
+\tikzset{
+  line/.style={
+    font=\ttfamily,
+  },
+  comment/.style={
+    label={[anchor=west]east:\hfill\bgroup\color{gray}/* #1 */\egroup}
+  },
+  text/.store in=\tikztext,
+  text after/.store in=\tikztextafter,
+  line body/.style={}
+}
+\def\tikztext{}
+\def\tikztextafter{}
+
+
+\DeclareDocumentCommand{\LINE}{O{}D(){@}m}{
+  \node[line body,on chain, inner sep=2\pgflinewidth] (#2-line) {\strut};
+  \node[line, xshift=\theindentdepth em,
+        anchor=west, at=(#2-line.west),#1] (#2) {#3};
+}
+\newcounter{indentdepth}
+\newenvironment{SCOPE}[2][]{
+  \LINE[#1] (#2-start) {\tikztext\{\tikztextafter};%
+  \def\SCOPEOPTS{#1}%
+  \def\SCOPENAME{#2}%
+  \addtocounter{indentdepth}{1}%
+}{
+  \addtocounter{indentdepth}{-1}%
+  \LINE[] (\SCOPENAME-end) {\}};%
+  \node[fit=(\SCOPENAME-start) (\SCOPENAME-end),inner sep=0] (\SCOPENAME) {};
+}
+
+\usepackage{xspace}
+\def\LET{let\xspace}
+\def\LETi{let[I]\xspace}
+\def\LETe{let[E]\xspace}
+\def\DECL{decl\xspace}
+\def\IMPORT{import\space}
+
+\colorlet{letcolor}{safegreen!50}
+\colorlet{refcolor}{safeblue!50}

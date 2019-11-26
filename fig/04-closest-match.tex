@@ -1,0 +1,43 @@
+\documentclass{lecturefig}
+
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \begin{SCOPE}{X}
+      \alt<1>{
+        \LINE[fill=letcolor] (def-A) {\LET A};
+        \LINE[fill=refcolor] (use) {A};
+      }{
+        \LINE[fill=refcolor] (use) {A};
+        \LINE[fill=letcolor] (def-A) {\LET A};
+      }
+      \draw[->] (use.west) -- (use.west -| X-start-line.west) |- (def-A);
+    \end{SCOPE}
+
+    \begin{SCOPE}{A}
+      \LINE[visible on=<2->,onslide=<2>{fill=letcolor}] (def-A) {\LET A};
+      \begin{SCOPE}{B}
+        \LINE[onslide=<3->{fill=letcolor}] (def-B) {\LET \alt<1-2>{B}{A}};
+        \begin{SCOPE}{C}
+          \LINE[fill=refcolor,onslide=<1>{fill=srared!50,draw=srared,thick, pin={[srared,align=center]east:\Lightning\\Fehler!}}] (use) {A};
+          \only<2>{\draw[->] (use.west) -- (use.west -| A-start-line.west) |- (def-A);}]
+          \only<3->{
+            \draw[->] (use.west) -- (use.west -| def-A.west) |- (def-B);
+          }
+        \end{SCOPE}
+      \end{SCOPE}
+      \LINE[fill=refcolor,visible on=<4->] (use-2) {A};
+    \end{SCOPE}
+    \begin{scope}[visible on=<4->]
+      \draw[->] (use-2.west) -- (use-2.west -| A-start-line.west) |- (def-A);
+      \begin{pgfonlayer}{background}
+        \coordinate(right) at ($(use)+(east:2cm)$);
+        \node[fit=(A) (right),inner sep=0,inner xsep=1ex,fill=badbee!20!white]{};
+        \node[fit=(B) (right),inner sep=0,inner xsep=1ex,fill=badbee!40!white]{};
+        \node[fit=(C) (right),inner sep=0,,fill=badbee!60!white]{};
+      \end{pgfonlayer}
+    \end{scope}
+  \end{tikzpicture}
+\end{frame}
+\end{document}

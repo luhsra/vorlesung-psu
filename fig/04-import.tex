@@ -1,0 +1,22 @@
+\documentclass{lecturefig}
+
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \begin{SCOPE}[text={\LET N=},comment={A, M}]{A}
+      \LINE[] (def) {\LET A};
+      \begin{SCOPE}[text={\LET M=},comment={B, C}]{C}
+        \LINE[] (def) {\LET B};
+        \LINE[] (def) {\LET C};
+      \end{SCOPE}
+    \end{SCOPE}
+    \begin{SCOPE}[onslide=<4>{text={\LET X=}},onslide=<2-3>{comment={A\only<3->{, B, C}}}]{X}
+      \LINE[visible on=<2->] (def) {\IMPORT ::N::A};
+      \LINE[visible on=<3->] (def) {\IMPORT::N::M::*};
+      \LINE[] (use) {\only<1>{::N::}A};
+      \LINE[] (use) {\only<1-2>{::N::M::}B};
+    \end{SCOPE}
+\end{tikzpicture}
+\end{frame}
+\end{document}

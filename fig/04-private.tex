@@ -1,0 +1,17 @@
+\documentclass{lecturefig}
+
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \begin{SCOPE}[]{A}
+      \begin{SCOPE}[text={\LET M=},onslide=<2>{text after={[I]}}]{B}
+        \LINE[fill=letcolor] (def) {\alt<1>{\LETi}{\LET} A};
+        \LINE[fill=refcolor] (use) {A};
+        \draw[->] (use) -| (def);
+      \end{SCOPE}
+      \LINE[fill=srared!50,label={[srared,align=left]east:\Lightning}] (use) {M::A};
+    \end{SCOPE}
+\end{tikzpicture}
+\end{frame}
+\end{document}
