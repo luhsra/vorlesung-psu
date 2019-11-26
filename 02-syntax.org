@@ -716,7 +716,7 @@ Wenn wir eine solche Nicht-Terminal-Funktion aufrufen, entscheidet sie anhand de
 Ein solcher Aufruf ist also ein Art "Rückwärtsableitung" auf der linken Seite des Tokenstroms.
 Die Funktion ordnet die Token so an, dass sie die Blätter des zurückgegebenen Ableitungsbaums sind.
 
-Wird an einer Stelle auf der rechten Seite ein Nicht-Terminal erwartet, so ruft die Funktion **rekursiv** die entsprechende Parsefunktion auf und gibt den Rückgabewert als Unterbaum weiter. Es sind diese rekursiven Aufrufe, die dieser Klasse von Parsern ihren Namen geben!
+Wird an einer Stelle auf der rechten Seite ein Nicht-Terminal erwartet, so ruft die Funktion **rekursiv** die entsprechende Parsefunktion auf und gibt den Rückgabewert als Unterbaum weiter. Es sind diese rekursiven Aufrufe, die der Klasse der Parser mit rekursivem Abstieg ihren Namen geben!
 
 Um ein ganzes Programm zu parsen, rufen wir einfach nur die Funktion, die dem Startsymbol entspricht, auf.
 Im Folgenden können Sie mit dem ~intAdd~-Parser aus den Vorlesungsfolien herumspielen.
