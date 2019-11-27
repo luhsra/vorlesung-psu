@@ -175,9 +175,10 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   \end{frame}
 #+end_src
 
-* Namensräume und Namensauflösung
+* Statische Namensauflößung
 ** Implizite Namensauflösung
 #+begin_src latex
+\dividerframe{Statische Namensauflößung}
   \begin{frame}{Implizite Namensauflösung}
     \begin{columns}
       \begin{column}{0.3\textwidth}
@@ -302,7 +303,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \bi
     \ii<2-> Definitionen bekommen ein weiteres Attribut\hfill\texttt{\LETi <NAME>}{
       \bi
-      \ii Interne Definitionen können nur über implizite Auflößung gefunden werden.
+      \ii Interne Definitionen können nur über implizite Auflösung gefunden werden.
       \ii Name wird unsichtbar für alles außerhalb des aktuellen NS
       \ii Wir können interne Namen ändern ohne externe Komponenten anzufassen.
       \ei
@@ -330,8 +331,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \end{columns}
   \end{frame}
 
-
-  %%ONLY%%
   \begin{frame}[fragile]{Fallbeispiel: Java Packages}
     \begin{columns}
       \begin{column}{0.35\textwidth}
@@ -370,10 +369,216 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 - Erster Haltepunkt: Module
 
+* Dynamische Namensauflösung
+** Binding Time
+#+begin_src latex
+  \dividerframe{Dynamische Namensauflösung}
+  \begin{frame}{Zeitpunkt der Namensbindung}
+    \textbf{Bisher:} Zu einem Namen haben wir bisher nur die Definitionsstelle gefunden, nicht aber das Objekt bzw. seine Adresse.\\[2ex]
 
-** Statische vs. Dynamische Namensauflösung
-- Diskussion zu Binding Time ('::' vs '.')
-- Pointer
+    \ALERT{Aber:} Nicht zu jedem Zeitpunkt ist mit einem Namen wirklich ein existierendes Objekt verbunden. \\[2ex]
+
+    \pause
+     \structure{Binding time:} Zeitpunkt der Bindung zwischen Name und Objekt{
+      \btUseExtraItemSep
+      \bii
+      \ii<+-> \structure{Compile time:} Der Übersetzer kennt Adresse des Objekts bereits.\\
+          \textit{Beispiel: Speicherbereich einer Hardwarekomponente.}
+      \ii<+-> \structure{Link time:}    Die Adresse wird beim Erstellen der Binärdatei ermittelt.\\
+          \textit{Beispiel: Funktionen und globale Variablen}
+      \ii<.-> \structure{Load time:}    Die Adresse wird beim Starten des Prozesses festgelegt.\\
+          \textit{Beispiel: Code in Bibliotheken}
+      \ii<+-> \structure{Run time:}     Die Adresse wird erst zur Laufzeit ermittelt.\\
+          \textit{Beispiel: Lokale Variablen und Objekte am Heap}
+      \eii
+    }
+  \end{frame}
+
+  \begin{frame}[fragile]{Zeitpunkt der Namensauflösung}
+    \bi
+    \ii Adressberechnung ist \ALERT{immer} erst nach der Binding Time möglich.{
+      \bi
+      \ii Wenn kein Objekt assoziiert ist, können wir auch keine Adresse ausrechnen.
+      \ii \structure{Partielle Namensauflösung}: Vorschrift und Werte vorberechnen.
+      \ei
+    }
+    \begin{columns}
+      \begin{column}[b]{0.35\textwidth}
+        \begin{code}[]
+          \begin{C}
+            struct foo {
+              int  a;
+              int *p;
+            } obj;
+            ...
+            @*(obj.p)@ = ...
+          \end{C}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.64\textwidth}
+        \btAnimation[width=\textwidth]{range=1-8:<1->}{fig/04-binding-time}
+      \end{column}
+    \end{columns}
+
+    \ei
+  \end{frame}
+
+#+end_src
+
+** Instantiierbare Namensräume
+#+begin_src latex
+  \begin{frame}[fragile]{Instanziierbare Namensräume}
+
+    \begin{columns}
+      \begin{column}{0.35\textwidth}
+        \begin{code}[tag=C++]
+          \begin{CPP}
+            namespace N {
+              int a;
+              int b;
+            };
+            N::a
+          \end{CPP}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.64\textwidth}
+        \textbf{Bisher} gab es von jedem Namensraum \alert{genau eine Instanz}.
+        Daher kann jeder enthaltene Name nur ein Objekt referenzieren.
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii<2-> \structure{Namensräume} mehrfach als eigene Objekte instantiieren{
+      \bi
+      \ii Jedes Laufzeitobjekt enthält eine Bindung für die deklarierten Namen
+      \ii Laufzeitdaten werden zur Unterscheidung gebraucht (Objektadresse)
+      \ei
+    }
+    \ei
+    \begin{columns}<3->
+      \begin{column}{0.35\textwidth}
+        \begin{code}[tag=C]
+          \begin{C}
+            struct N {
+              int a;
+              int b;
+            };
+
+            struct N objA;
+            struct N objB;
+
+          \end{C}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.63\textwidth}
+        \btUseExtraItemSep
+        \bii
+        \ii \codebox{objA.a} und \codebox{objB.a} sind verschiedenen
+        \ii \structure{Punktoperator} macht dynamische Auflösung\\{
+          \texttt{<obj>.<name>}: \codeinline{&obj + offset(N::name))}
+        }
+        \ii Java unterscheidet syntaktisch nicht zwischen dynamischer und statischer Namensauflösung
+        \eii
+      \end{column}
+    \end{columns}
+
+    \medskip
+    \bi
+    \ii<4-> Instanziierbare Namensräume sind ein \structure{Schlüsselkonzept} der Informatik
+    \ei
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Instanziierbare Namensräume (II)}
+    \begin{columns}
+      \begin{column}{0.35\textwidth}
+        \begin{code}
+          \begin{C}
+            struct N {
+              int a;
+              int b;
+            };
+
+            struct N objA;
+          \end{C}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.35\textwidth}
+        \includegraphics[width=\textwidth]{fig/04-instances}
+      \end{column}\hfill
+    \end{columns}
+    \medskip
+    \bi
+    \ii In unserer minimalen Namensraumsprache führen wir \LETd ein. {
+      \bi
+      \ii \texttt{\LETd <DST> = <SRC>} kopiert den NS \texttt{SRC} unter dem Namen \texttt{DST}
+      \ii Wir verwenden weiterhin nur den \texttt{::} Operator.
+      \ii Die Auflösung in einem \texttt{\LETd} Namensraum erforder \textbf{D}ynamisches Wissen.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+#+end_src
+
+#+begin_src latex
+  %%ONLY%%
+
+  \begin{frame}[fragile]{Fallbeispiel: Klassen in C++}
+    \begin{columns}[t]
+      \begin{column}{0.35\textwidth}
+        \begin{code}[]
+          \begin{CPP}
+            class B {
+              int a;
+             public:
+              int b;
+              int f1(){
+                return a+b;
+              }
+            };
+            B objB;
+          \end{CPP}
+        \end{code}
+        \begin{code}<2->[]
+          \begin{CPP}
+            class S : public B {
+              int c;
+            }
+            S objS;
+          \end{CPP}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.25\textwidth}
+        \btAnimation[width=\textwidth]{raisebox,1:<1>,2:<2->}{fig/04-instances-cpp}
+      \end{column}\hfill
+      \begin{column}{0.30\textwidth}
+        Kombination aus:
+        \bii
+        \ii Namensräumen
+        \ii Sichtbarkeit
+        \ii Instantiierbar
+        \ii<2-> Import
+        \eii
+
+        \medskip
+
+        \uncover<3->{
+          Feinheiten:
+          \bii
+          \ii \texttt{protected} Deklarationen ändern ihre Sichtbarkeit beim vererben.
+          \ii \texttt{struct} ist per default \texttt{[E]}.
+          \ii Man kann \texttt{public}, \texttt{protected} und \texttt{private} erben.
+          \eii
+        }
+
+      \end{column}
+
+    \end{columns}
+
+
+  \end{frame}
+#+end_src
 - Records
   - public, private, protected
 

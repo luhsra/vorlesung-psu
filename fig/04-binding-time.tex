@@ -1,0 +1,81 @@
+\documentclass{lecturefig}
+\usetikzlibrary{trees}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+      level 1/.style={sibling distance=4cm},
+      level 2/.style={sibling distance=3cm},
+      remember picture,
+    ]
+
+    \begin{scope}[
+      every node/.style={draw,fill=white},
+      edge from parent/.style = {draw, <-},
+      leaf/.style={rectangle split,  rectangle split parts=2},
+      known/.style={onslide=<#1->{fill=none,rectangle split part fill={white,safegreen!50}}},
+      ]
+
+    \begin{scope}[visible on=<-7>]
+      \node (add1) {add}
+      child { node (add2) {add}
+        child { node[leaf,known=4] (bss) {BSS Segment\nodepart{two}0x1000} }
+        child { node[leaf,known=3] (obj) {Offset: obj\nodepart{two}0x200} }
+      }
+      child { node[leaf,known=2] (field) {Offset: p\nodepart{two}4}}
+      ;
+    \end{scope}
+    \node (deref) at ($(add1)+(135:2.5cm)$) {deref};
+    \begin{scope}[visible on=<-7>]
+      \draw[->] (add1) -- (deref);
+    \end{scope}
+
+    \node[leaf,left=of deref,known=7] (mem) {mem@0x1204\nodepart{two}0x2000};
+    \draw[->] (mem) -- (deref);
+
+    \node[leaf,right=2 of deref,known=7] (int) {mem@0x2000\nodepart{two}34};
+    \draw[->] (deref) -- (int);
+
+    \only<8>{
+      \node[below=1.4 of deref,leaf,known=8] (const) {
+        Statische Konstanten
+        \nodepart{two}
+        0x1000 + 0x200 + 4
+      };
+      \draw[->] (const) -- (deref);
+    }
+  \end{scope}
+
+  \only<8>{
+    \node[text width=8cm,below=5mm of const,xshift=5mm,align=left] {\textit{Vereinfachung}: Wir nehmen im folgenden an, dass es nur Run Time (dynamisch) und Compile Time (statisch) gibt.};
+  }
+
+  \begin{pgfonlayer}{background}
+    \def\visible<#1>#2{
+      \begin{scope}[visible on={<#1>}]
+        #2
+      \end{scope}
+    }
+    \visible<2>{
+      \draw[ultra thin] (field) -- ++(-100:1cm) node[below] {Compile Time};
+    }
+    \visible<3>{
+      \draw[ultra thin] (obj.east) -- ++(20:8mm) node[right] {Link Time};
+    }
+    \visible<4>{
+      \draw[ultra thin] (bss) -- ++(120:1cm) node[above] {Load Time};
+    }
+    \visible<6-7>{
+      \node[fit=(add1) (bss) (field),fill=badbee!30,label={[align=left,font=\scriptsize\ttfamily,anchor=north west]north west:\&(obj.p)}]{};
+    }
+    \visible<5-7>{
+      \node[fit=(add2) (bss) (obj),fill=badbee!50,label={[align=left,font=\scriptsize\ttfamily,anchor=north west]north west:\&obj}]{};
+    }
+
+    \visible<7>{
+      \draw[ultra thin] (mem) -- ++(20:3cm) node[above] (run time) {Run Time};
+      \draw[ultra thin] (int) -- (run time);
+    }
+  \end{pgfonlayer}
+\end{tikzpicture}
+\end{frame}
+\end{document}

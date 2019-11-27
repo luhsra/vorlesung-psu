@@ -1,0 +1,25 @@
+\documentclass{lecturefig}
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \begin{SCOPE}[text={\LET N=}]{A}
+      \LINE[fill=letcolor] (defA) {\LET a};
+      \LINE[] (defB) {\LET b};
+    \end{SCOPE}
+
+    \LINE[] (objA) {\LETd \colorbox{letcolor}{objA} = \colorbox{refcolor}{N}()};
+
+    \LINE[] (@) {};
+    \LINE[] (ref) {};
+    \node[right=0 of ref,fill=refcolor] (ref1) {N::a};
+    \draw[->] (ref1.west) -- (ref1.west -| A-start-line.west) |- (defA.west);
+
+
+    \node[right=1 of ref1,fill=refcolor] (ref2) {objA::a};
+    \draw[->] (ref2) -- (objA);
+    \draw[->] (objA.north east)++(west:8mm) -- (defA);
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

@@ -1,0 +1,28 @@
+\documentclass{lecturefig}
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \begin{SCOPE}[text={\LET B=},private]{B}
+      \LINE[] (defA) {\LET a};
+      \LINE[onslide=<2>{fill=refcolor}] (defB) {\LETe b};
+      \begin{SCOPE}[text={\LETe f1=},private]{f1}
+        \LINE[] (use) {a b};
+      \end{SCOPE}
+    \end{SCOPE}
+    \LINE[] (obj) {\LETd objB = B()};
+    \LINE[] (@) {};
+    \begin{scope}[visible on=<2>]
+      \begin{SCOPE}[text={\LET S=},private]{B}
+        \LINE[fill=letcolor] (import) {\IMPORT B::*};
+        \LINE[] (defA) {\LET c};
+      \end{SCOPE}
+      \LINE[] (obj) {\LETd objS = S()};
+      \LINE[fill=refcolor] (ref) {obj::b};
+
+      \draw[->] (ref.west)--++(west:2mm) |- (import);
+      \draw[->] (import.east)--++(east:7mm) |- (defB);
+    \end{scope}
+  \end{tikzpicture}
+\end{frame}
+\end{document}
