@@ -1,0 +1,49 @@
+\documentclass{lecturefig}
+
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \begin{SCOPE}[text={\LET O=},text after={[I]}]{O}
+      \begin{SCOPE}[text={\LET I=},text after={[I]}]{I}
+        \LINE[] (def) {\alt<1>{\LETe}{\LET[E,S]} A};
+        \node[right=2 of def.west] (right){};
+      \end{SCOPE}
+    \end{SCOPE}
+
+    \node[fit=(O) (right),draw] (NS) {};
+
+    % Left
+    \node[align=left,font=\ttfamily,left=0.3 of NS,text width=5cm,fill=codecolor,label={[anchor=south east]south east:Java}] {
+      \structure{class} O \{\\
+      \ \ \structure{class} I \{\\
+      \ \ \ \ \structure{public\only<2>{ \textbf{static}}}\ int A;\\
+      \ \ \}\\
+      \}
+    };
+
+    % Right
+    \begin{scope}[every node/.style={draw,anchor=north,minimum size=\baselineskip,font=\ttfamily}]
+      \path[]
+      (NS.north east)
+      ++(east:1cm) node[fill=refcolor] (O) {\strut objO};
+
+      \node[right=0 of O] (d1) {\strut .};
+      \node[right=0 of d1,fill=refcolor] (I) {\strut objI};
+      \node[right=0 of I] (d2) {\strut .};
+      \node[right=0 of d2] (A) {\strut A};
+    \end{scope}
+
+      \node[anchor=south west,xshift=1cm] at (NS.south east) (knowledge) {Dynamisches Wissen};
+
+      \draw[->] (knowledge.north-|d1) -- coordinate(A) (d1);
+      \draw[->] (knowledge.north-|d2) -- coordinate(B) (d2);
+
+      \only<2>{
+        \draw[line width=3pt,srared] (A)++(west:1cm) -- (B) --++(east:1cm) coordinate(@);
+        \fill[white,opacity=0.9] (O.south west) rectangle ($(@)+(up:1.5pt)$);
+      }
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

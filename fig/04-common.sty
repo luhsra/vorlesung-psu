@@ -34,10 +34,11 @@
 }
 
 \usepackage{xspace}
-\def\LET{let\xspace}
+\newcommand\LET[1][]{let\ifx&#1&\else[#1]\fi\xspace}
 \def\LETi{let[I]\xspace}
 \def\LETe{let[E]\xspace}
 \def\LETd{let[D]\space}
+\def\LETs{let[S]\space}
 \def\DECL{decl\xspace}
 \def\IMPORT{import\space}
 

@@ -522,8 +522,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
 
 #+begin_src latex
-  %%ONLY%%
-
   \begin{frame}[fragile]{Fallbeispiel: Klassen in C++}
     \begin{columns}[t]
       \begin{column}{0.35\textwidth}
@@ -575,9 +573,31 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \end{column}
 
     \end{columns}
-
-
   \end{frame}
+
+  %%ONLY%%
+  \begin{frame}[fragile]{Statische Felder in Klassen}
+    \textbf{Beichte des Dozenten}: Ich habe \texttt{static} lange nicht verstanden.\\[2ex]
+
+    \bi
+    \ii<2-> In Klassenobjekten wird jeder Name dynamisch aufgelöst. {
+      \bi
+      \ii Manchmal sollen Namen dennoch dasselbe Objekt referenzieren.
+      \ii \texttt{\LETs} setzt die dynamische Namensauflösung außer Kraft
+      \ei
+      \btAnimation[width=0.9\textwidth]{center,padding,1:<1-2>,2:<3->}{fig/04-static}
+    }
+    \ii<4-> Statische lokale Variablen in C/C++ funktionieren genauso.{
+      \bi
+      \ii Die dynamische Information um die Call-Frame wird ignoriert.
+      \ii Die Variable behält, weil sie immer das selbe Objekt referenziert, ihren Wert.\\[1ex]
+      \codeinline[style=C]{int counter() { static int i = 0; return i++; }}
+      \ei
+    }
+    \ei
+
+    \end{frame}
+
 #+end_src
 - Records
   - public, private, protected
