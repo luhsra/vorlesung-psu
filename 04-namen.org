@@ -675,7 +675,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   \end{frame}
 
   \begin{frame}{Function-Call Frames und Rekursive Funktionen}
-    \textbf{Früher} (z.B. Fortran 77) hat man Rekursion und geschachtelte Funktionen einfach nicht unterstützt. \medskip
+    \textbf{Früher:} Keine Unterstützung für rekursiven Funktionen (z.B. Fortran 77) \medskip
 
     \bi
     \ii <2-> Funktionen werde instantiierbar; jeder Aufruf erzeugt einen \structure{Call Frame}.{
@@ -685,6 +685,25 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ei
       \medskip
       \btAnimation[width=0.65\textwidth]{center,1:<1>,range=1-9:<2->}{fig/04-call-frame}
+    }
+    \ei
+  \end{frame}
+
+
+  \begin{frame}{Geschachtelte Funktionen und Closures}
+    \bi
+    \ii Funktionen in Funktionen lassen Fragen über die Bindung aufkommen.{
+      \bi
+      \ii Die Deklaration zu einer Referenz ist nach CNSR klar
+      \ii \ALERT{Aber}: Wir brauchen einen \texttt{outer}-Call-Frame um \texttt{x} vollständig aufzulösen
+      \ei
+      \btAnimation[width=0.65\textwidth]{padding,center,range=1-9:<1->}{fig/04-closure}
+    }
+    \ii<2-> \structure{Lexicalisches Scoping}: Funktionen können \alert<5->{Zustand} halten{
+      \bi
+      \ii<3-> Bei der Definition von \texttt{inner} wird ein \structure{Closure} Objekt erstellt.
+      \ii<4-> Die Closure speichert den Frame über die Ausführung von \texttt{outer()} hinaus.
+      \ei
     }
     \ei
   \end{frame}
