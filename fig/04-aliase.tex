@@ -1,0 +1,21 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}
+      \node[draw,minimum width=1cm] (A) {obj};
+      \node[draw,minimum width=1cm,below=0.2 of A] (B) {*ptr};
+      \node[draw,right=2 of A.north,rectangle split,rectangle split parts=2,align=left,anchor=north] (C) {struct N\nodepart{two}var = 3};
+      \draw[->](A) -- (C.north west);
+      \draw[->](B) -- (C.text west);
+      \begin{scope}[visible on=<2->]
+        \node[draw,minimum width=1cm,right=2 of C.text east] (A) {fun};
+
+        \node[draw,right=of A] (B) {int increment(int x) \{...\};};
+        \node[draw,below=1 of B.west,anchor=west] (C) {int increment(float x) \{...\};};
+
+        \draw[->] (A) -- (B.west);
+        \draw[->] (A) -- (C.west);
+      \end{scope}
+    \end{tikzpicture}
+\end{frame}
+\end{document}

@@ -192,7 +192,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
           \ii Reihenfolge von Deklaration und Referenz teilweise egal.
           \ei
         }\medskip
-        \ii<2-> \enquote{Closest-nested scope rule} (CSNR){
+        \ii<2-> \enquote{Closest-nested scope rule} (CNSR){
           \bi
           \ii Suche nach Deklarationen von Innen nach Außen
           \ii Bei mehreren Möglichkeiten: Nimm die Innerste.
@@ -601,7 +601,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 ** Function-Call Frames
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}[fragile]{Funktionen und lokale Variablen}
     \begin{columns}
       \hfill
@@ -699,7 +698,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ei
       \btAnimation[width=0.65\textwidth]{padding,center,range=1-9:<1->}{fig/04-closure}
     }
-    \ii<2-> \structure{Lexicalisches Scoping}: Funktionen können \alert<5->{Zustand} halten{
+    \ii<2-> \structure{Lexikalisches Scoping}: Funktionen können \alert<5->{Zustand} halten{
       \bi
       \ii<3-> Bei der Definition von \texttt{inner} wird ein \structure{Closure} Objekt erstellt.
       \ii<4-> Die Closure speichert den Frame über die Ausführung von \texttt{outer()} hinaus.
@@ -713,7 +712,52 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 - Geschachtelte Funktionsdeklarationen
 
 * Overloading und Dynamic Dispatch
-** Aliase und Uneindeutige Auflösung
+** Uneindeutige Namensauflösung
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Überladene Funktionen}
+  \begin{frame}[fragile]{Pointer, Aliase und Uneindeutigkeit}
+    \textbf{Wiederholung:} Namensauflösung findet das Objekt zu einem Namen.\medskip
+    \bi
+    \ii<2-> Ein \structure{Zeiger} speichert das Ergebnis einer vollständigen Namensauflösung.{
+      \bi
+      \ii Der \codeinline{&(<Namenspfad>)}-Operator löst den Pfad auf und gibt eine Adrese zurück
+      \ii<3-> Der \codeinline{(*<Name>)}-Operator macht das von Name referenzierte Objekt zugänglich
+      \ei
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{code}[tag=C]
+            \begin{C}
+              struct N{
+                int var;
+              };
+              struct N obj;
+              int *ptr = &(obj.var);
+              (*ptr)++;
+            \end{C}
+          \end{code}
+        \end{column}\hfill
+        \begin{column}<3->{0.49\textwidth}
+          \begin{code}[tag=C]
+            \begin{C}
+              struct N {
+                int var;
+              };
+              struct N obj;
+              struct N* ptr = &obj;
+              (*ptr).var;
+            \end{C}
+          \end{code}
+        \end{column}
+      \end{columns}
+    }
+    \ii<4-> \structure{Aliase}: Mehrere Namen (\codeinline{obj}, \codeinline{*ptr}) binden nun das gleiche Objekt.{\\
+      \btAnimation[width=0.7\textwidth]{center,padding=1ex,1:<1-3>,range=1-2:<4->}{fig/04-aliase}
+    }
+    \ei
+    \OrangeBox<5->{Wäre es nützlich, wenn ein Name Objekte meinen könnte?}
+  \end{frame}
+#+end_src
 ** Einfluss von Dynamischen Typen
 - Single Dispatch
 - Multiple Dispatch
