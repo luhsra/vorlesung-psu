@@ -192,7 +192,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
           \ii Reihenfolge von Deklaration und Referenz teilweise egal.
           \ei
         }\medskip
-        \ii<2-> \enquote{Closest-nested scope rule}{
+        \ii<2-> \enquote{Closest-nested scope rule} (CSNR){
           \bi
           \ii Suche nach Deklarationen von Innen nach Außen
           \ii Bei mehreren Möglichkeiten: Nimm die Innerste.
@@ -575,7 +575,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \end{columns}
   \end{frame}
 
-  %%ONLY%%
   \begin{frame}[fragile]{Statische Felder in Klassen}
     \textbf{Beichte des Dozenten}: Ich habe \texttt{static} lange nicht verstanden.\\[2ex]
 
@@ -599,12 +598,99 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \end{frame}
 
 #+end_src
-- Records
-  - public, private, protected
 
 ** Function-Call Frames
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[fragile]{Funktionen und lokale Variablen}
+    \begin{columns}
+      \hfill
+      \begin{column}{0.3\textwidth}
+        \begin{code}[tag=C]
+          \begin{C}
+            int f1(int L) {
+              return L+1;
+            }
+          \end{C}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.3\textwidth}
+        \includegraphics[height=1.5cm]{fig/04-functions}
+      \end{column}
+      \hfill
+    \end{columns}
+    \smallskip
+    \bi
+    \ii Funktionen öffnen für ihren Rumpf einen eigenen Namensraum{
+      \bi
+      \ii Parameter\alert{deklarationen} werden zu Namen innerhalb der Funktion.
+      \ii \structure{Lokale Variablen} (und Parameter) sind nur innerhalb der Funktion sichtbar.
+      \ii Die Namen lokaler Variablen können Globale verdecken. (Folge von CNSR)
+      \ei
+    }
+    \ei
+    \begin{columns}[t]<2->
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=C]
+          \lstdefinestyle{defuse}{
+            moredelim=**[is][{\btHL[fill=refcolor]<3->}]{^u}{^},
+            moredelim=**[is][{\btHL[fill=letcolor]<3->}]{^d}{^}
+          }
+          \begin{C}[style=defuse]
+            int ^dfak^(int n) {
+              if (n < 1) {
+                return 1;
+              }
+              int tmp = ^ufak^(n-1);
+
+              return n * tmp;
+            }
+          \end{C}
+        \end{code}
+        \smallskip
+        \OrangeBox{Geschachtelte Funktionen?}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=JavaScript]
+          \lstdefinestyle{defuse}{
+            moredelim=**[is][{\btHL[fill=refcolor]<4->}]{^u}{^},
+            moredelim=**[is][{\btHL[fill=letcolor]<4->}]{^d}{^},
+            escapechar=`
+          }
+          \begin{JS}[style=defuse]
+            function outer() {
+              var ^dx^ = 0;
+              function ^dinner^() {
+                ``^ux^ = ^ux^ + 1;
+                return ^ux^;
+              }
+              return ^uinner^;
+            }
+          \end{JS}
+        \end{code}
+
+        \smallskip\OrangeBox{Funktionen schateln?}
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}{Function-Call Frames und Rekursive Funktionen}
+    \textbf{Früher} (z.B. Fortran 77) hat man Rekursion und geschachtelte Funktionen einfach nicht unterstützt. \medskip
+
+    \bi
+    \ii <2-> Funktionen werde instantiierbar; jeder Aufruf erzeugt einen \structure{Call Frame}.{
+      \bi
+      \ii<4-> Ein Call-Frame hat einen Zeiger auf seinen aufrufenden Namensraum (caller)
+      \ii<5-> Dynamische Namensauflösung erfolgt \alert<4>{relativ zum Stackpointer} (SP)
+      \ei
+      \medskip
+      \btAnimation[width=0.65\textwidth]{center,1:<1>,range=1-9:<2->}{fig/04-call-frame}
+    }
+    \ei
+  \end{frame}
+#+end_src
 - Lokale Variablen
-- Dynamisches Scoping
+- Rekursive Funktionen
 - Geschachtelte Funktionsdeklarationen
 
 * Overloading und Dynamic Dispatch

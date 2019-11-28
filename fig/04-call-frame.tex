@@ -1,0 +1,68 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    call frame/.style={
+      draw,fill=white,
+      rectangle split,
+      rectangle split parts=2,
+      align=left, font=\ttfamily
+    },
+    remember picture,
+    ]
+
+    \node[call frame                ,visible on=<2-8>] (f1) {fak(3)\nodepart{two}n = 3\\tmp = \alt<-7>{?}{2}};
+    \node[call frame,below=5mm of f1,visible on=<3-7>] (f2) {fak(2)\nodepart{two}n = 2\\tmp = \alt<-6>{?}{1}};
+    \node[call frame,below=5mm of f2,visible on=<4-6>] (f3) {fak(1)\nodepart{two}n = 1\\tmp = \alt<-5>{?}{1}};
+    \node[call frame,below=5mm of f3,visible on=<5-5>] (f4) {fak(0)\nodepart{two}n = 0\\tmp = ?};
+
+    \draw[visible on=<3-7>,<-] (f1) -- node[left,visible on=<3->]{\tiny caller}  (f2);
+    \draw[visible on=<4-6>,<-] (f2) -- node[left]{\tiny caller} (f3);
+    \draw[visible on=<5-5>,<-] (f3) -- node[left]{\tiny caller} (f4);
+
+    \draw[visible on=<7>,->,dashed] ($(f2.north)+(east:3mm)$) -- node[right]{2} ($(f1.south)+(east:3mm)$);
+    \draw[visible on=<6>,->,dashed] ($(f3.north)+(east:3mm)$) -- node[right]{1} ($(f2.south)+(east:3mm)$);
+    \draw[visible on=<5>,->,dashed] ($(f4.north)+(east:3mm)$) -- node[right]{1} ($(f3.south)+(east:3mm)$);
+
+    \draw[visible on=<8>,<-,thick,luhblue] (f1.text west) -- ++(west:1em) node[left]{SP};
+    \draw[visible on=<7>,<-,thick,luhblue] (f2.text west) -- ++(west:1em) node[left]{SP};
+    \draw[visible on=<6>,<-,thick,luhblue] (f3.text west) -- ++(west:1em) node[left]{SP};
+    \draw[visible on=<5>,<-,thick,luhblue] (f4.text west) -- ++(west:1em) node[left]{SP};
+    \draw[visible on=<4>,<-,thick,luhblue] (f3.text west) -- ++(west:1em) node[left]{SP};
+
+
+    \begin{scope}[visible on=<2-3>]
+      \draw[ultra thin] (f1.east) -- ++(-20:5mm) node[align=center,right](label){Call-Frame\\ Objekt};
+      \draw[visible on=<3>,ultra thin] (f2) -- (label);
+    \end{scope}
+
+    \begin{scope}[visible on=<4->,on layer=background]
+      \node[fill=safeblue!30,draw,fit=(f1) (f4),pin=20:Stackspeicher] {};
+    \end{scope}
+
+    \node[left=1.3 of f1.north west, anchor=north east,  align=left,fill=codecolor,font=\ttfamily] (code) {
+      \tikzmark{m1}int fak(int n) \{\\
+      \ \ if (n < 1) \{\\
+      \tikzmark{m2}\ \ \ \   return 1;\\
+      \ \ \}\\
+      \tikzmark{m3}\\
+      \ \ int tmp = fak(n-1);\\
+      \tikzmark{m4}\\
+      \ \ return n * tmp;\\
+      \}
+    };
+
+    \draw[<-,thick,srared,visible on=<1>] (pic cs:m1)++(up:0.3\baselineskip)-- ++(west:1em);
+    \draw[<-,thick,srared,visible on=<5>] (pic cs:m2)++(up:0.3\baselineskip)-- ++(west:1em);
+    \draw[<-,thick,srared,visible on=<2-4>] (pic cs:m3)++(up:0.3\baselineskip)-- ++(west:1em);
+    \draw[<-,thick,srared,visible on=<6-8>] (pic cs:m4)++(up:0.3\baselineskip)-- ++(west:1em);
+
+    \node[width as=code,below=of code,draw,minimum height=4\baselineskip] (console) {};
+    \node[anchor=north west,at=(console.north west),font=\ttfamily,align=left] {
+      \strut> fak(3);\\
+      \strut\only<9>{6;\\>}
+    };
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

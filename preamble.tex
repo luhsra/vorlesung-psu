@@ -14,6 +14,7 @@
 \usepackage{booktabs}
 \usepackage{xspace}
 \usepackage{multirow}
+\usepackage{pgffor}
 
 % Section Title and Block Number
 \newcommand{\psuSectionStart}[2]{
@@ -243,8 +244,17 @@
 , morekeywords=[5]{assert!, assert_eq!, assert_ne!, cfg!, column!, compile_error!, concat!, concat_idents!, debug_assert!, debug_assert_eq!, debug_assert_ne!, env!, eprint!, eprintln!, file!, format!, format_args!, include!, include_bytes!, include_str!, line!, module_path!, option_env!, panic!, print!, println!, select!, stringify!, thread_local!, try!, unimplemented!, unreachable!, vec!, write!, writeln!}  % prelude macros
 }%
 
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
 
-  \lstloadlanguages{C,C++,Java,sh,[x86masm]Assembler,rust}
+\lstloadlanguages{C,C++,Java,sh,[x86masm]Assembler,rust,JavaScript}
   \lstdefinestyle{basestyle}{
     basicstyle=\footnotesize\ttfamily,
     keywordstyle=\color{luhblue},
@@ -383,15 +393,28 @@
     moredelim=**[is][\color{i4blue}]{@@@}{@@@},
   }
 
+\lstdefinestyle{JS}{
+    style=basestyle,
+    language={javascript},
+    moredelim=**[is][\bfseries]{'}{'},
+    moredelim=**[is][\slshape]{''}{''},
+    moredelim=**[is][\lsthighlight]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{i4blue}]{@@@}{@@@},
+  }
+
 \let\C=\relax
 
-\lstnewenvironment{C}[1][]{
-  \lstset{style=C, autogobble, #1}
-} {}
+\newcommand{\addLangEnv}[1]{%
+  \addLangEnvHelper#1\@nnil%
+}
+\def\addLangEnvHelper#1/#2\@nnil{%
+  \lstnewenvironment{#1}[1][]{
+    \lstset{style=#2, autogobble, ##1}
+  } {}
+}
+\forcsvlist\addLangEnv{C/C,pascal/pascal,JS/JS}
 
-\lstnewenvironment{pascal}[1][]{
-  \lstset{style=pascal, autogobble, #1}
-} {}
 
 \lstnewenvironment{haskell}[1][]{
   \lstset{style=haskell, autogobble, #1}
