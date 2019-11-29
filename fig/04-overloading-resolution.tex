@@ -1,0 +1,44 @@
+\documentclass{lecturefig}
+
+\usepackage{fig/04-common}
+\begin{document}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[start chain=going below,node distance=0cm,
+    C/.style={onslide=<#1>{fill=badbee!40}}]
+    \begin{SCOPE}[]{A}
+      \LINE[] (pos) {\LET x(...)};
+      \LINE[] (int) {\LET f(...)};
+      \begin{SCOPE}[]{B}
+        \LINE[C=2-4] (intint) {\LET f\alt<-3>{(...)}{(int, int)}};
+        \node[line,at=(intint.west),anchor=west,invisible] {\LET f{(int, int)}};
+        \LINE[C=2-5] (double) {\LET f\alt<-3>{(...)}{(double)}};
+        \LINE[C=2-5,onslide=<6>{fill=letcolor}] (string) {\LET f\alt<-3>{(...)}{(string)}};
+        \begin{SCOPE}{C}
+          \LINE[fill=refcolor] (ref) {f\alt<-3>{(...)}{(string)}};
+        \end{SCOPE}
+      \end{SCOPE}
+    \end{SCOPE}
+    \only<2->{
+      \draw[] (ref.west) -- (ref.west -| A-start-line.west) coordinate(S);
+    }
+    \only<2>{
+      \draw[dashed,->] (S) |- (int);
+    }
+    \only<2-4>{
+      \draw[->] (S) |- (intint);
+    }
+    \only<4>{
+      \draw (intint.north) -- ++(100:1cm) node[fill=white,draw] {Parameter};
+      \draw (ref.south) -- ++(-100:1cm) node[fill=white,draw] {Argumente};
+    }
+
+    \only<2-5>{
+      \draw[->] (S) |- (double);
+    }
+    \only<2-6>{
+      \draw[->] (S) |- (string);
+    }
+  \end{tikzpicture}
+\end{frame}
+\end{document}

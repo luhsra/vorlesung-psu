@@ -1,0 +1,22 @@
+\documentclass{lecturefig}
+
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \LINE[] (def) {\LET isNeg(int)};
+    \LINE[] (def) {\LET isNeg(double)};
+    \LINE[] (def) {\LET isNeg(string)};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm]
+    \begin{SCOPE}[text={\LET fn},text after={[I]}]{A}
+      \LINE[] (def) {\LET value // type=string};
+      \LINE[] (def) {isNeg(string)};
+    \end{SCOPE}
+  \end{tikzpicture}
+\end{frame}
+
+\end{document}
