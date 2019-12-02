@@ -1018,27 +1018,139 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
 
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}[fragile]{Dynamischer Dispatch anhand des dynamischen Typs}
-    \begin{center}
-      \begin{minipage}{0.6\textwidth}
-      \begin{code}[]
-        \begin{CPP}
-          Base * obj = new Derived();
-          f(obj); // statisch: f(Base); dynamisch: f(Derived)
-        \end{CPP}
+    \begin{columns}[b]
+      \begin{column}{0.49\textwidth}
+      \begin{code}[tag=Java]
+        \begin{java}
+          Base obj = new Derived();
+          func(obj);
+          // dynamisch: func(Derived)
+          // statisch:  func(Base)
+
+
+        \end{java}
       \end{code}
-    \end{minipage}
-  \end{center}
+      \end{column}\hfill
+      \begin{column}<3->{0.49\textwidth}
+        \begin{code}[tag=Py]
+          \begin{py}[style=smaller]
+            def f(self, obj):
+               if isinstance(obj, Derived):
+                   return f_Derived(obj)
+               elif isinstance(obj, Base):
+                   return f_Base(obj)
+               raise TypeError()
+          \end{py}
+        \end{code}
+      \end{column}
+    \end{columns}
 
     \textbf{Bisher} haben wir nur den statischen Typen der Argumente betrachtet.
     \medskip
 
     \bi
-    \ii \structure{Dynamic Dispatch}: Überladungsauswahl Wir beachten den dynamischen Typen bei der Überladungsauflösung
+    \ii<2-> \structure{Dynamic Dispatch}: Überladungsauswahl anhand des dynamischen Typs{
+      \be
+      \ii Vorberechnung eines eingeschränkten Overload Sets
+      \ii Zur Laufzeit: Extraxtion des dynamischen Typs \alert{aller} Argumente
+      \ii Berechnung und Aufruf der spezifischsten Überladung
+      \ee
+    }\smallskip
+    \ii<3-> \structure{Multiple Dynamic Dispatch}: Dynamischer Dispatch allen Argumenten {
+      \bi
+      \ii Wird nur von wenige Sprachen direkt unterstützt (Common Lisp, Julia)
+      \ii Auswahl der passendsten Variante erzeugt hohen  Aufwand zur Laufzeit
+      \ii Emulation mit Hilfskonstrukten, wie \texttt{isinstance} Kaskaden.
+      \ei
+    }
+    \ei
+    \uncover<4->{
+      \medskip
+      \alert{$\Rightarrow$ Eingeschränkte Form (single dynamic dispatch) wird häufig angeboten.}
+    }
+  \end{frame}
+
+  \begin{frame}[fragile]{Single Dynamic Dispatch: Virtuelle Methoden}
+    \OrangeBox{Virtuelle Methoden sind eine Form von Dynamic Dispatch.}
+    \medskip
+    \begin{columns}
+      \begin{column}{0.6\textwidth}
+        \begin{code}[tag=Java]
+          \begin{java}[style=smaller,escapechar=`]
+            class Base {
+              public void foo(int x, int y){...}
+            }
+          \end{java}
+          \begin{java}[style=smaller,escapechar=`]
+            class Derived extends Base {
+             `\tikzmark{def}`public void foo(int x, int y){...}
+            }
+            ...
+            Base obj = new Derived();
+            `\tikzmark{callsite}`obj.foo(1, 1);
+          \end{java}
+        \end{code}
+        \begin{tikzpicture}[remember picture,overlay,visible on=<2->]
+          \draw[->,safegreen,thick] (pic cs:callsite)++(up:.5ex) -- ++(west:1em) |- ($(pic cs:def)+(up:0.5ex)$);
+        \end{tikzpicture}
+      \end{column}\hfill
+      \begin{column}{0.39\textwidth}
+        \btAnimation[width=\textwidth]{range=1-2:<1->}{fig/04-dynamic-dispatch}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii \structure{Methoden} werden im Kontext einer Klasse definiert.{
+      \bi
+      \ii Methoden werden \enquote{auf einem Objekt} aufgerufen: \codebox{obj.foo(1,1)}
+      \ii Das Objekt wird zu einem impliziten Argument (\texttt{this := obj})
+      \ii Bei \structure{statischen Methoden} wird nur der statische Typ beachtet.
+      \ei
+    }\medskip
+    \ii<2-> \structure{Virtuelle Methoden}: dynamischer Dispatch auf dem \texttt{this} Argument{
+      \bi
+      \ii Die passende Überladung hängt am Objekt, nicht an der Variable.
+      \ii Effizient implementierbar mit virtuellen Funktionstabellen (vtable).
+      \ii In Java ist jede Methode, per default, eine virtuelle Methode.
+      \ei
+    }
+    \ei
+
+  \end{frame}
+
+#+end_src
+* Summary
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+    \bi
+    \ii \structure{Namen} sind symbolische und statische Objektreferenzen {
+      \bi
+      \ii Bei der \structure{Deklaration} können Namen mit (Typ)information versehen werden
+      \ii Deklarationen werden in hierarchischen \structure{Namensräumen} strukturiert.
+      \ii Eingeschränkte Sichtbarkeit und Import von Namen möglich
+      \ei
+    }\medskip
+    \ii \structure{Namensauflösung} berechnet aus einem Namen die Objektadresse{
+      \bi
+      \ii Vollständige Auflösung ist nur nach der \structure{Binding Time} eines Namens möglich
+      \ii \structure{Partielle Auflösung} kann bereits vorgezogen werden (Variablendefinition)
+      \ei
+    }\medskip
+    \ii \structure{Instantiierbare Namensräume} führen zu dynamischer Namensauflösung {
+      \bi
+      \ii Eine Deklaration beschreibt viele Laufzeitobjekte (\texttt{struct}, \texttt{class})
+      \ii Laufzeitwissen wird zur vollständigen Namensauflösung benötigt (\texttt{this})
+      \ei
+    }\medskip
+    \ii \structure{Überladene Funktionen} werden mit Typinformationen aufgelöst {
+      \bi
+      \ii Neben dem Funktionsnamen wird auch die \structure{Typsignatur} einbezogen.
+      \ii Bei Subtyping: Auswahl zwischen statischem und \structure{dynamischem Dispatch}.
+      \ei
+    }
+
     \ei
   \end{frame}
 
 #+end_src
-
-* Summary

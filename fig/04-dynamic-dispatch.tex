@@ -1,0 +1,30 @@
+\documentclass{lecturefig}
+\usepackage{fig/04-common}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    start chain=going right,
+    node distance=1mm,
+    code/.style={font=\ttfamily},
+    arg/.style={draw, fill=white,on chain,code,minimum width=1cm,minimum height=1.1\baselineskip},
+    pin/.style={align=center,font=\footnotesize},
+    ]
+
+    \node[code,on chain] (f1) {foo(};
+    \node[arg,fill=safegreen!30] (arg1) {this};
+    \node[on chain,inner sep=0,]{\strut,};
+    \node[arg,fill=luhgray!50] (arg2) {x};
+    \node[on chain,inner sep=0,]{\strut,};
+    \node[arg,fill=luhgray!50] (arg3) { y};
+    \node[code,on chain] (paren) {)};
+
+    \begin{scope}[visible on=<2->]
+      \draw[ultra thin] (arg1) -- ++(-110:6mm) node[pin,below] {dynamic dispatch};
+
+      \draw[ultra thin] (arg2) -- ($(arg2)+(-80:6mm)+(east:2em)$) node[pin,below] (sd) {static dispatch};
+      \draw[ultra thin] (arg3) -- (sd);
+    \end{scope}
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
