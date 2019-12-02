@@ -187,10 +187,10 @@
 
   \usepackage{xparse}
   \usepackage{realboxes}
-  \DeclareDocumentCommand{\codebox}{O{codecolor}}{\Colorbox{#1}}
+  \DeclareDocumentCommand{\codebox}{O{codecolor}m}{\Colorbox{#1}{\texttt #2}}
   \DeclareDocumentCommand{\codeinline}{D<>{1-}O{}v}{%
     \only<#1>{%
-      \codebox{\csname lstinline\endcsname[#2]!#3!}%
+      \Colorbox{codecolor}{\csname lstinline\endcsname[#2]!#3!}%
     }%
   }
 
@@ -457,7 +457,6 @@
   \lstset{style=C, basicstyle=\scriptsize\ttfamily, keywordstyle={}}
 
   \lstdefinestyle{highlighting}{
-    style=nohighlighting,
     moredelim=**[is][\btHL<1>]{@1}{@},
     moredelim=**[is][\btHL<2>]{@2}{@},
     moredelim=**[is][\btHL<3>]{@3}{@},
@@ -467,47 +466,16 @@
     moredelim=**[is][\btHL<7>]{@7}{@},
     moredelim=**[is][\btHL<8>]{@8}{@},
     moredelim=**[is][\btHL<9>]{@9}{@},
+    moredelim=**[is][\btHL<1->]{@+1}{@},
+    moredelim=**[is][\btHL<2->]{@+2}{@},
+    moredelim=**[is][\btHL<3->]{@+3}{@},
+    moredelim=**[is][\btHL<4->]{@+4}{@},
+    moredelim=**[is][\btHL<5->]{@+5}{@},
+    moredelim=**[is][\btHL<6->]{@+6}{@},
+    moredelim=**[is][\btHL<7->]{@+7}{@},
+    moredelim=**[is][\btHL<8->]{@+8}{@},
+    moredelim=**[is][\btHL<9->]{@+9}{@},
  }
-  \lstdefinestyle{nohighlighting}{
-    moredelim=**[is][]{@1}{@},
-    moredelim=**[is][]{@2}{@},
-    moredelim=**[is][]{@3}{@},
-    moredelim=**[is][]{@4}{@},
-    moredelim=**[is][]{@5}{@},
-    moredelim=**[is][]{@6}{@},
-    moredelim=**[is][]{@7}{@},
-    moredelim=**[is][]{@8}{@},
-    moredelim=**[is][]{@9}{@},
-  }
-  \lstdefinestyle{highlight1}{
-    style=nohighlighting,
-    moredelim=**[is][\btHL]{@1}{@},
-  }
-  \lstdefinestyle{highlight2}{
-    style=nohighlighting,
-    moredelim=**[is][\btHL]{@2}{@},
-  }
-  \lstdefinestyle{highlight3}{
-    style=nohighlighting,
-    moredelim=**[is][\btHL]{@3}{@},
-  }
-  \lstdefinestyle{highlight4}{
-    style=nohighlighting,
-    moredelim=**[is][\btHL]{@4}{@},
-  }
-  \lstdefinestyle{highlight5}{
-    style=nohighlighting,
-    moredelim=**[is][\btHL]{@5}{@},
-  }
-  \lstdefinestyle{highlight6}{
-    style=nohighlighting,
-    moredelim=**[is][\btHL]{@6}{@},
-  }
-  \lstdefinestyle{highlight7}{
-    style=nohighlighting,
-    moredelim=**[is][\btHL]{@7}{@},
-  }
-
 
   % Makros to underbrace/overbrace elements in listings
   %

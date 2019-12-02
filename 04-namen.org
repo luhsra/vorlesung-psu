@@ -47,7 +47,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   \end{frame}
 
   \lstdefinestyle{defuse}{
-    style=nohighlighting,
     moredelim=**[is][{\btHL[fill=safegreen!50]<2-3>}]{!}{!},
     moredelim=**[is][{\btHL[fill=safeblue!50]<3>}]{@}{@},
     moredelim=**[is][{\btHL[fill=safeblue!50]<3->}]{^u}{^},
@@ -714,7 +713,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 * Overloading und Dynamic Dispatch
 ** Uneindeutige Namensauflösung
 #+begin_src latex
-  %%ONLY%%
   \dividerframe{Überladene Funktionen}
   \begin{frame}[fragile]{Pointer, Aliase und Uneindeutigkeit}
     \textbf{Wiederholung:} Namensauflösung findet das Objekt zu einem Namen.\medskip
@@ -755,7 +753,11 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \btAnimation[width=0.7\textwidth]{center,padding=1ex,1:<1-3>,range=1-2:<4->}{fig/04-aliase}
     }
     \ei
-    \OrangeBox<5->{Wäre es nützlich, wenn ein Name Objekte meinen könnte?}
+    \OrangeBox<5->{Wäre es nützlich, wenn ein Name mehrere Objekte meinen könnte?}
+  \end{frame}
+
+  \begin{frame}{Erinnerung: Arten des Polymorphismus}
+     \btAnimation[width=\textwidth]{center, padding, 3:<1>}{fig/03-polymorphismus}
   \end{frame}
 
 
@@ -808,7 +810,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \begin{column}{0.59\textwidth}
         \vspace{-1cm}
         \begin{btBlock}{Vorläufige Annahme}
-          Monomorphes und statisches Typsystem
+          \alert{Monomorphes} und statisches Typsystem
         \end{btBlock}
         \smallskip
         \be
@@ -819,10 +821,10 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
           \OrangeBox<3->{\strut Java: Überladung vs. Überschreiben}
           \ei
         }\medskip
-        \ii<4-> Typsignatur durch Typsystem ermitteln {
+        \ii<4-> Typsignaturen durch Typsystem ermitteln{
           \bi
-          \ii Anzahl und Typen der Parameter ermitteln
-          \ii Anzahl und Typen der Argumente ermitteln
+          \ii Definitionstelle und Aufrufstelle
+          \ii Liste der Parameter und der Argumente
           \ei
         }\medskip
         \ii<5-> Einschränkung des Overload Sets{
@@ -897,11 +899,146 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
 
 #+begin_src latex
-\begin{frame}{Polymorphe Typsysteme und Überladung}
+  \begin{frame}[fragile]{Operatorüberladung}
+    \bi
+    \ii<1-> Arithmetische Operatoren (\texttt{+,-,*,/}) sind überladenen{
+      \bi
+      \ii Interpretation als Funktionsaufrufe: \codebox{2 + 3} $\rightarrow$ \codebox{+(2, 3)}
+      \ii Der Operator (z.B., \texttt{+} oder \texttt{++}) wird zum Funktionsnamen: \texttt{\colorbox{badbee!50}{++}(a)}
+      \ii Sprachen definieren bereits mehrere überladene Implementierungen:{\\
+        \btSetNamedTab[1cm]{\first}%
+        \btSetNamedTab[4.5cm]{\second}%
+        \first \siginline{+}{(int, int)}{int}       \second Addition von Ganzzahlen\\
+        \first \siginline{+}{(float, float)}{float} \second Addition von Gleitkommazahlen\\
+        \first \siginline{+}{(string, string)}{string} \second Konkatenierung von Zeichenketten
+      }
+      \ii[$\Rightarrow$] Der Übersetzer braucht bereits Infrastruktur zur Überladungsauflösung
+      \ei
+    }\smallskip
+    \ii<2-> Manche Sprachen erlauben eigene Operatorüberladungen{
+      \bi
+      \ii Die selbst-definierten Überladungen müssen \enquote{magischen} Namen tragen
+      \ii Overload Set enthält Eingebaute und selbst-definierte Operatoren
+      \ei
+    }
+    \begin{code}[tag=C++]
+      \begin{CPP}[style=highlighting,style=smaller]
+        struct complex {
+          int real, imag;
+          complex(int r, int i)  {real = r;   imag = i;} // Konstruktor
+        };
 
-\end{frame}
+        complex @2operator+@ (complex c1, complex c2) {
+          return complex(c1.real + c2.real, c1.imag + c2.imag);
+        }
+      \end{CPP}
+    \end{code}
+    \ei
+
+
+  \end{frame}
+
 #+end_src
-** Einfluss von Dynamischen Typen
-- Single Dispatch
-- Multiple Dispatch
+
+
+** Überladung und Polymorphismus
+#+begin_src latex
+\begin{frame}{Erinnerung: Arten des Polymorphismus}
+\btAnimation[width=\textwidth]{center, padding, 5:<1>}{fig/03-polymorphismus}
+\end{frame}
+
+  \begin{frame}[fragile]{Interaktion zwischen Überladung und Subtypen}
+    \textbf{Erinnerung}: Subtyping ist eine Form des universellen Polymorphismus. Bei Vererbung ist die Kindsklasse ein Subtyp  der Elternklasse .
+
+    \begin{btBlock}{}
+      Ein polymorphes Typssystem führt Typkomptaibilität ein und erzeugt damit \structure{Uneindeutigkeit}. Diese muss die Sprache eindeutig auflösen.
+    \end{btBlock}\medskip
+
+    \begin{columns}[t]
+      \begin{column}<2->{0.49\textwidth}
+        \STRUCTURE{An der Definitionsstelle}\\[1ex]
+
+        \begin{code}[tag=C++]
+          \begin{CPP}[style=highlighting,style=smaller]
+            class S : public B {}
+            void @+3f(B * obj)@ {...}
+            void @+3f(S * obj)@ {...}
+            ...
+            S * obj = new S();
+            f(obj); // f(S *)
+          \end{CPP}
+        \end{code}
+
+        \bii
+        \ii Subtyp \texttt{S} kompatibel zu \texttt{B}
+        \ii Beide Defs. passen  zum Aufruf
+        \ii Welche Definition wählen wir?
+        \eii
+        \smallskip
+        \alert{$\Rightarrow$ Berechnung der Spezfifizät}
+
+      \end{column}\hfill
+      \begin{column}<4->{0.49\textwidth}
+        \STRUCTURE{An der Aufrufstelle}\\[1ex]
+
+        \begin{code}[tag=C++]
+          \begin{CPP}[style=highlighting,style=smaller]
+            // wie links
+            void f(@+5B * this@, int x) {...}
+            void f(@+5S * this@, int x) {...}
+            ...
+            @+5B *obj@ = new S();
+            f(@+5obj@, 23);
+          \end{CPP}
+        \end{code}
+        \bii
+        \ii Variablendeklaration vs. Objekt
+        \ii Statischer Typ != Dynamischer Typ
+        \ii Welchen Typen sollen wir beachten?
+        \eii
+        \smallskip
+        \alert{$\Rightarrow$ Dynamischer Dispatch}
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+
+  \begin{frame}{Auswahl der spezifischsten Überladung}
+    \btAnimation[width=0.9\textwidth]{range=1-8:<1->}{fig/04-overloading-subtypes}
+
+    \medskip
+    {\small \textbf{Intuition:} Umso mehr Casts notwendig sind, umso schlechter die \structure{Spezifität}.}
+
+    \bii
+    \ii<2-> Bestimmung der Argument--Parameter \alert<2>{Distanz} in der Vererbungshierarchie
+    \ii<3-> Inkompatible Typen erzeugen eine Distanz von $\infty$
+    \ii<7-> Der niedrigste Score ist die höchste Spezifität
+    \eii
+  \end{frame}
+#+end_src
+
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[fragile]{Dynamischer Dispatch anhand des dynamischen Typs}
+    \begin{center}
+      \begin{minipage}{0.6\textwidth}
+      \begin{code}[]
+        \begin{CPP}
+          Base * obj = new Derived();
+          f(obj); // statisch: f(Base); dynamisch: f(Derived)
+        \end{CPP}
+      \end{code}
+    \end{minipage}
+  \end{center}
+
+    \textbf{Bisher} haben wir nur den statischen Typen der Argumente betrachtet.
+    \medskip
+
+    \bi
+    \ii \structure{Dynamic Dispatch}: Überladungsauswahl Wir beachten den dynamischen Typen bei der Überladungsauflösung
+    \ei
+  \end{frame}
+
+#+end_src
+
 * Summary

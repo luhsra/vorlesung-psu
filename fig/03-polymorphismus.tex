@@ -48,9 +48,14 @@
          3 + 4.0
        };
 
-       \node[fit=(universal) (inclusion-code) (parametric-code), draw, thick,srared, visible on=<2>]{};
-       \node[fit=(overloading) (overloading-code), draw,thick,srared, visible on=<3>]{};
-       \node[fit=(coercion) (coercion-code), draw,thick,srared, visible on=<4>]{};
+       \node[fit=(universal)   (inclusion-code) (parametric-code), draw, thick,srared, visible on=<2>]{};
+       \node[fit=(overloading) (overloading-code), draw,thick,srared, visible on=<{3,5}>] (hl-overloading) {};
+       \node[fit=(coercion)    (coercion-code),    draw,thick,srared, visible on=<4>] {};
+       \node[fit=(inclusion)   (inclusion-code),   draw,thick,srared, visible on=<5>] (hl-inclusion) {};
+
+       \only<5>{
+         \draw[<->,thick,srared] (hl-overloading.north) -- ++(up:1em) -| node[above,pos=0.2]{Interaktion}(hl-inclusion.north);
+       }
 
 
   \end{tikzpicture}

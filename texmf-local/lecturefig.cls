@@ -53,3 +53,8 @@
 \newcommand{\tikznode}[2][]{%
   \tikz[baseline]\node[anchor=base,#1]{#2};%
 }
+
+\setbeamercolor{structure}{fg=luhblue,bg={}}
+\setbeamercolor{alerted text}{fg=srared}
+\colorlet{beamergreen}{luhgreen!80!black}
+\setbeamercolor{example text}{fg=beamergreen}
