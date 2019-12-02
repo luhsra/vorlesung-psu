@@ -94,7 +94,7 @@ er verlässt sich auf bewährte Konzepte, die häufig durch einen reichen Korpus
 
 In dieser Vorlesung wollen wir uns mit dem Aspekt der Typen in Programmiersprachen beschäftigen.
 Dabei wollen wir uns zunächst überlegen, was Typen, ganz [[https://de.wikipedia.org/wiki/Essentialismus][essentialistisch]], sind und was die einfachsten Ausprägungen des Konzepts "Typen" sind.
-Dies beinhaltet, zum Beispiel, die Ganzzahl- und Zeigertypen, aber auch Record- und Array-Typen.
+Dies beinhaltet, zum Beispiel, die Ganzzahl- und Zeigertypen, aber auch Record-[fn::Records, oder Verbunddatentypen, treten in vielen Sprachen auf. In C heißen sie structs.] und Array-Typen.
 Darauf aufbauend werden wir uns dem Bereich der *Polymorphie* zuwenden, der ganz essentiell für unsere modernen Programmiersprachen ist.
 Mit diesen polymorphen Typen können wir uns ein, potentiell unendliches, Universum von Typkombinationen definieren, das dabei hilft, unsere Programme sauber zu strukturieren und uns vor uns selbst und unseren Bugs schützt.
 Am Ende dieser Vorlesungseinheit werden wir uns anschauen, wie die Typen, die wir in den vorherigen Kapiteln konstruiert haben, in Programmiersprachen zu einem *Typsystem* kombiniert werden.
@@ -102,6 +102,8 @@ Am Ende dieser Vorlesungseinheit werden wir uns anschauen, wie die Typen, die wi
 Diese Vorlesung über Typen ist deswegen so spannend, weil moderne Programmiersprachen, wie C++ oder Rust, sehr ausgefeilte Typsysteme besitzen, die gewissermaßen das Rückgrat dieser Sprachen bilden. Nur mithilfe dieser rigorosen Typsysteme, die vom Übersetzer vor der Laufzeit durchgesetzt werden, ist es möglich große Programme mit vielen Entwicklern gleichzeit zu entwerfen. Typen sind dabei ein Kommunikationsmittel zwischen einem einzelnen Entwickler und der Maschine, und zwischen Entwicklern. In beiden Fällen verwendet der Programmierer die Typannotationen, um zu kommunizieren: "Beim Anlegen dieser Variable habe ich mir gedacht, dass folgende Eigenschaften und Invarianten gelten sollten".
 
 Wenn der Entwickler mit dem Übersetzer kommuniziert, stehen zwei Aspekte von Typen im Vordergrund: der querschneidende Informationsfluss und das Explizitmachen von Erwartungen.
+
+FIXME: Vielleicht hier einen Baum malen um das Verständnis zu verbessern.
 
 Im Kapitel über Parsing haben wir gelernt, dass wir die Syntax unserer Maschinenprogramme kontextfrei extrahieren und als Baum darstellen können.
 Der große Nachteil von Bäumen ist allerdings, dass sie streng hierarchisch sind.
@@ -204,7 +206,7 @@ Im Falle von Typen kommt dieses konstruktive Argument dann zu so Schlüssen wie 
 Bei der strukturellen Interpretation bilden *Typausdrücke* eine zentrale Rolle.
 Sie beschreiben, wie wir komplexere Typen aus einfachen Typen mittels der Anwendung von *Typkonstruktoren* erstellen.
 Dabei muss die Sprache eine Menge von eingebauten *Basistypen* (built-in types) mitbringen, die bereits definiert sind, bevor ein einziges Zeichen Code interpretiert wurde.
-Häufig enthält diese initiale Bevölkerung der Menge (T) aller Typen bereits Ganzzahlentypen, Zeichentypen und einen Typ für Wahrheitswerte.
+Häufig enthält diese initiale Bevölkerung der Menge aller Typen (die Menge T) bereits Ganzzahlentypen, Zeichentypen und einen Typ für Wahrheitswerte.
 
 Typkonstruktoren sind dann Funktionen, die eins oder mehrere Elemente der Typmenge als Argumente bekommen und einen neuen Typausdruck erzeugen, der wieder Teil der Menge T wird.
 Dabei mag es den geneigten Leser verwundern, dass wir nicht den Rückgabewert der Typkonstruktoren angeben, sondern den noch nicht ausgewerteten Ausdruck. Dies tun wir, da uns nicht konkrete Bitrepräsentation von Typen in einem konkreten Übersetzer interessiert, sondern wie diese Typen gebildet werden. Unser "Pointer auf char" von eben würden wir also als ~pointer(char)~ aufschreiben. Um dies zu verdeutlichen, wollen wir uns kurz ein Stück Python anschauen, mit dem wir diese strukturelle Interpretation betrachten können:
@@ -710,7 +712,10 @@ Um das ganze etwas plastischer zu machen, wollen wir uns ansehen, wie C-~struct~
 #+end_src
 
 Der Strukturtyp hat zwei Elemente mit den Namen "feld_1" und "feld_2"; beide Elemente haben unterschiedliche Typen (int, double).
-Der ~dot_operator~ ist als ~.~ in der Sprache als Infixoperator eingebaut und als zweites Argument werden Bezeichner verwendet, wie sie aus dem Scanner fallen.
+Der ~dot_operator~ ist als ~.~ in der Sprache als Infixoperator eingebaut.
+Im Beispiel extrahiert der Ausdruck ~var.feld_1~, das Feld ~feld_1~ aus dem Objekt, welches in ~var~ gespeichert ist.
+Dabei ist der Feldname fix und nur das Objekt veränderlich.
+
 
 Es gibt zwei geläufige Sonderformen von Strukturtypen:
 Tupel und varianten Records.
@@ -1121,7 +1126,7 @@ Um wenigstens die grundlegendste Art der Kompatibilität, nämlich Substituierba
 Weiterhin sorgt der Übersetzer dann dafür, dass die geerbten Strukturelemente an den gleichen Offsets, vom Beginn der Struktur her, zu finden sind.
 Um Typkompatibilität auf der Ebene der Abstraktionen zu erreichen, erbt der abgeleitete Typ alle Interfaceoperationen, die der Elterntyp aufweist.
 Beides, Strukturkompatibilität und Interfacekompatibilität, sind direkte Folgen unseres intentionalen Statements:
-~Derived~ ein Subtyp von ~Base~ werden.
+~Derived~ soll ein Subtyp von ~Base~ sein.
 
 Am gezeigten C++-Beispiel kann man die Kompatibilität im Speicherlayout relativ direkt am Assembler ablesen.
 Die Funktion ~getX()~, die sowohl mit Base als auch mit Derived-Objekten aufgerufen werden kann, extrahiert das Strukturelement mit dem Namen ~x~ aus dem Objekt.
