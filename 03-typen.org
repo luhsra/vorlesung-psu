@@ -1599,26 +1599,26 @@ Mit der Technik der *Unifikation*, die wir uns später anschauen wollen, werden 
   \bi
   \ii Das formale Konzept Typen findet Anwendung in Programmiersprachen{
     \bi
-    \ii Typen haben eine Struktur, eine Objektmenge und ein Interface
-    \ii \structure{Typkonstruktoren} komponieren komplexe Typen aus einfachen
+    \ii Typen haben eine Struktur, eine Objektmenge und ein Interface.
+    \ii \structure{Typkonstruktoren} komponieren komplexe Typen aus einfachen.
     \ei
   }\medskip
-  \ii Geläufige Typen werden oft direkt von der Sprache unterstützt{
+  \ii Geläufige Typen werden oft direkt von der Sprache unterstützt.{
     \bi
-    \ii \structure{Skalare Typen} sind unteilbar mit endlichem Wertebereich
-    \ii \structure{Zusammengesetzte Typen} können mehrere Subobjekte halten
+    \ii \structure{Skalare Typen} sind unteilbar mit endlichem Wertebereich.
+    \ii \structure{Zusammengesetzte Typen} können mehrere Subobjekte halten.
     \ei
   }\medskip
-  \ii Polymorphe Typsysteme sind flexibler als Monomorphe Typsysteme{
+  \ii Polymorphe Typsysteme sind flexibler als monomorphe Typsysteme.{
     \bi
     \ii \structure{Subtypen} definieren eine Hierarchie von kompatiblen Untermengen.
-    \ii \structure{Generische Typen} sind benutzerdefinierte Typkonstruktoren
+    \ii \structure{Generische Typen} sind benutzerdefinierte Typkonstruktoren.
     \ei
   }\medskip
-  \ii Typsysteme beschreiben die Integration von Typen in die Sprache{
+  \ii Typsysteme beschreiben die Integration von Typen in die Sprache.{
     \bi
-    \ii \structure{Strikte Typisierung} verhindert, dass wir das Typssytem umgehen
-    \ii \structure{Statische Typisierung} gibt jeder Variable einen festen Typen
+    \ii \structure{Strikte Typisierung} verhindert, dass wir das Typsystem umgehen.
+    \ii \structure{Statische Typisierung} gibt jeder Variable einen festen Typen.
     \ei
   }
   \ei
