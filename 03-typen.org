@@ -407,7 +407,7 @@ Diese sehr technische Art der Äquivalenz hat allerdings einige gravierende Nach
 Das zweite Problem struktureller Äquivalenz sind *rekursive Datentypen*.
 Solche rekursiven Typen können auftreten, wenn wir Typen einen Namen geben können und diesen Namen in der Definition des Typs selbst verwenden.
 Das Paradebeispiel eines rekursiven Typs, den wir auch schon im Parsing-Kapitel besprochen haben, ist die verkettete Liste, bei der jedes Listenelement einen Pointer auf eine (Rest-)Liste beinhaltet.
-Das Problem entsteht dann, wenn wir jedes Auftreten des Typnamens einfach durch den Erzeugten Typausdruck ersetzen wollen, weil dann ein endlos tief geschachtelter Typausdruck für diese doch sehr einfache Liste entsteht. Zwar wäre eine endlose Struktur für den Mathematiker erst mal in Ordnung, doch man muss einige Tricks[[fn::[[https://dl.acm.org/citation.cfm?id=1061632][The Equivalence of Modes and the Equivalence of Finite Automata]]] anwenden, um dies auf einem endlichen Rechner darzustellen.
+Das Problem entsteht dann, wenn wir jedes Auftreten des Typnamens einfach durch den Erzeugten Typausdruck ersetzen wollen, weil dann ein endlos tief geschachtelter Typausdruck für diese doch sehr einfache Liste entsteht. Zwar wäre eine endlose Struktur für den Mathematiker erst mal in Ordnung, doch man muss einige Tricks[fn::[[https://dl.acm.org/citation.cfm?id=1061632][The Equivalence of Modes and the Equivalence of Finite Automata]]] anwenden, um dies auf einem endlichen Rechner darzustellen.
 
 Aufgrund dieser Probleme mit struktureller Äquivalenz verwenden die meisten modernen Sprachen *Namensäquivalenz*.
 Die Idee dabei ist, dass jede Definition eines Typs, egal wie der Typ strukturiert ist, ein eigener Typ ist, der nur äquivalent zu sich selbst ist.
