@@ -1,7 +1,18 @@
 import shlex
+import re
 
 def normalize_topic(topic):
-    return topic.replace("?", "").replace(" ", "_").replace('"', "_").lower()
+    topic = topic.replace(" ", "_").replace('"', "_").lower()
+    topic = re.sub("[^a-zA-Z_]", "_", topic)
+    return topic
+
+def parse_topic_line(line):
+    pages, block, topic = line.strip().split(":", 2)
+    topic = normalize_topic(topic)
+    start, end = map(int, pages.split("-"))
+    return ((start, end), block, topic)
+
+
 
 def parse_block_src(line):
     if "#+begin_src" in line.lower():

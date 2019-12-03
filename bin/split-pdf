@@ -3,7 +3,7 @@
 import sys
 import subprocess
 import os.path
-from common import normalize_topic
+from common import parse_topic_line
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
@@ -12,28 +12,31 @@ if __name__ == '__main__':
     pdf = sys.argv[1]
     pdf_base, _ = os.path.splitext(pdf)
     lecture = os.path.basename(pdf_base)
+    output_dir = f"build/html/{lecture}"
+
+    # Use SVG
+    convert = ["pdf2svg", pdf, f"{output_dir}/slide-%04d.svg", "all"]
+    print(" ".join(convert))
+    subprocess.check_call(convert)
+
     with open(sys.argv[2]) as fd:
         for line in fd.readlines():
-            pages, lines, topic = line.strip().split(":", 2)
-            topic = normalize_topic(topic)
-            output_dir = f"build/html/{lecture}"
-            if not os.path.exists(output_dir):
-                os.mkdir(output_dir)
-            split = ["pdftk", pdf, "cat", pages, "output", f"{output_dir}/{topic}-{lines}.pdf", "dont_ask"]
-            print(" ".join(split))
-            subprocess.check_call(split)
+            (pages, block, topic) = parse_topic_line(line)
+            for page in range(pages[0], pages[1] + 1):
+                fn = f"{output_dir}/slide-{page:04d}.svg"
+                assert os.path.exists(fn), "PDF split failed"
+            continue
 
-            #convert = ["convert",
-            #           "-density", "400",
-            #           f"{output_dir}/{topic}-{lines}.pdf",
-            #           "-quality", "100",
-            #           "-sharpen", "0x1.0",
-            #           f"{output_dir}/{topic}-{lines}-%04d.png"
-            #]
-            # Use SVG
-            convert = ["pdf2svg",
-                       f"{output_dir}/{topic}-{lines}.pdf",
-                       f"{output_dir}/{topic}-{lines}-%04d.svg",
-                       "all"]
-            print(" ".join(convert))
-            subprocess.check_call(convert)
+            # if not os.path.exists(output_dir):
+            #     os.mkdir(output_dir)
+            # split = ["pdftk", pdf, "cat", pages, "output", f"{output_dir}/{topic}-{lines}.pdf", "dont_ask"]
+            # print(" ".join(split))
+            # subprocess.check_call(split)
+
+            # # Use SVG
+            # convert = ["pdf2svg",
+            #            f"{output_dir}/{topic}-{lines}.pdf",
+            #            f"{output_dir}/{topic}-{lines}-%04d.svg",
+            #            "all"]
+            # print(" ".join(convert))
+            # subprocess.check_call(convert)

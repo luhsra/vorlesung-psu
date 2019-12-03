@@ -940,7 +940,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 #+end_src
 
-
 ** Überladung und Polymorphismus
 #+begin_src latex
 \begin{frame}{Erinnerung: Arten des Polymorphismus}

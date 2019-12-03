@@ -6,9 +6,9 @@ import glob
 import logging
 import re
 import shlex
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 from collections import OrderedDict
-from common import normalize_topic, parse_block_src
+from common import parse_topic_line, parse_block_src
 
 def make_carousel(label, title, files):
     ret = []
@@ -71,23 +71,26 @@ if __name__ == "__main__":
         print(f"usage: {sys.argv[0]} [ORG-FILE] [TOPIC-FILE]")
 
     org, topics_fn = sys.argv[1:]
+    basename = os.path.basename(topics_fn)
+    base,_ = os.path.splitext(basename)
+    output_dir = f"build/html"
     with open(topics_fn) as fd:
         topics = OrderedDict()
-        for _, lines, topic in [x.strip().split(":", 2) for x in fd.readlines()]:
-            topic = normalize_topic(topic)
-            basename = os.path.basename(topics_fn)
-            base,_ = os.path.splitext(basename)
-            output_dir = f"build/html"
-            pattern = f"{output_dir}/{base}/{topic}-{lines}-*.svg"
-            topics[(topic, lines)] = [os.path.relpath(x, output_dir) for x in sorted(glob.glob(pattern))]
-            logging.info("%s %s slides: %s",topic, lines, len(topics[(topic, lines)]))
-
+        for line in fd.readlines():
+            (pages, block, topic) = parse_topic_line(line)
+            topics[(topic, block)] = []
+            for page in range(pages[0], pages[1] + 1):
+                fn = f"{output_dir}/{base}/slide-{page:04d}.svg"
+                assert os.path.exists(fn)
+                fn = os.path.relpath(fn, output_dir)
+                topics[(topic, block)].append(fn)
+            logging.info("Block %s slides: %s", block, len(topics[(topic, block)]))
+            logging.debug(topic)
 
     with open(org) as fd:
         lines = list(fd.readlines())
         blocks = list(find_blocks(lines))
         for (topic,block_number), svgs in reversed(topics.items()):
-            logging.info("%s %s", topic, block_number)
             start, end, title = blocks[int(block_number)-1]
             lines[start:end+1] = make_carousel(topic + block_number, title, svgs)
 
