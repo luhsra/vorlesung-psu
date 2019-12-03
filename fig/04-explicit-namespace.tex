@@ -1,17 +1,16 @@
 \documentclass{lecturefig}
-
 \usepackage{fig/04-common}
 \begin{document}
 \begin{frame}
-  \begin{tikzpicture}[start chain=going below,node distance=0cm]
-    \begin{SCOPE}[onslide=<3->{text={\colorbox{letcolor}{\LET N}=}}]{A}
+  \begin{tikzpicture}[start chain=going below,node distance=0cm,every comment/.style={font=\scriptsize}]
+    \begin{SCOPE}[text=\strut\only<3->{\colorbox{letcolor}{\LET N}=}]{A}
       \begin{SCOPE}[onslide=<2->{text={\colorbox{letcolor}{\LET M}=}}]{B}
         \LINE[fill=letcolor] (def) {\LET A};
       \end{SCOPE}
       \LINE[fill=refcolor] (use-short) {\only<2->{M::}A};
       \begin{SCOPE}{C}
-        \LINE[fill=refcolor] (use-wide) {\only<3->{::N::M::}A};
-        \node at ($(use-wide.west)+(east:2cm)$) (right) {};
+        \LINE[fill=refcolor,] (use-wide) {\only<3->{::N::M::}A};
+        \node at ($(use-wide.west)+(east:2.2cm)$) (right) {};
       \end{SCOPE}
       \begin{scope}[visible on=<1>]
         \draw[dashed,->] (use-short) -- (def);
@@ -22,9 +21,9 @@
         \draw[->] (use-short.west) -- (use-short.west -| A-start-line.west) |- (B-start.west);
       \end{scope}
       \begin{scope}[visible on=<3->]
-        \draw[->] (use-wide.north -| right) |- (def);
-        \draw[->] (use-wide.north -| right) |- (B-start.east);
-        \draw[->] (use-wide.north -| right) |- (A-start.east);
+        \draw[->] (use-wide.east) -- (use-wide.east -| right) |- (def);
+        \draw[->] (use-wide.east) -- (use-wide.east -| right) |- (B-start.east);
+        \draw[->] (use-wide.east) -- (use-wide.east -| right) |- (A-start.east);
       \end{scope}
     \end{SCOPE}
   \end{tikzpicture}

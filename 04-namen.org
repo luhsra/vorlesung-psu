@@ -241,15 +241,26 @@ Diese Sprache ist nicht dazu da tatsächlich übersetzt zu werden, sondern sie s
 Die Grammatik dieser Sprache ist denkbar einfach und sie kennt nur Deklarationen (~let <NAME>~), Referenzen (~<NAME>~), und geschachtelte Namensräume (~{...}~). Im weiteren Verlauf werden wir sie allerdings noch minimal erweitern.
 
 #+begin_example
-PROG  -> DECL*
-DECL  -> SCOPE
-SCOPE -> '{' DECL* '}' // Namensräume können geschachtelt sein
+PROG  -> STMT*
+STMT  -> SCOPE | DECL | REF
+SCOPE -> '{' STMT* '}' // Namensräume können geschachtelt sein
 DECL  -> 'let' NAME    // Deklaration eines Namens
-DECL  -> NAME          // Verwendung  eines Namens
+REF   -> NAME          // Verwendung  eines Namens
 #+end_example
 
 * Statische Namensauflößung
+
+Als erstes werden wir uns mit den Regel der Namensauflösung in geschachtelten Namensräumen beschäftigen.
+Dabei wollen wir uns zunächst nur mit statischer Namensauflösung beschäftigen, bei der hinter jeder Namensdeklaration maximal ein Laufzeitobjekt sein kann.
+Der Gegensatz zu dieser *statischen Namensauflösung*, ist die dynamische Namensauflösung, bei der es zu einer Deklaration mehrere Objekte[fn::Hinter einem Attribut in einer Klasse, steht in jeder Instanz ein anderes Objekt.
+Der ~this~ Zeiger dient zur Unterscheidung.]geben kann, zwischen denen wir mit zusätzlichem Laufzeitwissen unterscheiden werden.
+Dazu aber später mehr.
+
 ** Implizite Namensauflösung
+:PROPERTIES:
+:CUSTOM_ID: 04-implicit-resolution
+:END:
+
 #+begin_src latex
 \dividerframe{Statische Namensauflößung}
   \begin{frame}{Implizite Namensauflösung}
@@ -265,14 +276,14 @@ DECL  -> NAME          // Verwendung  eines Namens
           \ii Reihenfolge von Deklaration und Referenz teilweise egal.
           \ei
         }\medskip
-        \ii<2-> \enquote{Closest-nested scope rule} (CNSR){
+        \ii<2-|handout:2-> \enquote{Closest-nested scope rule} (CNSR){
           \bi
           \ii Suche nach Deklarationen von Innen nach Außen
           \ii Bei mehreren Möglichkeiten: Nimm die Innerste.
           \ii Im AST: Wir suchen von unten nach oben.
           \ei
         }\medskip
-        \ii<3-> Deklarationen können \structure{verdeckt} werden {
+        \ii<3-|handout:3-> Deklarationen können \structure{verdeckt} werden {
           \bi
           \ii Innere Deklarationen verdecken die Äußeren
           \ii Die äußere Deklaration bleibt \structure{gültig}, ist aber innen nicht mehr \structure{sichtbar}.
@@ -283,9 +294,36 @@ DECL  -> NAME          // Verwendung  eines Namens
     \end{columns}
   \end{frame}
   #+end_src
+
+Die wichtigste Art der Namensauflösung ist die *implizite Namensauflösung*, bei der der Übersetzer automatisch die "nächste" gültige Deklaration findet.
+Dabei sucht er für jede Referenz in einem Namensraum eine Deklaration im gleichen oder einem umgebenden Namensraum.
+Findet er bei dieser impliziten Suche keine Deklaration, so gibt es einen Übersetzerfehler.
+Im Folienbeispiel gibt es für die zweite Verwendung von A zunächst keine passende Deklaration.
+Die einzige Deklaration von A ist in einem Namensraum, der bereits geschlossen ist und daher die Gültigkeit des Namens beendet hat.
+Erst mit der Deklaration eines zweiten Namens mit dem Bezeichner ~A~, kann die zweite Referenz aufgelöst werden.
+
+Es ist Sprachabhängig, ob eine Deklaration im selben Namensraum wirklich vor der ersten Verwendung auftreten muss, oder ob ich alle Deklaration an das Ende eines Block packen kann.
+Sollte sich eine Sprache für eine strikte Auslegung der "Declaration before use" Regel entscheiden, so hat dies den historischen Hintergrund, dass es früher, aufgrund von schwachbrüstigen Maschinen, erstrebenswert war einen single-pass Übersetzer bauen zu können.
+Solche single-pass Übersetzer gehen nur ein einziges mal über den Quelltext und erzeugen den Binärcode direkt beim Lexen/Parsen.
+Für solche Übersetzer ist es dann natürlich unmöglich einen Namen aufzulösen, der lexikalisch nach der Verwendung deklariert wird; dazu müsste man zwei mal über den Quelltext gehen und zunächst alle Deklarationen einsammeln, bevor man die Referenzen auflöst.
+
+Sollte bei der impliziten Namensauflösung mehrere Deklarationen in umgebenden Namensräumen gefunden werden, so verwendet man jene Deklaration die der Verwendung am "nächsten" bzw.
+die am innersten ist.
+Dazu beginnen wir unsere Suche nach der Deklaration bei dem Namensraum der die Verwendung umschließt und arbeiten uns solange von innen nach außen, bis wir eine passende Deklaration gefunden haben.
+Diese Regel heißt die "Closest-nested scope rule" (CNSR).
+
+Eine Folge der CNSR ist, dass Deklarationen in untergeordneten Namensräumen *verdeckt* werden können.
+Dabei bleibt die äußere Deklaration weiterhin gültig, aber wir können sie mittels der impliziten Namensauflösung nicht mehr referenzieren; sie verliert ihre *Sichtbarkeit*.
+Nachdem der Namensraum der inneren Deklaration geschlossen wurde, wird die äußere Deklaration wieder sichtbar und kann referenziert werden.
+Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die letzte Deklaration von A ihre Gültigkeit.
+
 ** Explizite Namensräume
+:PROPERTIES:
+:CUSTOM_ID: 04-explicit-namespaces
+:END:
+
 #+begin_src latex
-  \begin{frame}[fragile]{Explizite Namensräume}
+  \begin{frame}<handout:1-3>[fragile]{Explizite Namensräume}
     \begin{btBlock}[type=alert]{\ALERT{Problem:} Referenzen nur entlang des ASTs möglich}
       Die implizite Namensauflösung erlaubt uns nur Namen zu referenzieren, die direkt über uns im AST sind. Namen aus einem anderen Namensraum (NS) sind nicht erreichbar
     \end{btBlock}
@@ -296,20 +334,14 @@ DECL  -> NAME          // Verwendung  eines Namens
       \end{column}\hfill
       \begin{column}{0.70\textwidth}
         \bi
-        \ii<2-> NS bekommt Namen im umgebenden NS {
+        \ii<2-|handout:2-> NS bekommt Namen im umgebenden NS {
           \bi
           \ii Namen aus einem NS anfordern mit \enquote{\texttt{::}}
           \ii Der Trenner \texttt{::} ist wie das \enquote{\texttt{/}} bei Pfaden
           \ii \alert<2>{Grundlegende Erweiterung} des Namensraumkonzepts
           \ei
         }
-        \ii<3-> Impliziter Wurzelnamensraum {
-          \bi
-          \ii Ermöglicht es alle Namensräume zu adressieren
-          \ii Vollständig qualifizierter Pfad ist eindeutig
-          \ei
-        }
-        \ii<4-> In C++: \enquote{\texttt{\LET <X>=...}} = \enquote{\texttt{namespace <X>}}{
+        \ii<3-|handout:2-> In C++: \enquote{\texttt{\LET <X>=...}} = \enquote{\texttt{namespace <X>}}{
           \begin{code}[tag=C++]
             \begin{CPP}
               namespace N { namespace M {
@@ -317,6 +349,13 @@ DECL  -> NAME          // Verwendung  eines Namens
               } }
             \end{CPP}
           \end{code}
+          \vspace{-1ex}
+        }
+        \ii<4-|handout:3-> Impliziter Wurzelnamensraum {
+          \bi
+          \ii Ermöglicht es alle Namensräume zu adressieren
+          \ii Vollständig qualifizierter Name ist eindeutig
+          \ei
         }
         \ei
       \end{column}
@@ -324,38 +363,74 @@ DECL  -> NAME          // Verwendung  eines Namens
 
   \end{frame}
 #+end_src
-- Expliziter Auflösungspfad (Qualified Name)
+
+Mit der CNSR können wir bereits einen großen Teil der Namen auflösen und mit den zugehörigen Referenzen verbinden.
+Allerdings sind die Namensräume, sofern sie nicht ineinander geschachtelt sind, voneinander abgeschottet.
+Ich kann keine Namen aus einem anderen, bereits geschlossenen Namensraum mittels CNSR referenzieren, da dieser hierarchisch nicht über mir ist.
+Wenn wir allerdings Namensräume dazu verwenden wollen um Komponenten abzubilden, wäre es durchaus wünschenswert in einen, bereits geschlossenen, Namensraum hinein greifen zu können.
+
+Das grundlegende Problem, wenn wir bereits geschlossene Namensräume referenzieren wollen ist, dass sie bisher anonyme Konstrukte sind, also keinen eigenen Namen haben.
+Wir lösen dieses Problem, indem wir die Möglichkeit eröffnen Namensräume an Namen zu binden und eine Möglichkeit geben einem benannten Namensraum (nach unten) zu suchen.
+
+#+begin_example
+DECL -> let NAME = SCOPE // Explizite, benannte Namensräume
+#+end_example
+
+Das erste bekommen wir in unserer domänenspezifischen Sprache hin, wenn wir die Grammatik um eine Regel zu *expliziten Namensräume* erweitern, welche dem folgenden Namensraum einen eigenen Namen geben.
+Dieser Name ist dann an seiner Deklarationsstelle genauso gültig und sichtbar, wie das jeder andere Namen auch ist.
+Allerdings schaffen wir mit dem ~::~ Operator die Möglichkeit einen Namen innerhalb eines expliziten Namensraums zu suchen.   Diese explizite bzw. *qualifizerte Referenzierung* sucht dabei nur in dem gegebenen Namensraum und führt keine CNSR Suche durch.
+Im Beispiel bedeutet der Ausdruck ~M::A~, dass wir den Namen ~A~ im expliziten Namensraum ~M~ referenzieren wollen.
+
+Da wir mit dem ~::~ Operator nur in einem Namensraum suchen können den wir mittels CSNR adressieren können, müssen wir einen impliziten *Wurzelnamensraum* einführen, in dem die Top-Level Deklarationen gespeichert werden.
+Nur so können wir uns, von der Wurzel abwärts, über explizite Namensräume zu allen erreichbaren Deklarationen referenzieren.
+
+Wir können uns den Doppelpunktoperator als einen Trenner in einem Zugriffspfad vorstellen.
+Das Pendant auf Dateisystemebene, auch einem hierarchischen Namensraum (siehe GBS), ist der Slash (~/~).
+Ein Reihung von Bezeichnern, die durch Doppelpunkte getrennt sind, ist daher eine Art expliziter Pfad im hierarchischen Namensraum.
+Fängt dieser Pfad mit ~::~ an, so haben wir einen *vollständig qualifizierten Namen* (=absoluter Pfad), ansonsten haben wir einen relativ qualifizierten Namen (=relativer Pfad).
+
+Explizite Namensräume sind eine grundlegende Erweiterung des Namensraumkonzepts, da sie es uns erlauben  kontrolliert auf Unternamensräume zugreifen zu können und nicht nur auf die CNSR angewiesen zu sein.
+Sehr nah an dieser Erweiterung ist das C++ Konstrukt ~namespace~, welches einem Namensraum wirklich nur einen eigenen Namen gibt, und sonst nichts weiteres tut.
+
+Noch eine spannende Bemerkung zum impliziten Wurzelnamensraum:
+Wenn eine Sprache keine Möglichkeit bietet auf diese Wurzel zugreifen zu können, so kann man einen Namensraum vom Rest des Programms isolieren.
+Innerhalb des Namensraums hat man keine Möglichkeit Namen zu notieren, die auf Deklarationen von außerhalb referenzieren.
+Nur jene Objekte, die wir (dynamisch) in diesen Namensraum hinein geben erlauben dem enthaltenen Code auf die Außenwelt zuzugreifen.
 
 ** Import von Namen
+:PROPERTIES:
+:CUSTOM_ID: 04-import
+:END:
+
 #+begin_src latex
   \begin{frame}[fragile]{Import von entfernten Namen}
     \begin{btBlock}[type=alert]{\ALERT{Problem:} Explizite Auflößungspfade sind zu lange}
       Ständig den vollständigen Namen (\texttt{::A::B::C}) einer entfernten Deklaration zu verwenden ist umständlich viel Schreibarbeit.
     \end{btBlock}
-  \medskip
+    \medskip
     \begin{columns}
       \begin{column}{0.29\textwidth}
-        \btAnimation[width=\textwidth]{range=1-4:<1->,4:<5->}{fig/04-import}
+        \btAnimation[width=\textwidth]{range=1-4:<1->}{fig/04-import}
       \end{column}\hfill
       \begin{column}{0.67\textwidth}
         \bi
         \ii Jeder NS hat verschiedene Namensmengen {
           \bi
-          \ii Die direkt deklarierten Namen
-          \ii Die implizit sichtbaren Namen
+          \ii Die direkt deklarierten Namen ($N_d$)
+          \ii Die implizit sichtbaren Namen ($N_v$)
           \ii Den Wurzelnamensraum
           \ei
         }\smallskip
-        \ii<2-> Viele Sprachen erlauben \structure{Import} von Namen{
+        \ii<2-|handout:2-> Viele Sprachen erlauben \structure{Import} von Namen{
           \bi
-          \ii \codeinline{import <NAME>} erweitert die deklarierten Namen
+          \ii \codeinline{import <PFAD>} erweitert die Namensmengen
           \ii Explizite Namensliste oder Importe mit \codeinline{*}
           \ii Importe geschehen oft implizit (z.B. Vererbung)
           \ei
         }\smallskip
-        \ii<4-> Importe sind (erstmal) transitiv {
+        \ii<4-|handout:4-> Importe nach $N_d$ sind transitiv {
           \bi
-          \ii Importiere Namen können importiert werden
+          \ii Importiere in die Namen können importiert werden
           \ii \codeinline{import ::X::*} enthält auch \codeinline{::N::M::B}
           \ei
         }
@@ -365,7 +440,39 @@ DECL  -> NAME          // Verwendung  eines Namens
   \end{frame}
 #+end_src
 
+Mit expliziten Namensräumen und dem ~::~ Operator haben wir die Möglichkeit geschaffen Namen zu referenzieren, die quer zur hierarchischen Namensraumstruktur deklariert wurde.
+Allerdings führt die Verwendung von qualifizieren Namen zu schwer lesbarem Code, da die Zugriffspfade lang und länger werden.
+Würde eine Sprache keine weiteren Mittel anbieten dieses Boilerplate Problem zu lösen, Programmierer würden sich einfach weigern ihre Namen in eine hierarchisch, anhand der logischen Komponentenstruktur, zu deklarieren.
+Da wollen wir den Entwicklern natürlich entgegen kommen!
+Viele Sprachen bieten die Möglichkeit Deklarationen von einem Namensraum in einen anderen Namensräumen zu *importieren*.
+
+Um den Import von Namen zu verstehen müssen wir zunächst definieren, was in einem Namensraum überhaupt sichtbar ist.
+Zum einen hat jeder Namensraum eine Menge von Namen die direkt in ihm deklariert sind.
+Im Folienbeispiel deklariert der Namensraum N die Namen ~{A, M}~.
+Zweitens hat jeder Namensraum eine Menge von sichtbaren Namen, welche die, zusätzlich zur Menge der direkt deklarierten Namen, alle Namen enthält, die durch die CNSR erreichbar sind.
+Mit dem Import von Namen können wir, je nach Sprache und verwendetem Konstrukt, die eine oder die andere Menge manipulieren.
+Da die Unterscheidung zwischen beiden fällen, nur in Randfällen wirklich relevant ist, werde ich im folgenden (und auf den Folien) so tun, als würden wir immer in die Menge der direkt-deklarierten Namen importieren.
+
+In unserer Mini-Sprache, können wir mit dem Import Statement (~import <PFAD>~) Namen aus einem explizit benanntem Namensraum importieren.
+Dabei erlauben wir nicht nur Importe einzelner Namen (~::N::A~), sondern auch Wildcard Importe (~::N::M::*~).
+Letztere haben den Vorteil, dass wir das Import Statement nicht anpassen müssen, wenn wir im exportierenden Namensraum neue Namen deklarieren[fn::Für eine Diskussion von Wildcard importen bei Python Modulen, können Sie einen Blick in [[https://www.python.org/dev/peps/pep-0008/#id23][PEP8]] werden].
+
+Wie bereits gesagt, importieren wir, der Einfachheit halber, nur in die Menge der direkt-deklarierten Namen.
+Das Import Statement wird also quasi zur Deklaration (oder, bei Wildcard Importen, zu vielen Deklarationen).
+Daher können wir die importierten Namen, von dritter Stelle wiederum importieren, falls wir den umgebenden Namensraum referenzieren können.
+Im Beispiel können wir, nachdem wir den Namen ~X~ vergeben haben, alle auf alle Deklarationen (~A,B,C~) zugreifen, wenn wird die ~import ::X::*~ schreiben.
+
+Manchmal ist der Import von Namen ein Seiteneffekt von anderen Sprachkonstrukten und nicht mit einem expliziten ~import~ Statement verbunden.
+So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in den Namensraum der Kindsklasse importiert.
+
+
+
+
 ** Einschränkung der Sichtbarkeit
+:PROPERTIES:
+:CUSTOM_ID: 04-limited-visibility
+:END:
+
 #+begin_src latex
   \begin{frame}{Einschränkung der Sichtbarkeit}
     \begin{btBlock}[type=alert]{\ALERT{Ziel:} Wir wollen Interna der Implementierung verstecken}
@@ -374,7 +481,7 @@ DECL  -> NAME          // Verwendung  eines Namens
     \smallskip
 
     \bi
-    \ii<2-> Deklarationen bekommen ein weiteres Attribut\hfill\texttt{\LETi <NAME>}{
+    \ii<2-|handout:2-> Deklarationen bekommen ein weiteres Attribut\hfill\texttt{\LETi <NAME>}{
       \bi
       \ii Interne Deklarationen können nur über implizite Auflösung gefunden werden.
       \ii Name wird unsichtbar für alles außerhalb des aktuellen NS
@@ -382,7 +489,7 @@ DECL  -> NAME          // Verwendung  eines Namens
       \ei
     }
     \ei
-    \begin{columns}<3->
+    \begin{columns}<3-|handout:3->
       \begin{column}{0.22\textwidth}
         \btAnimation[width=\textwidth]{center,range=1-2:<3->}{fig/04-private}
       \end{column}\hfill
@@ -393,7 +500,7 @@ DECL  -> NAME          // Verwendung  eines Namens
           \smallskip
         }
         \ii Interne Namen werden beim Import übersprungen.
-        \ii<4-> Namensräume können Standardattribute haben{
+        \ii<4-|handout:4-> Namensräume können Standardattribute haben{
           \bi
           \ii \texttt{\LETi} macht einen Namen nur intern sichtbar
           \ii \texttt{\LETe} macht einen Namen auch extern sichtbar
@@ -404,6 +511,31 @@ DECL  -> NAME          // Verwendung  eines Namens
     \end{columns}
   \end{frame}
 
+  #+end_src
+
+Ein Ziel von hierarchischen Namensräumen war, dass wir unseren Code anhand der Komponenten strukturieren wollen.
+Um allerdings richtiges *Information Hiding* betreiben zu können müssen wir es noch möglich machen, dass nicht jeder daher gelaufene Programmierer unsere Komponenten-internen Variablen und Funktionen verwenden und verändern kann.
+Bisher kann man an jeder Stelle des Programms mittels vollständig qualifizierten Namen (~::module::internal::my_precious~) auf alles zugreifen.
+Wir müssen also eine Möglichkeit schaffen, dass unterschiedlich Zugriffsrechte gelten, je nachdem von wo wir eine Deklaration referenzieren wollen.
+
+Um diese Ziel zu erreichen führen wir das Konzept von ~internen Deklarationen~ (auch private Deklarationen) ein.
+Diese internen Namen können nur durch die implizite Namensauflösung, jedoch nicht durch einen qualifizierten Namen, referenziert werden können.
+Des Weiteren werden interne (oder private) Deklarationen bei einem Import Statement übersprungen.
+Durch diese Festlegung ist es nur noch von innerhalb eines Namensraums, mittels impliziter Namensauflösung, möglich Referenzen zu einem Namen zu notieren.
+Von außerhalb, wo wir qualifizierte Pfade brauche, schlägt die Namensauflösung mit einem fehl (siehe ~M::A~).
+
+In unserer Mini-Sprache führen wir ein optionales Attribut ~I~ ein[fn::Fun Fact am Rande:
+Die gewählt Notation ist die Notation für optionale Parameter bei Latex Macros.
+Die Notation soll andeuten, dass das I ein optionales Attribut für die Deklaration ist.], welches bei der Deklaration angegeben werden kann um sie zu intern zu machen.
+Per Default sind alle Namen von überall sichtbar (~[E]~) und nur ausgewählte Deklarationen werden privat.
+Wir erlauben allerdings auch, diese default Sichtbarkeit am Beginn eines Namensraums zu ändern.
+
+In richtigen Programmiersprachen gibt es noch fein-granularere Abstufungen von Sichtbarkeit.
+Zum Beispiel regelt das Sichtbarkeitsattribut ~protected~ bei Java, wie sich die Sichtbarkeit einer Deklaration beim Import durch Vererebung ändert.
+Aber solche Feinheiten sind immer spezifisch für eine Sprache.
+Nur das Prinzip, das die Sichtbarkeit einer Deklaration, je nach Referenzstelle, unterschiedlich sein kann, die bleibt.
+
+#+begin_src latex
   \begin{frame}[fragile]{Fallbeispiel: Java Packages}
     \begin{columns}
       \begin{column}{0.35\textwidth}
@@ -437,10 +569,27 @@ DECL  -> NAME          // Verwendung  eines Namens
 
   \end{frame}
 #+end_src
-- introduce `export[public]', `export[protected]'
-- Export und Importliste
 
-- Erster Haltepunkt: Module
+An dieser Stelle wollen wir kurz innehalten und alle Konzepte zusammentragen, die wir bereits kennen gelernt haben.
+An dieser Stelle können wir Namensräume erzeugen, die Deklarationen enthalten.
+Diese Namensräume können selbst wieder einen Namen im übergeordneten Namensraum haben und wir können mittels qualifizierten Namen beliebig entfernte Deklarationen referenzieren.
+Mit einem Import Statement können wir Namen aus anderen Namensräumen in unseren eigenen Namensraum importieren und wir können die Sichtbarkeit von Deklarationen einschränken.
+
+Mit diesen Prinzipien können wir schon einige Programmkonstrukte in ihrer Funktion erklären und in unserer Mini-Sprache abbilden.
+Wir wollen dies, beispielhaft, anhand von Java Paketen tun.
+Java Pakete stellen Namensräume für Klassen dar, sodass ein Klassename nur innerhalb eines Pakets eindeutig sein muss.
+Außerdem erlauben es Java Pakete die Sichtbarkeit von Klassen zwischen Paketen zu steuern.
+
+Im Beispiel sehen wir, dass Pakete, die durch das ~package <NAME>;~ "betreten" werden, eigene Namespaces sind.
+Dadurch erklärt sich bereits, wie es sein kann, dass in unterschiedlichen Paketen der gleiche Klassenname verwendet werden kann.
+Außerdem vererben Pakete ein interne Standardsichtbarkeit an die darin enthaltenen Klassen.
+Dies ist, im übrgien bei Klassen ebenso, auch dort ist die Standardsichtbarkeit private.
+Die Klassen A und B haben unterschiedliche Sichtbarkeiten und nur die Klasse A kann von außerhalb ihres Pakets referenziert werden.
+Daher ist es möglich, dass wir die Klasse N.A in das Paket M importieren.
+Der einzige Unterschied zu unserer Mini-Sprache ist, dass Java an jeder Stelle den ~.~ zum trennen von Namen nimmt und nicht ~::~.
+Die Klasse B ist tatsächlich intern deklariert und kann daher nur von anderen Klassen aus dem Paket M verwendet werden.
+Wir sehen, ganz nebenbei, in dem Beispiel auch, dass Funktionen Namensräume sind, die per default ~[I]~ sind; lokale Variablen sind nicht von außen zugreifbar.
+
 
 * Dynamische Namensauflösung
 ** Binding Time

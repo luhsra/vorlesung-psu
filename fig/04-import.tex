@@ -4,14 +4,14 @@
 \begin{document}
 \begin{frame}
   \begin{tikzpicture}[start chain=going below,node distance=0cm]
-    \begin{SCOPE}[text={\LET N=},comment={A, M}]{A}
+    \begin{SCOPE}[text={\LET N=},comment={$N_d$=A,M}]{A}
       \LINE[] (def) {\LET A};
-      \begin{SCOPE}[text={\LET M=},comment={B, C}]{C}
+      \begin{SCOPE}[text={\LET M=},comment={$N_d$=B,C}]{C}
         \LINE[] (def) {\LET B};
         \LINE[] (def) {\LET C};
       \end{SCOPE}
     \end{SCOPE}
-    \begin{SCOPE}[onslide=<4>{text={\LET X=}},onslide=<2-3>{comment={A\only<3->{, B, C}}}]{X}
+    \begin{SCOPE}[onslide=<4>{text={\LET X=}},onslide=<-3>{comment={$N_d$=\only<2->{A}\only<3->{,B,C}}}]{X}
       \LINE[visible on=<2->] (def) {\IMPORT ::N::A};
       \LINE[visible on=<3->] (def) {\IMPORT::N::M::*};
       \LINE[] (use) {\only<1>{::N::}A};
