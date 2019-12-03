@@ -5,21 +5,27 @@
   \begin{tikzpicture}[start chain=going below,node distance=0cm]
     \begin{SCOPE}[onslide=<1>{text={void foo()\space}},onslide=<3>{fill=badbee!50}]{A}
       \LINE[] (def) {\alt<1>{int A;}{\only<3>{\colorbox{badbee!50}}{\LET}\alt<3>{\colorbox{letcolor}}{\space}{A}}};
-      \LINE[] (decl)   {\alt<1>{extern int B;}{\DECL B}};
+      \LINE[] (decl)   {\alt<1>{extern int B;}{\LET B}};
       \LINE[onslide=<3>{fill=refcolor}] (use) {A};
     \end{SCOPE}
 
-    \begin{onlyenv}<3>
+    \begin{scope}[visible on=<2>]
+      \node[right=2cm of decl.west,anchor=west,draw=badbee,thick,fill=badbee!20,text width=7cm] {
+        Wir werden eine Mini-Sprache entwicklen um wichtige Aspekte der Namensauflösung zu beleuchten.
+      };
+    \end{scope}
+
+    \begin{scope}[visible on=<3>]
 
     \draw[->] (use.west) -- (use.west -| A-start-line.west) |- node[pos=0.25,left,anchor=east,align=left]{Namens-\\auflösung} (def);
 
     \draw[->] (A-start.west) ++(east:3cm) coordinate(@)
                -- ++(east:1cm) node[right,anchor=west]{Namensraum};
-    \draw[->] (def.east-|@)  -- ++(east:1cm) node[right,anchor=west]{Definition};
+    \draw[->] (def.east-|@)  -- ++(east:1cm) node[right,anchor=west]{Deklaration \color{gray}(+Definiton)};
     \draw[->] (decl.east-|@)  -- ++(east:1cm) node[right,anchor=west]{Deklaration};
     \draw[->] (use.east-|@)    -- ++(east:1cm) node[right,anchor=west]{Referenz};
-    \end{onlyenv}
-  \end{tikzpicture}
+  \end{scope}
+\end{tikzpicture}
 \end{frame}
 
 \end{document}

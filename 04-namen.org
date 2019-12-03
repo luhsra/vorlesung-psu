@@ -17,7 +17,7 @@
 * Gedanken zu dieser Vorlesung                                     :noexport:
 
 Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
- - Die Regeln der Namensauflösung etablieren die Links zwischen Definition und  Benutzung [effektiv]
+ - Die Regeln der Namensauflösung etablieren die Links zwischen Deklaration und  Benutzung [effektiv]
  - Dynamische Namensauflösung kostet immer Laufzeit                                       [effizient]
 
 
@@ -25,7 +25,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 :PROPERTIES:
 :CUSTOM_ID: 04-einleitung
 :END:
-
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
   \begin{frame}
@@ -39,7 +38,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \bi
     \ii Die Namensauflösung ist grundlegend für das Programmverständnis{
       \bi
-      \ii Namen etablieren \structure{Querverbindungen} zu Laufzeitobjekten kontextsensitiv.
+      \ii Namen etablieren kontextsensitive \structure{Querverbindungen} zu Deklarationen.
       \ii Das informatische Grundprinzip von \structure{Information Hiding} hängt an Namen.
       \ei
     }
@@ -53,7 +52,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     moredelim=**[is][{\btHL[fill=safegreen!50]<3->}]{^d}{^},
     escapechar=`,
   }
-  \begin{frame}[fragile]{"Motivierendes" Beispiel: C++}
+  \begin{frame}<handout:2,5>[fragile]{"Motivierendes" Beispiel: C++}
     \def\p#1{\tikzmark{p#1}}
     \begin{columns}[t]
       \begin{column}{0.49\textwidth}
@@ -98,7 +97,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \end{column}
     \end{columns}
     \begin{tikzpicture}[remember picture,overlay]
-      \only<4->{
+      \only<4-|handout:5>{
         \draw[thick,srared,->] (pic cs:p1) --(pic cs:p2);
         \draw[thick,srared,->] (pic cs:p2) --($(pic cs:p34)+(up:2pt)$);
         \draw[thick,srared,->] (pic cs:p34) --(pic cs:p4);
@@ -106,7 +105,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
         \draw[thick,srared,->] (pic cs:p5) --(pic cs:p6);
         \draw[thick,srared,->] (pic cs:p6) --(pic cs:p7);
       }
-      \only<5->{
+      \only<5-|handout:5>{
         \draw[ultra thin] (pic cs:p8) -- ++(-45:2em) node[align=left,anchor=west,fill=badbee!50] {type = int\\addr = this + 4;};
       }
     \end{tikzpicture}
@@ -118,20 +117,53 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \ei
   \end{frame}
 
-  \begin{frame}{Grundbegriffe: Namen und Namensauflößung}
+  #+end_src
+
+In dieser Vorlesung soll es um das Konzept von *Namen* und *Namensauflösung* im Kontext von Programmiersprachen gehen.
+Dieses Kapitel ist der zweite Teil der Top-Down Betrachtung von Programmiersprachen, bei der wir aus Anwendersicht auf Konstrukte und grundlegende Prinzipien schauen, die in vielen Programmiersprachen vorkommen.
+Jede Programmiersprache muss eine Antwort darauf haben, wie sie Dinge (Objekte, Typen, Funktionen) an einer Stelle im Programm benennt um sie an anderer Stelle wieder zu verwenden.
+In dieser Vorlesung wollen wir uns damit beschäftigen, wie solche Antworten aussehen können und welche Prinzipien der Benennung und der Namensorganisation ersonnen wurden.
+Dabei wird keine Sprache alle der hier vorgestellten Prinzipien auch anwenden, sondern es wird immer nur eine Untermenge zu Anwendung kommen.
+
+Auf Seite des Übersetzers ist die Verbindung zwischen der Stelle an der ein Name eingeführt wird (*Deklaration*) und seinen Verwendungen (*Referenzierung*) eine wichtige Querverbindung, die das Programm zusammenhält.
+Zu jeder Verwendung eines Namens muss der Übersetzer die passende Deklaration finden; diesen Prozess, von der Verwendung zum Deklaration, nennen wir (partielle) *Namensauflösung*[fn::
+Partiell deswegen, weil wir im Übersetzer nur die Deklaration und nicht in jedem Fall das dahinterliegende Laufzeitobjekt finden.
+Vollständige Namensauflösung verbindet einen Namen mit der Speicheradresse eines Objekts.
+Dazu aber später mehr.].
+Entlang dieser Verbindungen, die quer zu den Ästen und Blättern des abstrakten Syntaxbaums (AST) gezogen werden, können Informationen zwischen der Deklarationsstelle und der Verwendungsstelle fließen.
+Die wichtigste Art von transportierten Information sind die der Typen.
+
+Im Beispiel (auf den Folien), etabliert die Namensauflösung einen Link (die roten Pfeile) zwischen der Verwendungstelle ~y~ und der Deklarationsstelle ~int y~ in Klasse ~B~.
+Entlang dieses Links fließt zum einen die Information, dass ~y~ vom Typ Ganzzahl ist, aber auch dass das Feld ~y~ mit einem relativen Offset (zum ~this~ Zeiger) von 4 zu finden ist.
+Mit diesem Wissen kann der Übersetzer in der Funktion ~func()~ zum einen prüfen, dass nur valide Operationen auf ~y~ ausgeführt werden und zum anderen kann er Code erzeugen, der das Feld, relativ zu einem ~this~ Zeiger, lesen und schreiben kann.
+
+In diese Vorlesung werde ich mich hauptsächlich auf solche Deklarationen konzentrieren, hinter denen ein zur Laufzeit ein Objekt steht, welches eine Speicheradresse hat.
+Allerdings gilt dies nicht für jede Deklaration.
+So haben, in übersetzten Sprachen, *Typdeklarationen* oft kein Pendant zur Laufzeit (es gibt keine Typobjekte), sondern nur die angehefteten Informationen an der Deklarationsstelle (z.B., der Typausdruck) is von Relevanz.
+Allerdings gelten auch für diese Deklarationen die selben Regeln und Prinzipien zur Namensauflösung, sie ist nur schon an der Deklarationsstelle beendet und muss/kann nicht bis zu einer Speicheradresse fortgeführt werden.
+
+Auf Seiten des Sprachdesigns haben die Regeln zur Namensauflösung auch eine zentrale Rolle:
+Eines der Kernprinzipien der Softwaretechnik ist das *Information Hiding*, bei der man sein Programm in Komponenten[fn::Komponenten kein allgemein definierter Begriff, und kann in unterschiedlichen Kontexten unterschiedliches bedeuten. Das grundlegende Merkmal von Komponenten ist aber, dass es ein "Innen" und ein "Außen" gibt, zwischen denen eine Schnittstelle definiert wird.] aufteilt (z.B.
+Klassen).
+Diese Komponenten haben einen internen Aufbau, den wir vor der Außenwelt verstecken, und ein externes Interface (die ~public~ Attribute und Methoden), welches die Außenwelt verwenden kann.
+Durch diese Trennung ist es möglich die Interna zu ändern, ohne alle Benutzer der Komponente anzupassen.
+Hier helfen die Sprachkonstrukte der Namensdeklaration dabei, Komponenten entlang von *hierarchischen Namensräumen* zu strukturieren und die *Sichtbarkeit von Namen* zwischen Komponenten einzuschränken.
+
+#+begin_src latex
+\begin{frame}{Grundbegriffe: Namen und Namensauflößung}
     \begin{center}
       \btImage[text width=0.8\textwidth,align=center,]{fig/04-objects}
     \end{center}
 
     \bi
-    \ii \STRUCTURE{Name}: Symbolische und Statische Objektreferenz im Programmcode{
+    \ii \STRUCTURE{Name}: Symbolische und Statische Referenz im Programmcode{
       \bi
       \ii \structure{Abstraktion}: Namen ersetzen die Verwendung konkreter Speicheradressen
       \ii \structure{Dokumentation}: Namen transportieren Informationen zwischen Entwicklern
       \ii \structure{Querverbindung}: Referenz von Deklarationen quer zum AST
       \ei
     }\medskip
-    \ii<2-> \STRUCTURE{Namensauflösung}: Adresse für referenziertes Objekt berechnen. {
+    \ii<2-> \STRUCTURE{Namensauflösung}: Auffinden des referenzierten Objekts. {
       \bi
       \ii Wird vom Übersetzer teilweise vorbereitet oder schon ganz durchgeführt.
       \ii Essentieller Teil der semantischen Analyse (\texttt{name 'x' is not defined})
@@ -142,29 +174,28 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
     \medskip
     \OrangeBox<3->{
-      Im Übersetzer suchen wir (oft) nur die \textbf{Definitionstelle} einer Variable
+      Im Übersetzer suchen wir (oft) nur die \textbf{Deklarationsstelle} des Namens
     }
   \end{frame}
-  #+end_src
 
-#+begin_src latex
-  \begin{frame}[t]{Grundbegriffe: Definition, Deklaration, Namensraum}
-    \btAnimation[]{center,range=1-3:<1->}{fig/04-scopes}
+  \begin{frame}<1-4|handout:1-4>[t]{Grundbegriffe: Deklaration, Definition, Namensraum}
+    \setbeamercovered{transparent=40}
+    \btAnimation[]{center,padding,range=1-3:<1->,3:<4->}{fig/04-scopes}
     \bi
-    \ii \structure{Definition} eines Namens für einen AST Knoten\hfill\only<2->{\texttt{\LET <NAME>}} {
+    \ii \structure{Deklaration} eines Namens für einen AST Knoten\hfill\only<2-|handout:2->{\texttt{\LET <NAME>}} {
       \bi
-      \ii Um AST Knoten (Variable) wieder zu finden, geben wir ihnen \alert{einen} Namen.
-      \ii Geht einher mit der Allokation eines Objekts (Variablendefinition).
+      \ii Um AST Knoten wieder zu finden, geben wir ihnen \alert{einen} Namen.
+      \ii Viele Konstrukte deklarieren einen Namen (Typen, Variablen, Funktionen).
       \ei
     }\smallskip
-    \ii \structure{Deklaration} eines entfernten Namens\hfill\only<2->{\texttt{\DECL <NAME>}}{
+    \ii<-3|handout:-3> \structure{Definition} von benannten Objekten {
       \bi
-      \ii Bekanntmachung, dass es einen AST Knoten mit diesem Namen gibt.
-      \ii Notwendig bei getrennter Übersetzung (C/C++) und mehreren Quelldateien.
-      \ii Jede Definition ist auch eine Deklaration.
+      \ii Jede Definition is auch eine Deklaration und führt einen Namen ein.
+      \ii Geht einher mit der Allokation eines Objekts (z.B. Definition einer Variablen)
+      \ii Wichtige Unterscheidung bei separater Übersetzung (C/C++).
       \ei
     }\smallskip
-    \ii \structure{Namensraum} ist ein Container für deklarierte Namen \hfill\only<2->{\texttt{\{...\}}}{
+    \ii \structure{Namensraum} ist ein Container für deklarierte Namen \hfill\only<2-|handout:2->{\texttt{\{...\}}}{
       \bi
       \ii Beschränken die Gültigkeit eines deklarierten Namens
       \ii \structure{Schachtelung}: Ein Namensraum kann auch weitere Namensräume beinhalten .
@@ -173,6 +204,49 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \ei
   \end{frame}
 #+end_src
+
+Nach diesem sehr groben Überblick über den ganzen Bereich der Namen, möchte ich einige Grundbegriffe genauer definieren, damit ich für den Rest dieses Skripts auf eine möglichst wohldefinierte Nomenklatur zurückgreifen kann.
+Der erste Begriff ist der des *Namens*:
+Ein Name ist eine symbolische und statische Referenz im Programmcode.
+Sie sind *statisch*, weil Namen direkt im Quelltext vorkommen und nicht erst zur Laufzeit erzeugt werden. Ein Name kann also nur etwas sein, was wir mit dem Editor sehen können, wie ein Bezeichner (~obj~) oder ein komplexerer Ausdruck (~obj.x~).
+Namen sind darüber hinaus aber auch *symbolisch*, weil sie abstrakte Stellvertreter für konkrete Objekte sind.
+Bei Variablen können wir, mit ihnen, symbolischen ~obj.x~ notieren können, anstatt ganz konkret ~0x1004~ schreiben zu müssen.
+Bei Typdeklarationen, die ja keine Laufzeitadresse haben, erlauben Namen es uns ~object_t obj~ anstatt ~<Typ in Zeile 30> obj~
+zu schreiben.
+
+Der zweite wichtige Begriff ist die *Namensauflösung*, bei der die symbolischen Namen durch die konkreten Objekte bzw. die konkreten Adressen ersetzt werden.
+Dazu müssen wir alle Namen, die stellvertretend für das gleiche sind, miteinander verbunden (Querverbindungen).
+Inbesondere wollen wir alle Verwendung eines Namens (Referenzen) mit jener Programmstelle verbinden, die den Namen zum ersten mal eingeführt hat (Deklaration).
+Falls es zu einem Namen tatsächlich ein Objekt zur Laufzeit gibt, so ist die *Adressberechnung* der abschließende Teil der Namensauflösung.
+
+Bereits erwähnt haben ich den Begriff der *Deklaration*.
+Deklarationen sind jene Stellen im Quellcode, die einen Namen einführen und damit dem Übersetzer bekannt machen.
+Für jede Verwendung eines Namens wird der Übersetzer die, im referenzierenden Kontext gültige, Deklaration suchen; gibt es keine gültige Deklaration, so ist das Programm fehlerhaft.
+In Sprachen gibt es viele Konstrukte, die benannt sind und daher einen Namen deklarieren.
+
+Der Begriff der *Definition* ist eine Erweiterung der Deklaration.
+Neben der Einführung eines neuen Namens, gehen Definitionen mit der Erstellung (Allokation) des konkreten Objekts einher.
+Daher kann es zu einem Namen auch immer nur *eine Definition*, aber *viele Deklarationen* geben.
+Besonders auffällig ist der Unterschied zwischen Deklaration und Definition beim Sprachen mit separater Übersetzung (C/C++).
+Dort kann immer nur eine Übersetzungseinheit einen Namen definieren (die globale Variable ~int B~), aber viele Übersetzungseinheiten können diesen Namen deklarieren (~extern int B~).
+Da wir uns in dieser Vorlesungseineit mit Namen und nicht mit Objekten und ihrer Erstellung auseinander setzen wollen, werden wir im folgenden Definitionen weitgehend ignorieren und so tun als gäbe es nur Deklarationen.
+
+Der letzte wichtige Begriff ist der des *Namensraums*.
+Ein Namensraum ist, ganz generell, ein Container für Namensdeklarationen.
+Namensräume strukturieren die Menge aller deklarierten Namen und schränken ihre Gültigkeit ein.
+Ohne Namensräume müsste jeder Name einen programmweit-eindeutigen Identifier haben und es gäbe genau eine lokale Variable mit dem Bezeichner ~i~. Das wäre eher unpraktisch.
+
+Für weitere Betrachtung von Namen, werde ich eine minimale, domänen-spezifische, Sprache {{{wikipedia_de(Domänenspezifische_Sprache)}}} entwickeln, um die wichtigsten Namenskonzepte konzentriert erklären zu können.
+Diese Sprache ist nicht dazu da tatsächlich übersetzt zu werden, sondern sie soll nur jene Aspekte herausarbeiten, die relevant für die Namensauflösung sind.
+Die Grammatik dieser Sprache ist denkbar einfach und sie kennt nur Deklarationen (~let <NAME>~), Referenzen (~<NAME>~), und geschachtelte Namensräume (~{...}~). Im weiteren Verlauf werden wir sie allerdings noch minimal erweitern.
+
+#+begin_example
+PROG  -> DECL*
+DECL  -> SCOPE
+SCOPE -> '{' DECL* '}' // Namensräume können geschachtelt sein
+DECL  -> 'let' NAME    // Deklaration eines Namens
+DECL  -> NAME          // Verwendung  eines Namens
+#+end_example
 
 * Statische Namensauflößung
 ** Implizite Namensauflösung
@@ -185,7 +259,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \end{column}\hfill
       \begin{column}{0.65\textwidth}
         \bi
-        \ii \enquote{Definition before Use}{
+        \ii \enquote{Declaration before Use}{
           \bi
           \ii Deklaration in einem umgebenden Namensraum.
           \ii Reihenfolge von Deklaration und Referenz teilweise egal.
@@ -300,9 +374,9 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \smallskip
 
     \bi
-    \ii<2-> Definitionen bekommen ein weiteres Attribut\hfill\texttt{\LETi <NAME>}{
+    \ii<2-> Deklarationen bekommen ein weiteres Attribut\hfill\texttt{\LETi <NAME>}{
       \bi
-      \ii Interne Definitionen können nur über implizite Auflösung gefunden werden.
+      \ii Interne Deklarationen können nur über implizite Auflösung gefunden werden.
       \ii Name wird unsichtbar für alles außerhalb des aktuellen NS
       \ii Wir können interne Namen ändern ohne externe Komponenten anzufassen.
       \ei
@@ -315,7 +389,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \begin{column}{0.72\textwidth}
         \bi
         \ii Zugriff auf einen internen Namen ist nicht erlaubt\\[0.5ex]{
-          Übersetzer findet zwar die Definition, meldet aber aufgrund des Attributs einen Fehler.
+          Übersetzer findet zwar die Deklaration, meldet aber aufgrund des Attributs einen Fehler.
           \smallskip
         }
         \ii Interne Namen werden beim Import übersprungen.
@@ -373,7 +447,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+begin_src latex
   \dividerframe{Dynamische Namensauflösung}
   \begin{frame}{Zeitpunkt der Namensbindung}
-    \textbf{Bisher:} Zu einem Namen haben wir bisher nur die Definitionsstelle gefunden, nicht aber das Objekt bzw. seine Adresse.\\[2ex]
+    \textbf{Bisher:} Zu einem Namen haben wir bisher nur die Deklaration gefunden, nicht aber das Objekt bzw. seine Adresse.\\[2ex]
 
     \ALERT{Aber:} Nicht zu jedem Zeitpunkt ist mit einem Namen wirklich ein existierendes Objekt verbunden. \\[2ex]
 
@@ -393,7 +467,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     }
   \end{frame}
 
-  \begin{frame}[fragile]{Zeitpunkt der Namensauflösung}
+  \begin{frame}[fragile]{Zeitpunkt der Adressberechnung}
     \bi
     \ii Adressberechnung ist \ALERT{immer} erst nach der Binding Time möglich.{
       \bi
@@ -699,7 +773,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     }
     \ii<2-> \structure{Lexikalisches Scoping}: Funktionen können \alert<5->{Zustand} halten{
       \bi
-      \ii<3-> Bei der Definition von \texttt{inner} wird ein \structure{Closure} Objekt erstellt.
+      \ii<3-> Bei der \textbf{Definition} von \texttt{inner} wird ein \structure{Closure} Objekt erstellt.
       \ii<4-> Die Closure speichert den Frame über die Ausführung von \texttt{outer()} hinaus.
       \ei
     }
@@ -823,7 +897,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
         }\medskip
         \ii<4-> Typsignaturen durch Typsystem ermitteln{
           \bi
-          \ii Definitionstelle und Aufrufstelle
+          \ii Deklaration und Aufrufstelle
           \ii Liste der Parameter und der Argumente
           \ei
         }\medskip
@@ -905,7 +979,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \bi
       \ii Interpretation als Funktionsaufrufe: \codebox{2 + 3} $\rightarrow$ \codebox{+(2, 3)}
       \ii Der Operator (z.B., \texttt{+} oder \texttt{++}) wird zum Funktionsnamen: \texttt{\colorbox{badbee!50}{++}(a)}
-      \ii Sprachen definieren bereits mehrere überladene Implementierungen:{\\
+      \ii Sprachen deklarieren bereits mehrere überladene Implementierungen:{\\
         \btSetNamedTab[1cm]{\first}%
         \btSetNamedTab[4.5cm]{\second}%
         \first \siginline{+}{(int, int)}{int}       \second Addition von Ganzzahlen\\
@@ -917,8 +991,8 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     }\smallskip
     \ii<2-> Manche Sprachen erlauben eigene Operatorüberladungen{
       \bi
-      \ii Die selbst-definierten Überladungen müssen \enquote{magischen} Namen tragen
-      \ii Overload Set enthält Eingebaute und selbst-definierte Operatoren
+      \ii Die selbst-deklarierte Überladungen müssen \enquote{magischen} Namen tragen
+      \ii Overload Set enthält Eingebaute und selbst-deklarierten Operatoren
       \ei
     }
     \begin{code}[tag=C++]
@@ -955,7 +1029,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
     \begin{columns}[t]
       \begin{column}<2->{0.49\textwidth}
-        \STRUCTURE{An der Definitionsstelle}\\[1ex]
+        \STRUCTURE{An der Deklarationsstelle}\\[1ex]
 
         \begin{code}[tag=C++]
           \begin{CPP}[style=highlighting,style=smaller]
@@ -970,8 +1044,8 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
         \bii
         \ii Subtyp \texttt{S} kompatibel zu \texttt{B}
-        \ii Beide Defs. passen  zum Aufruf
-        \ii Welche Definition wählen wir?
+        \ii Beide Dekls.. passen  zum Aufruf
+        \ii Welche Deklaration wählen wir?
         \eii
         \smallskip
         \alert{$\Rightarrow$ Berechnung der Spezfifizät}
@@ -1100,7 +1174,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \end{columns}
 
     \bi
-    \ii \structure{Methoden} werden im Kontext einer Klasse definiert.{
+    \ii \structure{Methoden} werden im Kontext einer Klasse deklariert.{
       \bi
       \ii Methoden werden \enquote{auf einem Objekt} aufgerufen: \codebox{obj.foo(1,1)}
       \ii Das Objekt wird zu einem impliziten Argument (\texttt{this := obj})
@@ -1133,7 +1207,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \ii \structure{Namensauflösung} berechnet aus einem Namen die Objektadresse{
       \bi
       \ii Vollständige Auflösung ist nur nach der \structure{Binding Time} eines Namens möglich
-      \ii \structure{Partielle Auflösung} kann bereits vorgezogen werden (Variablendefinition)
+      \ii \structure{Partielle Auflösung} kann bereits vorgezogen werden (Variablendeklaration)
       \ei
     }\medskip
     \ii \structure{Instantiierbare Namensräume} führen zu dynamischer Namensauflösung {
