@@ -583,7 +583,7 @@ Außerdem erlauben es Java Pakete die Sichtbarkeit von Klassen zwischen Paketen 
 Im Beispiel sehen wir, dass Pakete, die durch das ~package <NAME>;~ "betreten" werden, eigene Namespaces sind.
 Dadurch erklärt sich bereits, wie es sein kann, dass in unterschiedlichen Paketen der gleiche Klassenname verwendet werden kann.
 Außerdem vererben Pakete ein interne Standardsichtbarkeit an die darin enthaltenen Klassen.
-Dies ist, im übrgien bei Klassen ebenso, auch dort ist die Standardsichtbarkeit private.
+Dies ist, im übrigen bei Klassen ebenso, auch dort ist die Standardsichtbarkeit private.
 Die Klassen A und B haben unterschiedliche Sichtbarkeiten und nur die Klasse A kann von außerhalb ihres Pakets referenziert werden.
 Daher ist es möglich, dass wir die Klasse N.A in das Paket M importieren.
 Der einzige Unterschied zu unserer Mini-Sprache ist, dass Java an jeder Stelle den ~.~ zum trennen von Namen nimmt und nicht ~::~.
@@ -592,6 +592,12 @@ Wir sehen, ganz nebenbei, in dem Beispiel auch, dass Funktionen Namensräume sin
 
 
 * Dynamische Namensauflösung
+In unserer Definition von Namensauflösung haben wir gesagt, dass für Deklaration hinter denen ein Laufzeitobjekt steht, die Adressberechnung Teil der Namensauflösung ist.
+So gehört es bei Variablen dazu nicht nur die passende Deklaration zu finden, sondern auch die Adresse zu berechnen an der die Variable im Speicher abgelegt wird.
+Bei unserem bisherigen Konzept von Namensräumen wäre dies auch prinzipiell zur Übersetzungszeit möglich, da maximal ein Laufzeitobjekt hinter einer Deklaration steht.
+In diesem Unterkapitel werden wir diese Einschränkung aufweichen und es zulassen, das eine Deklaration viele Objekte im Speicher meinen kann.
+Zur Unterscheidung zwischen diesen Objekten verwenden wir eine dynamische Namensauflösung, bei der nicht nur die statische Struktur der hierarchischen Namensräume verwendet wird, sondern auch weiteres Laufzeitwissen.
+
 ** Binding Time
 #+begin_src latex
   \dividerframe{Dynamische Namensauflösung}
@@ -646,6 +652,55 @@ Wir sehen, ganz nebenbei, in dem Beispiel auch, dass Funktionen Namensräume sin
   \end{frame}
 
 #+end_src
+
+Um die dynamische Namensauflösung wirklich zu verstehen, müssen wir den Begriff der *Binding Time* einführen.
+Die Binding Time ist der Zeitpunkt an dem einem Namen ein konkretes Objekt zugeordnet wird, für das der Name stellvertretend ist.
+Dabei können unterschiedliche Namen zu ganz unterschiedlichen Zeitpunkten gebunden werden und die Bindung kann auch wieder aufgelöst werden.
+Wichtig für die Namensauflösung ist, dass wir erst  eine Adressberechnung durchführen können, wenn ein Objekt an einen Namen gebunden ist.
+Dies kann, wie wir sehen werden, für manche Deklarationen erst zur Laufzeit der Fall sein.
+
+An dieser Stelle, wollen wir verschiedene, geläufige Zeitpunkte zu denen eine Bindung hergestellt wird, diskutieren.
+Die häufigst genannten ist die Übersetzungszeit (Compile-time binding) und die Laufzeit (run-time binding).
+Allerdings kann man diese Zeiten noch feiner aufschlüsseln:
+
+Beim *compile-time binding* kennt der Übersetzer bereits die Adresse des referenzierten Objekts genau.
+Er kann also jede Verwendung des Namens direkt durch die eine Konstante ersetzen und diese, beispielweise, in die Assemblerbefehle als Immediate Operanden codieren.
+
+Wirklich compile-time binding, wenn wir es ganz genau nehmen, gibt es eigentlich kaum, da die meisten Werkzeugketten für übersetzte Sprachen sich in Übersetzer und Linker aufspalten.
+Für viele Referenzen fügt der Übersetzer einen symbolischen Namen in den Assemblercode ein, welcher vom Linker aufgelöst wird.
+Bei diesem *link-time binding*, werden vom Übersetzer eingefügte Platzhalter im Binärcode durch die errechneten Adressen ersetzt.
+Da link-time binding auch schon vor der Laufzeit stattfindet, zählt man es aber häufig auch zur Übersetzungszeit hinzu.
+
+Ganz anders ist dies beim *load-time binding*, welches stattfindet, wenn die Binärdatei in den Speicher geladen wird.
+Also direkt vor der Laufzeit des eigentlichen Programms.
+Manche Adressen werden erst beim Laden des Programms bekannt, da erst dort entschieden wird an welcher Stelle im Speicher das Programm oder die Bibliothek geladen wird.
+Daher müssen die Adressen in der geladenen Binärdatei nochmal angepasst werden.
+Dies funktioniert technisch, indem der Linker sogenannte Relocation-Informationen mit in die Binärdatei packt.
+Diese Relocations haben in etwa die Form:
+"Wenn diese Bibliothek an Stelle X geladen wird, dann addiere X auf die Binärcodestelle X[1000] hinzu".
+Hierdurch kann der Übersetzer Code erzeugen, der abhängig davon ist, wo eine Bibliothek hin geladen wird.
+
+Noch später findet das *run-time binding* statt, beim dem die Adresse eines Objekts erst zur Laufzeit stattfindet.
+Dies kann zum Beispiel der Fall sein, weil das Objekt auf dem Heap mittels ~malloc()~ erzeugt wurde.
+Hier können wir die Adresse einfach nicht vorher wissen und die Namen, die stellvertretend für dieses Objekt sind, müssen nach dem ~malloc()~ aufgelöst werden.
+
+Obwohl die Adresseberechnung immer erst dann stattfinden kann, wenn eine Bindung zwischen Name und Objekt etabliert ist, können wir doch Teile der Arbeit vorziehen um hinterher Zeit zu sparen.
+Bei dieser *partiellen Namensauflösung* werden Informationen, die zu unterschiedlichen Zeitpunkten bekannt werden, zu einer Berechnungsvorschrift für die tatsächliche Adresse kombiniert. Ich will dies am Folienbeispiel deutlich machen.
+
+In dem Beispiel, definieren wir die globale Variable obj, was nicht nur den Namen obj deklariert, sondern auch zur Allokation eines Objekts führt.
+Wir werden nun betrachten, welche Informationen in die Adresseberechnung für den Namen ~*(obj.p)~ eingehen und wann diese zur Verfügung stehen.
+Das erste was wissen ist das relative Offset des Feldes ~p~ innerhalb der Struktur ~foo~.
+Dieses Offset berechnet der Übersetzer (compile time) , da er entscheidet wie die einzelnen Felder eines Records im Speicher liegen.
+Das zweite was wir, zur Link Time, wissen, ist der Offset des Objekts im BSS Segment (siehe GBS).
+Der Linker hat dieses wissen, da er die einzelnen global-allokierten Objekte anordnet und Code-, Daten- und BSS Segment mit ihnen auffüllt.
+Allerdings weiß der Linker noch nicht, wo das Program hingeladen wird.
+Dieses Wissen haben wir erst zur Load Time, wenn klar ist, wo das BSS Segment im Speicher zu finden ist.
+Auf diese Load-Time-Adresse (~0x1000~) können wir den relativen Offsets für das Objekt und das Feld aufaddieren, sodass wir das Felde ~obj.p~ an der Speicherstelle ~0x1204~ verorten können.
+Da wir allerdings nicht nur auf ~obj.p~ zugreifen wollen, sondern auf das Objekt auf das dieser Zeiger zeigt, müssen wir zur Laufzeit (run-time binding) noch eine Dereferenzierungsoperation durchführen um die Adresseberechnung abzuschließen.
+
+Da Compile-, Link- und Load-Time gut von der Werkzeugkette kontrolliert werden, gibt es Optimierungen, dass die Vorberechnung der Adresse ~&obj.p~ zu einer Konstante im Programmcode zusammenfällt.
+Daher nehmen wir, der Einfachheit halber auch an, dass es nur compile-time und run-time binding gibt.
+Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
 
 ** Instantiierbare Namensräume
 #+begin_src latex
