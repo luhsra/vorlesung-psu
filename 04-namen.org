@@ -653,7 +653,7 @@ Zur Unterscheidung zwischen diesen Objekten verwenden wir eine dynamische Namens
 
 #+end_src
 
-Um die dynamische Namensauflösung wirklich zu verstehen, müssen wir den Begriff der *Binding Time* einführen.
+Um die dynamische Namensauflösung wirklich zu verstehen, müssen wir den Begriff der *Binding Time* bzw. Bindungszeitpunkt einführen.
 Die Binding Time ist der Zeitpunkt an dem einem Namen ein konkretes Objekt zugeordnet wird, für das der Name stellvertretend ist.
 Dabei können unterschiedliche Namen zu ganz unterschiedlichen Zeitpunkten gebunden werden und die Bindung kann auch wieder aufgelöst werden.
 Wichtig für die Namensauflösung ist, dass wir erst  eine Adressberechnung durchführen können, wenn ein Objekt an einen Namen gebunden ist.
@@ -703,6 +703,10 @@ Daher nehmen wir, der Einfachheit halber auch an, dass es nur compile-time und r
 Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
 
 ** Instantiierbare Namensräume
+:PROPERTIES:
+:CUSTOM_ID: 04-namespace-instances
+:END:
+
 #+begin_src latex
   \begin{frame}[fragile]{Instanziierbare Namensräume}
 
@@ -798,8 +802,45 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
 
 #+end_src
 
+Das bisher vorgestellt Konzept von Namensräumen war sehr statisch und es ging hauptsächlich darum die Deklaration zu einer Referenz zu finden.
+Wir haben angenommen, dass hinter jeder Deklaration maximal ein, nach der Bindung genau ein, Laufzeitobjekt/Instanz steht.
+Dieses Schema passt auch sehr gut auf Sprachkonstrukte wie C++ ~namespace~ oder Java Pakete.
+Allerdings bekommen wir es mit dem bisherigen Formalismus nicht hin so etwas simples wie C ~struct~ abzubilden.
+Denn in dem Moment, wo ich eine Struktur zweimal instantiiere (~objA~, ~objB~), steht die Felddeklaration ~int a~ für zwei Ganzzahlen, jeweils eine in jedem der beiden Objekte.
+Und das kann ja irgendwie nicht sein. Wir müssen also unseren Formalismus und die Mini-Sprache erweitern um auch dieses Sprachkonstrukt abzudecken.
+
+Wenn wir uns zurück erinnern, dann soll jeder Name eindeutig stellvertretend für (maximal) ein Objekt sein.
+Diesen Grundsatz wollen wir zunächst beibehalten.
+Allerdings können wir am Folienbeispiel von ~struct N~ sehen, dass das Feld ~int a~ der beiden Objekte nicht über ~N::a~, sondern über ~objA.a~ und ~objB.a~ referenziert wird.
+Man könnte also sagen, dass unter den Namen ~objA~ und ~objB~ Kopien des Namensraums von ~struct N~ angelegt wurden.
+In unserer Mini-Sprache wäre es ungefähr:
+
+#+begin_example
+let N = {
+   let a
+   let b
+}
+
+let objA = {
+   let a
+   let b
+}
+#+end_example
+
+Hinzu kommt, dass bei der Adressberechung von ~objA~, die Teil der vollständigen Namensauflösung ist, noch Laufzeitwissen hinzukommt.
+Beide Aspekte, Klonen von Namensräumen und Einbringung von Laufzeitwissen, fassen wir im Begriff der *Instantiierbaren Namensräumen* zusammen.
+Dieses Konzept beschreibt, wie wir einen Namensraum, mit all seinen Sichtbarkeits- und Zugriffsregeln, nehmen und unter einem anderen Namen erneut instantiieren.
+Somit kann ein Namensraum eine Blaupause für viele andere Namensräume werden.
+
+Das Konzept der instantiierbaren Namensräumen ist ein Schlüsselkonzept der Informatik und manifestiert sich besonders auffällig im objekt-orientierten Programmiersprachen.
+Auch dort ist der Namensraum einer Klasse die Blaupause für all ihre Instanzobjekte. Aber moderne Isolationskonzepte auf Systemebene, wie Docker bzw. Container, sind Anwendungen dieses Konzepts.
+
+In unserer Mini-Sprache führen wir, um instantiierbare Namensräume aus zu drücken, das zusätzliche let-Attribut ~let [D] <NAME>~ ein und erlauben, dass wir Instanzen eines Namensraums anlegen können (~<NS>()~).
+Das zusätzliche Attribut bedeutet, dass zur Adressberechnung von ~NAME~ Laufzeitwissen benötigt wird, der Teil hinter dem ~=~ gibt an welcher Namensraum geklont werden soll.
+Im Gegensatz zu vielen Sprachen, bleiben wir dabei immer den ~::~ Operator zur Namensauflösung zu nehmen, egal ob wir dynamisches Wissen brauchen oder nicht.
+
 #+begin_src latex
-  \begin{frame}[fragile]{Fallbeispiel: Klassen in C++}
+  \begin{frame}<handout:2>[fragile]{Fallbeispiel: Klassen in C++}
     \begin{columns}[t]
       \begin{column}{0.35\textwidth}
         \begin{code}[]
@@ -852,11 +893,27 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
     \end{columns}
   \end{frame}
 
-  \begin{frame}[fragile]{Statische Felder in Klassen}
+  #+end_src
+
+Mit dieser dem Wissen um instantiierbare Namensräume können wir ein C++ Beispiel recht vollständig in unsere Namensraumssprache übersetzen.
+Hierbei sehen wir, dass Klassen in C++ die bisher erwähnten Aspekte von Namensräumen (Sichtbarkeit, Import, Instantiierung) miteinander vereint.
+Überlegen Sie sich an dem Beispiel Antworten für die folgenden Fragen:
+Welche Namen sind in dem Quellcode im Wurzelnamensraum deklariert?
+Welche Namen sind unterhalb von ~objS.*~ vom Wurzelnamensraum aus sichtbar?
+Welche Namen sind innerhalb der Namensräume S und B sichtbar?
+
+C++ in seiner Gänze, auch nur den Aspekt der Klassen, können wir nicht allerdings mit unserer Mini-Sprache nicht abbilden.
+So gibt es in realen Sprachen noch einige komplexere Randfälle der Sichtbarkeit.
+So führt C++ und Java noch das Schlüsselwort ~protected~ ein und es gelten noch leicht andere Regeln wenn Vererbung mit der Verdeckung von Deklarationen zusammenkommt.
+Aber ein so tiefer Einstieg in Details einzelner Sprachen ist an dieser Stelle auch nicht da Ziel der Übung.
+Sondern ich möchte bei ihnen ein Verständnis für die grundlegenden Namensraumkonzepte schaffen, die Sie dann für jede erlernte Sprache mit um Details ergänzen müssen.
+
+#+begin_src latex
+  \begin{frame}<handout:2,3>[fragile]{Statische Felder in Klassen}
     \textbf{Beichte des Dozenten}: Ich habe \texttt{static} lange nicht verstanden.\\[2ex]
 
     \bi
-    \ii<2-> In Klassenobjekten wird jeder Name dynamisch aufgelöst. {
+    \ii<2-> In Klassenobjekten wird jeder Name dynamisch aufgelöst (this-Zeiger). {
       \bi
       \ii Manchmal sollen Namen dennoch dasselbe Objekt referenzieren.
       \ii \texttt{\LETs} setzt die dynamische Namensauflösung außer Kraft
@@ -876,7 +933,30 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
 
 #+end_src
 
+Mit dem wissen um dynamische Namensauflösung in instantiierten Namensräumen können wir nun auch zu einem Thema kommen, dass ich selbst lange nicht verstanden habe: Was tut eigentlich das Schlüsselwort ~static~ an Attributen und Methoden in Java und C++[fn::Ich ignoriere an dieser Stelle bewusst ~static~ Funktionen in C. Die sind komisch, weil ~static~ dort etwas anderes bedeutet und eher so etwas wie ~private~ auf Ebene der Übersetzungseinheiten meint.]. Dazu wollen wir uns die Situation in C++ genauer anschauen.
+
+In C++ wird jedes Feld innerhalb eines Namensraums, relativ zum ~this~ Zeiger des Objekts, dynamisch aufgelöst.
+Das bedeutet das jede Instanz ein eigenes Objekt hinter der gleichen Felddeklaration hat.
+Allerdings wollen Entwickler es manchmal haben, dass alle Instanzen das gleiche Objekt hinter dem selben Namen im Namensraum der Klasse sehen.
+Dies hat den Vorteil, dass alle Instanzen der Klasse miteinander "reden" können, aber das Feld mit den gleichen Sichtbarkeits- und Zugriffsregeln versehen ist, wie alle anderen Felder.
+
+Daher gibt es das Schlüsselwort ~static~, dass an bei der Adressberechnung allen Einfluss von dynamischen Informationen abschneidet.
+Der Übersetzer ignoriert also beim berechnen der Adresse für ~objO::objI::A~ die ~this~-Zeiger von beiden Objekten, sodass die Namensauflösung immer zum gleichen Ergebnis kommt.
+
+Um dieses Verhalten in unserer Mini-Sprache abzubilden führen wir das let-Attribut ~[S]~ ein, das alle ~[D]~ Attribute im Auflösungspfad ungültig macht.
+Wenn wir die Attribute an den Auflösungspfad schreiben, dann würden bekommen wir ~objO[D]::objI[D]::A[S]~.
+~[S]~ ist also zu ~[D]~ komplementär, ebenso wie ~[I]~ komplementär zu ~[E]~ ist.
+
+Mit diesem Wissen um statische Variablen, könnten wir nun auch besser verstehen, wie statische lokale Variablen in C funktionieren.
+Allerdings müssen wir uns dazu auch noch anschauen, wie lokale Variablen im Kontext der Adressberechnung überhaupt funktionieren. Dies machen wir im nächsten Unterkapitel.
+
+
+
 ** Function-Call Frames
+:PROPERTIES:
+:CUSTOM_ID: 04-call-frames
+:END:
+
 #+begin_src latex
   \begin{frame}[fragile]{Funktionen und lokale Variablen}
     \begin{columns}
@@ -899,9 +979,9 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
     \bi
     \ii Funktionen öffnen für ihren Rumpf einen eigenen Namensraum{
       \bi
-      \ii Parameter\alert{deklarationen} werden zu Namen innerhalb der Funktion.
       \ii \structure{Lokale Variablen} (und Parameter) sind nur innerhalb der Funktion sichtbar.
       \ii Die Namen lokaler Variablen können Globale verdecken. (Folge von CNSR)
+      \ii Parameter\alert{deklarationen} werden zu Namen innerhalb der Funktion.
       \ei
     }
     \ei
@@ -924,7 +1004,7 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
           \end{C}
         \end{code}
         \smallskip
-        \OrangeBox{Geschachtelte Funktionen?}
+        \OrangeBox{Rekursion?}
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=JavaScript]
@@ -945,12 +1025,26 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
           \end{JS}
         \end{code}
 
-        \smallskip\OrangeBox{Funktionen schateln?}
+        \smallskip\OrangeBox{Geschachtelte Funktionen?}
       \end{column}
     \end{columns}
   \end{frame}
+  #+end_src
 
-  \begin{frame}{Function-Call Frames und Rekursive Funktionen}
+Wir wollen uns damit beschäftigen wie lokale Variablen in unser Konzept von Namensräumen passen.
+Dabei sind besonders zwei Probleme spannend:
+Was passiert wenn eine Funktion sich mehrfach aufruft?
+Was wäre eine sinnvolle Semantik für geschachtelte Deklarationen von Funktionen.
+Bevor wir uns allerdings diesen Fragen widmen, wollen wir wieder unsere statische Namensraumbrille aufsetzen.
+
+Bezüglich Namen hat eine Funktion zwei wichtige Aspekte:
+lokale Variablen und Parameter.
+Die Deklaration lokaler Variablen ist auf den Funktionsrumpf beschränkt und es ist weiterhin nicht möglich auf die lokalen Variablen von andern Funktionen, von außen, zuzugreifen.
+Daher können wir sagen, das Funktionen Namensräume sind und die Sichtbarkeit aller enthaltenen Deklarationen ~[I]~ ist.
+Parameter sind, im Bezug auf Namensauflösung, sehr ähnlich wie lokale Variablen, da ihre Gültigkeit auf den Funktionsrumpf beschränkt ist.
+
+#+begin_src latex
+  \begin{frame}<handout:2->{Function-Call Frames und Rekursive Funktionen}
     \textbf{Früher:} Keine Unterstützung für rekursiven Funktionen (z.B. Fortran 77) \medskip
 
     \bi
@@ -964,8 +1058,30 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
     }
     \ei
   \end{frame}
+#+end_src
 
+Spannend werden lokale Variablen (und Parameter), wenn wir Rekursion erlauben, was dazu führt, dass eine Funktion aktiv ist und dann erneut aktiviert wird; es also zwei "Instanzen" dieser Funktion gibt.
+Was passiert in diesem Fall mit den Namen lokaler Variablen?
+Lösen diese Namen in beiden *Funktionsinstanzen* zum gleichen Objekt auf, oder nicht?
+Historisch gesehen, gab es Sprachen die keine Unterstützung für Rekursion geboten haben und eine lokale Variable immer die gleiche Speicherstelle gemeint hat.
+Allerdings waren diese Sprachen sehr limitiert und heute würde niemand mehr so eine Sprache ernsthaft verwenden wollen.
+Wie sieht es also in modernen Sprachen (jünger als 50 Jahre) aus?
 
+In modernen Sprachen wird mit jedem Funktionsaufruf eine Instanz des Namensraums der Funktion, mit all seinen lokalen Variablen und Parametern erzeugt; der **Function-Call Frame*[fn::Sie wollen wirklich nicht, dass ich den Begriff Aufrufrahmen oder Stapelrahmen verwende.].
+Die Funktions-lokalen Deklarationen werden dynamisch zu diesem Function-Call Frame aufgelöst, ebenso wie Objektattribute dynamisch zum ~this~-Zeiger aufgelöst werden.
+
+Diese Call-Frames halten für jeden Aufruf Speicherplatz für alle lokalen Variablen (und die Parameter) bereit.
+Die Namen innerhalb der Funktionsinstanz werden zum Aufrufzeitpunkt an das neu erzeugte Call-Frame Objekt gebunden (run-time binding!). Die Auflösung der Namen erfolgt dann relativ zum Stackpointer (SP), der zu jedem Zeitpunkt auf den aktuell aktiven Call-Frame zeigt.
+
+Jedes Call-Frame Objekt hat zusätzlich noch einen Zeiger auf den Call-Frame aus dem heraus er aufgerufen wurde (caller).
+In den meisten Fällen ist die Beziehung zwischen Aufrufer und Aufgerufenem hierarchisch und der Aufrufer wird solange pausiert bis der Aufrufer fertig ist.
+Der ~fak(3)~ Call Frame existiert länger als der ~fak(2)~ Call Frame.
+Daher kann man diese Objekte sehr effizient auf einem Stack direkt hintereinander speichern.
+Dies ist allerdings nur eine Optimierung und wir könnten auch für jedes Call-Frame Objekt ~malloc()~ aufrufen.
+
+In kurz: Funktionen sind instantiierbare Namensräume und die lokalen Variablen werden dynamisch zum Call-Frame Objekt aufgelöst.
+
+#+begin_src latex
   \begin{frame}{Geschachtelte Funktionen und Closures}
     \bi
     \ii Funktionen in Funktionen lassen Fragen über die Bindung aufkommen.{
@@ -984,10 +1100,32 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
     \ei
   \end{frame}
 #+end_src
-- Lokale Variablen
-- Rekursive Funktionen
-- Geschachtelte Funktionsdeklarationen
 
+Die zweite Spannende Frage kommt auf, wenn wir Funktionen, die ja Namensräume sind, schachteln wollen.
+Also was passiert, wenn wir eine Funktion innerhalb einer Funktion definieren? Und insbesondere was passiert mit der Bindung wenn wir in der inneren Funktion eine lokale Variable aus der äußeren Funktion referenzieren?
+Die Möglichkeit Funktionen geschachtelt zu definieren bieten nicht alle Sprachen, da es schwierig ist diese Frage mit einer effizienten Implementierung zu beantworten. Wir wollen uns hier mit dem abstrakten Konzept begnügen.
+Im Beispiel schauen wir uns JavaScript an, welches es erlaubt Funktionen zu schachteln.
+
+Zunächst einmal ist klar, dass die Referenz in der inneren Funktion sich auf die äußere Deklaration bezieht, da es keine verdeckende Deklaration in der inneren Funktion mit dem Namen ~x~ gibt.
+Jetzt ist ~x~ allerdings eine lokale Variable (dynamisch gebunden) und es braucht immer ein Call-Frame Object der Funktion ~outer()~ um eine Adresse für ~x~ zu berechnen.
+
+Würden wir die Funktion ~inner()~ innerhalb der Funktion ~outer()~ direkt aufrufen, so könnten wir einfach einen Zeiger auf unser aktuellen Call-Frame mitgeben, vielleicht als impliziten Parameter, und die Sache wäre geritzt.
+Aber was passiert, wenn wir die Funktion ~inner()~ als Rückgabewert zurückgeben.
+Wenn wir dann ~inner()~, irgendwann später, aufrufen wollen, müssen wir einen Call-Frame für ~inner()~ erzeugen und brauchen Zugriff auf einen Call-Frame von ~outer()~. Aber, woher nehmen, wenn nicht stehlen.
+
+Die Antwort auf diese Frage, die aktuelle Skriptsprachen, wie JavaScript, für diese Frage wählen nennt sich *Lexikalisches Scoping*.
+Dabei speichern wir uns einen Zeigern auf den Call-Frame von ~outer()~, an der Stelle wo ~inner()~ definiert wird, in einem *Closure* Objekt weg.
+Dieses Closure Objekt liefert dann, wenn wir die zurückgegebene Funktion ~inner()~ aufrufen, das nötige ~outer()~-Call-Frame Objekt.
+Die Funktion ~inner()~ speichert also dauerhaft den Zustand der umgebenen Funktion zu dem Zeitpunkt an die Closure erzeugt wurde.
+
+Durch das weg sichern des ~outer()~-Call-Frames passieren zwei Dinge:
+Zum einen ist die zurückgegebene Funktion nun mit Zustands behaftet, der über mehrere Aufrufen des Rückgabewerts hinweg bestehen bleibt.
+Im Beispiel haben wir den Rückgabewert an den Namen ~f~ gebunden und jeder Aufruf von ~f()~ führ dazu, dass die Variable ~x~ um eins erhöht wird.
+
+Zum anderen lebt der Call-Frame von ~outer()~ nun länger als der Code von ~outer()~ aktiv ist.
+Dies führt dazu, dass wir Call-Frames nicht mehr einfach auf einem Stack allokieren können, sondern tatsächlich ~malloc()~ aufrufen müssen.
+
+Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was der Unterschied zwischen lokalen statischen Variablen in C und lexikalisch gebundenen Variablen in JavaScript ist.
 * Overloading und Dynamic Dispatch
 ** Uneindeutige Namensauflösung
 #+begin_src latex

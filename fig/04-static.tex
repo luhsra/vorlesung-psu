@@ -14,12 +14,12 @@
     \node[fit=(O) (right),draw] (NS) {};
 
     % Left
-    \node[align=left,font=\ttfamily,left=0.3 of NS,text width=5cm,fill=codecolor,label={[anchor=south east]south east:Java}] {
-      \structure{class} O \{\\
-      \ \ \structure{class} I \{\\
-      \ \ \ \ \structure{public\only<2>{ \textbf{static}}}\ int A;\\
-      \ \ \}\\
-      \}
+    \node[align=left,font=\ttfamily,left=0.3 of NS,text width=5cm,fill=codecolor,label={[anchor=south east]south east:C++}] {
+      \structure{class} O \{ \structure{public:}\\
+      \ \ \structure{class} I \{ \structure{public:}\\
+      \ \ \ \ \structure{\only<2>{\textbf{static}}}\ int A;\\
+      \ \ \} objI;\\
+      \} objO;
     };
 
     % Right
@@ -28,19 +28,19 @@
       (NS.north east)
       ++(east:1cm) node[fill=refcolor] (O) {\strut objO};
 
-      \node[right=0 of O] (d1) {\strut .};
+      \node[right=0 of O] (d1) {\strut ::};
       \node[right=0 of d1,fill=refcolor] (I) {\strut objI};
-      \node[right=0 of I] (d2) {\strut .};
+      \node[right=0 of I] (d2) {\strut ::};
       \node[right=0 of d2] (A) {\strut A};
     \end{scope}
 
       \node[anchor=south west,xshift=1cm] at (NS.south east) (knowledge) {Dynamisches Wissen};
 
-      \draw[->] (knowledge.north-|d1) -- coordinate(A) (d1);
-      \draw[->] (knowledge.north-|d2) -- coordinate(B) (d2);
+      \draw[->] (knowledge.north-|O) -- coordinate(@) (O);
+      \draw[->] (knowledge.north-|I) -- coordinate(B) (I);
 
       \only<2>{
-        \draw[line width=3pt,srared] (A)++(west:1cm) -- (B) --++(east:1cm) coordinate(@);
+        \draw[line width=3pt,srared] (@-|O.west) -- (@-|A.east) coordinate (@);
         \fill[white,opacity=0.9] (O.south west) rectangle ($(@)+(up:1.5pt)$);
       }
 
