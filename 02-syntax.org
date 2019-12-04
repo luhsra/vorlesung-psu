@@ -953,7 +953,7 @@ So kann, im Beispiel, dem Nicht-Terminal ~trans~ in jeder beliebigen Ableitung n
 Etwas schwieriger ist ~factor_tail~.
 Man könnte zwar meinen, dass ~+~ Teil der FOLLOW-Menge ist, da mittels dieser Regel die ganzen ~+~ erzeugt werden.
 Allerdings gibt es keine Satzform (partielle Ableitung), bei der bereits ein ~+~ rechts von ~factor_tail~ steht.
-Wenn man sich ansieht was, in rechten Seiten rechts von ~factor_tail~ steht, kommt man dazu, dass ~factor_tail~ am Ende von seiner eigenen Regel und am Ende der ~term~ Regel steht.
+Wenn man sich ansieht, was in rechten Seiten rechts von ~factor_tail~ steht, kommt man dazu, dass ~factor_tail~ am Ende von seiner eigenen Regel und am Ende der ~term~ Regel steht.
 In beiden Fällen können wir, weil das Wort dort endet, nichts darüber lernen, was rechts von ~factor_tail~ stehen könnte.
 Daher müssen wir, bei ~term~ schauen was rechts davon stehen kann.
 Dies bringt uns dann zu der Erkenntnis, dass die FOLLOW-Menge von ~factor_tail~ und ~term~ gleich ist.
