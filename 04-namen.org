@@ -237,8 +237,9 @@ Namensräume strukturieren die Menge aller deklarierten Namen und schränken ihr
 Ohne Namensräume müsste jeder Name einen programmweit-eindeutigen Identifier haben und es gäbe genau eine lokale Variable mit dem Bezeichner ~i~. Das wäre eher unpraktisch.
 
 Für weitere Betrachtung von Namen, werde ich eine minimale, domänen-spezifische, Sprache {{{wikipedia_de(Domänenspezifische_Sprache)}}} entwickeln, um die wichtigsten Namenskonzepte konzentriert erklären zu können.
-Diese Sprache ist nicht dazu da tatsächlich übersetzt zu werden, sondern sie soll nur jene Aspekte herausarbeiten, die relevant für die Namensauflösung sind.
+Diese Namensraumsprache ist nicht dazu da tatsächlich übersetzt zu werden, sondern sie soll nur jene Aspekte herausarbeiten, die relevant für die Namensauflösung sind.
 Die Grammatik dieser Sprache ist denkbar einfach und sie kennt nur Deklarationen (~let <NAME>~), Referenzen (~<NAME>~), und geschachtelte Namensräume (~{...}~). Im weiteren Verlauf werden wir sie allerdings noch minimal erweitern.
+Am Endes dieses Kapitels gibt es noch eine Übersicht über alle vorgestellten Konstrukte und Attribute.
 
 #+begin_example
 PROG  -> STMT*
@@ -453,7 +454,7 @@ Zweitens hat jeder Namensraum eine Menge von sichtbaren Namen, welche die, zusä
 Mit dem Import von Namen können wir, je nach Sprache und verwendetem Konstrukt, die eine oder die andere Menge manipulieren.
 Da die Unterscheidung zwischen beiden fällen, nur in Randfällen wirklich relevant ist, werde ich im folgenden (und auf den Folien) so tun, als würden wir immer in die Menge der direkt-deklarierten Namen importieren.
 
-In unserer Mini-Sprache, können wir mit dem Import Statement (~import <PFAD>~) Namen aus einem explizit benanntem Namensraum importieren.
+In unserer Namensraumsprache, können wir mit dem Import Statement (~import <PFAD>~) Namen aus einem explizit benanntem Namensraum importieren.
 Dabei erlauben wir nicht nur Importe einzelner Namen (~::N::A~), sondern auch Wildcard Importe (~::N::M::*~).
 Letztere haben den Vorteil, dass wir das Import Statement nicht anpassen müssen, wenn wir im exportierenden Namensraum neue Namen deklarieren[fn::Für eine Diskussion von Wildcard importen bei Python Modulen, können Sie einen Blick in [[https://www.python.org/dev/peps/pep-0008/#id23][PEP8]] werden].
 
@@ -524,7 +525,7 @@ Des Weiteren werden interne (oder private) Deklarationen bei einem Import Statem
 Durch diese Festlegung ist es nur noch von innerhalb eines Namensraums, mittels impliziter Namensauflösung, möglich Referenzen zu einem Namen zu notieren.
 Von außerhalb, wo wir qualifizierte Pfade brauche, schlägt die Namensauflösung mit einem fehl (siehe ~M::A~).
 
-In unserer Mini-Sprache führen wir ein optionales Attribut ~I~ ein[fn::Fun Fact am Rande:
+In unserer Namensraumsprache führen wir ein optionales Attribut ~I~ ein[fn::Fun Fact am Rande:
 Die gewählt Notation ist die Notation für optionale Parameter bei Latex Macros.
 Die Notation soll andeuten, dass das I ein optionales Attribut für die Deklaration ist.], welches bei der Deklaration angegeben werden kann um sie zu intern zu machen.
 Per Default sind alle Namen von überall sichtbar (~[E]~) und nur ausgewählte Deklarationen werden privat.
@@ -575,7 +576,7 @@ An dieser Stelle können wir Namensräume erzeugen, die Deklarationen enthalten.
 Diese Namensräume können selbst wieder einen Namen im übergeordneten Namensraum haben und wir können mittels qualifizierten Namen beliebig entfernte Deklarationen referenzieren.
 Mit einem Import Statement können wir Namen aus anderen Namensräumen in unseren eigenen Namensraum importieren und wir können die Sichtbarkeit von Deklarationen einschränken.
 
-Mit diesen Prinzipien können wir schon einige Programmkonstrukte in ihrer Funktion erklären und in unserer Mini-Sprache abbilden.
+Mit diesen Prinzipien können wir schon einige Programmkonstrukte in ihrer Funktion erklären und in unserer Namensraumsprache abbilden.
 Wir wollen dies, beispielhaft, anhand von Java Paketen tun.
 Java Pakete stellen Namensräume für Klassen dar, sodass ein Klassename nur innerhalb eines Pakets eindeutig sein muss.
 Außerdem erlauben es Java Pakete die Sichtbarkeit von Klassen zwischen Paketen zu steuern.
@@ -586,7 +587,7 @@ Außerdem vererben Pakete ein interne Standardsichtbarkeit an die darin enthalte
 Dies ist, im übrigen bei Klassen ebenso, auch dort ist die Standardsichtbarkeit private.
 Die Klassen A und B haben unterschiedliche Sichtbarkeiten und nur die Klasse A kann von außerhalb ihres Pakets referenziert werden.
 Daher ist es möglich, dass wir die Klasse N.A in das Paket M importieren.
-Der einzige Unterschied zu unserer Mini-Sprache ist, dass Java an jeder Stelle den ~.~ zum trennen von Namen nimmt und nicht ~::~.
+Der einzige Unterschied zu unserer Namensraumsprache ist, dass Java an jeder Stelle den ~.~ zum trennen von Namen nimmt und nicht ~::~.
 Die Klasse B ist tatsächlich intern deklariert und kann daher nur von anderen Klassen aus dem Paket M verwendet werden.
 Wir sehen, ganz nebenbei, in dem Beispiel auch, dass Funktionen Namensräume sind, die per default ~[I]~ sind; lokale Variablen sind nicht von außen zugreifbar.
 
@@ -807,13 +808,13 @@ Wir haben angenommen, dass hinter jeder Deklaration maximal ein, nach der Bindun
 Dieses Schema passt auch sehr gut auf Sprachkonstrukte wie C++ ~namespace~ oder Java Pakete.
 Allerdings bekommen wir es mit dem bisherigen Formalismus nicht hin so etwas simples wie C ~struct~ abzubilden.
 Denn in dem Moment, wo ich eine Struktur zweimal instantiiere (~objA~, ~objB~), steht die Felddeklaration ~int a~ für zwei Ganzzahlen, jeweils eine in jedem der beiden Objekte.
-Und das kann ja irgendwie nicht sein. Wir müssen also unseren Formalismus und die Mini-Sprache erweitern um auch dieses Sprachkonstrukt abzudecken.
+Und das kann ja irgendwie nicht sein. Wir müssen also unseren Formalismus und die Namensraumsprache erweitern um auch dieses Sprachkonstrukt abzudecken.
 
 Wenn wir uns zurück erinnern, dann soll jeder Name eindeutig stellvertretend für (maximal) ein Objekt sein.
 Diesen Grundsatz wollen wir zunächst beibehalten.
 Allerdings können wir am Folienbeispiel von ~struct N~ sehen, dass das Feld ~int a~ der beiden Objekte nicht über ~N::a~, sondern über ~objA.a~ und ~objB.a~ referenziert wird.
 Man könnte also sagen, dass unter den Namen ~objA~ und ~objB~ Kopien des Namensraums von ~struct N~ angelegt wurden.
-In unserer Mini-Sprache wäre es ungefähr:
+In unserer Namensraumsprache wäre es ungefähr:
 
 #+begin_example
 let N = {
@@ -835,7 +836,7 @@ Somit kann ein Namensraum eine Blaupause für viele andere Namensräume werden.
 Das Konzept der instantiierbaren Namensräumen ist ein Schlüsselkonzept der Informatik und manifestiert sich besonders auffällig im objekt-orientierten Programmiersprachen.
 Auch dort ist der Namensraum einer Klasse die Blaupause für all ihre Instanzobjekte. Aber moderne Isolationskonzepte auf Systemebene, wie Docker bzw. Container, sind Anwendungen dieses Konzepts.
 
-In unserer Mini-Sprache führen wir, um instantiierbare Namensräume aus zu drücken, das zusätzliche let-Attribut ~let [D] <NAME>~ ein und erlauben, dass wir Instanzen eines Namensraums anlegen können (~<NS>()~).
+In unserer Namensraumsprache führen wir, um instantiierbare Namensräume aus zu drücken, das zusätzliche let-Attribut ~let [D] <NAME>~ ein und erlauben, dass wir Instanzen eines Namensraums anlegen können (~<NS>()~).
 Das zusätzliche Attribut bedeutet, dass zur Adressberechnung von ~NAME~ Laufzeitwissen benötigt wird, der Teil hinter dem ~=~ gibt an welcher Namensraum geklont werden soll.
 Im Gegensatz zu vielen Sprachen, bleiben wir dabei immer den ~::~ Operator zur Namensauflösung zu nehmen, egal ob wir dynamisches Wissen brauchen oder nicht.
 
@@ -902,7 +903,7 @@ Welche Namen sind in dem Quellcode im Wurzelnamensraum deklariert?
 Welche Namen sind unterhalb von ~objS.*~ vom Wurzelnamensraum aus sichtbar?
 Welche Namen sind innerhalb der Namensräume S und B sichtbar?
 
-C++ in seiner Gänze, auch nur den Aspekt der Klassen, können wir nicht allerdings mit unserer Mini-Sprache nicht abbilden.
+C++ in seiner Gänze, auch nur den Aspekt der Klassen, können wir nicht allerdings mit unserer Namensraumsprache nicht abbilden.
 So gibt es in realen Sprachen noch einige komplexere Randfälle der Sichtbarkeit.
 So führt C++ und Java noch das Schlüsselwort ~protected~ ein und es gelten noch leicht andere Regeln wenn Vererbung mit der Verdeckung von Deklarationen zusammenkommt.
 Aber ein so tiefer Einstieg in Details einzelner Sprachen ist an dieser Stelle auch nicht da Ziel der Übung.
@@ -943,7 +944,7 @@ Dies hat den Vorteil, dass alle Instanzen der Klasse miteinander "reden" können
 Daher gibt es das Schlüsselwort ~static~, dass an bei der Adressberechnung allen Einfluss von dynamischen Informationen abschneidet.
 Der Übersetzer ignoriert also beim berechnen der Adresse für ~objO::objI::A~ die ~this~-Zeiger von beiden Objekten, sodass die Namensauflösung immer zum gleichen Ergebnis kommt.
 
-Um dieses Verhalten in unserer Mini-Sprache abzubilden führen wir das let-Attribut ~[S]~ ein, das alle ~[D]~ Attribute im Auflösungspfad ungültig macht.
+Um dieses Verhalten in unserer Namensraumsprache abzubilden führen wir das let-Attribut ~[S]~ ein, das alle ~[D]~ Attribute im Auflösungspfad ungültig macht.
 Wenn wir die Attribute an den Auflösungspfad schreiben, dann würden bekommen wir ~objO[D]::objI[D]::A[S]~.
 ~[S]~ ist also zu ~[D]~ komplementär, ebenso wie ~[I]~ komplementär zu ~[E]~ ist.
 
@@ -1764,7 +1765,7 @@ Und erzeugen eine Call Instruktion, die dynamisch, über den ~this~- und den ~vt
 Diese zusätzliche Indirektion über diese beiden Zeiger ist es auch, was virtuelle Methodenaufrufe teurer macht als statische Methodenaufrufe.
 
 
-* Summary
+* Zusammenfassung
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
@@ -1798,3 +1799,20 @@ Diese zusätzliche Indirektion über diese beiden Zeiger ist es auch, was virtue
   \end{frame}
 
 #+end_src
+
+
+** Die Namensraumsprache
+:PROPERTIES:
+:CUSTOM_ID: 04-namespace-language
+:END:
+
+- ~{...}~: Ein Namensraum der Namensräume und Deklarationen enthalten kann. Der Namensraum hat die Standardattribute ~[E,S]~.
+- ~{[<ATTR>] ...}~: Ein Namensraum mit Standardattribute, die er an seine enthaltenen Deklarationen vererbt, die dort aber überschrieben werden können.
+- ~let <NAME>~: Deklariert NAME als neuen Namen an dieser Stelle.
+- ~let[<ATTR>] <NAME>~: Deklariert NAME mit den gegebenen Attributen ATTR an dieser Stelle.
+- ~[I]~: Deklarationsattribut für interne (oder private) Sichtbarkeit. Der Name ist nur noch von innerhalb des umgebenden Namensraums sichtbar. Er wird bei Importen übersprungen.
+- ~[E]~: Externe Sichtbarkeit. Das Gegeteil von ~[I]~.
+- ~[D]~: Der so deklarierte Name benötigt Laufzeitwissen um aufgelöst zu werden.
+- ~[S]~: Alles Laufzeitwissen wird bei der Auflösung dieses Namens ignoriert bzw. ist nicht nötig. Gegeteil von ~[D]~.
+- ~import <PFAD>~: Importiert die referenzierte Deklaration in den aktuellen Namensraum.
+- ~NS()~: Legt einen Klon des Namensraums NS an.
