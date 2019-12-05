@@ -234,9 +234,9 @@ Da wir uns in dieser Vorlesungseineit mit Namen und nicht mit Objekten und ihrer
 Der letzte wichtige Begriff ist der des *Namensraums*.
 Ein Namensraum ist, ganz generell, ein Container für Namensdeklarationen.
 Namensräume strukturieren die Menge aller deklarierten Namen und schränken ihre Gültigkeit ein.
-Ohne Namensräume müsste jeder Name einen programmweit-eindeutigen Identifier haben und es gäbe genau eine lokale Variable mit dem Bezeichner ~i~. Das wäre eher unpraktisch.
+Ohne Namensräume müsste jeder Name einen Programm-weit eindeutigen Bezeichner haben und es gäbe genau eine lokale Variable mit dem Bezeichner ~i~. Das wäre eher unpraktisch.
 
-Für weitere Betrachtung von Namen, werde ich eine minimale, domänen-spezifische, Sprache {{{wikipedia_de(Domänenspezifische_Sprache)}}} entwickeln, um die wichtigsten Namenskonzepte konzentriert erklären zu können.
+Für weitere Betrachtung von Namen, werde ich eine minimale, Domänen-spezifische, Sprache {{{wikipedia_de(Domänenspezifische_Sprache)}}} entwickeln, um die wichtigsten Namenskonzepte konzentriert erklären zu können.
 Diese Namensraumsprache ist nicht dazu da tatsächlich übersetzt zu werden, sondern sie soll nur jene Aspekte herausarbeiten, die relevant für die Namensauflösung sind.
 Die Grammatik dieser Sprache ist denkbar einfach und sie kennt nur Deklarationen (~let <NAME>~), Referenzen (~<NAME>~), und geschachtelte Namensräume (~{...}~). Im weiteren Verlauf werden wir sie allerdings noch minimal erweitern.
 Am Endes dieses Kapitels gibt es noch eine Übersicht über alle vorgestellten Konstrukte und Attribute.
