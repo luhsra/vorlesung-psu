@@ -381,7 +381,7 @@ Dieser Name ist dann an seiner Deklarationsstelle genauso gültig und sichtbar, 
 Allerdings schaffen wir mit dem ~::~ Operator die Möglichkeit einen Namen innerhalb eines expliziten Namensraums zu suchen.   Diese explizite bzw. *qualifizerte Referenzierung* sucht dabei nur in dem gegebenen Namensraum und führt keine CNSR Suche durch.
 Im Beispiel bedeutet der Ausdruck ~M::A~, dass wir den Namen ~A~ im expliziten Namensraum ~M~ referenzieren wollen.
 
-Da wir mit dem ~::~ Operator nur in einem Namensraum suchen können den wir mittels CSNR adressieren können, müssen wir einen impliziten *Wurzelnamensraum* einführen, in dem die Top-Level Deklarationen gespeichert werden.
+Da wir mit dem ~::~ Operator nur in einem Namensraum suchen können den wir mittels CNSR adressieren können, müssen wir einen impliziten *Wurzelnamensraum* einführen, in dem die Top-Level Deklarationen gespeichert werden.
 Nur so können wir uns, von der Wurzel abwärts, über explizite Namensräume zu allen erreichbaren Deklarationen referenzieren.
 
 Wir können uns den Doppelpunktoperator als einen Trenner in einem Zugriffspfad vorstellen.
@@ -1126,11 +1126,15 @@ Zum anderen lebt der Call-Frame von ~outer()~ nun länger als der Code von ~oute
 Dies führt dazu, dass wir Call-Frames nicht mehr einfach auf einem Stack allokieren können, sondern tatsächlich ~malloc()~ aufrufen müssen.
 
 Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was der Unterschied zwischen lokalen statischen Variablen in C und lexikalisch gebundenen Variablen in JavaScript ist.
-* Overloading und Dynamic Dispatch
-** Uneindeutige Namensauflösung
+
+* Überladene Funktionen
+:PROPERTIES:
+:CUSTOM_ID: 04-overloading
+:END:
+
 #+begin_src latex
   \dividerframe{Überladene Funktionen}
-  \begin{frame}[fragile]{Pointer, Aliase und Uneindeutigkeit}
+  \begin{frame}<handout:2,4,5>[fragile]{Pointer, Aliase und Uneindeutigkeit}
     \textbf{Wiederholung:} Namensauflösung findet das Objekt zu einem Namen.\medskip
     \bi
     \ii<2-> Ein \structure{Zeiger} speichert das Ergebnis einer vollständigen Namensauflösung.{
@@ -1165,13 +1169,52 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
         \end{column}
       \end{columns}
     }
-    \ii<4-> \structure{Aliase}: Mehrere Namen (\codeinline{obj}, \codeinline{*ptr}) binden nun das gleiche Objekt.{\\
+    \ii<4-|handout:4-> \structure{Aliase}: Mehrere Namen (\codeinline{obj}, \codeinline{*ptr}) binden nun das gleiche Objekt.{\\
       \btAnimation[width=0.7\textwidth]{center,padding=1ex,1:<1-3>,range=1-2:<4->}{fig/04-aliase}
     }
     \ei
-    \OrangeBox<5->{Wäre es nützlich, wenn ein Name mehrere Objekte meinen könnte?}
+    \OrangeBox<5-|handout:5->{Wäre es nützlich, wenn ein Name mehrere Objekte meinen könnte?}
   \end{frame}
+  #+end_src
 
+  Wir haben gelernt, dass ein Name ein symbolischer Stellvertreter für ein Objekt ist. Nachdem ein Objekt tatsächlich an den Namen gebunden wurde (binding time!), können wir auch den letzten Teil der Namensauflösung durchführen und die Adresse des Objekts berechnen. Wie passt nun das Konzept von Zeigern, die ja offensichtlich etwas mit Adressen auf Objekte zu tun haben, in unser Schema von Namen?
+
+Kurz gesagt:
+Zeiger sind Objekte, die das Ergebnis der Adressberechnung speichern können.
+Wir können also zu einem Zeitpunkt die Adresse für einen Namen berechnen und in einem Zeiger speichern.
+Diesen Zugriff auf das Ergebnis der Adressberechnung können wir in C/C++ mit dem Und-Operator (~&(Pfad)~) erreichen.
+
+Zu einem späteren Zeitpunkt können wir das gespeicherte Ergebnis verwenden um nun tatsächlich auf das Objekt zuzugreifen.
+Bei diesem nach gelagerten Schritt dereferenzieren (~(*ptr)~) wir den Zeiger und berechnen die Adresse des Objekts durch einen Blick in den Speicher. Man könnte also sagen, dass ~*ptr~ auch ein Namensauflösungspfad ist, er hängt nur von zusätzlichem Laufzeitwissen ab. Zeiger sind demnach Teil der dynamischen Namensauflösung.
+
+Mit Zeigern bekommen wir nun Situationen bei denen mehrere Namen Stellvertreter für das gleiche Objekt sind, sie sind *Aliase* voneinander.
+In unserem Beispiel zeigt der Name ~obj~ und der Pfad ~*ptr~ auf das gleiche Objekt, obwohl die Deklarationen beider Namen nichts miteinander zu tun haben.
+Die beiden Namen wurden erst zur Laufzeit an das gleiche Objekt gebunden.
+Solche Aliase haben eine wichtige Bedeutung für einen optimierenden Übersetzer.
+Wenn diese nicht ausschließen können, dass ein Objekt nicht zwischenzeitlich durch einen Zugriff über einen Alias verändert wurde, können sie das Objekt nicht in Registern zwischenspeichern, sondern müssen es immer wieder aus dem Speicher laden.
+Ein Beispiel wo dieses Aliasproblem{{{wikipedia_en(Pointer_aliasing)}}} den Übersetzer vom optimieren abhält sehen wir hier:
+
+#+begin_src C
+int x = 0, y = 1;
+int *p = test() ? &x : &y; // Der Übersetzer weiß nicht ob p auf x oder auf y zeigt
+...
+x = 23;            // x hat einen bekannten Wert (23)
+*p = 42;           // könnte x verändern
+printf("%d\n", x); // x hat einen unbekannten Wert, eine Optimierung printf("%d\n", 23) ist nicht erlaubt.
+#+end_src
+
+Mit Zeigern haben wir Aliase bekommen, wo zwei Namen auf ein Objekt zeigen.
+Aber könnte auch das Gegenteil Sinn machen, wenn ein Name auf zwei unterschiedliche Objekte zeigt?
+Irgendwie wäre das doch komisch, wenn (wie im Beispiel) der Name ~fun~ auf beide Implementierungen der Funktion ~fun~ zeigt.
+Das kann doch irgendwien nicht sein, wie sollten wir denn die Adresse ~&fun~ berechnen?
+Es muss also mehr Wissen zur Unterscheidung geben als den reinen Funktionsnamen [fn::Der Dozent flüstert ihnen zu: Die Typen der Signatur!]. Und damit sind wir beim nächsten Thema angelangt: Überladung und typabhängige Namensauflösung.
+
+** Typabhängige Namensauflösung
+:PROPERTIES:
+:CUSTOM_ID: 04-typed-name-resolution
+:END:
+
+#+begin_src latex
   \begin{frame}{Erinnerung: Arten des Polymorphismus}
      \btAnimation[width=\textwidth]{center, padding, 3:<1>}{fig/03-polymorphismus}
   \end{frame}
@@ -1217,8 +1260,36 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
     }
     \ei
   \end{frame}
+#+end_src
 
-  \begin{frame}{Namensauflösung für überladene Funktionen}
+Zunächst zur Einordnung:
+Überladung ist ein Teil des Konzepts *Polymorphismus*, dass wir bereits im Typenkapitel kennen gelernt haben.
+Bei Polymorphismus geht es darum, dass ein Objekt vielerlei Gestalt haben kann.
+Beim Subtyppolymorphismus kann eine Instanz von ~Derived~ sich sowohl wie ein ~Base~-Objekt, als auch wie ein ~Derived~-Objekt verhalten; es passt an beiden Stellen.
+Bei der Überladung von Funktionen haben wir das Funktionssymbol (~do()~), dass sich sowohl wie ein ~do(Point2D)~ als auch wie ein ~do(Point3D)~ verhalten kann; es hat also mehrerlei Gestalt.
+
+Allerdings gibt es einen grundlegenden Unterschied zwischen Subtyping und Überladung:
+Ein Subtyp verhält sich in jeder Situation in gleicher Weise (daher universell!)
+polymorph.
+Bei der Überladung kommt es auf den Kontext der Funktionsaufrufes an, dort wird ad-hoc Entschieden welche Gestalten ~do()~ haben kann und dann auch einnimmt.
+Genauer gesagt, werden wir uns die Argumente des Funktionsaufrufs genauer anschauen und anhand ihrer Typen entscheiden, welches Funktionsobjekt in genau diesem Kontext an den Namen ~do~ gebunden und letztendlich aufgerufen wird.
+
+Um unser Konzept von Namen, bei dem jeder Name stellvertretend für genau ein Objekt steht, aufrecht zu erhalten, müssen wir unsere Namen erweitern, damit Sie, trotz Überladung, eindeutig bleiben.
+Wir gehen dazu her und machen die Typen der Parameter zum Teil des (deklarierten und referenzierten) Namens.
+Die Typen der Parameter sind, zusammen mit dem Rückgabetypen, der wichtigste Teil der *Signatur* einer Funktion.
+Die meisten Sprachen schauen sich bei der Überladung nur die Paramtertypen, nicht aber den Rückgabetypen an[fn::Die Sprache Ada ist ein Gegenbeispiel.
+Dort findet Überladung auch anhand des Rückggabetypen statt.].
+Daher wollen wir uns auf diese gängigste Art der Überladung beschränken.
+
+Bei der Überladung wir die Signatur also zum Teil des Namens.
+Bei der Deklaration schreiben wir diese Typen direkt bei den Parametern hin.
+Die Funktion ~bool isNeg(int x)~ ist also eine Deklaration für den Namen ~isNeg(int)~.
+An der Aufrufstelle, dort wo wir überladene Funktionsnamen referenzieren, ist das ganze allerdings etwas anders gelagert:
+Dort muss der Übersetzer die Typen der Argumente ausrechnen und den Namen vervollständigen.
+Wir schrieben nur ~isNeg(...)~ und der Übersetzer macht daraus eine Referenz für den Namen ~isNeg(string)~, weil er erkennen kann, dass das Argument ein String ist.
+
+#+begin_src latex
+\begin{frame}{Namensauflösung für überladene Funktionen}
     \begin{columns}[t]
       \begin{column}{0.38\textwidth}
         \btAnimation[width=\textwidth]{raisebox,range=1-6:<1->,6:<7->}{fig/04-overloading-resolution}
@@ -1232,18 +1303,18 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
         \be
         \ii Overload Set bestimmen{
           \bi
-          \ii<2-> Suche mittels CSNR sichtbare Deklaration
+          \ii<2-> Suche nach sichtbaren Deklaration
           \ii<2-> \alert<2-3>{Abbruch} der Suche beim ersten Treffer\\[1ex]
           \OrangeBox<3->{\strut Java: Überladung vs. Überschreiben}
           \ei
         }\medskip
-        \ii<4-> Typsignaturen durch Typsystem ermitteln{
+        \ii<4-|handout:4-> Typsignaturen durch Typsystem ermitteln{
           \bi
           \ii Deklaration und Aufrufstelle
           \ii Liste der Parameter und der Argumente
           \ei
         }\medskip
-        \ii<5-> Einschränkung des Overload Sets{
+        \ii<5-|handout:5-> Einschränkung des Overload Sets{
           \bi
           \ii Übereinstimmung in Parameteranzahl
           \ii<6-> Typen müssen gleich sein\\[1ex]
@@ -1314,6 +1385,30 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
   \end{frame}
 #+end_src
 
+Wir haben die Typen der Parameter und die Typen der Argumente zum Teil der Namen gemacht.
+Wie gliedert sich diese Erweiterung in die Regeln der Namensauflösung ein.
+Dazu wollen wir uns anschauen, wie überladene Funktionen für ein monomorphes und statisches Typsystem augelöst werden[fn::Zur Erinnerung: Monomorph=Typen sind gleich oder inkompatibel zueinander. Statisch: Variablen haben annotierte Typen.]
+
+Wenn wir einen Namen auflösen wollen, so suchen wir zunächst das *Overload Set* mittels der bekannten Namensauflösungsregeln.
+Die kann mittels CNSR oder über expliziter Namenspfade passieren.
+Das Overload Set enthält dann alle Deklarationen, die im Namensraum der ersten Übereinstimmung, gefunden werden.
+Aus diesem Grund nehmen wir im Beispiel das äußere ~f()~ nicht mit in das Overload Set mit auf.
+Dieser Abbruch der Suche ist dann auch der Grund, wieso es in C++/Java einen Unterschied zwischen Überschreiben und Überladen gibt.
+
+Die unvollständigen Namen aus dem Overload Set und an der Aufrufstelle geben wir an das Typsystem und bitten darum die Namen um ihre Signaturen zu vervollständigen.
+An dieser Stelle haben wir eine Interaktion zwischen Typssystem und Namensauflösung, weswegen Überladung auch eine *typabhängige Namensauflösung* ist.
+
+Aus dem vervollständigten Overload Set streichen wir zuerst alle Deklarationen bei der die Anzahl der Parameter nicht übereinstimmt (~f(int, int)~).
+Danach suchen wir uns die Deklaration raus, die nicht nur im Funktionsnamen, sondern auch in der Signatur zu unserer Referenz passt.
+Finden wir keine Deklaration, so gibt es einen Fehler bei der Namensauflösung.
+Da wir (erstmal) ein monomorphes Typsystem angenommen haben, kann es auch keine zwei Elemente des Overload Sets geben, die passen.
+
+Genau dieses Vorgehen, die Typen in den Namen zu codieren, sehen wir auf der technischen Ebene bei C++.
+Dort gibt es das sogenannte *Name Mangling* bei denen die Parametertypen in den Assemblernamen der Funktion codiert wird.
+Die Signatur ~isNeg(double)~ wird, sowohl an der Definitionsstelle als auch an der Aufrufstelle zu ~_Z5isNegd~ (das ~d~ steht für double); ~(int, int)~ wird zum Suffix ~ii~.
+Dies macht der Übersetzer in jeder Übersetzungseinheit (=jeder ~.o~ Datei) gleich und die Bindung des Namens geschieht dann durch den Linker, der an der Aufrufstelle eine konstante Adresse (~0x11e4) einsetzen kann.
+Wir sehen also, dass diese Art der Überladung in C++ *keine* Kosten zur Laufzeit erzeugt[fn::Dies ist ein wichtiger Punkt für effizentes Programmieren. Überladung kostet nicht generell Laufzeit. Solche "Zero-Cost" Abstraktionen sind immer von Vorteil.]!
+
 #+begin_src latex
   \begin{frame}[fragile]{Operatorüberladung}
     \bi
@@ -1350,11 +1445,9 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
       \end{CPP}
     \end{code}
     \ei
-
-
   \end{frame}
-
 #+end_src
+
 
 ** Überladung und Polymorphismus
 #+begin_src latex
@@ -1363,7 +1456,7 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
 \end{frame}
 
   \begin{frame}[fragile]{Interaktion zwischen Überladung und Subtypen}
-    \textbf{Erinnerung}: Subtyping ist eine Form des universellen Polymorphismus. Bei Vererbung ist die Kindsklasse ein Subtyp  der Elternklasse .
+    \textbf{Erinnerung}: Subtyping ist eine Form des universellen Polymorphismus. Bei Vererbung ist die Kindsklasse ein Subtyp  der Elternklasse.
 
     \begin{btBlock}{}
       Ein polymorphes Typssystem führt Typkomptaibilität ein und erzeugt damit \structure{Uneindeutigkeit}. Diese muss die Sprache eindeutig auflösen.

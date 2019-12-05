@@ -21,17 +21,19 @@
     };
 
     \begin{scope}[visible on=<3->]
-      \node[call frame,below=1 of f1] (closure) {
+      \node[call frame,below=5mm of f1] (closure) {
         <closure>
         \nodepart{two}
+        body = \{ x = x + 1;\\
+        \hspace{1.5cm}return x; \}\\
         caller = <frame>\tikzmark{closure}
       };
-      \draw[->] (pic cs:inner)++(up:0.2\baselineskip)--++(west:1em) |- (closure.text west);
-      \draw[->] (pic cs:closure)++(up:0.2\baselineskip)--++(east:2em) |- (f1.text east);
+      \draw[->] (pic cs:inner)++(up:0.2\baselineskip)--++(west:2em) |- (closure.text west);
+      \draw[->] (pic cs:closure)++(up:0.2\baselineskip) coordinate (@) -- (@-|closure.east) --++(east:2em) |- (f1.text east);
     \end{scope}
 
     \begin{scope}[visible on=<4->]
-      \draw[<-] (closure) -- ++(down:1cm) node[draw,below]{global variable: f};
+      \draw[<-] (closure.south) -- ++(down:5mm) node[draw,below]{global variable: f};
     \end{scope}
 
 
