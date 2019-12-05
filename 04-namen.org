@@ -197,7 +197,7 @@ Hier helfen die Sprachkonstrukte der Namensdeklaration dabei, Komponenten entlan
     }\smallskip
     \ii \structure{Namensraum} ist ein Container für deklarierte Namen \hfill\only<2-|handout:2->{\texttt{\{...\}}}{
       \bi
-      \ii Beschränken die Gültigkeit eines deklarierten Namens
+      \ii Beschränken die Sichtbarkeit eines deklarierten Namens
       \ii \structure{Schachtelung}: Ein Namensraum kann auch weitere Namensräume beinhalten .
       \ei
     }
@@ -221,7 +221,7 @@ Falls es zu einem Namen tatsächlich ein Objekt zur Laufzeit gibt, so ist die *A
 
 Bereits erwähnt haben ich den Begriff der *Deklaration*.
 Deklarationen sind jene Stellen im Quellcode, die einen Namen einführen und damit dem Übersetzer bekannt machen.
-Für jede Verwendung eines Namens wird der Übersetzer die, im referenzierenden Kontext gültige, Deklaration suchen; gibt es keine gültige Deklaration, so ist das Programm fehlerhaft.
+Für jede Verwendung eines Namens wird der Übersetzer die, im referenzierenden Kontext sichtbare, Deklaration suchen; gibt es keine sichtbare Deklaration, so ist das Programm fehlerhaft.
 In Sprachen gibt es viele Konstrukte, die benannt sind und daher einen Namen deklarieren.
 
 Der Begriff der *Definition* ist eine Erweiterung der Deklaration.
@@ -233,7 +233,7 @@ Da wir uns in dieser Vorlesungseineit mit Namen und nicht mit Objekten und ihrer
 
 Der letzte wichtige Begriff ist der des *Namensraums*.
 Ein Namensraum ist, ganz generell, ein Container für Namensdeklarationen.
-Namensräume strukturieren die Menge aller deklarierten Namen und schränken ihre Gültigkeit ein.
+Namensräume strukturieren die Menge aller deklarierten Namen und schränken ihre Sichtbarkeit ein.
 Ohne Namensräume müsste jeder Name einen Programm-weit eindeutigen Bezeichner haben und es gäbe genau eine lokale Variable mit dem Bezeichner ~i~. Das wäre eher unpraktisch.
 
 Für weitere Betrachtung von Namen, werde ich eine minimale, Domänen-spezifische, Sprache {{{wikipedia_de(Domänenspezifische_Sprache)}}} entwickeln, um die wichtigsten Namenskonzepte konzentriert erklären zu können.
@@ -287,7 +287,7 @@ Dazu aber später mehr.
         \ii<3-|handout:3-> Deklarationen können \structure{verdeckt} werden {
           \bi
           \ii Innere Deklarationen verdecken die Äußeren
-          \ii Die äußere Deklaration bleibt \structure{gültig}, ist aber innen nicht mehr \structure{sichtbar}.
+          \ii Die äußere Deklaration bleibt bestehen, ist aber innen nicht mehr \structure{sichtbar}.
           \ei
         }
         \ei
@@ -296,11 +296,11 @@ Dazu aber später mehr.
   \end{frame}
   #+end_src
 
-Die wichtigste Art der Namensauflösung ist die *implizite Namensauflösung*, bei der der Übersetzer automatisch die "nächste" gültige Deklaration findet.
+Die wichtigste Art der Namensauflösung ist die *implizite Namensauflösung*, bei der der Übersetzer automatisch die "nähste" sichtbare Deklaration findet.
 Dabei sucht er für jede Referenz in einem Namensraum eine Deklaration im gleichen oder einem umgebenden Namensraum.
 Findet er bei dieser impliziten Suche keine Deklaration, so gibt es einen Übersetzerfehler.
 Im Folienbeispiel gibt es für die zweite Verwendung von A zunächst keine passende Deklaration.
-Die einzige Deklaration von A ist in einem Namensraum, der bereits geschlossen ist und daher die Gültigkeit des Namens beendet hat.
+Die einzige Deklaration von A ist in einem Namensraum, der bereits geschlossen ist und daher die Sichtbarkeit des Namens beendet hat.
 Erst mit der Deklaration eines zweiten Namens mit dem Bezeichner ~A~, kann die zweite Referenz aufgelöst werden.
 
 Es ist Sprachabhängig, ob eine Deklaration im selben Namensraum wirklich vor der ersten Verwendung auftreten muss, oder ob ich alle Deklaration an das Ende eines Block packen kann.
@@ -314,9 +314,9 @@ Dazu beginnen wir unsere Suche nach der Deklaration bei dem Namensraum der die V
 Diese Regel heißt die "Closest-nested scope rule" (CNSR).
 
 Eine Folge der CNSR ist, dass Deklarationen in untergeordneten Namensräumen *verdeckt* werden können.
-Dabei bleibt die äußere Deklaration weiterhin gültig, aber wir können sie mittels der impliziten Namensauflösung nicht mehr referenzieren; sie verliert ihre *Sichtbarkeit*.
+Dabei bleibt die äußere Deklaration weiterhin bestehen, aber wir können sie mittels der impliziten Namensauflösung nicht mehr referenzieren; sie verliert ihre *Sichtbarkeit*.
 Nachdem der Namensraum der inneren Deklaration geschlossen wurde, wird die äußere Deklaration wieder sichtbar und kann referenziert werden.
-Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die letzte Deklaration von A ihre Gültigkeit.
+Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die letzte Deklaration von A ihre Sichtbarkeit.
 
 ** Explizite Namensräume
 :PROPERTIES:
@@ -378,7 +378,7 @@ DECL -> let NAME = SCOPE // Explizite, benannte Namensräume
 #+end_example
 
 Das erste bekommen wir in unserer domänenspezifischen Sprache hin, wenn wir die Grammatik um eine Regel zu *expliziten Namensräume* erweitern, welche dem folgenden Namensraum einen eigenen Namen geben.
-Dieser Name ist dann an seiner Deklarationsstelle genauso gültig und sichtbar, wie das jeder andere Namen auch ist.
+Dieser Name ist dann an seiner Deklarationsstelle genauso sichtbar, wie das jeder andere Namen auch ist.
 Allerdings schaffen wir mit dem ~::~ Operator die Möglichkeit einen Namen innerhalb eines expliziten Namensraums zu suchen.   Diese explizite bzw. *qualifizerte Referenzierung* sucht dabei nur in dem gegebenen Namensraum und führt keine CNSR Suche durch.
 Im Beispiel bedeutet der Ausdruck ~M::A~, dass wir den Namen ~A~ im expliziten Namensraum ~M~ referenzieren wollen.
 
@@ -1042,7 +1042,7 @@ Bezüglich Namen hat eine Funktion zwei wichtige Aspekte:
 lokale Variablen und Parameter.
 Die Deklaration lokaler Variablen ist auf den Funktionsrumpf beschränkt und es ist weiterhin nicht möglich auf die lokalen Variablen von andern Funktionen, von außen, zuzugreifen.
 Daher können wir sagen, das Funktionen Namensräume sind und die Sichtbarkeit aller enthaltenen Deklarationen ~[I]~ ist.
-Parameter sind, im Bezug auf Namensauflösung, sehr ähnlich wie lokale Variablen, da ihre Gültigkeit auf den Funktionsrumpf beschränkt ist.
+Parameter sind, im Bezug auf Namensauflösung, sehr ähnlich wie lokale Variablen, da ihre Sichtbarkeit auf den Funktionsrumpf beschränkt ist.
 
 #+begin_src latex
   \begin{frame}<handout:2->{Function-Call Frames und Rekursive Funktionen}
