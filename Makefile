@@ -56,6 +56,10 @@ $(1).publish:   build/html/index.html $(1).all
 	cd build/html; rsync -aLv  ./index.html ./css ./js ./lst ./fig ./$(2)* ${REMOTE}
 endef
 
+# Wordcount
+wc:
+	@make -s 01.wc 02.wc 03.wc 04.wc  | tr "\n" " " | dc -f - -e '[+z1<r]srz1<rp'
+
 %.view:
 	xdg-open $< &
 
