@@ -96,13 +96,13 @@
 
   \begin{scope}[visible on=<8>,draw,srared,ultra thick,]
     \node[draw,fill=srared!20,align=left,text width=5cm,inner sep=1em,left=4mm of f2-box,font=\color{black}] (error){
-      Wenn zwei Funktionen den gleichen Score haben, so wirft der Übersetzer einen Fehler.
+      Wenn zwei Funktionen den gleichen Malus haben, so wirft der Übersetzer einen Fehler.
     };
     \draw[->] (f1-box.west) -| (error.north);
     \draw[->] (f3-box.west) -| (error.south);
   \end{scope}
 
-  \node[anchor=east] at (label-vererbung-|choosen.east) (label-specifity) {\structure{Score}};
+  \node[anchor=east] at (label-vererbung-|choosen.east) (label-specifity) {\structure{Malus}};
 
   \end{tikzpicture}
 \end{frame}

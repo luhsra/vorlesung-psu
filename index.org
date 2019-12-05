@@ -16,9 +16,9 @@ Abschnitte: {{{headlines(./02-syntax.org)}}}
 
 Abschnitte: {{{headlines(./03-typen.org)}}}
 
-* COMMENT [[file:04-namen.org][Sprachen: Namen]]
-   - Scoping, Statische und Dynamische Bindung, Type-directed Name Resolution, Overloading, Static and Dynamic Dispatch
-   - Brujin Indices + Lexical Depth
+* [[file:04-namen.org][Sprachen: Namen]]
+Abschnitte: {{{headlines(./04-namen.org)}}}
+
 * COMMENT [[05-semantische-analyse.org][Übersetzer: Semantische Analyse und Source-to-Source Transformation]]
    - Typprüfung, Namensauflösung, Fehlermeldungen
    - C-Präprozessor/M4, Hygenische Makros, Transpilation, Domain Specific Languages

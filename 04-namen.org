@@ -1448,8 +1448,35 @@ Wir sehen also, dass diese Art der Überladung in C++ *keine* Kosten zur Laufzei
   \end{frame}
 #+end_src
 
+Mit diesem Wissen um Überladung wollen wir uns nun einem Thema nähern, dass für viele eine Art schwarze Magie zu sein scheint: *Operatorüberladung*. Dabei ist die Überladung von Operatoren eigentlich auch nicht anders als die Überladungen von Funktionen. Wir müssen uns nur folgenden Satz auf der Zunge zergehen lassen: *Operatoren sind komisch benannte Funktionen*.
+
+Operatoren (~A+B~) haben alles was andere Funktionen auch haben:
+Parameter (~A~, ~B~), einen Funktionsnamen ~+~ und wenn man sie ausführt haben sie einen Rückgabewert.
+Klarer wir das ganze, wenn wir einen Ausdruck mit einem Operator nicht als Infix[fn::Der Operator steht zwischen seinen Argumenten], sondern in Prefixschreibweise notieren:
+~+(A, B)~.
+Plötzlich sieht so eine Operatoranwendung auch aus wie ein Funktionsaufruf bei dem das Lexer-Token des Operators (~+~) zum Funktionsnamen wird.
+
+Weil wir Operatoren als Funktionen sehen, können wir sie prinzipiell auch überladen.
+Tatsächlich sind in vielen Sprachen die *Standardoperatoren* bereits für die eingebauten Datentypen überladen.
+So haben die Überladungen des Plus-Operator in Python nicht nur unterschiedliche Datentypen (~float~ vs.
+~int~), sondern es steht manchmal sogar eine ganz andere Semantik dahiner, wie dies bei ~+(string, string)~ der Fall ist.
+Wenn wir dann die Namensauflösung für die Operatoren machen, wird das Overload Set mit diesen vordefinierten Überladungen vom Übersetzer gefüllt[fn::Tatsächlich sind die Implementierungen dieser Standardoperatoren ein Beispiel für echtes Compile-Time Binding.].
+
+Manche Sprachen erlauben es darüber hinaus, eigene Überladungen für bereits existierende Operatoren zu definieren.
+Dazu muss die Sprache allerdings festlegen wie sie normale Funktionsnamen von den "komischen Namen" der Operatoren unterscheiden kann.
+In C++ wird dazu das Prefix ~operator~ vor den Operator geschrieben.
+Im Beispiel ist daher der gesamte hervorgehobene Text (~operator+~) der Name der definierten Funktion.
+Die selbst-definierten Überladungen werden dem Overloading Set hinzugefügt und der Mechanismus der Namensauflösung geht seinen gewohnten Gang.
+
+Es gibt sogar Sprachen, wie Haskell, die es einem erlauben ganz eigene neue Operatoren zu definieren.
+Dazu muss allerdings Lexer und Parser, während diese gerade laufen, über die neu definierten Operatoren informiert werden.
+Lexer, Parser und Semantische Analyse müssen also noch enger verzahnt werden, als dies sonst der Fall ist.
 
 ** Überladung und Polymorphismus
+:PROPERTIES:
+:CUSTOM_ID: 04-dynamic-dispatch
+:END:
+
 #+begin_src latex
 \begin{frame}{Erinnerung: Arten des Polymorphismus}
 \btAnimation[width=\textwidth]{center, padding, 5:<1>}{fig/03-polymorphismus}
@@ -1520,10 +1547,31 @@ Wir sehen also, dass diese Art der Überladung in C++ *keine* Kosten zur Laufzei
     \bii
     \ii<2-> Bestimmung der Argument--Parameter \alert<2>{Distanz} in der Vererbungshierarchie
     \ii<3-> Inkompatible Typen erzeugen eine Distanz von $\infty$
-    \ii<7-> Der niedrigste Score ist die höchste Spezifität
+    \ii<7-> Der niedrigste Malus ist die höchste Spezifität
     \eii
   \end{frame}
 #+end_src
+
+Im letzten Unterkapitel haben wir die (vorläufige) Annahme getroffen eine Sprache mit monomorphem Typsystem zu haben. Allerdings haben wir in der letzten Vorlesung schon gesagt, dass solche Typssystem wenig flexibel sind. Daher wollen wir uns nun ansehen, wie Überladung mit einem Inklusionspolymorphismus interagiert und welche Folgen sich daraus ergeben. Wir picken uns für diese Diskussionganz bewusst den *Subtyp*-Polymorpismus heraus, weil dieser allgegenwärtig ist (Vererbung).
+
+Durch die Einführung von Subtyping erzeugen wir eine gewisse Uneindeutigkeit mit denen die Sprache umgehen muss um weiterhin die Regel "Ein Name, ein Objekt" aufrecht zu erhalten. Dabei bekommen wir an zwei Stellen Uneindeutigkeit: An der Deklarationsstelle und an der Aufrufstelle.
+
+An der *Deklarationsstelle* können wir Überladungen erzeugen bei denen die Parametertypen in einer Typ--Subtyp Relation stehen. Da der Untertyp ~S~ typkompatibel mit dem Obertyp ~B~ ist, könnte ein Aufruf ~f(S)~ von beiden Deklarationen behandelt werden. Welche sollen wir also wählen?
+
+Die andere Uneindeutigkeit tritt an der *Aufrufstelle* auf, weil wir in einer Variable vom Obertypen ohne Probleme ein Objekt vom Untertyp speichern können. Dies führt dazu, dass der dynamische Typ und der statische Typ einer Variable (siehe Typkapitel) sich unterscheiden. Welchen Typen sollen wir beachten, wenn wir den Referenznamen erzeugen? Ist der Aufruf im Beispiel ~f(B, int)~ oder ist er ~f(S, int)~. Dazu kommt, dass wir den dynamischen Typen (normalerweise) erst zur Laufzeit wissen können, während der statische Typ bereits bei der Übersetzung bekannt ist.
+
+Weil es erstmal einfacher ist, wollen wir als Erstes das Problem an der Deklarationsstelle angehen.
+Dazu rechnen wir für eine bestimme Aufrufstelle die *Spezifität* für jede Deklaration des Overload Sets.
+Die Idee dabei ist, dass manche Deklarationen "besser" auf die Aufrufstelle passen als andere.
+Im Prinzip kann jede Sprache diese Spezifität anders ausrechnen, aber die grundlegende Idee ist dabei meist ähnlich.
+
+Für jedes Argument--Parameter Paar berechnen wir wie weit die Typen in der Vererbungshierarchie voneinander entfernt sind.
+Umso weiter die Distanz ist, also umso mehr Casts man bräuchte, umso schlechter kann die Deklaration mit diesem Argument umgehen. Im Beispiel ist bei der ersten Funktion das Argument ~S11~ zwei Kanten in der Vererbungshierarchie von dem Parametertypen ~B~ entfernt; Sie gibt also 2 *Maluspunkte*.
+Am Ende rechnen wir, zum Beispiel durch addieren, alle Maluspunkte zusammen und nehmen die Deklaration mit den wenigsten Maluspunkten als Ergebnis der Namensauflösung.
+
+Dabei gibt es zwei Randfälle:
+Wenn Parametertyp und Argumenttyp inkompatibel zueinander sind, so vergeben wir einen unendlich großen Malus um die Funktion aus dem Overload Set zu kegeln.
+Zum anderen könnten zwei Deklarationen genau den gleichen Maluswert haben, was zu einem Übersetzungsfehler führt, dass die Überladung in diesem Fall uneindeutig ist[fn::Ambigous Overload].
 
 #+begin_src latex
   \begin{frame}[fragile]{Dynamischer Dispatch anhand des dynamischen Typs}
@@ -1628,6 +1676,94 @@ Wir sehen also, dass diese Art der Überladung in C++ *keine* Kosten zur Laufzei
   \end{frame}
 
 #+end_src
+
+Der andere Aspekt bei der Verbindung von Polymorphismus und Überladung ist der Einfluss des *dynamischen Datentyps*.
+Prinzipiell ist die Geschichte ganz einfach:
+In dem Moment, wo wir das Typssystem nach der Signatur der Aufrufstelle beten, fragen wir nicht nach der Signatur der statischen Typen, sondern nach der Signatur der dynamischen Typen.
+Es werden also nicht die Typen der Variablen verwendet, sondern der Typ des übergebenen Objekts zählt. Eigentlich ganz einfach, könnte man Browser und Laptop zuklappen und endlich schlafen gehen. Leider ist es nicht ganz so leicht.
+
+Das Problem mit dynamischen Typen ist, dass sie an den Objekten hängen.
+Und Objekte werden ganz häufig ja erst zur Laufzeit an Namen gebunden (run-time binding).
+Wir müssten also ganz oft mit der Auflösung der Überladung bis zum letzten Moment, bis zur Nanosekunde des Aufrufstelle warten, die dynamischen Typen extrahieren und die ganze Berechnung der Spezifität durchführen.
+Das Folienbeispiel in Python tut das, indem es mittels ~isinstance()~ den dynamischen Typen prüft.
+Allerdings kostet das, und zwar so richtig.
+Deswegen bietet kaum eine Sprache direkt Mittel an diese Art der dynamischen Überladungsauflösung, die auch *multiple dynamic dispatch* heißt, auszudrücken.
+Das ist schade, weil es uns solch schreckliche ~isinstance()~-Kasakaden wie im Beispiel ersparen würde.
+
+Was in vielen Sprachen allerdings angeboten wird ist eine eingeschränkte Form des dynamischen Dispatch, in Form von *virtuellen Methoden*: der *single dynamic dispatch*.
+
+Dazu müssen wir zunächst einmal verstehen, was *Methoden* eigentlich sind und was sie von Funktionen unterscheidet bzw.
+was sie zu besonderen Funktionen macht.
+Methoden werden im Kontext eines dynamisch instantiierbaren Namensraums (zum Beispiel einer Klasse) deklariert.
+Ruft man eine Methode auf, so wird der Zeiger auf die Namensrauminstanz als erstes *implizites Argument* an die Funktion übergeben.
+Ob man an der Deklarationsstelle diesen impliziten Parameter aufschreiben muss, wie in Python, oder weglassen kann, wie in C++ oder Java, das ist wiederum sprachspezifisch.
+Wichtig ist nur:
+Das erste Argument ist implizit und zeigt auf das Instanzobjekt und hat die umgebende Klasse als Parametertypen. Im Beispiel haben wir für die Funktion ~foo~ in Derived die Signatur ~foo :: (Derived, int, int) -> void~.
+
+Bei Methoden gibt es dann die Unterscheidung zwischen statischen und virtuellen Methoden: Beim Aufruf einer statischen Methoden wird an der Aufrufstelle die statische Signatur berechnet und die Überladungsauflösung durchgeführt. Da dabei alles statisch ist, kann dies bereits zur Übersetzungszeit erfolgen. Eine Zero-Cost Abstraktion!
+
+Bei virtuellen Methoden berechnen wir an der Aufrufstelle eine Signatur, bei der für dieses erste implizite Argument der dynamischen Typen anstatt der statische Typ beachtet wird.
+Wir machen einen dynamischen Dispatch auf dem ~this~ Zeiger.
+
+In Java haben die Sprachdesigner entschieden, dass jede Methode per default virtuell ist und man explizit mit dem Schlüsselwort ~static~ auf statischen Dispatch umstellen muss. Bei C++ ist die Entscheidung genau gegenteilig ausgefallen, dort muss man explizit ~virtual~ sagen.
+
+Virtuelle Methoden lassen sich relativ effizient implementieren, indem man eine virtuelle Funktionstablle (vtable) in jedes Objekt schreibt. Die Idee dabei ist die Folgende:
+
+| Methode     | Signatur              | statischer Teil | Slot |
+|-------------+-----------------------+-----------------+------|
+| Base.foo    | (Base *, int, int)    | (int, int)      |    0 |
+| Derived.foo | (Derived *, int, int) | (int, int)      |    0 |
+
+1. Wir sammeln alle überladenen Funktionen in Ober- und Unterklasse mitsamt ihrer Signaturen ein.
+2. Wir berechnen für jede Methode den statischen Anteil der Signatur (alle Parametertypen bis auf das erste)
+3. Wir gruppieren die Methoden nach dem statischen Teil und geben jeder Gruppe einen Slot.
+4. Wir erzeugen für jede Klasse eine virtuelle Funktionstabelle mit so vielen Einträgen wie es Slots gibt.
+5. Wir schreiben einen auf die passende Implementierung in die passende Funktionstabelle.
+6. Zum Erzeugungszeitpunkt bekommt jedes Element einen Zeiger auf die Funktionstabelle.
+
+Wir emulieren dies mal in C:
+
+#+begin_src C
+  void Base_foo(Base *, int, int);
+  void Derived_foo(Derived *, int, int);
+
+  // 4. Virtuelle Funktionstabellen
+  function_t Base_vtable[1] = {
+      // 5. Einträge für die Slots
+      &Base_foo // Slot 0
+  };
+  function_t Derived_vtable[1] = { &Derived_foo };
+
+  // 6. Zeiger auf die Funktionstabelle in die Recordtypen
+  struct Base {
+      function_t * vtable;
+      ....
+  };
+
+  struct Derived {
+      function_t * vtable;
+      ....
+  };
+
+  int main() {
+      // 6. Setzen des vtable Zeigers. DIES ist der BINDEZEITPUNKT der virtuellen Methoden.
+      Derived d;
+      d.vtable = &Derived_vtable;
+
+      // Cast nach Base *
+      Base *b = (Derived *) &d;
+
+      // Aufruf des Slots 0: b->foo(23, 42)
+      b->vtable[0](b, 23, 42);
+  }
+#+end_src
+
+
+An der Aufrufstelle erstellen wir dann nur noch den statischen Anteil der Signatur, führen die Überladungsauflösung durch um auf die Slotnummer zu kommen.
+Und erzeugen eine Call Instruktion, die dynamisch, über den ~this~- und den ~vtable~-Zeiger auf die richtige Implementierung kommt.
+Diese zusätzliche Indirektion über diese beiden Zeiger ist es auch, was virtuelle Methodenaufrufe teurer macht als statische Methodenaufrufe.
+
+
 * Summary
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
