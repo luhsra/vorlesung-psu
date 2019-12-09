@@ -10,12 +10,13 @@
 
 
 % Signaturen
+\colorlet{signaturecolor}{badbee!20}
 \newcommand{\siginline}[4][\scriptsize]{%
-  \Colorbox{badbee!20}{#1#2\hspace{1ex}\texttt{::}\hspace{1ex}#3\hspace{1ex}$\mapsto$\hspace{1ex}#4}%
+  \Colorbox{signaturecolor}{#1#2\hspace{1ex}\texttt{::}\hspace{1ex}#3\hspace{1ex}$\mapsto$\hspace{1ex}#4}%
 }
 
 % Typausdrücke
-\colorlet{typecolor}{safegreen!30}
+\colorlet{typecolor}{safegreen!30!white}
 \newcommand{\typeinline}[2][\scriptsize]{%
   \colorbox{typecolor}{#1#2}%
 }

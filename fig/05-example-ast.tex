@@ -1,0 +1,113 @@
+\documentclass{lecturefig}
+\usepackage{fig/03-common}
+\begin{document}
+\begin{frame}<1-6>[fragile]
+  \begin{tikzpicture}[
+    ast/.style={draw,  minimum height=\ht\strutbox+\dp\strutbox,
+    },
+    typebox/.style={
+      anchor=north west,fill=typecolor,draw,font=\tiny},
+    type at node/.style={
+      shift={(-1ex,1ex)},typebox,at={(#1.south east)},
+    },
+    ]
+
+    \node[ast] (function) (function) {function}
+      child { node[ast] (function-id){"f"} }
+      child { node[ast] (function-params) {params}
+        child { node[ast,xshift=-1.5cm] (param) {param}
+          child { node [ast] (param-name) {"b"} }
+          child { node [ast] (param-type) {int} }
+        }
+      }
+      child { node[ast] (function-type) {int} }
+      child { node[ast] (function-block) {\{\}}
+        child { node [ast] (var) {var}
+          child { node [ast] (var-name) {"a"} }
+          child { node [ast,xshift=-1.1em] (var-type) {int} }
+          child { node [ast,xshift=-1.1em] (var-init) {1} }
+        }
+        child { node [ast,xshift=2cm] (return) {return}
+          child { node [ast] (plus) {+}
+            child { node [ast] (plus-lhs) {"a"} }
+            child { node [ast] (plus-rhs) {"b"} }
+          }
+        }
+      }
+    ;
+
+    \begin{visible}<1>
+      \node[below=5mm of param-name.west, anchor=north west,draw,text width=6cm,font=\footnotesize,fill=badbee!20]{
+        \textbf{Erinnerung:} Der abstrakte Syntaxbaum ist die kondensierte Variante des Syntaxbaums.
+      };
+    \end{visible}
+
+    \begin{visible}<1-3>
+      \node[right=2.5 of function.north east,anchor=north west,align=left,draw,fill=codecolor,font=\scriptsize\ttfamily]
+      {
+        function f(b:int):int\\
+        \{\\
+        \ \ var a :\ int = 1;\\
+        \ \ return a + b;\\
+        \}
+      };
+
+    \end{visible}
+
+    \tikzset{label/.style={
+        pos=0.5,sloped,above,font=\tiny\ttfamily,inner sep=1pt,
+      }
+    }
+    \path(function)  -- node[label]       {\alt<1>{[0]}{.name}} (function-id);
+    \path(function) -- node[label]        {\alt<1>{[1]}{.params}} (function-params);
+    \path(function) -- node[label]        {\alt<1>{[2]}{.rettype}} (function-type);
+    \path(function) -- node[label]        {\alt<1>{[3]}{.body}} (function-block);
+    \path(function-params) -- node[label] {[0]}             (param);
+    \path(function-block) -- node[label]  {[0]}             (var);
+    \path(function-block) -- node[label]  {[1]}             (return);
+    \path(var) -- node[label]             {\alt<1>{[0]}{.name}} (var-name);
+    \path(var) -- node[label]             {\alt<1>{[1]}{.type}} (var-type);
+    \path(var) -- node[label]             {\alt<1>{[2]}{.init}} (var-init);
+    \path(param) -- node[label]           {\alt<1>{[0]}{.name}} (param-name);
+    \path(param) -- node[label]           {\alt<1>{[1]}{.type}} (param-type);
+    \path(return) -- node[label]          {\alt<1>{[0]}{.value}} (plus);
+    \path(plus) -- node[label]            {\alt<1>{[0]}{.lhs}} (plus-lhs);
+    \path(plus) -- node[label]            {\alt<1>{[1]}{.rhs}} (plus-rhs);
+
+
+    \begin{visible}<3->
+      \draw[->,thick,dashed] (plus-lhs) -| node[sloped,pos=0.25,above]{Referenz} (var);
+      \draw[->,thick,dashed] (plus-rhs) -- ++(down:2em) -| node[sloped,pos=0.35,above,inner sep=2pt](ref){Referenz} (param);
+      \begin{visible}<3>
+        \draw[ultra thin] (ref.north west) -- ++(160:1em) node[above,draw,xshift=-1ex,fill=badbee!20]{\scriptsize Deklariert?};
+      \end{visible}
+
+    \end{visible}
+
+    \begin{visible}<4->
+      \node[type at node=plus] (plus-type)   {(int,int)$\rightarrow$int};
+      \begin{visible}<4>
+        \draw[ultra thin] (plus-type.north) -- ++(20:1em) node[above,draw,xshift=1em,fill=badbee!20]{\scriptsize Überladung?};
+      \end{visible}
+
+      \node[type at node=plus-lhs] {int};
+      \node[type at node=plus-rhs] {int};
+
+      \node[type at node=var] {int};
+      \node[type at node=var-init] {int};
+
+      \node[type at node=param] {int};
+
+
+      \node[type at node=function] (function-signature) {int$\rightarrow$int};
+      \node[type at node=var-init] {int};
+      \node[type at node=return]   (return-type) {int};
+    \end{visible}
+
+    \begin{visible}<5>
+      \draw[<->,thick,srared] (function-signature) to[bend left] node[thin,above,black,fill=badbee!20,draw]{match?} (return-type);
+    \end{visible}
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

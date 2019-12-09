@@ -1,0 +1,105 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 05 - Semantische Analyse
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
+ - Wie fließen Attribute  [effektiv]
+   - Attribut Grammatike
+ - Übersetzertechniken kennen lernen [effizient]
+   - Visitor Pattern
+
+
+* Ziele der semantischen Analyse
+:PROPERTIES:
+:CUSTOM_ID: 05-einleitung
+:END:
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \begin{frame}
+    \maketitle
+  \end{frame}
+
+  \begin{frame}{Einordnung in die Vorlesung: Semantische Analyse}
+    \begin{center}
+      \includegraphics[page=5,width=0.8\linewidth]{fig/01-overview-small}
+    \end{center}
+    \bi
+    \ii Übersetzer prüft bei der semantische Analyse die letzten Sprachregeln.\\
+    \alert{$\Rightarrow$ In der semantischen Analyse werden die letzten Fehler entdeckt.} \medskip
+    \ii Was sollte der \emph{effektive} und \emph{effiziente} Informatiker darüber Wissen? {
+      \bi
+      \ii Datenfluss auf einem Baum geschieht entlang und quer zu den Kanten.
+      \ii Übersetzertechniken sind auch in anderen Bereichen einsetzbar.
+      \ei
+      }
+      \ei
+
+  \end{frame}
+
+  \begin{frame}{Beispiel: Semantische Analyse eines Programms}
+    \btAnimation[width=\textwidth]{center,range=1-5:<1->}{fig/05-example-ast}
+  \end{frame}
+
+  \begin{frame}[t]{Ziele der Semantischen Analyse}
+    \begin{btBlock}{Syntaktische und Semantische Analyse prüfen alle Sprachregeln}\small
+      Die syntaktische Analyse prüft die kontextfreien Regeln einer Sprache. Alles was nicht kontextfrei geprüft werden kann, überprüft die semantische Analyse.
+    \end{btBlock}
+    \bi
+    \ii Abschließende Prüfung der Sprachregeln und Informationsgewinnung{
+      \bi
+      \ii Alle restlichen, nicht-syntaktischen, Sprachfehler werden hier aufgedeckt.
+      \ii \enquote{Wo ist diese verwendete Variable deklariert und mit welchem Typ?}
+      \ei
+    }\medskip\pause
+    \ii \tikzmark{A}\structure{Deklariertheit}: Kann jede (statische) Namensreferenz aufgelöst werden?{
+      \bi
+      \ii Zu jedem Namen(spfad) muss eine Deklaration gefunden werden.
+      \ii Auffinden der passenden Überladung für eine Aufrufstelle.
+      \ei
+    }\medskip
+    \ii \tikzmark{B}\structure{Typkonsistenz}: Werden die statischen Typen korrekt verwendet?{
+      \bi
+      \ii Die Typen der Argumente müssen zur Signatur einer Operation passen.
+      \ii Nicht jede Inkonsistenz ist ein Fehler (Implizite Typumwandlung)
+      \ei
+    }
+    \ei
+    \begin{tikzpicture}[remember picture,overlay,visible on=<3->]
+      \draw[<->,srared,thick] ($(pic cs:A)+(west:1.2em)$) coordinate(@) -- ($(pic cs:B)+(west:1.2em)+(up:1ex)$);
+    \end{tikzpicture}
+  \end{frame}
+#+end_src
+
+* AST Struktur und Attributierung
+- AST: Baumstruktur und Knoteninhalte
+  - Deklarationen, Statements, Expressions
+  - Vererbungshierarchie von Knoten
+  - Angehängte Attribute an AST Knoten
+* Informationsfluss auf Bäumen
+** Attributierte Grammatiken
+  - Synthethische Attribute (Von unten nach oben)
+  - Geerbte Attribute ( Von links nach rechts)
+** Traversierung von Bäumen
+  - Synthetische Attribute
+  - Visitor Pattern: Emulate Double Dispatch
+  - type_equal, type_compatible
+** Symboltabelle
+  - Geerbte Attribute
+  - find_decl, find_decl_fun
+** Was tun bei Fehlern?
+* Integration
+  - Language: Coercion
+    - Unifikation am Beispiel von Typen?

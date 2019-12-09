@@ -58,3 +58,5 @@
 \setbeamercolor{alerted text}{fg=srared}
 \colorlet{beamergreen}{luhgreen!80!black}
 \setbeamercolor{example text}{fg=beamergreen}
+
+\newenvironment<>{visible}[1][]{\begin{scope}[visible on=#2,#1]}{\end{scope}}
