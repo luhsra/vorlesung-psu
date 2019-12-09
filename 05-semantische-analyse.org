@@ -84,10 +84,55 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
 
 * AST Struktur und Attributierung
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}{AST: Baumstruktur}
+
+  \end{frame}
+
+  \begin{frame}{AST: Eine Hierarchie von Knotentypen}
+
+  \end{frame}
+
+  \begin{frame}{Clang: AST Knoten und ihre Attribute}
+    \begin{center}
+      \btImage[text width=0.7\textwidth,draw,label=below:\scriptsize Ausschnitt aus der Klassenhierarchie]{fig/05-llvm-named-decl-tree}
+      \medskip
+
+      \btImage[text width=0.7\textwidth,draw,label=below:\scriptsize Öffentliches Interface von \texttt{clang::NamedDecl}]{fig/05-llvm-named-decl-member}
+    \end{center}
+  \end{frame}
+
+  \begin{frame}[fragile]{Clang: AST für ein einfaches Programm}
+    \begin{columns}
+      \begin{column}{0.4\textwidth}
+        \begin{code}[tag=C]
+          \lstinputlisting[style=CPP,style=smaller,numbers=left,]{lst/05-example.cc}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.59\textwidth}
+        \bii
+        \ii CLang: C/C++ Frontend für LLVM
+        \ii Source-to-Source Transformation
+        \ii \texttt{clang::VarDecl} ist ein \texttt{clang::NamedDecl}
+        \eii
+      \end{column}
+    \end{columns}
+
+    \begin{btBlock}{\$ clang -Xclang -ast-dump -fsyntax-only /tmp/test.cc}
+      \scriptsize
+      \input{fig/05-clang-output}
+    \end{btBlock}
+  \end{frame}
+
+  \begin{frame}{AST: Zusätzliche Attribute}
+
+  \end{frame}
+#+end_src
 - AST: Baumstruktur und Knoteninhalte
-  - Deklarationen, Statements, Expressions
   - Vererbungshierarchie von Knoten
   - Angehängte Attribute an AST Knoten
+  - Deklarationen, Statements, Expressions
 * Informationsfluss auf Bäumen
 ** Attributierte Grammatiken
   - Synthethische Attribute (Von unten nach oben)

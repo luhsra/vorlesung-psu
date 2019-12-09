@@ -1,0 +1,48 @@
+\newcommand{\decl}{\color{safegreen}}
+\newcommand{\stmt}{\color{srared}}
+\newcommand{\sloc}{\color{luhgray}}
+\newcommand{\ws}[1]{\textcolor[rgb]{0,0,0}{#1}}
+\newcommand{\ptr}{\color{badbee}}
+\newcommand{\token}{\color{luhblue}}
+\ttfamily%
+{\bfseries\decl TranslationUnitDecl}{\ptr\ 0x2fde598}\\
+{\color[rgb]{0,0,0.93}`{-}}{\bfseries{}\decl FunctionDecl}{\ptr\ 0x3018de8}\ $<${\sloc line:4:1}$>$\ {\sloc line:1:5}{\bfseries{}\token\ f}\ {\color[rgb]{0,0.8,0}'int\ (int)'}\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \textbar {-}}\tikznode[name=param]{{\bfseries{}\decl ParmVarDecl}{\ptr\ 0x3018d20}}\ $<${\sloc col:7},\ {\sloc col:11}$>$\ {\sloc col:11}\ used{\bfseries{}\token\ x}\ {\color[rgb]{0,0.8,0}'int'}\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ `{-}}{\bfseries{}\stmt CompoundStmt}{\ptr\ 0x3019060}\ $<${\sloc col:14},\ {\sloc line:4:1}$>$\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ \ \ \textbar {-}}{\bfseries{}\stmt DeclStmt}{\ptr\ 0x3018ff0}\ $<${\sloc line:2:5},\ {\sloc col:26}$>$\hspace*{\fill}\\
+%
+{\color[rgb]{0,0,0.93}\ \ \ \ \textbar \ `{-}}%
+\tikznode[name=type]{\bfseries{}\decl VarDecl}%
+\tikznode[name=ptr]{\ptr0x3018ee8}%
+\tikznode[name=sloc]{$<${\sloc col:5},\ {\sloc col:25}$>$\ {\sloc col:9}}%
+\ used \tikznode[name=name]{\bfseries{}\token result}\ \tikznode[name=int]{\color[rgb]{0,0.8,0}'int'}\ cinit\hspace*{\fill}\\
+%
+{\color[rgb]{0,0,0.93}\ \ \ \ \textbar \ \ \ `{-}}{\bfseries{}\stmt ParenExpr}{\ptr\ 0x3018fd0}\ $<${\sloc col:18},\ {\sloc col:25}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}}{\color[rgb]{0,0.8,0.8}}\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ \ \ \textbar \ \ \ \ \ `{-}}{\bfseries{}\stmt BinaryOperator}{\ptr\ 0x3018fa8}\ $<${\sloc col:19},\ {\sloc col:23}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}}{\color[rgb]{0,0.8,0.8}}\ '/'\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ \ \ \textbar \ \ \ \ \ \ \ \textbar {-}}{\bfseries{}\stmt ImplicitCastExpr}{\ptr\ 0x3018f90}\ $<${\sloc col:19}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}}{\color[rgb]{0,0.8,0.8}}\ $<${\color[rgb]{0.8,0,0}LValueToRValue}$>$\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ \ \ \textbar \ \ \ \ \ \ \ \textbar \ `{-}}{\bfseries{}\stmt DeclRefExpr}{\ptr\ 0x3018f48}\ $<${\sloc col:19}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}\ lvalue}{\color[rgb]{0,0.8,0.8}}\ {\bfseries{}\decl ParmVar}{\ \tikznode[name=ref-param]{\ptr 0x3018d20}}\\%{\bfseries{}\token\ 'x'}\ {\color[rgb]{0,0.8,0}'int'}\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ \ \ \textbar \ \ \ \ \ \ \ `{-}}{\bfseries{}\stmt IntegerLiteral}{\ptr\ 0x3018f70}\ $<${\sloc col:23}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}}{\color[rgb]{0,0.8,0.8}}{\bfseries{}\token\ 42}\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ \ \ `{-}}{\bfseries{}\stmt ReturnStmt}{\ptr\ 0x3019048}\ $<${\sloc line:3:5},\ {\sloc col:12}$>$\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ \ \ \ \ `{-}}{\bfseries{}\stmt ImplicitCastExpr}{\ptr\ 0x3019030}\ $<${\sloc col:12}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}}{\color[rgb]{0,0.8,0.8}}\ $<${\color[rgb]{0.8,0,0}LValueToRValue}$>$\hspace*{\fill}\\
+{\color[rgb]{0,0,0.93}\ \ \ \ \ \ \ \ `{-}}{\bfseries{}\stmt DeclRefExpr}{\ptr\ 0x3019008}\ $<${\sloc col:12}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}\ lvalue}{\color[rgb]{0,0.8,0.8}}\ \tikznode[name=var]{\bfseries{}\decl Var} \tikznode[name=ref-var]{\ptr 0x3018ee8}%\\{\bfseries{}\token\ 'result'}\ {\color[rgb]{0,0.8,0}'int'}\hspace*{\fill}\\
+\begin{tikzpicture}[remember picture,overlay]
+  \begin{scope}[visible on=<2>,every node/.style={font=\normalsize\sffamily},every path/.style={thick}]
+    \node[fit=(type),inner sep=0,draw]{};
+    \draw[<-](type) -- ++(down:2em) node[below,fill=white,draw,align=left]{Knotentyp:\\C++ Klassen};
+    \node[fit=(ptr),inner sep=0,draw]{};
+    \draw[<-](ptr) -- ++(up:2em) node[above,fill=white,draw,align=left]{Verzeigerte\\Datenstruktur};
+    \node[fit=(sloc),inner sep=0,draw]{};
+    \draw[<-](sloc) -- ++(down:2em) node[below,fill=white,draw,align=left]{Position innerhalb\\der Quelldatei};
+    \node[fit=(name),inner sep=0,draw]{};
+    \draw[<-](name) -- ++(up:2em) node[above,fill=white,draw,align=left]{Name der\\Deklaration};
+    \node[fit=(int),inner sep=0,draw]{};
+    \draw[<-](int) -- ++(down:2em) node[below,fill=white,draw,align=left]{Typ der \\Deklaration};
+  \end{scope}
+  \begin{scope}[visible on=<3>]
+    \node[fit=(type) (ptr),draw,inner sep=0pt] (A){};
+    \node[fit=(var) (ref-var),draw,inner sep=0pt] (B) {};
+    \draw[->,srared,thick] (B) to[bend left=1ex] (A);
+  \end{scope}
+
+
+\end{tikzpicture}

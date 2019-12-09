@@ -527,7 +527,7 @@
 
 
 \newcommand{\tikznode}[2][]{%
-  \tikz[baseline]\node[anchor=base,#1]{#2};%
+  \tikz[baseline,remember picture]\node[anchor=base,#1]{#2};%
 }
 
 \newsavebox{\@overlaybox}
