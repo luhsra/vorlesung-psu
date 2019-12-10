@@ -1,0 +1,70 @@
+\documentclass{lecturefig}
+\usepackage{fig/05-common}
+\begin{document}
+\begin{frame}<-10>[fragile]
+  \begin{tikzpicture}[ast/.style={
+      anchor=north,text width=3.4cm,
+      ast with attributes,rectangle split parts=#1},
+    sibling distance=5cm,level distance=1.6cm,
+    edge from parent/.style={draw,->},
+    ast edge/.style={pos=0.6,->,sloped,above,font=\ttfamily\scriptsize},
+    ]
+    \small
+
+    \def\I#1{\setcounter{beamerpauses}{#1}\addtocounter{beamerpauses}{1}}
+    \def\V<#1>#2#3{\strut v = \alt<2-#1>{#2}{\alt<1>{?}{\I{#1}\ALERT<+>{#3}}}}
+    \def\H<#1>#2#3{\strut h = \alt<2-#1>{#2}{\alt<1>{?}{\I{#1}\ALERT<+>{#3}}}}
+
+    \node[ast=2] (root) {A : plus
+      \nodepart{two}
+      \V<8>{B.v + C.v}{12}\\
+      \H<6>{max(B.h, C.h)+1}{3}
+    }
+    child { node[ast=3] {B : literal
+        \nodepart{two}
+        token = 4
+        \nodepart{three}
+        \V<5>{int(B.token)}{4}\\
+        \H<1>{1}{1}
+      }
+      edge from parent node[ast edge]{.lhs}
+    }
+    child {
+      node [ast=2] {C : plus \nodepart{two}
+        \V<7>{D.v + E.v}{8}\\
+        \H<4>{max(D.h, E.h)+1}{2}
+      }
+      child { node[ast=3] {D : literal
+          \nodepart{two}
+          token = 3
+          \nodepart{three}
+          \V<3>{int(E.token)}{3}\\
+          \H<1>{1}{1}
+        }
+        edge from parent node[ast edge]{.lhs}
+      }
+      child { node[ast=3] {E : literal
+          \nodepart{two}
+          token = 5
+          \nodepart{three}
+          \V<2>{int(E.token)}{5}\\
+          \H<1>{1}{1}
+        }
+        edge from parent node[ast edge]{.rhs}
+      }
+      edge from parent node[ast edge]{.rhs}
+    }
+  ;
+
+  \node[right=8.5 of root.north,anchor=north,align=left,draw,font=\normalsize,fill=white] {
+    \textbf{Semantische Regeln}\\
+    literal:\\
+    \hspace{1em}x.v = int(x.token)\\
+    \hspace{1em}x.h = 1\\
+    plus:\\
+    \hspace{1em}x.v = x.lhs.v + x.rhs.v\\
+    \hspace{1em}x.h = max(x.lhs.h, x.rhs.h) + 1
+    };
+  \end{tikzpicture}
+\end{frame}
+\end{document}

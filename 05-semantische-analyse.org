@@ -85,6 +85,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 * AST Struktur und Attributierung
 #+begin_src latex
+\dividerframe{AST Knoten}
   \begin{frame}[t,fragile]{AST: Baumstruktur im Übersetzer}
     \textbf{Theoretisch} ganz einfach. Ein AST ist eine Menge von Knoten....
 
@@ -242,7 +243,89 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   - Vererbungshierarchie von Knoten
   - Angehängte Attribute an AST Knoten
   - Deklarationen, Statements, Expressions
+
 * Informationsfluss auf Bäumen
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[t]{Semantische Regeln als Attributgleichungen}
+    \bi
+    \ii Die sem. Analyse berechnet die Werte der Attribute für jeden Knoten{
+      \bi
+      \ii Attribute hängen von anderen (benachbarten) AST Knotenattributen ab.
+      \ii Abstrakte Sicht: Gleichungssystem mit Gleichungen für jeden Knotentyp
+      \ii Reihenfolge der Auswertung ist nicht fest gelegt.
+      \ei
+    }
+    \ei
+    \begin{btBlock}[type=example]{\textbf{Beispiel}: Höhe (h) und Wert (v) in einem Additionsbaum}
+      \btAnimation[width=0.9\textwidth]{center,1:<1>,range=1-9:<2->}{fig/05-attribute-tree}
+      \btAnimation[width=0.6\textwidth]{center,10:<11->}{fig/05-attribute-tree}
+    \end{btBlock}
+    \bi
+    \ii<11-> \structure{Attributgrammatiken} annotieren die Regeln direkt an die Produktionen\\
+    \bi
+    \ii \codebox{\small\ttfamily\grammarrule{plus}{expr + expr}\hspace{1cm}\{ \$0.h = max(\$1.h, \$3.h) + 1 \}}
+    \ii Parseaktionen (Parsebaum$\rightarrow$AST) sind bereits Attributgrammatiken
+    \ei
+    \ei
+  \end{frame}
+
+  \begin{frame}{Abhängigkeitsgraphen und Attributtypen}
+    \bi
+    \ii Attribut-Gleichungssystem beinhaltet einen \structure{Abhängigkeitsgraphen} {
+      \bi
+      \ii Für jedes Attribut auf der rechten Seite gibt es eine Abhängigkeit
+      \ii Topologische Sortierung bestimmt die Auswertereihenfolge
+      \ii Verschiedene Verfahren für unterschiedliche Typen von Abhängigkeiten
+      \ei
+    }
+    \begin{columns}[t]
+      \begin{column}<2->{0.32\textwidth}
+        \begin{center}
+          \includegraphics[height=2.5cm,page=1]{fig/05-dependency-tree}\\
+          \structure{Synthetische Attribute}
+          \scriptsize \enquote{von unten nach oben}
+        \end{center}
+        \bii
+        \ii S-Attribute
+        \ii Abhängig von Kindern
+        \ii Typen in Expressions
+        \ii Technik: Traversierung
+        \eii
+    \end{column}\hfill
+    \begin{column}<3->{0.33\textwidth}
+      \begin{center}
+        \includegraphics[height=2.5cm,page=2]{fig/05-dependency-tree}\\
+        \structure{Geerbte Attribute}\\
+        \scriptsize \enquote{von links nach rechts}
+      \end{center}
+      \bii
+      \ii L-Attribute
+      \ii Abhängig von Vorgängern und Nachbarn
+      \ii Namensauflösung
+      \ii Technik: Symboltabelle
+      \eii
+    \end{column}
+    \begin{column}<4->{0.33\textwidth}
+      \begin{center}
+        \includegraphics[height=2.5cm,page=3]{fig/05-dependency-tree}\\
+        \structure{Zyklen Abhängig.}
+        \scriptsize \enquote{all-over-the-place}
+      \end{center}
+      \bii
+      \ii Fixpunktberechnung
+      \ii Eher zu vermeiden
+      \ii Typinferenz in Haskell
+      \ii Technik: Unifikation
+      \eii
+    \end{column}
+    \end{columns}
+
+    \ei
+
+  \end{frame}
+
+#+end_src
 ** Attributierte Grammatiken
   - Synthethische Attribute (Von unten nach oben)
   - Geerbte Attribute ( Von links nach rechts)
