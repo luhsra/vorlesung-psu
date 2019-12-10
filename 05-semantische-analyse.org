@@ -246,7 +246,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 * Informationsfluss auf Bäumen
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}[t]{Semantische Regeln als Attributgleichungen}
     \bi
     \ii Die sem. Analyse berechnet die Werte der Attribute für jeden Knoten{
@@ -326,10 +325,116 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   \end{frame}
 
 #+end_src
-** Attributierte Grammatiken
-  - Synthethische Attribute (Von unten nach oben)
-  - Geerbte Attribute ( Von links nach rechts)
 ** Traversierung von Bäumen
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[t]{Traversierung von Bäumen}
+    \begin{btBlock}{Berechnung der synthetischen Attribute}
+      Wir müssen \textbf{jeden Knoten} besuchen, \textbf{knotenspezifischen} Code ausführen, und die Attributwerte \textbf{von unten nach oben} propagieren.
+    \end{btBlock}
+    \medskip
+
+    \begin{columns}[t]<2->
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=Python]
+          \lstinputlisting[style=py,linerange={v0s-v0e}]{lst/05-traversal.py}%
+          \uncover<3->{%
+            \lstinputlisting[style=py,linerange={v1s-v1e}]{lst/05-traversal.py}%
+          }%
+          \uncover<4->{%
+            \lstinputlisting[style=py,linerange={v2s-v2e}]{lst/05-traversal.py}%
+          }
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \structure{Baumtraversierung (Post-Order)}
+        \bii
+        \ii Bäume sind rekursiv.
+        \ii Jeden Knoten besuchen auch!\\[5ex]
+        \ii<3-> Dynamischer Typ des Knoten
+        \ii<3-> Zugriff auf Attribute der Kinder
+        \ii<3-> Attributgleichung ausrechnen\\[6ex]
+        \ii<4-> Setzen des Attributs
+        \ii<4-> Wert im Aufrufer verfügbar
+        \eii
+
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}{Probleme von Ad-Hoc Traversierung}
+      \textbf{Ironie}: Das geht aber noch mehr ad-hoc und unlesbar!
+      \begin{center}
+        \begin{minipage}{0.5\linewidth}
+        \begin{code}[]
+          \lstinputlisting[style=py,linerange={v3s-v3e}]{lst/05-traversal.py}
+        \end{code}
+        \end{minipage}
+      \end{center}
+
+      \bi
+      \ii<2-> Die \structure{Attributgleichungen} gehen im \alert{fragilen} Boilerplate unter{
+        \bi
+        \ii Duplikation der Traversierungslogik für jedes Attribut
+        \ii Duplikation der \codebox{isinstance} Kaskade für jedes Attribut
+        \ii Ein neuer AST Knotentyp $\rightarrow$ N Traversierungsfunktionen anpassen.
+        \ei
+      }\medskip
+      \ii<3-> Wende informatische Super-Power \alert{"Trennung der Belange"} an! {
+        \bi
+        \ii Attributgleichungen werden in einer Besucherklasse gekapselt
+        \ii Generischer Code für Traversierung in definierter Ordnung
+        \ei
+      }
+      \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Visitor-Pattern: Operationen auf Knoten kapseln}
+    \begin{code}[tag=C++]
+      \lstinputlisting[style=CPP,linerange={Vs-Ve}]{lst/05-visitor.cc}
+    \end{code}
+    \bi
+    \ii Bündelung der Attributgleichungen in einem Visitor-Objekt {
+      \bi
+      \ii Die \codebox{visit()} Funktion wird für jeden Knotentyp überladen
+      \ii Visitor-Objekt kann zusätzlichen Zustand als Member speichern
+      \ii Vererbungshierarchie kann beachtet werden (\codeinline[style=CPP]{void visit(NamedDecl D)})
+      \ei
+    }
+    \ei
+
+    \begin{columns}<2->
+      \begin{column}{0.49\textwidth}
+        \begin{code}[]
+          \lstdefinestyle{error}{
+            escapechar=`,
+            moredelim=**[is][{\btHL[fill=srared!50!white,name=error]<3->}]{@}{@},
+          }
+          \lstinputlisting[style=CPP,style=smaller,style=error,linerange={Ts-Te}]{lst/05-visitor.cc}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.48\textwidth}
+        \bi
+        \ii Generischer Traversierer {
+          \bi
+          \ii Knoten haben Liste der Kinder
+          \ii Definierte Besuchsreihenfolge
+          \ii Visitor wird auf jeden Knoten angewendet.
+          \ei
+        }
+        \ei
+      \end{column}
+    \end{columns}
+    \begin{tikzpicture}[remember picture,overlay]
+      \only<3>{
+        \draw(error) -- ++(0:2cm) node[right,fill=srared!20!white,draw=srared,thick,align=left]{Das ist so kaputt!\\
+          Dynamischer Dispatch nur im nullten Argument!\\
+        Ruft immer \fbox{\texttt{Visitor::visit(Tree)}} auf!};
+      }
+    \end{tikzpicture}
+
+  \end{frame}
+#+end_src
   - Synthetische Attribute
   - Visitor Pattern: Emulate Double Dispatch
   - type_equal, type_compatible
