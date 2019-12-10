@@ -1,0 +1,42 @@
+\documentclass{lecturefig}
+\usepackage{fig/05-common}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[ast/.style={ast with attributes}]
+
+    \node[ast] {
+      MemberExpr
+      \nodepart{two}
+      expr\_type = None\\
+      field\_decl = None
+    }
+    child {
+      node[ast,shift={(-1.5cm,-2cm)}] (decl-ref-expr) {DeclRefExpr
+        \nodepart{two}
+        expr\_type = None\\
+        value\_decl = None
+        }
+        edge from parent node[sloped,above] {\scriptsize .lhs\_obj}
+    }
+    child[edge from parent/.style={draw,->}] {
+      node[ast,shift={(1.5cm,-1.5cm)}] {Identifier
+        \nodepart{two}
+        name = foo\\
+        keyword = false
+      }
+      edge from parent node[sloped,above] {\scriptsize .rhs\_name}
+    }
+    ;
+
+    \node[ast, below=1.5 of decl-ref-expr] (OBJ){
+      Identifier
+      \nodepart{two}
+      name = OBJ\\
+      keyword = false
+    };
+    \draw[->] (decl-ref-expr) -- node[sloped,below,rotate=180] {\scriptsize .name} (OBJ);
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

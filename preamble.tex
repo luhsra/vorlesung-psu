@@ -529,6 +529,7 @@
 \newcommand{\tikznode}[2][]{%
   \tikz[baseline,remember picture]\node[anchor=base,#1]{#2};%
 }
+\newenvironment<>{visible}[1][]{\begin{scope}[visible on=#2,#1]}{\end{scope}}
 
 \newsavebox{\@overlaybox}
 \newenvironment<>{overlaybox}[1][]{%

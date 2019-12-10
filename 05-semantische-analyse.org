@@ -85,14 +85,126 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 * AST Struktur und Attributierung
 #+begin_src latex
-  %%ONLY%%
-  \begin{frame}{AST: Baumstruktur}
+  \begin{frame}[t,fragile]{AST: Baumstruktur im Übersetzer}
+    \textbf{Theoretisch} ganz einfach. Ein AST ist eine Menge von Knoten....
+
+    \tikzmark{X}\begin{columns}[b]
+      \begin{column}{0.44\textwidth}
+        \begin{code}[]
+          \begin{CPP}[style=smaller]
+            struct node_t {
+              int    type;
+              string token;
+              vector<node_t> children;
+            };
+          \end{CPP}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.55\textwidth}
+        \begin{code}[]
+          \begin{CPP}[style=smaller]
+            string getName(node_t *n) {
+              if (n->type == VAR_DECL) {
+                return n->children[1].token;
+              } else if (n->type == VAR_REF) {
+                return n->token;
+              } ....
+            }
+          \end{CPP}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii<2-> \textbf{In Realität}: Code des Übersetzers muss auf dem dem AST operieren {
+      \bi
+      \ii Struktur der Grammatik sollte sich in den Datenstrukturen widerspiegeln
+      \ii Übersetzer sind komplexe Programme, Bugs sind besonders schwerwiegend
+      \ii Nutzung der verfügbaren Sprachfeatures um Übersetzer \structure{robust} zu machen
+      \ei
+    }
+    \ei
+
+    \begin{code}<2->[tag=Java]
+      \tikzset{every node/.style={inner sep=0}}
+      \begin{java}[style=smaller,escapechar=`]
+        class `\tikznode[name=classdef]{ClassDef}` extends Definition {
+          public Name               name;
+          public ClassDef           extending;
+          public `\tikznode[name=type]{List<InterfaceDef>}`    implementing;
+          public List<Definition>   `\tikznode[name=member]{defs}`;
+          ....
+        }
+      \end{java}
+    \end{code}
+    \begin{tikzpicture}[remember picture,overlay]
+      \begin{visible}<2->
+        \draw[ultra thick, srared](pic cs:X) -- node[sloped,fill=srared!2,draw]{\Huge NEIN}++(12cm,-2.2cm);
+      \end{visible}
+      \begin{visible}<3->
+        \node[fit=(classdef),draw,pin={[draw,fill=badbee!20!white]60:Knotentypen als Klassen}] {};
+        \node[fit=(type),draw,pin={[draw,fill=badbee!20!white]-90:Kinder haben Typen}] {};
+        \node[fit=(member),draw,pin={[draw,fill=badbee!20!white]10:Kinder haben Namen}] {};
+      \end{visible}
+    \end{tikzpicture}
+  \end{frame}
+
+  \begin{frame}[fragile]{AST: Eine Hierarchie von Knotentypen}
+    \bi
+    \ii<+-> Die Grammatik legt bereits eine Hierarchie von Knotentypen nahe\\{
+      \btSetNamedTab[1cm]{\first}%
+      \first Grammatik:      \grammarrule{\NT{smt}}{assign\_stmt \OR while\_stmt \OR if\_stmt \OR \ldots}\\
+      \first AST Definition: \codeinline[style=java]{class AssignStmt extends Stmt {...}}
+    }
+    \ii<+-> Zusammenfassung von Ähnlichkeiten verschiedener Knotentypen\\
+        \textit{Beispiel}: Viele Deklarationen können einen Namen tragen. Lassen wir diese von \codebox{NamedDecl} erben, so können wir sie gleich behandeln.\medskip
+
+    \ii<+-> Häufig verwendete Klassen von Knotentypen{
+      \bi
+      \ii \structure{Expression}: Ausdrücke die man auswerten kann und die ein Ergebnis liefern.\\
+      \hspace{5mm}\textit{Beispiele:} Addition, Dereferenzierung, \codeinline{(<cond> ? <then> : <else>)}
+      \ii \structure{Statement}: Anweisungen die sequentiell bearbeitet werden.\\
+      \hspace{5mm}\textit{Beispiele:} if-else, Schleifen, Zuweisungen
+      \ii \structure{Typen}: Literal notierte Typausdrücke.\\
+      \hspace{5mm}\textit{Beispiele:} Typname, Typausdruck innerhalb eines Casts
+      \ii \structure{Deklaration}: Jede statisch Bekanntmachung für den Compiler\\
+      \hspace{5mm}\textit{Beispiele:} Variablendefinition, Klassendeklarationen, \codeinline[style=C]{typedef}
+      \ei
+    }
+    \ei
 
   \end{frame}
 
-  \begin{frame}{AST: Eine Hierarchie von Knotentypen}
+  \begin{frame}[fragile]{AST: Zusätzliche Attribute}
+    \vspace{-1ex}
+    \bi
+    \ii Der Parser erzeugt die Knoten und die Baumstruktur.{
+      \bi
+      \ii \structure{Parseraktionen} machen dies nebenher, wenn eine Regel angewendet wird:\\
+         \codeinline!while_stmt -> WHILE ( expr ) body         { new WhileStmt(cond=T3, body=T5) }!
+      \ii \codebox{expr} ist ein Expression Knoten und ist über T3 zugreifbar.
+      \ei
+    }
+    \ii<2-> Semantische Analyse berechnet zusätzliche \structure{Attribute}{
+      \bi
+      \ii Datenhaltung während Analyse, Wissensbasis für den Rest des Übersetzers
+      \ii \textit{Beispiel}: Berechneten Typ einer Expression, Zeiger auf die Deklaration.
+      \ei
+    }
+    \ei
 
+    \begin{columns}<3->[t]
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=Python]
+          \lstinputlisting[style=py,style=smaller,linerange={range0-range1}]{lst/05-DeclRefExpr.py}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \btAnimation[width=0.9\textwidth]{raisebox,center,1:<1->}{fig/05-member-expr.pdf}
+      \end{column}
+    \end{columns}
   \end{frame}
+
 
   \begin{frame}{Clang: AST Knoten und ihre Attribute}
     \begin{center}
@@ -125,9 +237,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \end{btBlock}
   \end{frame}
 
-  \begin{frame}{AST: Zusätzliche Attribute}
-
-  \end{frame}
 #+end_src
 - AST: Baumstruktur und Knoteninhalte
   - Vererbungshierarchie von Knoten
