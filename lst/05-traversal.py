@@ -50,3 +50,33 @@ def height(N):
 #v3e
 
 print(height(tree))
+
+
+#tgs
+def traversal(V, T):
+  # Depth-First Order
+  for child in T.children:
+    traversal(V, child)
+
+  # Introspection
+  T_name = type(T).__qualname__
+  M_name = "visit_" + T_name
+  method = getattr(V, M_name)
+
+  # Aufruf des Visitors
+  method(T)
+#tge
+
+#vgs
+class HeightVisitor:
+  def visit_literal(self, N):
+    N.h = 1
+
+  def visit_plus(self, N):
+    h = max(N.lhs.h,
+            N.rhs.h)
+    N.h = h + 1
+#vge
+
+traversal(HeightVisitor(), tree)
+print(tree.h)

@@ -414,15 +414,12 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
         \end{code}
       \end{column}\hfill
       \begin{column}{0.48\textwidth}
-        \bi
-        \ii Generischer Traversierer {
-          \bi
-          \ii Knoten haben Liste der Kinder
-          \ii Definierte Besuchsreihenfolge
-          \ii Visitor wird auf jeden Knoten angewendet.
-          \ei
-        }
-        \ei
+        \structure{Generische Traversierung}
+        \bii
+        \ii Knoten haben Liste der Kinder
+        \ii Definierte Besuchsreihenfolge
+        \ii Visitor wird auf jeden Knoten angewendet.
+        \eii
       \end{column}
     \end{columns}
     \begin{tikzpicture}[remember picture,overlay]
@@ -432,7 +429,71 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
         Ruft immer \fbox{\texttt{Visitor::visit(Tree)}} auf!};
       }
     \end{tikzpicture}
+  \end{frame}
 
+  \begin{frame}[fragile]{Visitor-Pattern: Double Dynamic Dispatch}
+    \begin{btBlock}[type=alert]{Statische Typen an der Aufrufstelle: \texttt{visit(Visitor, Tree)}}
+      Bei der Traversierung soll \texttt{visit(v, t)} für das konkrete Visitor-Objekt und spezifisch für den AST Knoten aufgerufen werden.\\
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{CPP}[style=smaller]
+            visit(HeightVisitor, literal)
+            visit(HeightVisitor, plus)
+          \end{CPP}
+        \end{column}\hfill
+        \begin{column}{0.49\textwidth}
+          \begin{CPP}[style=smaller]
+            visit(ValueVisitor,  literal)
+            visit(ValueVisitor,  plus)
+          \end{CPP}
+        \end{column}
+      \end{columns}
+    \end{btBlock}
+
+    \bi
+    \ii<2-> Dynamischer Dispatch in den \textbf{ersten zwei Argumenten} nötig{
+      \bi
+      \ii Emulation mittels zweifachem virtuellen Methodenaufruf.
+
+      \btAnimation[width=0.9\textwidth]{center,padding top=1ex,1:<1-2>,range=2-3:<3->}{fig/05-accept-visit}
+
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Visitor-Pattern: Dispatch mit Introspection}
+    \bi
+    \ii Python hat Überladung nur im ersten Argument (self), dafür dynamisch!{%
+      \bi
+      \ii Keine statischen Typen $\Rightarrow$ Keine doppelte Definition von Methoden.
+      \ii Jedoch kann man Namensauflösung zur Laufzeit durchführen.
+      \ei
+    }
+    \ei
+    \vspace{-1em}
+    \begin{columns}<2->[t]
+      \begin{column}{0.49\textwidth}
+        \begin{code}[]
+          \lstinputlisting[style=py,style=smaller,style=error,linerange={tgs-tge}]{lst/05-traversal.py}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}[]
+          \lstinputlisting[style=py,style=smaller,style=error,linerange={vgs-vge}]{lst/05-traversal.py}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii<2-> Emulation von Überladung durch Introspektion{
+      \bi
+      \ii \codeinline[style=py]{type(T)} extrahiert den \textbf{dynamischen} Typen des Knotens
+      \ii \codeinline[style=py]{M_name = "visit_" + ...} erzeugt dynamisch einen \textbf{Namen}
+      \ii \codeinline[style=py]{getattr(V, "visit_plus")} löst den Namen; gibt die Methode zurück
+      \ei
+    }
+    \ei
   \end{frame}
 #+end_src
   - Synthetische Attribute

@@ -1,0 +1,42 @@
+\documentclass{lecturefig}
+\usepackage{lecturesourcecode}
+\usepackage{fig/05-common}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture,
+    code/.style={fill=codecolor,draw,inner ysep=2pt},
+    every btHL/.style={fill=badbee},
+    ]
+    \node[code,label={[anchor=south east]south east:\textit{\color{gray}C++}}](traversal){%
+      \lstinputlisting[style=CPP,style=smaller,style=highlighting,linerange={Tcs-Tce}]{lst/05-visitor.cc}%
+    };
+    \node[fit=(@),inner sep=0] (traversal-call-accept){};
+    \node[code, visible on=<2->,
+        right=2 of traversal.north west,yshift=-1.5em,
+        onslide=<1>{every btHL/.style={}},
+        anchor=north west] (accept) {%
+      \lstinputlisting[style=CPP,style=smaller,style=highlighting,linerange={Tacs-Tace}]{lst/05-visitor.cc}%
+    };
+    \node[fit=(@),inner sep=0] (accept-call-visit){};
+
+    \node[code,visible on=<3->,
+        right=2.2 of accept.north west,yshift=-1.9em,
+        anchor=north west] (visit) {%
+      \lstinputlisting[style=CPP,style=smaller,style=highlighting,linerange={Tvcs-Tvce}]{lst/05-visitor.cc}%
+    };
+
+    \only<1-> {
+      \node[draw,fill=badbee!20!white,below=1 of traversal-call-accept.west,align=center](dd){Dynamic\\Dispatch};
+      \draw[ultra thin] (traversal-call-accept.south west) ++(east:1ex) -- (dd);
+    }
+
+    \only<2->{
+      \draw[->,srared,thick] (traversal-call-accept.west) -- ++(west:1em) |- (pic cs:accept);
+      \draw[ultra thin] (accept-call-visit.south west) ++(east:1ex) -- (dd);
+    }
+    \only<3->{
+      \draw[->,srared,thick] (accept-call-visit.west) -- ++(west:1em) |- (pic cs:visit);
+    }
+  \end{tikzpicture}
+\end{frame}
+\end{document}
