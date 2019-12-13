@@ -59,3 +59,11 @@ Was wir nicht machen:
   - Logische Programmierung (z.B. Prolog)
   - Parallele Programmierung
   - Parsingtheorie in Detail
+
+
+* Copyright Notice
+:PROPERTIES:
+:CUSTOM_ID: copyrightNotice
+:END:
+
+#+INCLUDE: COPYING.org
