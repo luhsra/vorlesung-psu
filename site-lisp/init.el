@@ -18,11 +18,17 @@
 
 (require 'org)
 (require 'ob-tangle-sra)
+(require 'ox-html)
 (require 'htmlize)
 
 (setq org-html-klipsify-src nil)
 (setq org-html-htmlize-font-prefix  "org-")
 (setq org-html-htmlize-output-type 'css)
+(setq org-html-postamble
+      (with-temp-buffer
+        (insert-file-contents
+         (format "%s/COPYING.footer.html" org-sra-src-dir))
+        (buffer-string)))
 
 (message "... emacs is started.")
 (custom-set-variables

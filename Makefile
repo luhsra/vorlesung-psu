@@ -1,7 +1,7 @@
 REMOTE=lab:/proj/www/sra.uni-hannover.de/Lehre/V_PSÜ/skript/.
 
 ORG_PDF=$(shell echo 0*.org)
-ORG=$(filter-out export-prologue.org, $(filter-out setup.org, $(shell echo *.org)))
+ORG=index.org $(ORG_PDF)
 
 PDF=$(foreach i,${ORG_PDF},$(patsubst %.org,build/%.slides.pdf,${i}))
 HTML=$(foreach i,${ORG},$(patsubst %.org,build/html/%.html,${i}))
@@ -21,6 +21,7 @@ build: texmf/ls-R
 	@mkdir -p build/html
 	@ln -fs ../export-prologue.org build
 	@ln -fs ../../html/css build/html/
+	@ln -fs ../../html/img build/html/
 	@ln -fs ../../html/js build/html/
 	@ln -fs ../../fig     build/html
 	@ln -fs ../../lst     build/html

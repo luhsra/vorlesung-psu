@@ -9,7 +9,7 @@ class MemberExpr(Expr):
   field_decl : FieldDecl = None
 
   def __init__(self, L, R):
-      self.lhs_obj   = L
-      self.rhs_name  = R
+    self.lhs_obj   = L
+    self.rhs_name  = R
   ...
 #range1

@@ -327,7 +327,6 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
 ** Traversierung von Bäumen
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}[t]{Traversierung von Bäumen}
     \begin{btBlock}{Berechnung der synthetischen Attribute}
       Wir müssen \textbf{jeden Knoten} besuchen, \textbf{knotenspezifischen} Code ausführen, und die Attributwerte \textbf{von unten nach oben} propagieren.
@@ -481,6 +480,10 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \begin{column}{0.49\textwidth}
         \begin{code}[]
           \lstinputlisting[style=py,style=smaller,style=error,linerange={vgs-vge}]{lst/05-traversal.py}
+          \vspace{-1ex}
+        \end{code}
+        \begin{code}[]
+          \lstinputlisting[style=py,style=smaller,style=error,linerange={igs-ige}]{lst/05-traversal.py}
         \end{code}
       \end{column}
     \end{columns}
@@ -498,11 +501,69 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
   - Synthetische Attribute
   - Visitor Pattern: Emulate Double Dispatch
-  - type_equal, type_compatible
+
+#+begin_src latex
+   \begin{frame}{Berechnung des Typen und Typkonsistenz}
+    \vspace{-1ex}
+    \bi
+    \ii S-Attribut: Für \structure{Expressions} berechnen wir Typen (bottom-up) {
+      \bi
+      \ii \structure{Blätter}: \btDefTab Konstante Literale (23, "foobar") haben feste, eingebaute Typen\\
+                   \btUseTab Namensreferenzen haben Typen der Deklaration (später mehr)
+      \ii \structure{Innere Knoten}: Jeder Knotentyp hat eine Typ-Gleichung.\\
+                   \btUseTab Jeder Knoten propagiert seinen Ergebnistypen nach oben.\\
+      \ei
+      \OrangeBox{Typberechnung und -prüfung geschiet \enquote{in einem Rutsch}!}
+    }
+    \ei
+
+    \begin{columns}<2->
+      \begin{column}{0.52\textwidth}
+        \raisebox{-\height}{%
+          \begin{code}[]
+            \lstinputlisting[style=py,style=smaller,linerange={V1s-V1e}]{lst/05-type-visitor.py}
+            \vspace{-1ex}
+            \uncover<3->{
+              \lstinputlisting[style=py,style=smaller,linerange={V2s-V2e}]{lst/05-type-visitor.py}
+            }\vspace{-1ex}
+            \uncover<4->{
+              \lstinputlisting[style=py,style=smaller,linerange={V3s-V3e}]{lst/05-type-visitor.py}
+            }
+          \vspace{-1ex}
+        \end{code}
+      }
+      \end{column}\hfill
+      \begin{column}{0.47\textwidth}
+        \mbox{}\\[1ex]
+        \structure{Minimalbeispiel}
+        \bii
+        \ii Monomorphes Typsystem
+        \ii Ganzzahl und Pointertyp
+        \ii Addition nur auf Ganzzahlen
+        \eii
+
+        \smallskip
+        \begin{center}
+          \includegraphics[height=2.5cm,page=1]{fig/05-dependency-tree}
+        \end{center}
+        \smallskip
+
+
+      \end{column}
+    \end{columns}
+  \end{frame}
+#+end_src
 ** Symboltabelle
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Namensauflösung\\mittels\\Symboltabelle}
+
+  \begin{frame}{Statische Namensauflösung als L-Attribut}
+
+  \end{frame}
+#+end_src
   - Geerbte Attribute
   - find_decl, find_decl_fun
 ** Was tun bei Fehlern?
-* Integration
-  - Language: Coercion
-    - Unifikation am Beispiel von Typen?
+* Coercion: Automatische Typumwandlung
+* COMMENT Unifikation

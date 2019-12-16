@@ -13,7 +13,7 @@ class Visitor { public:
 //Ts
 void
 traversal(Visitor& v, Tree& t) {
-  for (Tree c : t.children()) {
+  for (Tree& c : t.children()) {
     traversal(v, c);
   }
   ``@v.visit(t);@

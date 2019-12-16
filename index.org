@@ -1,10 +1,10 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+INCLUDE: export-prologue.org
-#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil num:nil
 #+MACRO: headlines (eval (org-macro-headlines $1))
 
 
-* [[file:01-einleitung.org][Einleitung]]
+* <2020-04-14> [[file:01-einleitung.org][Einleitung]]
 
 Abschnitte: {{{headlines(./01-einleitung.org)}}}
 
@@ -59,11 +59,3 @@ Was wir nicht machen:
   - Logische Programmierung (z.B. Prolog)
   - Parallele Programmierung
   - Parsingtheorie in Detail
-
-
-* Copyright Notice
-:PROPERTIES:
-:CUSTOM_ID: copyrightNotice
-:END:
-
-#+INCLUDE: COPYING.org

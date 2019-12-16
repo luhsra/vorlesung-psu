@@ -78,5 +78,8 @@ class HeightVisitor:
     N.h = h + 1
 #vge
 
-traversal(HeightVisitor(), tree)
+#igs
+visitor = HeightVisitor()
+traversal(visitor, tree)
+#ige
 print(tree.h)
