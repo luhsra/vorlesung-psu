@@ -555,11 +555,158 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
 ** Symboltabelle
 #+begin_src latex
-  %%ONLY%%
+
   \dividerframe{Namensauflösung\\mittels\\Symboltabelle}
 
-  \begin{frame}{Statische Namensauflösung als L-Attribut}
+  \begin{frame}[fragile]{Statische Namensauflösung als L-Attribut}
+    \bi
+    \ii Referenzen beziehen sich auf benannte, aber entfernte Deklarationen{%
+      \bi
+      \ii Deklaration muss vor der Benutzung stattfinden (im AST links)
+      \ii Welche Deklaration gemeint ist, ist ein L-Attribut.
+      \ei
+    }
+    \begin{columns}
+      \begin{column}{3cm}
+          \smallskip
+          \begin{center}
+            \includegraphics[height=2.5cm,page=2]{fig/05-dependency-tree}
+          \end{center}
+          \smallskip
+      \end{column}\hfill
+      \begin{column}{9cm}
+        \structure{Vorgehen der Namensauflösung}
+        \bii
+        \ii Traversierung aller Deklarationen, Referenzen und Namensraumkonstrukte
+        \ii \structure{Symboltabelle} speichert die aktuell sichtbaren Namen
+        \ii Fortwährende Aktualisierung der Tabelle
+        \ii Auflösung von Referenzen über API der Symboltabelle
+        \eii
+      \end{column}
+    \end{columns}
+    \ii<2-> \structure{Symboltabelle}: Mögliche API in Java\\[1ex]
+    \begin{code}[tag=Java]
+      \begin{java}
+        interface SymbolTable {
+          ...
+          public void openNamespace(Tree NS);
+          public void createName(Name name, Tree node);
+          public Tree findName(Name name);
+          public void closeNamespace(Tree NS);
+          ...
+        }
+      \end{java}
+    \end{code}
+    \ei
+  \end{frame}
 
+  \begin{frame}[fragile]{AST Traversierung mit Symboltabelle}
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \begin{code}
+          \lstinputlisting[style=py,style=smaller,linerange={V1s-V1e}]{lst/05-name-resolution.py}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \bii
+        \ii Visitor hält eine Symboltabelle, die den aktuellen Kontext speichert.
+        \ii \codeinline[style=py]{self.ST} ist der \enquote{Datenrucksack} für die Traversierung.
+        \eii
+      \end{column}
+    \end{columns}
+
+    \begin{columns}[t]<2->
+      \begin{column}{0.49\textwidth}
+        \begin{code}
+          \lstinputlisting[style=py,style=smaller,linerange={V2s-V2e}]{lst/05-name-resolution.py}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \bii
+        \ii Visitor muss es erlauben Code vor (\codebox{pre\_}) und nach (\codebox{post\_}) Besuch der Kindsknoten auszuführen.
+        \ii \tikzmark{visitor} Einige AST Knoten öffen einen neuen Namensraum.
+        \eii
+      \end{column}
+    \end{columns}
+
+      \begin{columns}[t]<3->
+      \begin{column}{0.49\textwidth}
+        \begin{code}
+          \lstinputlisting[style=py,style=smaller,linerange={V3s-V3e}]{lst/05-name-resolution.py}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \bii
+        \ii Deklarationen führen Namen (\codebox{N}) für AST Knoten (\codebox{fn}) ein.
+        \eii
+      \end{column}
+    \end{columns}
+
+      \begin{columns}[t]<4->
+      \begin{column}{0.49\textwidth}
+        \begin{code}
+          \lstinputlisting[style=py,style=smaller,linerange={V4s-V4e}]{lst/05-name-resolution.py}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \bii
+        \ii Referenz \codebox{R} mittels Tabelle auflösen
+        \ii Ergebnis (\codebox{decl}) als Attribut speichern
+        \eii
+      \end{column}
+    \end{columns}
+
+    \begin{tikzpicture}[remember picture,overlay]
+      \only<2>{
+        \draw (pic cs:visitor) ++(-1cm,5mm) -- ++(-80:1.2cm) node[below,fill=codecolor]{
+          \lstinputlisting[style=py,style=smaller,linerange={ts-te}]{lst/05-name-resolution.py}
+        };
+      }
+    \end{tikzpicture}
+  \end{frame}
+
+  \begin{frame}{Symboltablle als Stack von Namensräumen}
+    \btAnimation[width=\textwidth]{range=1-12:<1->}{fig/05-symbol-table}
+  \end{frame}
+
+  \begin{frame}[fragile]{Erweiterte Traversierung bei der Namensauflösung}
+    \bi
+    \ii Beliebige Reihenfolge von Deklaration und Referenzen in einem NS{
+      \bi
+      \ii Java: Reihenfolge der Methodendefinition ist egal!
+      \ii \textbf{Lösung:} Wir traversieren den AST \alert<1>{zweimal}.{
+        \be
+        \ii Einsammeln aller Deklarationen.Speicherung an den Knoten (z.B. \codebox{ClassDecl})
+        \ii Auflösen der Referenzen beim zweiten Durchlauf
+        \ee
+      }
+      \ei
+    }
+    \ei
+    \bigskip
+    \bi
+    \ii<2-> Überladung von Funktionen anhand der statischen Signaturen{
+      \bi
+      \ii Typinformationen müssen bei der Namensauflösung bereit stehen
+      \ii \textbf{Lösung}: Typberechnung und Namensauflösung im \alert<2>{selben Visitor} durchführen.\\
+      \begin{code}[tag=Python]
+        \begin{py}
+          def post_CallExpr(self, call): # Post-Order: Bekannte Parametertypen
+             # 1. Berechnung der Statischen Signatur
+             N = signature(call.func_name)
+             for p in call.param:
+               N.addParam(p.Type)
+
+             # 2. Namensauflösung des komplexen Namens
+             call.decl = self.ST.findName(N)
+
+             # 3. Ergebnistyp der CallExpr
+             call.Type = call.decl.ReturnType
+        \end{py}
+      \end{code}
+      \ei
+    }
+    \ei
   \end{frame}
 #+end_src
   - Geerbte Attribute

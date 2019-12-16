@@ -1,0 +1,110 @@
+\documentclass{lecturefig}
+\usepackage{fig/05-common}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    level distance=1cm,
+    sibling distance=2.5cm,
+    dot/.style={
+      fill=black,circle,inner sep=1pt,font=\color{white},
+    },
+    ast/.style={ast with attributes,name=#1,label={[dot,anchor=center]text split west:\footnotesize #1},
+    anchor=north},
+    NS/.style={
+      draw,
+      rectangle split,
+      rectangle split parts=2,
+      align=left,
+      font=\ttfamily,
+      rectangle split part fill={luhblue!30,white},
+      align=flush left,
+    },
+    hl/.style={
+      draw,thick,srared,label={[anchor=south east,inner sep=0,srared]north east:#1},
+    },
+    edge from parent/.style={draw,->},
+    ]
+    \def\N#1{\tikz[baseline]\node[dot,anchor=base]{\footnotesize #1};}
+    \newcommand<>{\B}[2]{\tikz[baseline,visible on={#3}]\draw[->] (0,0) node[rectangle,anchor=east]{#1} -- ++(east:1em) node[dot,anchor=west,xshift=1mm]{\footnotesize #2};}
+    \node[ast=A] {TranslationUnit\nodepart{two}name=<root>}
+      child { node[ast=B] {VarDecl\nodepart{two}name=tmp}       }
+      child { node[ast=C] {Namespace\nodepart{two}name=math}
+        child { node[ast=D] {Function\nodepart{two}name=fib}
+          child { node[ast=E] {VarDecl\nodepart{two}name=tmp} }
+          child { node[ast=F] {DeclRef\nodepart{two}name=tmp\\\B<7->{decl}{E}} }
+          child { node[ast=G] {CallExpr\nodepart{two}name=fib\\\B<8->{decl}{D}} }
+        }
+      }
+      child { node[ast=H] {DeclRef\nodepart{two}name=tmp\\\B<11->{decl}{B}} };
+
+
+
+      \newcommand<>{\V}[1]{\begin{visible}#2#1\end{visible}}
+      \node[right=3.5 of A] (st-label) {\structure{\textbf{Symbol Table}}};
+
+      \begin{visible}<2-11>
+        \node[NS, below=0.2 of st-label,xshift=-1em] (root) {
+          Namespace: \N{A}\nodepart{two}
+          \B<3->{tmp}{B}\\
+          \B<4->{math}{C}
+        };
+        \V<2>{\node[fit=(A), hl=pre]{};}
+        \V<3>{\node[fit=(B), hl=pre]{};}
+        \V<4>{\node[fit=(C), hl=pre]{};}
+        \V<10>{\node[fit=(C), hl=post]{};}
+        \V<11>{\node[fit=(H), hl=]{};}
+      \end{visible}
+      \V<11->{
+        \draw[->,dashed](H.north)--(H.north|-A.north)--++(up:1em)-|(B.north);
+      }
+      \V<12>{\node[fit=(A), hl=post]{};}
+
+
+      \begin{visible}<4-9>
+        \node[NS, below=6mm of root] (math) {
+          Namespace: \N{C}\nodepart{two}
+          \B<5->{fib}{D}
+        };
+        \draw[<-](root)--(math);
+        \V<5>{\node[fit=(D), hl=pre]{};}
+        \V<9>{\node[fit=(D), hl=post]{};}
+      \end{visible}
+
+      \begin{visible}<5-8>
+        \node[NS, below=6mm of math] (fib) {
+          Namespace: \N{D}\nodepart{two}
+          \B<6->{tmp}{E}
+        };
+        \draw[<-](math)--(fib);
+        \V<6>{\node[fit=(E), hl=pre]{};}
+        \V<7>{\node[fit=(F), hl=pre]{};}
+
+        \V<8>{\node[fit=(G), hl=pre]{};}
+      \end{visible}
+      \V<7->{\draw[->,dashed](F.south)--++(down:1em)-|(E.south);}
+      \V<8->{\draw[<-,dashed](D.east)-|(G.north);}
+
+      \V<7>{
+        \draw[->,luhblue,thick] ($(fib.south east)+(east:1em)$)
+              -- node[below,sloped,xshift=5mm]{CNSR search}
+              ($(fib.north east)+(east:1em)$);
+      }
+      \V<8>{
+        \draw[->,luhblue,thick] ($(fib.south east)+(east:1em)$)
+              -- node[below,sloped]{CNSR search}
+              ($(math.north east)+(east:1em)$);
+      }
+      \V<11>{
+        \draw[->,luhblue,thick] ($(root.south east)+(east:1em)$)
+              -- node[below,sloped](cnsr-label){CNSR search}
+              ($(root.north east)+(east:1em)$);
+      }
+
+      \begin{pgfonlayer}{background}
+        \node[fill=codecolor,fit=(st-label) (root) (cnsr-label) (fib),]{};
+      \end{pgfonlayer}
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

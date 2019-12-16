@@ -12,6 +12,7 @@
 \RequirePackage{marvosym}
 \RequirePackage{helvet}
 \RequirePackage{lmodern}
+\RequirePackage[scaled=0.85]{beramono}
 \RequirePackage{convention} % texmf-local
 
 
