@@ -1,0 +1,16 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every node/.style={fill=white,font=\ttfamily},N/.style={circle,draw,minimum width=3em}]
+    \node[N](array){[]};
+    \node[N] at (0:4cm) (string){"0"};
+    \node[N] at (-60:4cm) (tab){"\textbackslash t"};
+    \node[N] at (barycentric cs:array=1,string=1,tab=1) (zero){0};
+
+    \foreach \s/\t in {array/string,string/tab,tab/array} {
+      \draw[srared,<->] (\s) --    node[sloped,fill=srared!20,draw] {\color{black}!=} (\t);
+      \draw[safegreen,<->] (\s) -- node[sloped,fill=safegreen!20,draw] {\color{black}==} (zero);
+    }
+  \end{tikzpicture}
+\end{frame}
+\end{document}

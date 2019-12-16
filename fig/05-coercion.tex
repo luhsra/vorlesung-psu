@@ -1,0 +1,37 @@
+\documentclass{lecturefig}
+\usepackage{fig/05-common}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    ast/.style={ast with attributes},
+    edge from parent/.style={draw,->},
+    sibling distance=4cm,level distance=2cm,
+    ]
+    \node[ast,text width=2.5cm]{CallExpr\nodepart{two}Type = \alt<1>{\ALERT{error}}{float}}
+      child{ node[ast]{Function\nodepart{two}
+        name = double\\
+       Type = float$\rightarrow$float
+    } }
+    child{
+      node[ast,text width=3cm](cast){\alt<1>{Literal}{ImplicitCast}\nodepart{two}
+          \alt<1>{%
+            value = 23\\
+            Type = int
+          }
+          {%
+            FromType =  int\\
+            Type     = float
+          }
+    } }
+    ;
+
+    \begin{visible}<2>
+      \node[ast,below=1 of cast](literal){Literal\nodepart{two}
+        value = 23\\
+        Type = int
+      };
+      \draw[->] (cast) -- (literal);
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\end{document}

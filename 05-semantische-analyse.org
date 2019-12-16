@@ -553,6 +553,73 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \end{columns}
   \end{frame}
 #+end_src
+** Coercion: Automatische Typumwandlung
+#+begin_src latex
+  \dividerframe{Coercion:\\Automatische Typumwandlung}
+  \begin{frame}{Automatische Typumwandlung}
+    \begin{btBlock}{Was passiert bei inkompatiblen Typen?}\small
+      Passen gefordertert (z.B. Parameter) und vorhandener Typ (z.B.Argument) nicht zusammen, kann eine \textbf{implizite} Typumwandlung eingefügt werden.
+    \end{btBlock}
+
+    \medskip
+    \begin{columns}
+      \begin{column}{0.40\textwidth}
+        \includegraphics[width=\textwidth]{fig/05-coercion}
+      \end{column}
+      \begin{column}<2->{0.20\textwidth}
+        \centering
+        \Huge $\Rightarrow$
+      \end{column}
+      \begin{column}<2->{0.40\textwidth}
+        \includegraphics[width=\textwidth,page=2]{fig/05-coercion}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii<3-> Sprachen definieren eine Reihe von automatischen Typumwandlungen{
+      \bi
+      \ii \structure{Ganzzahlweitung}: Umwandlung in breitere Integer ohne Informationsverlust
+      \ii C: \codebox{char}$\rightarrow$\codebox{short}$\rightarrow$\codebox{int}$\rightarrow$\codebox{long}
+      \ii C++: Implizite Umwandlung von \codebox{void*} zu beliebigen Zeigern (z.B., \codebox{int *})
+      \ei
+    }
+    \ei
+
+  \end{frame}
+
+  \begin{frame}{Einordnung der automatischen Typumwandlung}
+    \btAnimation[width=0.8\textwidth]{center, padding, 4:<1->}{fig/03-polymorphismus}
+    \bi
+    \ii Automatisch umgewandelte Typen verhalten sich \structure{polymorph}!{
+      \bi
+      \ii \structure{Ad-Hoc}: Die Umwandlung ist abhängig vom konkreten Kontext
+      \ii Typumwandlung \btDefTab ist polymorph auf Seite des Produzenten\\Überladung\btUseTab ist polymorph auf Seite des Konsumenten
+      \ei
+    }\smallskip
+    \ii<2-> Manche Sprachen erlauben es nutzerdefinierte implizite Umwandlungen.{
+      \bi
+      \ii \structure{Converting constructors} (C++): Konstruktoren mit genau einem Argument ergänzen die eingebauten Regeln zur Typumwandlung.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Probleme der automatischen Typumwandlung}
+    \begin{center}
+      \includegraphics[width=4cm]{fig/05-js-triangle}
+    \end{center}
+    \bi
+    \ii Implizite Typumwandlung können leicht zu Verwirrung führen!
+        \bi
+        \ii Javascript: Umwandlungen von Strings und leeren Arrays zur Zahl \texttt{0}\\
+        \enquote{When using two equals signs [...] some funky conversions take place}
+        \ii Inkonsistente Gleicheit: \codebox{([]!="0")} vs. \codebox{(([]==0)\&\&(0=="0"))}
+        \ei
+        \medskip
+    \ii[$\Rightarrow$] Die traurige Wahrheit: JavaScript hat zusätzlich einen \texttt{===}-Operator.
+    \ei
+  \end{frame}
+#+end_src
 ** Symboltabelle
 #+begin_src latex
 
@@ -691,11 +758,11 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ii \textbf{Lösung}: Typberechnung und Namensauflösung im \alert<2>{selben Visitor} durchführen.\\
       \begin{code}[tag=Python]
         \begin{py}
-          def post_CallExpr(self, call): # Post-Order: Bekannte Parametertypen
+          def post_CallExpr(self, call): # Post-Order: Bekannte Argumenttypen
              # 1. Berechnung der Statischen Signatur
              N = signature(call.func_name)
-             for p in call.param:
-               N.addParam(p.Type)
+             for A in call.arguments:
+               N.addParam(A.Type)
 
              # 2. Namensauflösung des komplexen Namens
              call.decl = self.ST.findName(N)
@@ -711,6 +778,5 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 #+end_src
   - Geerbte Attribute
   - find_decl, find_decl_fun
-** Was tun bei Fehlern?
-* Coercion: Automatische Typumwandlung
+
 * COMMENT Unifikation
