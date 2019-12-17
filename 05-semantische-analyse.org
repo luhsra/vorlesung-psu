@@ -779,4 +779,86 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   - Geerbte Attribute
   - find_decl, find_decl_fun
 
-* COMMENT Unifikation
+** Unifikation
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Unifikation}
+
+  \begin{frame}[fragile]{Zyklisch-abhängige Attribute}
+    \begin{columns}
+      \begin{column}{3cm}
+        \includegraphics[height=2.5cm,page=3]{fig/05-dependency-tree}
+      \end{column}\hfill
+      \begin{column}{8cm}
+        \bii
+        \ii Zyklische Attribute erfordern komplexen Datenfluss{
+          \bi
+          \ii Knoten liefern Teilwissen um das Attribut
+          \ii Gleichungssystem für Attribute ist \alert<-2>{selbst-referenziell}
+          \ii Einfaches zyklisches Beispiel: \only<2->{\texttt{x.h = 1, y.h = 2}}\\
+              \hfill\colorbox{badbee!20}{\parbox[b]{0.8\textwidth}{
+                  \texttt{x.h = y.h - 1} \hspace{1cm}\textit{Konsekutive Zahlen}\\
+                  \texttt{y.h = 2 * x.h} \hspace{1cm}\textit{Vielfachheit}
+                }
+              }\hfill
+          \smallskip
+          \ii<3-> ... wurden lange für Programmiersprachen gemieden.
+          \ei
+        }
+        \eii
+      \end{column}
+    \end{columns}
+    \bigskip
+
+    \bi
+    \ii<4-> \structure{Typinferenz} erleichtert statische Typisierung, erzeugt aber Zyklen{
+      \btUseExtraItemSep
+      \bi
+      \ii Inferenz: Ableitung der statischen Typen aus der Verwendung der Variablen
+      \ii \codeinline{fun(x) { return x + 2 }} $\rightarrow$ Der Parameter x muss vom Typ \codeinline[style=C]{int} sein
+      \ii \structure{Hindley-Milner Typinferenz} ist, kombiniert mit parametrischem Polymorphismus, die Grundlage der \alert{funktionalen Programmierung}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Typinferenz durch Ersetzung von Typvariablen}
+    \begin{columns}
+      \begin{column}{0.40\textwidth}
+        \btAnimation[width=\textwidth]{range=1-6:<1->}{fig/05-inference}
+      \end{column}\hfill
+      \begin{column}{0.58\textwidth}
+        \OrangeBox{Was ist der Typ von \codebox{append(p1, p2)}?}
+        \smallskip
+        \bii
+        \ii Blätter: Einsetzen des vorhandenen Wissens{%
+          \bi
+          \ii Die Variable p2 hat Typ \codebox{int}
+          \ii \codebox{append()} ist generische Funktion und hängt ein Element an homogene Liste an
+          \ii Alles unbekannte wird durch eine \structure{freie Typvariable} ($\alpha, \beta, \gamma$) dargestellt.
+          \ei
+        }\medskip
+        \ii<2-> Knoten führen \structure{Nebenbedingungen} ein{
+          \bi
+          \ii CallExpr: Die Signatur der aufgerufene Funktion muss zu den Argumenten passen.
+          \ii Rückggabetyp (E.T) soll ermittelt werden
+          \ei
+        }\medskip
+        \ii<3->Variablen-Elimination durch \structure{Ersetzungen}{
+          \bi
+          \ii Ersetze jede Variable durch Typausdruck
+          \ii Nebenbedingungen \alert<-5>{müssen erfüllt} werden!
+          \ii Fertig, wenn es \alert<6>{keine freie Variable} mehr gibt
+          \ei
+        }
+        \eii
+
+      \end{column}
+    \end{columns}
+
+
+  \end{frame}
+
+#+end_src
+
+* Zusammenfassung

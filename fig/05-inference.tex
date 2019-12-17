@@ -1,0 +1,52 @@
+\documentclass{lecturefig}
+\usepackage{fig/05-common}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    ast/.style={ast with attributes,rectangle split parts=#1,anchor=north},
+    sibling distance=2.3cm,
+    level distance=2cm,
+    edge from parent/.style={draw,->},
+    ]
+
+    \def\ALPHA{\only<-3>{\ensuremath{\alpha}}\only<4->{\ensuremath{[\GAMMA]}}}
+    \def\BETA{\only<-4>{\ensuremath{\beta}}\only<5->{\ensuremath{[\GAMMA]}}}
+    \def\GAMMA{\only<-5>{\ensuremath{\gamma}}\only<6->{\ensuremath{\text{int}}}}
+
+
+    \node[ast=3,text width=4cm] (call) {CallExpr E
+      \nodepart{two}
+      T=\strut\ALPHA
+      \nodepart{three}\centering
+      \strut\only<2>{append.T}\only<3->{$([\GAMMA], \GAMMA)\rightarrow[\GAMMA]$}\\
+      \strut\only<2->{=}\\
+      \strut\only<2>{(p1.T, p2.T)$\rightarrow$E.T}\only<3->{$(\BETA, \text{int})\rightarrow\ALPHA$}\\[0ex]
+    }
+    child { node [ast=2,text width=4cm] {Function:\ append
+        \nodepart{two}
+        T=\strut([\GAMMA],\GAMMA)$\rightarrow$[\GAMMA]%
+      } }
+    child { node [ast=2,yshift=-1.6cm] (p1) {Var:\ p1
+        \nodepart{two}
+        T = \strut\BETA
+      } }
+    child { node [ast=2,xshift=-1cm] (p2) {Var: p2
+        \nodepart{two}
+        T = int
+      } }
+    ;
+
+    \begin{visible}<2>
+      \node[align=center,left=0.4 of call.two split west,anchor=east](@){Typregel\\für\\CallExpr};
+      \draw[ultra thin] (@) -- (call.three west);
+    \end{visible}
+
+    \node[below=0.5cm of p1,align=center,draw,visible on=<3->] {
+      \textbf{Ersetzung der Typvariablen}\\
+      \strut\only<4->{$\alpha\rightarrow[\gamma]$}\\
+      \strut\only<5->{$\beta\rightarrow[\gamma]$}\\
+      \strut\only<6->{$\gamma\rightarrow \GAMMA$}
+    };
+  \end{tikzpicture}
+\end{frame}
+\end{document}
