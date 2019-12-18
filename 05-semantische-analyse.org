@@ -16,10 +16,12 @@
 
 * Gedanken zu dieser Vorlesung                                     :noexport:
 Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
- - Wie fließen Attribute  [effektiv]
-   - Attribut Grammatike
+ - Wie fließen Attribute             [effektiv]
+   - Attribut Grammatiken
  - Übersetzertechniken kennen lernen [effizient]
    - Visitor Pattern
+   - Symboltabelle
+   - Unifikation
 
 
 * Ziele der semantischen Analyse
@@ -48,12 +50,45 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \ei
 
   \end{frame}
+  #+end_src
 
-  \begin{frame}{Beispiel: Semantische Analyse eines Programms}
-    \btAnimation[width=\textwidth]{center,range=1-5:<1->}{fig/05-example-ast}
-  \end{frame}
 
-  \begin{frame}[t]{Ziele der Semantischen Analyse}
+In dieser Vorlesungseinheit werden wir uns mit der *semantischen Analyse* befassen.
+In den letzten beiden Kapiteln haben wir uns mit zwei essentiellen Bereichen des Sprachdesigns (Typen und Namen) befasst.
+Diese beiden Themenbereiche greifen wir bei der semantischen Analyse wieder auf, betrachten Sie diesmal allerdings aus Sicht des Übersetzers:
+"Wie *implementieren* wir Typprüfung und Namensauflösung in einem Übersetzer?"
+Dazu werden wir zum einen einen theoretischen Hintergrund kennen lernen, der uns erklärt was wir in der semantischen Analyse überhaupt ausrechnen (Knotenattribute) und welche Techniken dafür geeignet sind (Baumtraversierung, Symboltabelle, Unifikation).
+Die Vorlesung ist dabei stark von möglichen Implementierungen getrieben; Schnallen Sie sich also an, es wird Codebeispiele regnen!
+
+Zunächst wollen wir die semantische Analyse einmal in den Ablauf des Übersetzungsvorgangs einordnen.
+In der zweiten Vorlesung haben wir uns mit der syntaktischen Analyse befasst, die einen Zeichenstrom einließt und durch Anwendung eines kontextfreien Parsers einen abstrakten Syntaxbaum (AST) extrahiert.
+Ausgehend vom Syntaxbaum, welcher für jede Anwendung einer Grammatikregel einen Knoten enthält, berechnen wir den AST als eine kondensierte Form der Programmstruktur.
+Durch die Baumstruktur des AST können wir beliebig tiefe syntaktische Schachtelungen (z.B. geklammerte arithmetische Ausdrücke) darstellen.
+Der AST ist die *Eingabe der semantischen Analyse*.
+
+Während die syntaktische Analyse bereits sicher stellt, dass ein Programm korrekt notiert wurde und syntaktisch korrekt ist (z.B.
+Klammerung ist balanciert), können sich immer noch inhaltliche (oder semantische) Fehler im AST verstecken.
+So könnte in einem Ausdruck eine Variable referenziert werden, die nirgends deklariert ist, oder wir könnten versuchen eine Ganzzahl auf zu rufen (~int x = 1; x();~).
+Beide Fehler können, prinzipbedingt, nicht durch einen kontextfreien Parser erkannt werden, da sie erst in einer gewissen Umgebung, einem Kontext, erkennbar werden.
+Daher teilt man die Menge aller Sprachregeln in die syntaktischen Regeln und die semantischen Regeln ein.
+Im Prinzip prüft die semantische Analyse all übrigen Regeln ab, die nicht bereits im Parser geprüft werden konnten.
+Dies bedeutet aber auch, dass wir am Ende der semantischen Analyse sicher wissen, ob ein vorliegendes Programm wirklich ein Programm der Sprache ist oder nur ein Zeichenstrom der einem validen Programm zum verwechseln ähnlich sieht[fn::Wenn ihr "C Programm" nicht kompliert, ist es kein Programm der Sprache C].
+
+Das Ergebnis der semantischen Analyse ist wieder der AST.
+Allerdings reichert die semantische Analyse die Knoten des AST um *semantische Attribute* an.
+Diese Attribute beinhalten Zeiger auf die Deklaration bei Namensreferenzen oder den berechneten Rückggabetyp eines komplexen Ausdrucks.
+Diese Attribute hängen dabei nicht nur von dem Knoten ab, an den wir sie anhängen, sondern auch von den Kindern, den Geschwistern oder dem Vorgänger des aktuellen Knotens.
+Die Techniken mit denen wir diese Attribute berechnen und auf Konsistenz prüfen, sind dabei nicht nur für den Übersetzerbau hilfreich, sondern auch für andere Bereiche der Informatik.
+
+TL;DR: Semantische Analyse(AST) -> AST mit semantischen Attributen an jedem Knoten
+
+
+#+begin_src latex
+\begin{frame}{Beispiel: Semantische Analyse eines Programms}
+  \btAnimation[width=\textwidth]{center,range=1-5:<1->}{fig/05-example-ast}
+\end{frame}
+
+\begin{frame}[t]{Ziele der Semantischen Analyse}
     \begin{btBlock}{Syntaktische und Semantische Analyse prüfen alle Sprachregeln}\small
       Die syntaktische Analyse prüft die kontextfreien Regeln einer Sprache. Alles was nicht kontextfrei geprüft werden kann, überprüft die semantische Analyse.
     \end{btBlock}
@@ -83,7 +118,38 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   \end{frame}
 #+end_src
 
+Um die Schritte der semantischen Analyse deutlicher zu machen, wollen wir uns ein Beispiel ansehen.
+Beim AST, den wir aus dem Parser bekommen, sind alle Kinder eines AST Knotens erst einmal gleichberechtigt, haben aber eine Ordnung, die sich aus den Regeln der Grammatik ergeben; Wir können diese also in einem Knoten in einem Array speichern (im Beispiel ist der Rückgabetyp der Funktion in ~function.children[2]~ gespeichert.
+Da solche magischen Konstanten den Code unseres Übersetzers unübersichtlich macht, geben wir den Kindern der AST Knoten, wo dies Sinn macht, symbolische Namen (~function.rettype~).
+
+Bei der *Namensauflösung* prüfen wir zum einen ob es eine passende Deklaration (*Deklariertheitseigenschaft*) gibt und zum anderen speichern wir die gefundene Referenz als Attribut an der Verwendungsstelle.
+Bemerkenswert im Beispiel ist, dass wir bei der Referenz ~"a"~ nicht auf den deklarierenden Bezeichner ~"a"~ zeigen lassen, sondern auf den inneren Knoten der das semantische Element "Variablendeklaration" darstellt; Wir etablieren so eine *semantische Querverbindung* im AST.
+Querverbindung deshalb, weil sich die Kante nicht entlang der kanten des Baums hangelt, sondern direkt, quer zu jeder Eltern-Kind Beziehung, gezogen wird.
+
+Das Ziel der *Typprüfung* ist es sicher zu stellen, dass jede angewandte Operation kompatibel zu den statischen Typen der Operanden ist; Operanden und Operationen müssen konsistent zueinander sein!
+So dürfen wir das Ergebnis einer Addition nicht als Funktion aufrufen:
+~(1+1)()~, weil man Ganzzahlen, immer noch nicht, aufrufen kann.
+Um diese Typprüfung durch zu führen, berechnen wir für die Knoten des ASTs einen Rückggabetyp:
+Beginnend bei den Blättern, die entweder konstante Laterale (~1~) oder Namensreferenzen sind (Typ der Deklaration), propagieren wir die Typinformationen im Baum von unten nach oben.
+Bei jedem inneren Knoten prüfen wir ob die Typen der direkten Kinder (= die Operanden) zum Knotentyp (= die Operation) passt.
+So erwartet die ~+~ Operation im Beispiel, dass sowohl das linke (left-hand side, lhs) als auch das rechte (right-hand side, rhs) Kind ein ~int~ ist. Das Ergebnis dieser Addition ist wiederum selbst vom Typ ~int~.
+Außerdem wird sichergestellt, dass die zurückgegebenen Werte zum deklarierten Rückggabetyp der Funktion passen.
+
+Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Namensauflösung, wie bereits erwähnt, miteinander interagieren. Hätte unsere Sprache die Möglichkeit diesen Operator zu überladen, so würden wir für den ~+~-Knoten zunächst die Typen der Kinder berechnen, eine Aufrufsignatur erstellen und per Namensauflösung eine Referenz auf die verwendete Überladung ziehen. Der Knotentyp unserer Addition wäre dann nicht immer ~+~, sondern der Rückgabetyp der gefundenen Überladung.
+
+
+
+
+
+
+
+
+
 * AST Struktur und Attributierung
+:PROPERTIES:
+:CUSTOM_ID: 05-ast-types
+:END:
+
 #+begin_src latex
 \dividerframe{AST Knoten}
   \begin{frame}[t,fragile]{AST: Baumstruktur im Übersetzer}
@@ -907,8 +973,6 @@ https://eli.thegreenplace.net/2018/unification/
 
 * Zusammenfassung
 #+begin_src latex
-  %%ONLY%%
-
   \begin{frame}{Zusammenfassung: Semantische Analyse}
     \bi
     \ii Semantische Analyse prüft die restlichen, kontextsensitiven Sprachregeln{
