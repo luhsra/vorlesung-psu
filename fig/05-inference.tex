@@ -13,13 +13,14 @@
     \def\BETA{\only<-4>{\ensuremath{\beta}}\only<5->{\ensuremath{[\GAMMA]}}}
     \def\GAMMA{\only<-5>{\ensuremath{\gamma}}\only<6->{\ensuremath{\text{int}}}}
 
+    \alt<6>{\colorlet{equal}{safegreen}}{\colorlet{equal}{srared}}
 
     \node[ast=3,text width=4cm] (call) {CallExpr E
       \nodepart{two}
       T=\strut\ALPHA
       \nodepart{three}\centering
       \strut\only<2>{append.T}\only<3->{$([\GAMMA], \GAMMA)\rightarrow[\GAMMA]$}\\
-      \strut\only<2->{=}\\
+      \strut\only<2->{\colorbox{equal!30}{\textbf{\ \ \color{equal}$=$\ \ }}}\\
       \strut\only<2>{(p1.T, p2.T)$\rightarrow$E.T}\only<3->{$(\BETA, \text{int})\rightarrow\ALPHA$}\\[0ex]
     }
     child { node [ast=2,text width=4cm] {Function:\ append
@@ -37,15 +38,15 @@
     ;
 
     \begin{visible}<2>
-      \node[align=center,left=0.4 of call.two split west,anchor=east](@){Typregel\\für\\CallExpr};
+      \node[align=center,left=0.4 of call.two split west,anchor=east](@){Semantische\\Regel\\für\\CallExpr};
       \draw[ultra thin] (@) -- (call.three west);
     \end{visible}
 
     \node[below=0.5cm of p1,align=center,draw,visible on=<3->] {
       \textbf{Ersetzung der Typvariablen}\\
-      \strut\only<4->{$\alpha\rightarrow[\gamma]$}\\
-      \strut\only<5->{$\beta\rightarrow[\gamma]$}\\
-      \strut\only<6->{$\gamma\rightarrow \GAMMA$}
+      \strut\only<4->{$\alpha\mapsto[\gamma]$}\\
+      \strut\only<5->{$\beta\mapsto[\gamma]$}\\
+      \strut\only<6->{$\gamma\mapsto \GAMMA$}
     };
   \end{tikzpicture}
 \end{frame}

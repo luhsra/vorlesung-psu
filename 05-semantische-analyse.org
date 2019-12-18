@@ -781,8 +781,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 ** Unifikation
 #+begin_src latex
-  %%ONLY%%
-  \dividerframe{Unifikation}
+  \dividerframe{Zyklische Attribute\\und\\Unifikation}
 
   \begin{frame}[fragile]{Zyklisch-abhängige Attribute}
     \begin{columns}
@@ -808,7 +807,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
         \eii
       \end{column}
     \end{columns}
-    \bigskip
+    \bigskip\bigskip
 
     \bi
     \ii<4-> \structure{Typinferenz} erleichtert statische Typisierung, erzeugt aber Zyklen{
@@ -816,7 +815,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \bi
       \ii Inferenz: Ableitung der statischen Typen aus der Verwendung der Variablen
       \ii \codeinline{fun(x) { return x + 2 }} $\rightarrow$ Der Parameter x muss vom Typ \codeinline[style=C]{int} sein
-      \ii \structure{Hindley-Milner Typinferenz} ist, kombiniert mit parametrischem Polymorphismus, die Grundlage der \alert{funktionalen Programmierung}
+      \ii \structure{Hindley-Milner Typinferenz} kombiniert zyklische Attribute mit\\ \textbf{parametrischem Polymorphismus}; Grundlage der \alert{funktionalen Programmierung}
       \ei
     }
     \ei
@@ -838,7 +837,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
           \ii Alles unbekannte wird durch eine \structure{freie Typvariable} ($\alpha, \beta, \gamma$) dargestellt.
           \ei
         }\medskip
-        \ii<2-> Knoten führen \structure{Nebenbedingungen} ein{
+        \ii<2-> Regeln als \structure{parametrische Bedingungen}{%
           \bi
           \ii CallExpr: Die Signatur der aufgerufene Funktion muss zu den Argumenten passen.
           \ii Rückggabetyp (E.T) soll ermittelt werden
@@ -846,19 +845,96 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
         }\medskip
         \ii<3->Variablen-Elimination durch \structure{Ersetzungen}{
           \bi
-          \ii Ersetze jede Variable durch Typausdruck
-          \ii Nebenbedingungen \alert<-5>{müssen erfüllt} werden!
-          \ii Fertig, wenn es \alert<6>{keine freie Variable} mehr gibt
+          \ii \textbf{Ziel:} \alert<-5>{Bedingungen müssen erfüllt} sein
+          \ii Ersetztung: Variable $\rightarrow$ Typausdruck
+          \ii Finde Sequenz \only<6>{\color{safegreen}\bfseries}{unifizierender Ersetztungen}
           \ei
         }
         \eii
 
       \end{column}
     \end{columns}
+  \end{frame}
 
+  \begin{frame}{Unifikation: Berechnung von passenden Ersetzungen}
+    \begin{btBlock}{Unifikation}
+      Finden eine Sequenz von Variablen-Ersetzungen, die zwei Terme angleicht.
+    \end{btBlock}
+    \medskip
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \hspace{3mm}$T_1=\text{func}(\text{list}(\gamma),$ \btSetNamedTab\first $\gamma$,\hspace{1em}\btSetNamedTab\second$ \text{list}(\gamma))$\\
+        \hspace{3mm}$T_2=\text{func}(\beta,$\first $\text{int},$ \second$\alpha)$\\[1ex]
+      \end{column}
+      \begin{column}<2->{0.49\textwidth}
+        $U=\{\underbrace{\alpha\mapsto \beta}_{S_1}, \underbrace{\beta\mapsto list(\gamma)}_{S_2}, \underbrace{\gamma\mapsto\text{int}}_{S_3}\}$
+      \end{column}
+    \end{columns}
+    \medskip
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \structure{Typausdrücke mit freien Variablen}
+        \bii
+        \ii Typ(konstruktoren): int, func, List
+        \ii Variablen: $\alpha, \beta, \gamma$
+        \ii Variablen können in beiden Termen, auch mehrfach, vorkommen%
+        \eii
+      \end{column}
+      \begin{column}<2->{0.49\textwidth}
+        \structure{Unifizierende Ersetzung}
+        \bii
+        \ii Ersetzungssequenz: $S_1\circ S_2 \circ S_3$
+        \ii Reihenfolge ist relevant!
+        \ii \textbf{Allgemeinster Unifikator} nimmt nur notwendige Ersetzungen vor.
+        \eii
+      \end{column}
+    \end{columns}
 
+    \bigskip\bigskip
+    \bi
+    \ii<3-> Mehrere Unifikations-Algorithmen \texttt{unify($T_1$, $T_2$)$\rightarrow U$}{
+      \bi
+      \ii Erster Algorithmus von Robinson (1965) hat exponentielle Laufzeit
+      \ii Lineare Laufzeit: Paterson, Wegman (1978); Martelli, Montanari (1982)
+      \ei
+    }
+    \ei
   \end{frame}
 
 #+end_src
 
+https://eli.thegreenplace.net/2018/unification/
+
 * Zusammenfassung
+#+begin_src latex
+  %%ONLY%%
+
+  \begin{frame}{Zusammenfassung: Semantische Analyse}
+    \bi
+    \ii Semantische Analyse prüft die restlichen, kontextsensitiven Sprachregeln{
+      \bi
+      \ii \structure{Namensauflösung}: Gibt es zu jeder Referenz es eine Deklaration?
+      \ii \structure{Typkonsistenz}:  Werden die statische Typen korrekt verwendet?\\[1ex]
+      \ii[\color{srared}$\Rightarrow$] Nach der semantischen Analyse haben wir ein korrektes Programm vor uns!
+      \ei
+    }\medskip
+    \ii<2-> Berechnung der \structure{semantischen Attribute} für jeden Knoten (z.B. Typ){
+      \bi
+      \ii Attribute sind Abhängig von anderen (auch entfernten) Knotenattributen\\
+          $\Rightarrow$ Gleichungssystem zwischen allen Knotenattributen\\[1ex]
+      \ii \structure{S-Attribut}: Nur Abhängigkeiten zu den eigenen Kindern \hfill(\enquote{nach unten})
+      \ii \structure{L-Attribut}: Abhängigkeiten von Geschwister und Vorgängern \hfill(\enquote{nach links})
+      \ii \structure{Zyklische Attribute}: Wechselseitig-abhängige Attributgleichungen
+      \ei
+    }\medskip
+    \ii<3-> \structure{Übersetzertechniken} zur Attributberechnung und Regelprüfung{
+      \bi
+      \ii \structure{Baumtraversierung}: Visitor bündelt Knotentyp-abhängige Operationen
+      \ii \structure{Symboltabelle}: Speichert die aktuell deklarierten Namen beim Traversieren
+      \ii \structure{Unifikation}: Angleichung von parametrischen Typausdrücken durch Ersetzung
+      \ei
+    }
+    \ei
+  \end{frame}
+
+#+end_src
