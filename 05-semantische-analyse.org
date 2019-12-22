@@ -536,6 +536,9 @@ Im Folgenden werde ich also drei Techniken vorstellen um unterschiedliche Typen 
 Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zyklische Attribute).  Los gehts!
 
 ** Traversierung von Bäumen
+:PROPERTIES:
+:CUSTOM_ID: 05-tree-traversal
+:END:
 #+begin_src latex
   \begin{frame}[t]{Traversierung von Bäumen}
     \begin{btBlock}{Berechnung der synthetischen Attribute}
@@ -597,7 +600,33 @@ Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zy
       }
       \ei
   \end{frame}
+  #+end_src
+  
+Als erstes wollen wir uns die *Baumtraversierung* anschauen und mit dem *Visitor*/*Besucher*-Pattern ein Entwurfsmuster diskutieren bei dem man die Attributegleichungen für S-Attribute übersichtlich formulieren kann.
+Generell fließen die Informationen bei S-Attributen von unten nach oben, wir müssen also zuerst alle Kinder eines Knotens besuchen, bevor wir daran gehen das eigene Attribut auszurechnen. Dieses Berechnungsmuster entspricht einer Tiefensuche mit Post-Order Besuchsreihenfolge.
 
+Das erste Codebeispiel zeigt eine rekursive Funktion, die diese Tiefensuche implementiert und das Höhenattribut ausrechnet.
+Im gesamten Verlauf, wird die Funktion ~height(N)~ für jeden Knoten ~N~ des Baums einmal aufgerufen und der untere Teil der Funktion rechnet die Höhe aus.
+Der rekursive Besuch aller Knoten geschiet dadurch, dass wir ~height()~ mit dem Wurzelknoten aufrufen und wir bei jedem Knoten zuerst ~height(child)~ für alle Kinder auswerten.
+Beachten Sie hier, dass jeder Knotentyp unter dem Feld ~N.children~ eine Liste aller seiner Kinder bereit stellt[fn::Für ~plus~: ~N.children = [N.lhs, N.rhs]~].
+Bei einem Auf einem Knoten stehend, besucht ~height()~ also zuerst die Kinder, rechnet dort das Attribut ~child.h~ aus und erst danach wird der Code für den aktuellen Knoten ausgewertet und das Attribut gesetzt.
+
+Der mittlere Teil berechnet, abhängig von Typ des Knotens den Wert für das Attribut ~h~.
+Für ~literal~-Knoten ist die Höhe 1, für Blätter hängt sie von den beiden Kindern ab.
+An dieser Stelle verwenden wir den dynamischen Typ des Knotens um in Python eine Fallunterscheidung anhand der AST-Knotenklasse (~isinstance()~) zu machen.
+
+Mit diesem Muster können wir alle S-Attribute für unseren AST ausrechnen.
+Allerdings geht die Formulierung der Attributgleichungen im Code für die Traversierung und der Fallunterscheidung für den dynamischen Typen (=dynamic dispatch) unter.
+Um dieses Problem noch deutlicher zu machen, habe ich auf der zweiten Folie die Traversierung noch kompakter formuliert, und den Rückggabewert von ~height()~ für die Propagation der Höhe verwendet.
+Der Besuch der Kinder ist jetzt spezifisch für den Knotentypen und seine Kinder geworden.
+
+Hierdurch entstehen mehrere Probleme:
+Zum einen schreiben wir den Code für Traversierung und dynamischen Dispatch für jedes Attribut immer wieder, was zu einer unsäglichen Menge an Boilerplate-Code führt, und zum anderen ist die Lösung sehr  fragil:
+Führen wir einen neuen Knotentypen ein, der Kinder besitzt, so müssen wir alle Baumtraversierungen unseres Übersetzer um diesen Knotentypen ergänzen.
+Vergessen wir dabei den rekursiven Abstieg für diesen Knotentypen richtig zu implementieren, so vergessen wir ganze Unterbäume bei der Baumtraversierung. 
+Um dieses Problem zu lösen und besseren Code zu schreiben, faktorisieren wir jene Teile der Implementierung, die für alle Baumtraversierungen gleich sind, in eine generische Funktion aus. Wir wenden also das informatische Grundprinzip *Trennung der Belange* an.
+
+#+begin_src latex
   \begin{frame}[fragile]{Visitor-Pattern: Operationen auf Knoten kapseln}
     \begin{code}[tag=C++]
       \lstinputlisting[style=CPP,linerange={Vs-Ve}]{lst/05-visitor.cc}
@@ -617,7 +646,7 @@ Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zy
         \begin{code}[]
           \lstdefinestyle{error}{
             escapechar=`,
-            moredelim=**[is][{\btHL[fill=srared!50!white,name=error]<3->}]{@}{@},
+            moredelim=**[is][{\btHL[fill=srared!50!white,name=error]<3-|handout:2>}]{@}{@},
           }
           \lstinputlisting[style=CPP,style=smaller,style=error,linerange={Ts-Te}]{lst/05-visitor.cc}
         \end{code}
@@ -632,7 +661,7 @@ Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zy
       \end{column}
     \end{columns}
     \begin{tikzpicture}[remember picture,overlay]
-      \only<3>{
+      \only<3|handout:2>{
         \draw(error) -- ++(0:2cm) node[right,fill=srared!20!white,draw=srared,thick,align=left]{Das ist so kaputt!\\
           Dynamischer Dispatch nur im nullten Argument!\\
         Ruft immer \fbox{\texttt{Visitor::visit(Tree)}} auf!};
@@ -709,8 +738,22 @@ Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zy
     \ei
   \end{frame}
 #+end_src
-  - Synthetische Attribute
-  - Visitor Pattern: Emulate Double Dispatch
+
+Mit dem *Visitor*-Pattern bündeln wir nur den knotenspezifischen Code und geben für jeden Knotenart eine ~visit()~-Funktion an.
+Um dies generisch zu formulieren, können wir in C++ das Sprachfeature der überladenen Funktionen verwenden, welches wir in der letzten Vorlesung bereits diskutiert haben.
+Durch diese Überladung, wird die ~visit()~ Funktion zu einer Art komplexem Operator, der für jede Art von Knoten weiß welcher Code ausgeführt werden soll.
+Indem wir die ~visit()~-Methode virtuell machen, können wir von ~Visitor~ erben und Funktionen für einzelne Knotentypen überschreiben.
+
+Die ~traversal()~-Funktion bündelt nun generischen Teil der Baumtraversierung. Sie bekommt ein Visitor-Objekt  und einen Baumknoten als Argument und kümmert sich um die Besuchsreihenfolge und den korrekten Aufruf der ~visit()~-Funktionen.
+Für den rekursiven Abstieg verlässt sich die Traversierungsfunktion darauf, dass jeder Knotentyp eine Liste seiner Kinder bereitstellt.
+Nachdem diese besucht wurden, rufen wir die ~visit()~-Funktion auf. 
+
+Leider ist das Codebeispiel, wie ich es auf der ersten Folie gezeugt habe, kaputt.
+Denn an der Aufrufstelle von ~visit()~ wird, bei der Auflösung der Überladung, nur der dynamische Typ von ~v~, nicht aber der von ~t~ beachtet.
+Dieses Problem, dass virtuelle Methoden nur im ersten Argument dynamischen Dispatch anwenden, haben wir bereits im Kapitel über Namensauflösung diskutiert {{{see(04-dynamic-dispatch, Dynamischer Dispatch)}}}.
+Für das Visitor-Pattern brauchen wir allerdings nicht nur einen solchen single-dynamic dispatch, sondern einen double-dynamic dispatch.
+Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C++) und einer dynamischen Skriptsprache (Python) emulieren können.
+
 
 #+begin_src latex
    \begin{frame}{Berechnung des Typen und Typkonsistenz}
