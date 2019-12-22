@@ -6,6 +6,8 @@
  (org-mode
   (fill-column . 130)
   (ospl-mode . 1)
+  (flyspell-mode . 1)
+  (whitespace-mode . nil)
   (ispell-local-dictionary . "german8"))
  (tex-mode
   (ispell-local-dictionary . "german8")))

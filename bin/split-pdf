@@ -19,7 +19,7 @@ if __name__ == '__main__':
     print(" ".join(convert))
     subprocess.check_call(convert)
 
-    with open(sys.argv[2]) as fd:
+    with open(sys.argv[2], "rb") as fd:
         for line in fd.readlines():
             (pages, block, topic) = parse_topic_line(line)
             for page in range(pages[0], pages[1] + 1):

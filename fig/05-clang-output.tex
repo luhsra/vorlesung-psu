@@ -26,7 +26,7 @@
 {\color[rgb]{0,0,0.93}\ \ \ \ \ \ `{-}}{\bfseries{}\stmt ImplicitCastExpr}{\ptr\ 0x3019030}\ $<${\sloc col:12}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}}{\color[rgb]{0,0.8,0.8}}\ $<${\color[rgb]{0.8,0,0}LValueToRValue}$>$\hspace*{\fill}\\
 {\color[rgb]{0,0,0.93}\ \ \ \ \ \ \ \ `{-}}{\bfseries{}\stmt DeclRefExpr}{\ptr\ 0x3019008}\ $<${\sloc col:12}$>$\ {\color[rgb]{0,0.8,0}'int'}{\color[rgb]{0,0.8,0.8}\ lvalue}{\color[rgb]{0,0.8,0.8}}\ \tikznode[name=var]{\bfseries{}\decl Var} \tikznode[name=ref-var]{\ptr 0x3018ee8}%\\{\bfseries{}\token\ 'result'}\ {\color[rgb]{0,0.8,0}'int'}\hspace*{\fill}\\
 \begin{tikzpicture}[remember picture,overlay]
-  \begin{scope}[visible on=<2>,every node/.style={font=\normalsize\sffamily},every path/.style={thick}]
+  \begin{scope}[visible on=<2|handout:2>,every node/.style={font=\normalsize\sffamily},every path/.style={thick}]
     \node[fit=(type),inner sep=0,draw]{};
     \draw[<-](type) -- ++(down:2em) node[below,fill=white,draw,align=left]{Knotentyp:\\C++ Klassen};
     \node[fit=(ptr),inner sep=0,draw]{};
@@ -38,7 +38,7 @@
     \node[fit=(int),inner sep=0,draw]{};
     \draw[<-](int) -- ++(down:2em) node[below,fill=white,draw,align=left]{Typ der \\Deklaration};
   \end{scope}
-  \begin{scope}[visible on=<3>]
+  \begin{scope}[visible on=<3|handout:3>]
     \node[fit=(type) (ptr),draw,inner sep=0pt] (A){};
     \node[fit=(var) (ref-var),draw,inner sep=0pt] (B) {};
     \draw[->,srared,thick] (B) to[bend left=1ex] (A);

@@ -138,14 +138,11 @@ Außerdem wird sichergestellt, dass die zurückgegebenen Werte zum deklarierten 
 Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Namensauflösung, wie bereits erwähnt, miteinander interagieren. Hätte unsere Sprache die Möglichkeit diesen Operator zu überladen, so würden wir für den ~+~-Knoten zunächst die Typen der Kinder berechnen, eine Aufrufsignatur erstellen und per Namensauflösung eine Referenz auf die verwendete Überladung ziehen. Der Knotentyp unserer Addition wäre dann nicht immer ~+~, sondern der Rückgabetyp der gefundenen Überladung.
 
 
+Wir wollen uns im Folgenden den notwendigen Techniken für diese beiden Aspekte der semantischen Analyse widmen.
+Neben Typkonsistenz und Deklariertheit kann es allerdings noch andere Sprachregeln geben, die nicht kontextfrei prüfbar sind und daher in den Bereich der semantischen Analyse fallen.
+Diese lassen sich in aller Regeln mit den selben Techniken erledigen.
 
-
-
-
-
-
-
-* AST Struktur und Attributierung
+* AST Struktur und Knotenattribute
 :PROPERTIES:
 :CUSTOM_ID: 05-ast-types
 :END:
@@ -192,7 +189,7 @@ Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Name
     }
     \ei
 
-    \begin{code}<2->[tag=Java]
+    \begin{code}<2-|handout:2->[tag=Java]
       \tikzset{every node/.style={inner sep=0}}
       \begin{java}[style=smaller,escapechar=`]
         class `\tikznode[name=classdef]{ClassDef}` extends Definition {
@@ -205,17 +202,33 @@ Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Name
       \end{java}
     \end{code}
     \begin{tikzpicture}[remember picture,overlay]
-      \begin{visible}<2->
+      \begin{visible}<2-|handout:2->
         \draw[ultra thick, srared](pic cs:X) -- node[sloped,fill=srared!2,draw]{\Huge NEIN}++(12cm,-2.2cm);
       \end{visible}
-      \begin{visible}<3->
+      \begin{visible}<3-|handout:3->
         \node[fit=(classdef),draw,pin={[draw,fill=badbee!20!white]60:Knotentypen als Klassen}] {};
         \node[fit=(type),draw,pin={[draw,fill=badbee!20!white]-90:Kinder haben Typen}] {};
         \node[fit=(member),draw,pin={[draw,fill=badbee!20!white]10:Kinder haben Namen}] {};
       \end{visible}
     \end{tikzpicture}
   \end{frame}
+  #+end_src
 
+Bevor wir zu den Analysetechniken kommen, werfen wir einen genaueren Blick auf die Knoten des abstrakten Syntaxbaums.
+Für die semantische Analyse müssen wir viel Code schreiben, der auf den Knoten des ASTs operiert.
+Bauen wir dabei einen Fehler ein, so ist dieser um ein vielfaches schwerwiegender als ein Bug in einem anderen Programm, da ein Übersetzerbug beliebig viele Programme beeinflussen kann.
+Wir sollten daher bei der Konstruktion von Übersetzern besonders vorsichtig sein und so viele Sicherheits- und Verständlichkeits-Features unserer Host-Sprache (Programmiersprache in der der Übersetzer selbst verfasst ist) nutzen.
+Der Code des Übersetzer muss also *robust* sein und wir sollten *defensiv programmieren*.
+
+Für den AST bedeutet dies, dass wir wegkommen müssen von der Vorstellung ein AST sei einfach eine Sammlung von Knoten und Kanten, welche zu der sehr minimalistischen, ersten Implementierung auf den Folien führt.
+Dort sind alle AST Knoten vom gleichen Datentyp (~node_t~), unterschieden durch eine magische Ganzzahlkonstante (~tag~), und versehen mit einer unstrukturierten Liste aller Kinder (~std::vector<node_t>~).
+Eine solche simplistische Darstellung ist zwar maximal flexibel ist, verhindert aber, dass wir die Host-Sprache voll ausnützen und führt außerdem zu wirklich unlesbarem Code.
+
+Besser ist es da jeden AST-Knotentyp auf einen Typen der Host-Sprache abzubilden und seine Kinder unter sprechenden Namen bekannt zu machen.
+Auf diese Weise können wir auch jedem Kind einen statischen Typen zuordnen und so verhindern, dass eine Typdeklaration als Operand einer Addition zuweisen.
+Wir bekommen so ein weiteres Sicherheitsnetz durch das Typssystem.
+
+#+begin_src latex
   \begin{frame}[fragile]{AST: Eine Hierarchie von Knotentypen}
     \bi
     \ii<+-> Die Grammatik legt bereits eine Hierarchie von Knotentypen nahe\\{
@@ -271,8 +284,48 @@ Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Name
       \end{column}
     \end{columns}
   \end{frame}
+  #+end_src
 
+Wenn wir auf die Grammatik einer Sprache schauen, sehen wir oft auch eine Hierarchie der einzelnen Knotentypen.  
+So beinhaltet ein Codeblock mehrere Statements, aber jedes Statement kann entweder eine Zuweisung (~assign_stmt~), eine Schleife (~while_stmt~), eine Bedingung (~if_stmt~), usw. sein.
+Diese Flexibilität können wir auch im Code des Übersetzers gewinnbringend abbilden, indem wir eine Vererbungshierarchie von Knotentypen definieren.
+Dies ermöglicht es uns die statischen Typen für Kinder weiterhin möglichst strikt zu halten:
 
+#+begin_src java
+class CodeBlock extends Statement {
+   public List<Statement> stmts;
+}
+#+end_src
+
+Außerdem können wir Eigenschaften in mehrere Knotentypen vorkommen in eine Oberklasse heraus zu destillieren.
+In der Vorlesung zur Namensauflösung haben wir über benannte Deklarationen geredet, ein Aspekt der Sprache den man in einer Klasse ~NamedDecl~ (mit ~.name~ Attribut) abbilden kann.
+Auf diese Weise kann der Code zur Namensauflösung Variablen- als auch Funktionsdeklarationen gleich behandeln.
+
+Grundsätzlich hat man in übersetzten Sprachen vier Knotentypen, die üblicherweise als Wurzel der Vererbungshierarchie für AST Knoten dienen:
+Expressions (Ausdrücke), Statements (Anweidungen), Typen und Deklarationen.
+Diese vier Knotentypen sind auch Vokabel, die Sie als effektiver Lerner einer neuen Sprache brauchen um einen Text über die Sprache leicht verstehen zu können.
+
+*Expressions* sind all jene Konstrukte, die bei ihrer Ausführung einen Ergebniswert liefern.
+So ist eine Addition ebenso eine Expression wie ein Literal eine Expression ist[fn::Der Ausdruck (1+2) besteht aus drei Expressions. Zählen Sie diese auf!].
+Bei Expressions gibt es auch weniger intuitive Überraschungen:
+So funktioniert der ternäre ~?:~-Operator zwar wie ein if-else, ist aber eine Expression das er einen Ergebniswert liefert.
+Auch Definition einer C-Funktion keine Expression, dafür aber ihr Aufruf (~CallExpr~).
+
+*Statements* sind Anweisungen die von der virtuellen Maschine, welche diese definiert, sequentiell abgearbeitet werden.
+Zu den Statements gehören alle Zuweisungen und alle Kontrollflusskonstrukte (Bedingungen, Schleifen).
+Für C kann man, in etwa sagen, dass jede semantisch-zusammengehörige Programmzeile ein Statement ist.
+
+Die *Typ*-Knotentypen[fn::Jetzt nicht verwirren lassen!]
+sind jene syntaktischen Elemente mit denen wir Typausdrücke im Code notieren.
+Diese brauchen wir zum Beispiel für ~typedef~, zur Notation von Parametertypen einer Funktion oder als Inhalt einer Cast-*Expression*[fn::Überlegen Sie sich für ~(void *) a~, was hier Expression und was ein Typknoten ist.].
+Die Typ-Knotentypen können wir direkt als Typausdrücke verwenden, was eine Dopplung von Klassen vermeidet (~ast.IntType~ vs. ~type_expr.IntType~).
+
+*Deklarationen* sind all jene Programmstrukturen, die dem Übersetzer etwas bekannt machen.
+Dies beinhaltet sowohl Variablendefinition als auch ~typedef~-Konstrukte.
+Deklarationen sind das statische Rückgrat der Programmstruktur.
+Wir hängen Typen an die Deklaratione und füllen sie mit Statements, die wiederum Expressions beinhalten.
+
+#+begin_src latex
   \begin{frame}{Clang: AST Knoten und ihre Attribute}
     \begin{center}
       \btImage[text width=0.7\textwidth,draw,label=below:\scriptsize Ausschnitt aus der Klassenhierarchie]{fig/05-llvm-named-decl-tree}
@@ -305,12 +358,34 @@ Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Name
   \end{frame}
 
 #+end_src
-- AST: Baumstruktur und Knoteninhalte
-  - Vererbungshierarchie von Knoten
-  - Angehängte Attribute an AST Knoten
-  - Deklarationen, Statements, Expressions
+
+Die hier vorgeschlagene Klassenhierarchie, bestehend aus Deklarationen, Expressions, Statements und Typen, findet sich auch im LLVM C-Frontend CLang.
+Dort erben, beispielsweise, alle Deklarationen, die einen Namen einführen könnten, von ~NamedDecl~.
+Werfen Sie einen Blick auf die Vererbungsbeziehungen von [[https://clang.llvm.org/doxygen/classclang_1_1NamedDecl.html][NamedDecl]] in der automatisch generierten Dokumenation von CLang.
+Wenn Sie sich noch mehr für die Implementierung eines real existierenden Übersetzers interssieren bietet auch die [[https://clang.llvm.org/docs/IntroductionToTheClangAST.html]["Introduction to the CLang AST"]] einen guten Einstieg.
+Dort gibt es auch den Hinweis zum [[https://clang.llvm.org/docs/RAVFrontendAction.html][RecursiveASTVisitor]], der das später beschriebene Visitor-Pattern für den CLang AST implementiert.
+Mit seiner Hilfe ist es leicht möglich CLang Plugins zu bauen, welches Operationen auf C/C++ Code ausführt. Es ist diese einfache Zugänglichkeit, das relativ moderne Design, und eine existente Dokumentation, die CLang (und LLVM) zu einer guten Basis für Forschung im Bereich des Übersetzerbaus macht.
+
+Auf den Folien ist auch eine textuelle Representation des CLang ASTs für ein kurzes Programm gezeigt.
+Dort können wir die einzelnen Aspekte eines gut handhabbaren ASTs direkt sehen.
+Alle Elemente einer Übesetzungseinheit[fn::Eine Übersetzungseinheit ist die (oder mehrere) C-Dateien, die zu einem Object-File (.o-Datei) übersetzt werden.]
+sind unter dem Wurzelknoten ~TranslationUnitDecl~ gespeichert; in unserem Beispiel ist dies genau die gezeigte Funktion.
+Innerhalb des ASTs finden wir Statements und Deklarationen, die sich ineinander schachteln. Jedem dieser Knotentypen entspricht eine C++ Klasse innerhalb CLang API.
+
+An jedem Knoten wird seine Adresse im Speicher ausgegeben um Referenzierung innerhalb der Ausgabe zu erlauben. Diese Adressen sind nicht Teil der Programmstruktur und sie können sich mit jedem Aufruf des Übersetzers ändern. Die einzelnen Knoten sind zum einen entlang ihrer Baumkanten in einer Eltern-Kind-Beziehung verbunden, und zum anderen über die Querverbindungen welche die Namensauflösung eingeführt hat. So Referenziert die  ~DeclRefExpr~ in der letzten Zeile den ~VarDecl~ Knoten, welcher die lokale Variable ~result~ eingeführt hat.
+
+Eigentlich sind auch die Typknoten Teil der Baumstruktur.
+In der hier gezeigten textuellen Darstelung werden sie allerdings, der Übersichtlichkeit halber, nicht als eigene Knoten dargestellt, sondern "nur" als Attribute von anderen Knoten.
+So hat die ~FunctionDecl~ für unsere Funktion ~f~ den Typen ~"int (int)"~.
+Arbeitet man allerdings programmatisch mit dem CLang AST, so stellen sich diese Typen allerdings auch als Baum dar und entsprechen den von uns besprochenen Typausdrücken.
+In unserer Sprache könnte man auch sagen, dass die Typ-AST Knoten zu einem Typausdruck zusammengefaltet wurden und als Knotenattribut
+an die Deklarationen/Statements geheftet wurden.
 
 * Informationsfluss auf Bäumen
+:PROPERTIES:
+:CUSTOM_ID: 05-attribute-flow
+:END:
+
 #+begin_src latex
   \begin{frame}[t]{Semantische Regeln als Attributgleichungen}
     \bi
@@ -327,14 +402,54 @@ Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Name
       \btAnimation[width=0.6\textwidth]{center,10:<11->}{fig/05-attribute-tree}
     \end{btBlock}
     \bi
-    \ii<11-> \structure{Attributgrammatiken} annotieren die Regeln direkt an die Produktionen\\
+    \ii<11-|handout:11-> \structure{Attributgrammatiken} annotieren die Regeln direkt an die Produktionen\\
     \bi
     \ii \codebox{\small\ttfamily\grammarrule{plus}{expr + expr}\hspace{1cm}\{ \$0.h = max(\$1.h, \$3.h) + 1 \}}
     \ii Parseaktionen (Parsebaum$\rightarrow$AST) sind bereits Attributgrammatiken
     \ei
     \ei
   \end{frame}
+  #+end_src
 
+Wir wollen uns nun der semantischen Analyse etwas formaler nähern um auf einer abstrakteren Ebene zu verstehen, was da eigentlich gemacht wird.
+Ich habe bereits in der Einführung gesagt, dass wir für jeden AST Knoten *Attribute*, wie den Typ, ausrechnen werden.
+Diese Attribute hängen von der Nachbarschaft des Knotens ab und erlauben es kontext-sensitive Sprachregeln abzubilden.
+Eine solche kontext-sensitive Sprachregel wäre zum Beispiel, dass die Operanden einer Addition zwei Ganzzahlen sein müssen und das Ergebnis der Addition wiederum eine Ganzzahl ist.
+
+Abstrakt gesehen bilden die Knotenattribute untereinander ein *Gleichungssystem*[fn::Dies ist ein wichtiger Satz!].
+An jedem Knoten definieren wir die Attribute als Gleichungen, welche die Attribute anderer Knoten als Variablen verwenden.
+Die Form dieser Gleichungen ist in den semantischen Regeln der Sprache festgelegt und sind abhängig vom Knotentyp. Sie werden dann für jeden Knoten, anhand der Blaupause in den Sprachregeln, instanziiert.
+In Verlauf der semantischen Analyse lösen wir dieses Gleichungssystem auf indem wir konkrete Werte für die Attribute berechnen. Dabei ist die *Reihenfolge der Berechnenung nicht vorgegeben*!
+
+Um dieses wichtige Prinzip zu veranschaulichen, zeigen die Folien einen sehr einfachen AST mit nur 2 Knotentypen (Literal, Addition), für den wir zwei Attribute (Höhe und Summe) ausrechnen wollen.
+Ich wähle hier absichtlich zwei Attribute, die nichts mit Übersetzern zu tun haben um klar zu machen, dass diese Gleichungssysteme aus Attributen ein allgemeines Prinzip sind und keine spezialisierte Übersetzertechnik ist.
+Die Herangehensweise Knotenattribute als symbolische Gleichungen zu beschreiben, ohne dass man darüber nachdenkt wie man diese Attribute ausrechnet, erlaubt es uns konzentrierter über die Beziehungen der Knoten nachzudenken und uns nicht in rekursiven Traversierungslogiken zu verirren.
+
+Die Analyse beginnt damit, dass wir die Gleichungen aus den semantischen Sprachregeln für jeden Knoten instantiieren und die konkrete Nachbarschaft einsetzen.
+Für die literalen Blätter ist die Baumhöhe immer 1 und die Summe der Ganzzahlwert des angehängten Tokens.
+Für ~plus~-Knoten, die nur als innere Knoten auftreten können, ist das Attribut ~v~, die Summe der ~v~-Attribute der Kinder; Für die Höhe ist es das Maximum der Höhe der beiden Unterbäume, plus eins.
+Um dieses Gleichungssystem zu verstehen, stelle ich mir immer vor ganz lokale auf einem der Knoten zu stehen:
+Dort sehe ich genau die ausgehenden Kanten zu den Kinds- und zum Elternknoten, und kann von den Gleichungen sagen, dass Sie im prinzip wahr sind.
+So kann ich mir auf einem ~plus~-Konten sagen:
+"Ich bin ~x~ und meine Wert ~x.v~ ist die Addition der Werte ~v~ meiner linken Seite (~x.lhs.v~) und meiner rechten Seite (~x.rhs.v~)!
+Das sollte mal jemand ausrechnen, und mir ist eigentlich auch egal wie!"
+
+Nachdem wir die Attributgleichungen aufgestellt haben, geht es daran diese Aufzulösen.
+Als Mensch können wir hergehen, auf den gesamten AST blicken und eine Attributgleichung auflösen, für die alle benötigten Werte bereits ausgerechnet sind.
+Das habe ich für das Folienbeispiel gemacht, was zu einer sehr eratischen Berechungsreihenfolge geführt hat.
+Das war pädagogische Absicht um ihnen nochmals zu sagen:
+Die Berechnungsreihenfolge ist in den Attributen nicht festgelegt!
+
+Diese Attribute-getriebene Herangehensweise an die semantische Analyse hat einen breiteren theoretischen Hintergrund, in Form von *Attributgrammatiken*, dessen Details ich ihnen hier ersparen möchte.
+Für unsere Zwecke reicht es aus, dass sie eine Intuition dafür entwickeln, was dabei ungefähr passiert.
+Bei einer Attributgrammatik legt man nicht für jeden AST Knotentyp eine semantische Regel fest, sondern für jede Produktion der Grammatik.
+Solange allerdings alle Grammatik-Regeln die eine bestimmte Knotenart erzeugen, die selbe Gleichung haben, ist unser vorgestelltes Modell von Attributgleichungen äquivalent zu Attributgrammatiken.
+
+Ein Beispiel für solche Attributgrammatiken sind die *Parseraktionen*, die viele Parsergeneratoren erlauben.
+Dabei wird ein Stück Code an jede Regeln geheftet, welches der Parser ausgeführt wenn er die Grammatik-Regel anwendet.
+In der Übung werden wir solche Parseraktionen allerdings nur verwenden um den AST während des Parsevorgangs zu konstruieren ohne zuerst den vollständigen Syntaxbaum zu erzeugen.
+
+#+begin_src latex
   \begin{frame}{Abhängigkeitsgraphen und Attributtypen}
     \bi
     \ii Attribut-Gleichungssystem beinhaltet einen \structure{Abhängigkeitsgraphen} {
@@ -391,6 +506,35 @@ Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Name
   \end{frame}
 
 #+end_src
+
+Nun wollen wir uns der maschinellen Berechnung der AST Attribute zuwenden. Dazu wollen wir uns zunächst die Struktur der aufgestellten Gleichungssysteme nähern, indem wir über die *Abhängigkeiten* zwischen den Knotenattributen nachdenken.
+Für jedes Attribut dass auf der rechten Seite einer Gleichung auftaucht gibt es eine Berechnungsabhängigkeit zwischen diesem Knoten und dem Attribut des referenzierten Knoten. Es ensteht ein *Abhängigkeitsgraph*, bei dem die Attribute die Knoten und die Abhängigkeiten die Kanten sind.
+
+Im Beispiel mit der Baumhöhe erzeugt die Gleichung ~x.h = max(x.lhs.h, x.rhs.h) + 1~ zwei Kanten im Abhängigkeitsgraphen. Diese Kanten gehen vom Attribut ~x.h~ zu den Höhnenattributen der beiden Kinder von ~x~. Die Gleichungen für die Summe eines ~plus~-Knotens erzeugt ebenfalls zwei Abhängigkeiten, ebenfalls gerichtet auf direkte Kindsattribute.
+
+Würden wir ganz generell eine Berechnungsreihenfolge für diesen Abhängigkeitsgraphen angeben wollen, so würden wir die Attribute *toplogisch Sortieren*. Eine topologische Sortierung bedeutet, dass wir alle Attribute, aus dem gesamten AST, in eine Reihenfolge bringen, sodass alle Abhängigkeiten erfüllt sind, wenn ein Attribut an die Reihe kommt. Für die Höhe des Beispielbaums wäre die Reihenfolge ~[B.h, D.h, E.h, C.h, A.h]~ eine topologische Sortierung für den enstandenen Abhängigkeitsgraphen. *Aufgabe:* Vollziehen Sie diese Reihenfolge anhand des Baums nach!
+
+Allerdings wäre es viel zu aufwendig, den Abhängigkeitsgraphen tatsächlich aufzustellen und dann topologisch zu sortieren.
+Er ist nur ein gedankliches Modell um auf eine praktikable Berechnungsvorschrifft zu kommen, die implizit die topologische Berechnungsreihenfolge erzeugt. Dazu teilen wir die Abhängigkeiten der Attribute in unterschiedliche Klassen ein.
+
+Bei *synthetischen Attributen* (S-Attribute) erzeugen die Sprachregeln nur Abhängigkeiten zu den Kindern, sodass der Wert eines Knotens genau dann ausgerechnet werden kann, wenn die Werte all seiner Kinder ausgerechnet sind.
+Die Abhängigkeiten eines S-Attributs sind also streng hierarchisch "von unten nach oben".
+Die Attribute Höhe und Summe aus unserem Beispiel sind ebensolche S-Attribute.
+Aber auch die Ergebnis-Typen von arithmetrischen Ausdrücken sind synthetisch[fn::Ich finde den Namen "synthetische Attribute" so überhaupt nicht sprechend, aber so heißen diese Attribute nunmal in der Literatur.]. 
+Die Technik für solche Attribute ist die Baumtraversierung, genauer gesagt die Baumtraversierung mit Post-Order Reihenfolge[fn::Wie bei der Titanic: Post-Order=Kinder zuerst!]. Wir werden uns diese im folgenden genauer ansehen.
+
+Bei *geerbten Attributen* (L-Attribute) zeigen die Abhängigkeiten "nach links" in den Baum.
+Ein L-Attribut kann also von Attributen von "älteren" Geschwistern und den Eltern-Knoten abhängen.
+Bilden wir dies auf einen Programmcode ab, so hat ein L-Attribut nur Abhängigkeiten zu Elementen die weiter oben in der Datei stehen.
+Ein Beispiel für solche L-Attribute sind Namensreferenzen, die auf vorher deklarierte Namen zeigen müssen.
+Wir werden solche L-Attribute mittels der Symboltabelle und einer Baumtraversierung berechnen.
+Dabei ist die Symboltabelle eine Art "Datenrucksack" den wir während der Baumtraversierung mit uns herumtragen und mit Informationen füllen.
+
+Die dritte Art von Attributen sind die "zyklischen Attribute". Bei diesen sind beliebige Abhängkeiten zwischen den Knoten des ASTs möglich; eben auch zyklische Abhängigkeiten. Traditionell haben Sprachdesigner solche zyklischen Attribute eher vermieden, da sie relativ komplex auszurechnen sind und sie nicht mittels einer einfachen Baumtraversierung aufgelößt werden können. Allerdings kann man mittels zyklischer Attribute das Problem der Typinferenz formulieren. Deswegen werfen wir einen kurzen Blick auf die Technik der *Unifikation*, die es erlaubt solche zyklischen Attribute zu berechnen.
+
+Im Folgenden werde ich also drei Techniken vorstellen um unterschiedliche Typen von Attributen zu berechnen:
+Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zyklische Attribute).  Los gehts!
+
 ** Traversierung von Bäumen
 #+begin_src latex
   \begin{frame}[t]{Traversierung von Bäumen}

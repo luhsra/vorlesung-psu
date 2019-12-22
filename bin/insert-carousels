@@ -74,7 +74,7 @@ if __name__ == "__main__":
     basename = os.path.basename(topics_fn)
     base,_ = os.path.splitext(basename)
     output_dir = f"build/html"
-    with open(topics_fn) as fd:
+    with open(topics_fn, "rb") as fd:
         topics = OrderedDict()
         for line in fd.readlines():
             (pages, block, topic) = parse_topic_line(line)

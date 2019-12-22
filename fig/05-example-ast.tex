@@ -28,7 +28,7 @@
           child { node [ast,xshift=-1.1em] (var-init) {1} }
         }
         child { node [ast,xshift=2cm] (return) {return}
-          child { node [ast] (plus) {+}
+          child { node [ast,] (plus) {+}
             child { node [ast] (plus-lhs) {"a"} }
             child { node [ast] (plus-rhs) {"b"} }
           }
@@ -85,9 +85,9 @@
     \end{visible}
 
     \begin{visible}<4->
-      \node[type at node=plus] (plus-type)   {(int,int)$\rightarrow$int};
+      \node[type at node=plus] (plus-type)   {int};
       \begin{visible}<4>
-        \draw[ultra thin] (plus-type.north) -- ++(20:1em) node[above,draw,xshift=1em,fill=badbee!20]{\scriptsize Überladung?};
+        \draw[ultra thin] (plus-type.north) -- ++(20:1em) node[anchor=west,draw,xshift=1em,fill=badbee!20,align=left,font=\scriptsize]{ Überladung?\\ (int,int)$\rightarrow$int};
       \end{visible}
 
       \node[type at node=plus-lhs] {int};
