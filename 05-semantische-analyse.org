@@ -1176,6 +1176,9 @@ Das gezeigte Muster zur Namensauflösung funktioniert hervorragend, solange die 
 Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besprochen haben, sind überladene Funktionen. An dieser Stelle schauen wir uns nur die Einbindung der dort besprochenen Strategie (die Parametertypen werden Teil des Namens) an. Hierfür erzeugt der Code ein ~signatur~-Objekt, welches als "Name" verwendet wird. Dort fügen wir, neben dem aufgerufenem Funktionsnamen auch noch die Parametertypen an und suchen nach der Deklaration. Haben wir diese gefunden, so speichern wir sie als Attribut (~call.decl~) und verwenden den Rückgabetyp als Typen des ~CallExpr~-Knoten (~call.Type = ...~).
 
 ** Unifikation
+:PROPERTIES:
+:CUSTOM_ID: 05-unification
+:END:
 #+begin_src latex
   \dividerframe{Zyklische Attribute\\und\\Unifikation}
 
@@ -1216,7 +1219,20 @@ Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besproch
     }
     \ei
   \end{frame}
+  #+end_src
 
+Mit der Baumtraversierung haben wir eine Technik bekommen um S-Attribute auszurechnen. Die Symboltabelle hat uns dazu befähigt Namensauflösung als ein L-Attribut zu berechnen. Aber was tun wir, wenn wir einen Zyklus in unseren Attributabhängigkeiten haben.
+Also wie berechnen wir eine Attributgleichung, bei der ein Attribut über Umwege von seinem eigenen Attributwert abhängt. Oder wenn die Abhängigkeiten komplexer sind als einfach von unten nach oben oder von links nach rechts.
+
+Im Beispiel habe ich eine solche Attributabhängigkeit mit zwei Knoten gezeigt. Zum sollen dort die beiden Attributwerte ~x.h~ und ~y.h~ aufeinander folgende Ganzzahlen sein, und zum anderen soll ~y.h~ genau doppelt so groß sein wie ~x.h~. Diese Bedingungen sind zyklisch und können nur von ~x.h=1~ und ~y.h=2~ erfüllt werden. Ich habe diese Beispiel absichtlich so gestaltet, dass es nichts mit Programmiersprachen zu tun hat, sondern es soll nur klar werden was es bedeutet, eine  zyklische Attributabhängigkeit in einem AST zu haben.
+
+Ein solch komplexes, unter Umständen zyklisches, System von Attributabhängigkeiten kann aber auch bei Programmiersprachen nützlich sein: Lange Zeit haben Informatiker versucht Sprachregeln so zu gestalten, dass die semantische Analyse alleine mit S- und L-Attributen dargestellt werden kann. Dies führt aber dazu, dass häufig mehr Annotationen durch den Programmierer notwendig waren, da alles vor seiner Verwendung explizit angegeben werden musste (z.B. Namensdeklarationen oder Typannotationen). Häufig kommt man als Programmierer bei solch expliziten Sprachen auf den Gedanken: "Eigentlich müsste der Übersetzer das doch sehen. Das ist doch super offensichtlich!". 
+
+Dieses Gefühl entsteht beispielsweise häufig bei expliziten statischer Typisierung: Eigentlich verwenden wir eine Variable so, dass doch, aus dem Kontext(!), klar ist welcher Typ gemeint ist. Mit Hilfe der *Typinferenz* können wir den Übersetzer dazu befähigen den Typen in solchen Situationen zu berechnen. Dabei leitet der Übersetzer die statischen Variablentypen aus der konkreten Verwendung der Variablen automatisch ab. Der formale Hintergrund und die häufigst eingesetzte Variante ist die *Hindley-Milner Typinferenz*{{{wikipedia_de(Typinferenz_nach_Hindley-Milner)}}}.
+
+Nachteil an dieser komplexen Typinferenz ist, dass die Typattribute nun ein zyklisches Gleichungssystem bilden können, welches wir nicht mehr mit einfacher Baumtraversierung berechnen können. Wir brauchen eine mächtigere Technik, welche ich im Folgenden, überblickshalber, vorstellen werde: Die (synaktische) *Unifikation*.
+
+  #+begin_src latex
   \begin{frame}[fragile]{Typinferenz durch Ersetzung von Typvariablen}
     \begin{columns}
       \begin{column}{0.40\textwidth}
@@ -1233,17 +1249,17 @@ Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besproch
           \ii Alles unbekannte wird durch eine \structure{freie Typvariable} ($\alpha, \beta, \gamma$) dargestellt.
           \ei
         }\medskip
-        \ii<2-> Regeln als \structure{parametrische Bedingungen}{%
+        \ii<2-|handout:2-> Regeln als \structure{parametrische Bedingungen}{%
           \bi
           \ii CallExpr: Die Signatur der aufgerufene Funktion muss zu den Argumenten passen.
           \ii Rückggabetyp (E.T) soll ermittelt werden
           \ei
         }\medskip
-        \ii<3->Variablen-Elimination durch \structure{Ersetzungen}{
+        \ii<3-|handout:3->Variablen-Elimination durch \structure{Ersetzungen}{
           \bi
-          \ii \textbf{Ziel:} \alert<-5>{Bedingungen müssen erfüllt} sein
+          \ii \textbf{Ziel:} \alert<-5|handout:-5>{Bedingungen müssen erfüllt} sein
           \ii Ersetztung: Variable $\rightarrow$ Typausdruck
-          \ii Finde Sequenz \only<6>{\color{safegreen}\bfseries}{unifizierender Ersetztungen}
+          \ii Finde Sequenz \only<6|handout:6>{\color{safegreen}\bfseries}{unifizierender Ersetztungen}
           \ei
         }
         \eii
@@ -1251,7 +1267,21 @@ Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besproch
       \end{column}
     \end{columns}
   \end{frame}
+  #+end_src
+  
+Typinferenz und Unifikation kommen insbesondere bei *funktionalen Programmiersprachen*, die generische Typen{{{see(03-polymorphism, Polymorphismus)}}} verwenden (z.B. Haskell) zum Einsatz.
+Wir wollen nun schrittweise durchgehen, wie die Typinferenz in diesen Sprachen funktioniert und wie wir Unifikation zur Auflösung zyklischer Attribute verwenden.
 
+Zunächst stellen wir, wie gewohnt, die Attributgleichungen auf. In unserem Beispiel betrachen wir einen Funktionsaufruf ~append(p1, p2)~, für den wir zwei Dinge wissen: Zum einen wissen wir, dass ~append()~ als erstes Argument eine Liste mit beliebigen Elementtypen bekommt und das zweite Argument an diese Liste anhängt, bevor sie zurückgegeben wird. Dabei muss der zweite Parameter den gleichen Typen haben wie die Listenelemente[fn::In Kurz: ~append()~ fügt ein Element, typsicher, an eine homogene Liste an.].
+Zum zweiten Wissen wir, dass ~p2~ vom Typ ~int~ ist. 
+
+Allerdings wissen wir, zu diesem Zeitpunkt, einige Dinge noch nicht: Welchen Typ hat ~p1~? Welchen Rückggabetypen hat die gesamte ~CallExpr~? Was ist die konkrete Aufrufsignatur für ~append()~? Alle Typen, die wir noch nicht kennen, ersetzen wir in den Attributgleichungen durch *Typvariablen*. Konkrete Werte für diese Variablen zu finden ist nun unser Ziel für die Typinferenz.
+
+Mit diesem Typvariablen können wir nun die semantischen Sprachregeln als Gleichheitsbedingung formulieren. Im Beispiel ist die relevante Sprachregel: *"Bei einem Funktionsaufruf müssen Parameterypen und Argumenttypen gleich sein. Der Rückggabetyp ergibt sich aus der Funktionssignatur"*. Ersetzen wir alle Attributreferenzen in dieser Bedingung durch die entsprechenden Gleichungen mit den freien Typvariablen, so erhalten wir die Bedingung: Der Term ~([Gamma], Gamma)->[Gamma]~ soll gleich sein mit dem Term ~(Beta, int)->Alpha~! Um diese Bedingung zu erfüllen, müssen wir die freien Typvariablen geschickt durch entsprechende Typausdrücke ersetzen. Der Prozess eine solche Ersetzung zu finden heißt *Unifikation*.
+
+Im Beispiel führe ich, nacheinander, drei Ersetzungen durch für die drei freien Typvariablen durch. Am Ende dieser *Sequenz von Ersetzungen* sind beide Terme an dem Funktionsaufruf gleich und wir haben erfolgreich eine Typinferenz durchgeführt. Hätten wir keine unifizierende Ersetzung gefunden, so hätten wir einen Übersetzungsfehler signalisieren müssen. Aber in unserem Fall hat alles geklappt: Wir wissen nun, dass ~p1~ eine Liste von Ganzzahlen ist, dass der Rückggabetyp des Funktionsaufrufs ebenfalls eine Ganzzahlenliste ist, und dass ~append()~ auf Ganzzahlenlisten operiert.
+
+#+begin_src latex
   \begin{frame}{Unifikation: Berechnung von passenden Ersetzungen}
     \begin{btBlock}{Unifikation}
       Finden eine Sequenz von Variablen-Ersetzungen, die zwei Terme angleicht.
@@ -1299,7 +1329,15 @@ Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besproch
 
 #+end_src
 
-https://eli.thegreenplace.net/2018/unification/
+Die zentrale Technik der Typinferenz ist die Unifikation. Wir wollen, ganz kurz, definieren, was die Unfikation im Rahmen der Typinferenz leistet. Die Unifikation arbeitet auf mehreren geschachtelten Termen die freie Variablen enthalten. In unserem Fall sind Typausdrücke mit freien Typvariablen die Terme welche verarbeitet werden sollen (T1, T2). Dabei können die Typvariablen mehrfach in einem Term oder in mehreren Termen vorkommen, müssen aber in jedem Fall durch den selben Typausdruck ersetzt werden. Dieses mehrfache Auftreten einer Variable erlaubt es uns die zyklischen Abhängigkeiten zu notieren. 
+
+Die Unifikation berechnet für die gegebenen Terme eine Sequenz von Ersetzungen, bei denen immer eine Typvariable durch einen konkreten Typausdruck ersetzt wird. Dabei ist die Reihenfolge der Ersetzungen relevant! Im Beispiel sehen wir, dass ich für die gleichen zu unifizierenden Typausdrücke eine andere unifizierende Ersetzungssequenz angegeben habe, die allerdings zum gleichen Ergebnis führt.
+
+Für zwei unifizierbare Terme gibt es immer unendlich viele unifizierende Ersetzungen, denn wir können immer noch eine weitere nutzlose Unifikation hinzufügen (z.B.
+~Alpha->Beta, Beta->Alpha, Alpha->Beta, Beta->list(Gamma),....~).
+Daher suchen wir nicht nur irgendeine Unifikation, sondern den *allgemeinsten Unifikator*, welche beide Terme angleicht und nur die wirklich notwendigen Ersetzungen vornimmt. 
+
+In der Literatur gibt es mehrere Verfahren um die Unifikation effizient durch zu führen. Dabei wurde der erste Algorithmus von Robinson, welcher im schlimmsten Fall noch exponentielle Laufzeit hat, verbessert, sodass heute Unifikation in linearer Laufzeit möglich ist. Wir wollen die konkreten Algorithmen an dieser Stelle nicht diskutieren. Sollten Sie sich für die algorithmischen Details dennoch interessieren, seien sie auf den Blogeintrag von [[https://eli.thegreenplace.net/2018/unification/][Eli Bendesky]] verwiesen. Dort finden Sie eine Implementierung des Robinon-Algorithmus in Python.
 
 * Zusammenfassung
 #+begin_src latex
