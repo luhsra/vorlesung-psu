@@ -4,7 +4,7 @@
 #+MACRO: headlines (eval (org-macro-headlines $1))
 
 
-* <2020-04-14> [[file:01-einleitung.org][Einleitung]]
+* [[file:01-einleitung.org][Einleitung]]
 
 Abschnitte: {{{headlines(./01-einleitung.org)}}}
 
@@ -19,41 +19,45 @@ Abschnitte: {{{headlines(./03-typen.org)}}}
 * [[file:04-namen.org][Sprachen: Namen]]
 Abschnitte: {{{headlines(./04-namen.org)}}}
 
-* COMMENT [[file:05-semantische-analyse.org][Übersetzer: Semantische Analyse]]
+* [[file:05-semantische-analyse.org][Übersetzer: Semantische Analyse]]
+Abschnitte: {{{headlines(./05-semantische-analyse.org)}}}
 
 * COMMENT [[06-objekte.org][Sprachen: Objekte]]
+ - Sprachen: Objekte
+    - Data Abstraction, Objekterzeugung, Lebenszeiten, Ownership, Initialisierung, Mixins, Prototype-Inheritance,
 
-   - Sprachen: Objekte
-     - Data Abstraction, Objekterzeugung, Lebenszeiten, Ownership, Initialisierung, Mixins, Prototype-Inheritance,
-   - Sprachen: Operationen
+* COMMENT Sprachen: Operationen
      - Standardkonstrukte
      - Auswertungsstrategie
      - Call-By-*
      - Seiteneffekte
      - Verhaltenskomposition
      - Verhaltensableitung
-   - Übersetzer: Intermediate Code Generierung
-     - 3-Address Code, Basic Blocks, Control-Fluss Graph, R-Values, L-Values
 
-   - Übersetzer: Optimierung
-     - Fixpunkt Analyse
-     - Konstantenfortschreibung, Konstantenfolding
-     - Dead Code Elimination
-     - Tail-Call Optimization
-   - Übersetzer: Machienencodegenerierung
-     - Registerallokation, Funktionsaufrufe, ABI, Peephole Optimizer
-   - Übersetzer: Das Run-Time Environment
-     - ELF und Dynamische Libraries, Garbage Colletion, Just-in-Time Compilation
+* COMMENT TODO 6 Vorlesungen
 
-   - Sprachen: Das Objektorientierte Paradigma
-     - SOLID
-     - https://de.wikipedia.org/wiki/Prinzipien_objektorientierten_Designs
+     - Übersetzer: Intermediate Code Generierung
+       - 3-Address Code, Basic Blocks, Control-Fluss Graph, R-Values, L-Values
 
-   - Sprachen: Das Funktionale Paradigma
-     - Freiheit von Seiteneffekten
-     - Parametrische Datentypen
-     - Unifikation von Generischen Datentypen
+     - Übersetzer: Optimierung
+       - Fixpunkt Analyse
+       - Konstantenfortschreibung, Konstantenfolding
+       - Dead Code Elimination
+       - Tail-Call Optimization
+     - Übersetzer: Machienencodegenerierung
+       - Registerallokation, Funktionsaufrufe, ABI, Peephole Optimizer
+     - Übersetzer: Das Run-Time Environment
+       - ELF und Dynamische Libraries, Garbage Colletion, Just-in-Time Compilation
 
+     - Sprachen: Das Objektorientierte Paradigma
+       - SOLID
+       - https://de.wikipedia.org/wiki/Prinzipien_objektorientierten_Designs
+
+     - Sprachen: Das Funktionale Paradigma
+       - Freiheit von Seiteneffekten
+       - Parametrische Datentypen
+       - Unifikation von Generischen Datentypen
+       
 
 Was wir nicht machen:
   - Logische Programmierung (z.B. Prolog)
