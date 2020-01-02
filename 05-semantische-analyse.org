@@ -754,6 +754,30 @@ Dieses Problem, dass virtuelle Methoden nur im ersten Argument dynamischen Dispa
 Für das Visitor-Pattern brauchen wir allerdings nicht nur einen solchen single-dynamic dispatch, sondern einen double-dynamic dispatch.
 Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C++) und einer dynamischen Skriptsprache (Python) emulieren können.
 
+In der statischen C++ Variante erreichen wir den double-dynamic dispatch dadurch, dass wir zweimal hintereinander einen single-dynamic dispatch durchführen bzw.
+zwei virtuelle Methodenaufrufe hintereinander schalten.
+Der Startpunkt unseres Aufrufs ist die ~traversal()~-Funktion:
+Hier rufen wir auf einem ~Tree~-Objekt die *virtuelle* ~accept()~-Methode auf, die uns als Trampolin für den double-dynamic dispatch dient (1.
+dynamic dispatch).
+Weil ~accept()~ virtuell ist, wird der Aufruf anhand des dynamischen Typen aufgelößt und wir landen in Codestücken die spezifisch für den jeweiligen AST-Knotentyp sind; der statische Typ des ~this~-Zeigers ist gleich dem dynamischen Typen des Objekts.
+Die ~accept()~-Methoden bekommt ein Visitorobjekt (statischer Typ: ~Visitor~, dynamischer Typ: divers) und ruft dort die *virtuelle* ~visit()~-Funktion mit sich selbst auf (2.
+dynamic dispatch).
+Somit kommen wir, mit dem zweiten virtuellen Methodenaufruf, zu einer ~visit()~-Funktion die dynamisch abhängig ist vom Knoten *und* vom Visitortypen!
+
+Man kann diese Aufrufkette ~traversal()-accept()-visit()~ so beschreiben, dass wir den statischen Typen der Argumente schrittweise an ihre dynamischen Typen anpassen.
+Am Anfang haben wir ~(Visitor,Tree)~, dann ~(Visitor, literal)~ und letztendlich ~(HeightVisitor, literal)~.
+
+Für die Python-Variante des Visitor Patterns wählen wir eine andere Technik, da wir in dieser Skriptsprache keine Überladung in den Parametertypen haben (keine Statischen Typen!).
+Anstatt dessen Verwenden wir Introspektion auf dem gegebenen Visitor-Objekt und dem AST-Knoten.
+In Python haben wir die Möglichkeit uns den dynamischen Typen eines Objekts als ein eigenes Objekt geben zu lassen (~type()~).
+Aus diesem Typ-Objekt können wir den Typnamen (~__qualname__~[fn::Dieses Attribut gibt es erst seit Python 3.
+Es ist der qualified-name des Typen, der bei Klassen gleich dem Klassennamen ist.])
+extrahieren und einen Methodennamen abzuleiten.
+Würden wir den gegebenen Code mit einem ~literal~ Knoten ausführen, so wäre ~M_name~ der String ~"visit_literal"~.
+Mit Hilfe von Introspektion mittels ~getattr(obj, name)~ kommen wir an die virtuelle Methode (selbst auch wieder ein Objekt), die wir aufrufen können.
+Diese Art einen double-dynamic dispatch durch zu führen ist nur möglich, wenn eine Sprache mittel zur Introspektion der Laufzeitumgebung (dynamische Typinspektion, Finden von Methoden) zur Verfügung stellt. 
+
+
 
 #+begin_src latex
    \begin{frame}{Berechnung des Typen und Typkonsistenz}
@@ -806,10 +830,28 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
     \end{columns}
   \end{frame}
 #+end_src
-** Coercion: Automatische Typumwandlung
+
+Mit all unserem Vorwissen, und zwei Implementierungsvarianten für das Visitor-Pattern im Rücken, ist es nun relativ einfach eine simple Typberechung und -prüfung zu definieren.
+Dafür berechnen wir für jeden (relevanten) Knoten im AST einen statischen Rückggabetypen aus und prüfen an allen inneren Knoten ob die Typen der Kinder zueinander und zum Knotentypen kompatibel sind. Zum Beispiel sollten wir nur zwei Ganzzahlen miteinander addieren, wobei das Ergebnis der Addition wiederum eine Ganzzahl ist.
+
+Lassen wir alle Feinheiten, wie Namensauflösung und Polymorphie, außer Acht, so ist der Knotentyp ein S-Attribut, welches von unten nach oben propagiert wird.
+Wir müssen also für alle Blätter einen Typ angeben und für jeden inneren Knotentyp eine Berechnungsvorschrift für die Propagation von unten nach oben.
+Bei literalen Konstanten (z.B., ~23~, ~"foo"~) geben die Sprachregeln genau vor, welchen Typ diese Ausdrücke haben (z.B., int, string).
+Diese Sprachregeln lässt sich sehr klar in unserem ~TypeVisitor~ kodieren, indem wir das Typattribut in den Blättern entsprechend setzen.
+Bei manchen Knoten, wie dem address-of-Operator (~&FOO~), besteht die Typberechnung daraus einen Typkonstruktor (~pointer()~) auf dem Typen des einzigen Kindes anzuwenden.
+Informeller gesagt, ist der Ergebnistyp des address-of-Operators ein Pointertyp, als Pointee-Typ den Typ des Kindes hat; ~&"foobar"~ hat den Typ ~pointer(string)~, wenn ~"foobar"~ den Typ ~string~ hat.
+
+Bei komplexeren Knoten oder bei komplexeren Sprachregeln beinhaltet die entsprechende ~visit()~-Methode nicht nur Typberechnung, sondern sie prüft auch ob gewisse Sprachregeln eingehalten wurden. So müssen in einem strikt Monomorphen Typssystem die beiden Operandentypen bei einer Addition übereinstimmen (~L.equal(R)~). Weiterhin wird überprüft, ob die Addition für diese Typen überhaupt definiert ist. In unserem Beispiel ist nur eine Addition von Ganzzahlen erlaubt (~L.equal(int)~).
+
+Wir übergeben der ~traversal()~-Funktion die Wurzel des ASTs und das Visitor-Objekt und die ~visit()~-Methoden werden, in der richtigen Reihenfolge, von unten nach oben, aufgerufen, sodass die Typinformationen von unten nach oben berechnet wird. Dabei prüfen wir nicht nur die konsistente Verwendung der Typen, sondern befüllen auch für jeden Knoten das Typ-Attribut, welches wir im weiteren Verlauf der Übersetzung verwenden werden.
+
+** Coercion: Implizite Typumwandlung
+:PROPERTIES:
+:CUSTOM_ID: 05-coercion
+:END:
 #+begin_src latex
-  \dividerframe{Coercion:\\Automatische Typumwandlung}
-  \begin{frame}{Automatische Typumwandlung}
+  \dividerframe{Coercion:\\Implizite Typumwandlung}
+  \begin{frame}{Automatisch-angewendete implizite Typumwandlung}
     \begin{btBlock}{Was passiert bei inkompatiblen Typen?}\small
       Passen gefordertert (z.B. Parameter) und vorhandener Typ (z.B.Argument) nicht zusammen, kann eine \textbf{implizite} Typumwandlung eingefügt werden.
     \end{btBlock}
@@ -829,7 +871,7 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
     \end{columns}
 
     \bi
-    \ii<3-> Sprachen definieren eine Reihe von automatischen Typumwandlungen{
+    \ii<3-> Sprachen definieren eine Reihe von impliziten Typumwandlungen{
       \bi
       \ii \structure{Ganzzahlweitung}: Umwandlung in breitere Integer ohne Informationsverlust
       \ii C: \codebox{char}$\rightarrow$\codebox{short}$\rightarrow$\codebox{int}$\rightarrow$\codebox{long}
@@ -857,7 +899,40 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
     \ei
   \end{frame}
 
-  \begin{frame}{Probleme der automatischen Typumwandlung}
+
+#+end_src
+
+Aber nicht immer passen die an einem Knoten geforderten Typen zu den Typen der Operanden.
+Im Beispiel wollen wir eine Funktion, welche eine Fließkommazahl erwartet, mit einer Ganzzahl aufrufen.
+Wäre unsere Sprache ganz strikt, müssten wir an dieser Stelle die Übersetzung abbrechen und dem Programmierer die Aufgabe überlassen eine explizite Umwandlung von Ganzzahl zu Fließkommazahl einzufügen.
+Eine solche explizite Typumwandlung heißt auch Cast (~(char *) ....~) oder Coercion und hat zweierlei Aspekte:
+Zum einen wird der angegebene Typausdruck anstatt der des Kindes als Rückgabetyp verwendet, zum anderen muss, unter Umständen, Code eingefügt werden der das Objekt zur Laufzeit vom einen zum anderen Typen umwandelt.
+Allerdings prüft nicht jede Programmiersprache ob die angegebene Typumwandlung überhaupt Sinn ergibt oder ob der Programmierer das Typssystem absichtlich umgeht[fn::Bei C bieten Casts kaum bis keine Typsicherheit, was aber für systemnahe Programmierung mehr als Feature denn als Bug gesehen wird.]. 
+
+Da das manuelle einfügen von expliziten Typumwandlungen aufwendig ist und zu einer verschlechterten Lesbarkeit des Codes führt, haben viele Sprachen, zumindestens einige, Regeln zur *impliziten Typumwandlung*.
+So wandeln viele Sprachen eine Ganzzahl automatisch in eine Fließkommazahl um.
+Technisch geschieht die implizite Typumwandlung während der Berechnung des Typattributs:
+Passt an einem Knoten der vorgefundene Typ eines Kindes nicht zum erwarteten Typ, so prüft der Übersetzer ob die Sprachregeln es erlauben eine implizite Umwandlung vor zu nehmen. Ist dies möglich, so wird ein *neuer AST Knoten* eingefügt, der die Typumwandlung durchführt.
+
+In einem Sprachstandard werden normalerweise nur solche impliziten Typumwandlungen definiert, welche keine Überraschende Semantik haben.
+So kennen viele Sprachen die *Ganzzahlweitung*, welche eine implizite Umwandlung von den kleinen (Bitbreite) zu den großen Ganzzahltypen erlaubt.
+Möglich ist dies, weil durch eine solche Weitung kein Informationsverlust entstehen kann; der größere Ganzzahltyp hat eine höhere Informationskapazität.
+
+Wenn wir, für einen kurzen Augenblick, unsere sprachphilosophische Brille aufsetzen, so ist die implizite Typumwandlung oder Coercion eine Spielart des *Polymorphismus*, denn sie erlaubt es dass ein Typ an Stelle eines anderen Typen treten kann; der implizit umwandelbare Typ hat eine weitere Gestalt.
+Dabei gehört die Coercion, ebenso wie die Überladung, zur Klasse der Ad-Hoc Polymorphie, da die konkrete Gestalt des Typens an der konkreten Stelle im Programm bzw. im AST festgestellt wird.
+
+Vergleichen wir Coercion mit Überladung, so stellen wir fest, dass beide Ad-Hoc Mechanismen in der gleichen Problemlage angewendet werden, sie aber auf unterschiedlichen Seiten wirken.
+Die Überladung wählt anhand des Operandentypen die Operation aus; Bei der Coercion wandeln wir den Operanden anhand des Operators um.
+In manchen Sprachen interagieren beide Mechanismen an einer Stelle.
+So kann es in C++ passieren, dass ein Funktionsargument zuerst implizit umgewandelt wird, bevor die richtige Überladung ausgewählt wird.
+Solch eine Situation kann noch unübersichtlicher werden, da der Programmierer eigene Regeln zur impliziten Typumwandlung definieren kann.
+
+Generell lässt sich sagen, dass implizite Typumwandlungen ein mächtiges, aber auch ein gefährliches Sprachmittel sind.
+Zum einen führen gut gewählte Coercion-Regeln zu Code bei dem nicht beständig gegen das Typsystem gekämpft wird.
+Zum anderen können automatisch-angewendete Typumwandlungen zu Situationen führen, bei denen man sich fragt: "Wieso funktioniert das? Und was wird hier eigentlich aufgerufen?"
+
+#+begin_src latex
+  \begin{frame}{Probleme der implizten Typumwandlung}
     \begin{center}
       \includegraphics[width=4cm]{fig/05-js-triangle}
     \end{center}
@@ -873,7 +948,19 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
     \ei
   \end{frame}
 #+end_src
+
+Ein besonders schönes Beispiel für verwirrende Regeln zur impliziten Typumwandlung ist JavaScript.
+Dort gibt es viele Situationen bei denen Zeichenkennten automatisch zu einem "semantisch-äquivalenten Typen" umgeweandelt.
+Verwendet man, beispielsweise, die Zeichenkette ~"23"~ in einem Ganzzahl-Kontext, so wird diese Zeichenkette als eine Ganzzahl zur Basis 10 geparst.
+Hier geschieht also nur auf Ebene der Typen eine Umwandlung, sondern es wird eine Interpretation der Zeichenkette, unter der Annahme des Zehnersystems, durchgeführt.
+
+So gut die Idee auf den ersten Blick erscheinen mag (sie spart eine Menge ~parseInt()~-Aufrufe), so schlecht ist sie in der Praxis. Denn diese, und ähnliche semantische Interpretationen von leeren Arrays, führen dazu, dass der ~==~-Operator und der ~!=~-Operator inkonsistent werden![fn::Lassen Sie sich das noch einmal auf der Zunge zergehen! Inkonsistenz bei der Gleichheitsrelation! Um George Orwell zu zitieren: "Schwarz ist weiß, Freiheit ist Sklaverei".]
+Nachdem diese Inkonsistenz aufgefiel, hat JavaScript einen ~===~-Operator bekommen, bei dem die impliziten Typumwandlungen ausgeschaltet werden um "echte Gleichheit" abprüfen zu können.
+
 ** Symboltabelle
+:PROPERTIES:
+:CUSTOM_ID: 05-symbol-table
+:END:
 #+begin_src latex
 
   \dividerframe{Namensauflösung\\mittels\\Symboltabelle}
@@ -949,7 +1036,7 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
       \end{column}
     \end{columns}
 
-      \begin{columns}[t]<3->
+      \begin{columns}[t]<3-|handout:2->
       \begin{column}{0.49\textwidth}
         \begin{code}
           \lstinputlisting[style=py,style=smaller,linerange={V3s-V3e}]{lst/05-name-resolution.py}
@@ -962,7 +1049,7 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
       \end{column}
     \end{columns}
 
-      \begin{columns}[t]<4->
+      \begin{columns}[t]<4-|handout:2->
       \begin{column}{0.49\textwidth}
         \begin{code}
           \lstinputlisting[style=py,style=smaller,linerange={V4s-V4e}]{lst/05-name-resolution.py}
@@ -975,9 +1062,11 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
         \eii
       \end{column}
     \end{columns}
+    
+
 
     \begin{tikzpicture}[remember picture,overlay]
-      \only<2>{
+      \only<2|handout:1>{
         \draw (pic cs:visitor) ++(-1cm,5mm) -- ++(-80:1.2cm) node[below,fill=codecolor]{
           \lstinputlisting[style=py,style=smaller,linerange={ts-te}]{lst/05-name-resolution.py}
         };
@@ -985,10 +1074,62 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
     \end{tikzpicture}
   \end{frame}
 
+    #+end_src
+
+Nachdem wir eine Idee davon bekommen haben, wie Typen in eine Übersetzer berechnet und geprüft werden, wollen wir uns der Namensauflösung zuwenden.
+Nachdem wir diesem Thema schon eine ganze Vorlesung gewidmet haben, wollen wir hier nur diskutieren wie sich diese in unserer Attribut-Sicht einordnet und jene Techniken kennen lernen mit denen die entsprechenden Sprachregeln implementiert werden.
+
+Namen verbinden Deklaration und Referenz quer zum AST.
+Daher ist es nicht möglich diese Verbindung als S-Attribut zu formulieren, sondern wir müssen eine mächtigere Klasse von Attributen verwenden.
+Wenn eine Deklaration immer vor einer Verwendung stattfinden muss, so können wir die Namensauflösung als Berechnung eines *L-Attribut* auffassen ("die Deklaration steht im AST links").
+Der gesuchte Attributwert ist dabei ein Zeiger an der Namensreferenz, welche auf den deklarierenden AST-Knoten zeigt.
+Um ein solches L-Attribut zu berechnen erweitern wir den Visitor um eine Zustandsvariable, die es erlaubt Daten während der Traversierung von links nach rechts zu transportieren. Für die Namensauflösung ist die Symboltabelle die kanonische Datenstruktur um Informationen über die aktuell deklarierten Namen zu transportieren.
+
+Die *Symboltabelle* ist eine Datenstruktur mit der wir einen hierarchischen Namensraum während der Baumtraversierung verwalten können.
+Im Minimum, erlaubt eine Symboltabelle einen neuen Namensraum zu öffen (~openNamespace()~), einen neuen Namen zu deklarieren (~createName()~), einen Namen aufzulösen (~findName()~) und den zuletzt geöffneten Namensraum wieder zu schließen (~closeNamespace()~).
+Dabei kann die Symboltabelle nicht nur die clostest-nested scope rule (CNSR), sondern auch komplexere Namensraumoperationen (wie Import von Namen), kapseln.
+
+Zuerst wollen wir uns ansehen, wie die Symboltabelle bei einer Baumtraversierung verwendet wird, bevor wir uns ihrer Implementierung zuwenden.
+Um eine mit Zustand behaftete Traversierung durchzuführen geben wir unserer Visitor-Klasse, welche bisher keinen eigenen Zustand hatte, ein Objekt-Attribut ~self.ST~, welches im Konstruktor mit einer leeren Symboltabelle initialisiert wird.
+Mit dieser einen Symboltabelle iterieren wir nun über alle Knoten des ASTs.
+
+Um Namensräume korrekt zu öffnen und zu schließen zu können müssen wir unseren Visitor noch um eine weitere Funktionalität erweitern: Pre-Order Besuchsreihefolge. Bisher haben wir, an einm Knoten, die ~visit()~-Funktionen aufgerufen *nachdem* alle Kinder besucht worden sind (Post-Order). Nun wollen wir zusätzlich auch noch vor dem Besuch der Kinder eine Funktion aufrufen. Dazu führen wir in der ~traversal()~-Funktion vor und nach der Schleife über die Kinder einen double-dynamic dispatch mit Hilfe des Visitor-Objekts durch. Wir rufen die ~pre()~-Funktionen vor, und die ~post()~-Funktionen nach dem rekursivem Abstieg auf. Auf diese Weise, können wir einen Namensraum beim Besuch einer Namensraum-Deklaration öffnen, bevor wir alle enthaltenen Elemente abarbeiten. Nach der Abarbeitung wird der entsprechnende Namensraum wieder geschlossen.
+
+Beim Besuch einer benannten Deklaration erzeugen wir einen neuen Namen (~self.ST.createName()~) und richten so eine Abbildung vom entsprechenen Namen auf den deklarierenden AST-Knoten ein. In einer Sprache mit statischen Typen hätten wir die Signatur ~createName(string, Decl)~.
+
+An Stellen an denen wir eine Namensreferenz auflösen wollen, fragen wir die Symboltabelle nach dem referenzierten Namen und bekommen den vorher verknüpften AST-Knoten als Rückggabewert von ~findName(string)~.
+Diese Deklaration können wir nun (als Zeiger/Refenz) in einem AST-Attribut der ~DeclRefExpr~ speichern.
+
+#+begin_src latex
   \begin{frame}{Symboltablle als Stack von Namensräumen}
     \btAnimation[width=\textwidth]{range=1-12:<1->}{fig/05-symbol-table}
   \end{frame}
+#+end_src
 
+Wir wollen uns nun damit beschäftigen, wie die Symboltabelle implementiert ist und wie wir CNSR-Namensauflösung implementieren können.
+Dabei sei gesagt, dass die hier gezeigte Methode nicht unbedingt die effizienteste Variante ist, aber sie ist gut geeignet das Prinzip der Symboltabelle zu vermitteln.
+
+Wir implementieren die Symboltabelle als einen Stack von Namensräumen. Am Beginn der Namensauflösung ist unsere Symboltabelle leer und es ist kein Namensraum auf dem Stack gespeichert. Bei Besuch der AST-Wurzel legen wir den *Wurzelnamensraum* an und speichern eine Referenz auf denjenigen AST-Knoten, der diesen Namensraum geöffnet hat (A).
+Auf den Folien ist der aktuell besuchte Knoten rot umrandet und ich habe für Sie annotiert, ob wir gerade in der Pre-Order oder in der Post-Order Visitor-Funktion sind.
+
+Beim Besuch einer Deklaration legen wir in dem Namensraum, der ganz oben auf dem Stack liegt ein entsprechendes Mapping an.
+Zum Beispiel:
+~tmp -> B~ oder ~fib -> D~. 
+Wenn wir einen benannten Namensraum besuchen (~math~), legen wir zuerst ein Mapping im aktuellen Namensraum an (~math->C~) und legen erst danach einen neuen, leeren Namensraum auf den Stack.
+
+Treffen wir auf eine Namensreferenz, so führt die ~findName()~-Funktion die CSNR-Namensauflösung durch:
+Beginnend beim obersten Namensraum auf dem Stack, suchen wir nach dem referenzierten Namen.
+Finden wir den Namen nicht, so gehen wir immer eine Ebene in unserem Stack nach unten.
+Erst wenn wir auch im Wurzelnamensraum keine Deklaration finden, geben wir einen Übersetzungsfehler aus; Es wurde ein Name verwendet, der niemals deklariert wurde.
+Die gefundene Deklaration speichern wir als Referenz in einem Attribut (gestrichelte Linien).
+
+Beim Aufsteigen aus dem rekursiven Abstieg, bauen wir die aufgestapelten Namensräume wieder ab. Um sie im weiteren noch verfügbar zu haben, können wir die befüllten Namensräume aber auch als AST-Attribut an die Knoten hängen (nicht gezeigt).
+
+Im folgenden sehen sie eine minimale Implementierung einer Symboltabelle. Zum experimentieren, habe ich alle AST-Knoten durch entsprechende Strings ersetzt und die einzelnen API-Aufrufe selbst getätigt. Spielen Sie damit herum! Benennen sie, beispielsweise, die zweite Deklaration von ~tmp~ um und beobachten Sie, wie sich die Ausgabe ändert.
+
+#+INCLUDE: ../lst/05-symbols.py
+
+#+begin_src latex
   \begin{frame}[fragile]{Erweiterte Traversierung bei der Namensauflösung}
     \bi
     \ii Beliebige Reihenfolge von Deklaration und Referenzen in einem NS{
@@ -1005,7 +1146,7 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
     \ei
     \bigskip
     \bi
-    \ii<2-> Überladung von Funktionen anhand der statischen Signaturen{
+    \ii<2-|handout:2-> Überladung von Funktionen anhand der statischen Signaturen{
       \bi
       \ii Typinformationen müssen bei der Namensauflösung bereit stehen
       \ii \textbf{Lösung}: Typberechnung und Namensauflösung im \alert<2>{selben Visitor} durchführen.\\
@@ -1029,8 +1170,10 @@ Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C
     \ei
   \end{frame}
 #+end_src
-  - Geerbte Attribute
-  - find_decl, find_decl_fun
+
+Das gezeigte Muster zur Namensauflösung funktioniert hervorragend, solange die Deklarationen in strikter Ordnung vor ihren Referenzen auftauchen müssen. Dies ist zum Beispiel bei C der Fall. Wollen wir diese Regel etwas aufweichen, indem wir erlauben, dass innerhalb eines Namensraums Referenzen vor ihren Deklarationen auftauchen können (wie dies bei Methoden in Java der Fall ist), so müssen wir zweimal über den AST traversieren: Beim ersten Mal sammeln wir alle Deklarationen ein und stecken sie in die Namensräume, welche wir an die AST-Knoten hängen. Beim zweiten Mal, lösen wir alle Namensräume wieder auf.
+
+Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besprochen haben, sind überladene Funktionen. An dieser Stelle schauen wir uns nur die Einbindung der dort besprochenen Strategie (die Parametertypen werden Teil des Namens) an. Hierfür erzeugt der Code ein ~signatur~-Objekt, welches als "Name" verwendet wird. Dort fügen wir, neben dem aufgerufenem Funktionsnamen auch noch die Parametertypen an und suchen nach der Deklaration. Haben wir diese gefunden, so speichern wir sie als Attribut (~call.decl~) und verwenden den Rückgabetyp als Typen des ~CallExpr~-Knoten (~call.Type = ...~).
 
 ** Unifikation
 #+begin_src latex

@@ -27,7 +27,7 @@ class NameVisitor:
     self.ST.createName(N, D)
 #V3e
 #V4s
-  def pre_DeclRefExpr(self, T):
+  def pre_DeclRefExpr(self, R):
     N = R.identifier
     decl = self.ST.findName(N)
     R.decl = decl
