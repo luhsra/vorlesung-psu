@@ -100,6 +100,86 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
   \end{frame}
 
 #+end_src
+
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[fragile]{Beispiel: Leben eines Loggers}
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=C]
+          \begin{C}[style=smaller]
+            typedef enum {
+              DEBUG, INFO, WARN, ERROR, 
+            } level_t;
+          
+            typedef struct {
+              level_t level;
+              int fd;
+            } log_t;
+
+            int main() {
+              // Geburt
+              log_t *L = log_init();
+
+              // Leben
+              log(L, INFO, "message");
+              L->level = DEBUG;
+              log(L, INFO, "message");
+
+              // Tod
+              log_deinit(L);
+            }
+          \end{C}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}[]
+          \begin{C}[style=smaller]
+            log_t * log_init() {
+              // Allokation: Speicher am Heap
+              log_t *l = malloc(sizeof(log_t));
+              // Initialisierung des Zustands
+              l->level = WARN;
+              l->fd    = open("/dev/stderr", 0);
+              return l;
+            }
+          \end{C}
+        \end{code}
+
+        \begin{code}[]
+          \begin{C}[style=smaller]
+            void
+            log(log_t *l, level_t ll, char *m) {
+              if (ll >= l->level) {
+                write(l->fd, m, strlen(m));
+              }
+            }
+          \end{C}
+        \end{code}
+
+        \begin{code}[]
+          \begin{C}[style=smaller]
+            void log_deinit(log_t *l) {
+              close(l->fd); // Datei schließen
+              free(l);      // Speicher freigeben
+            }
+          \end{C}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii<2-> Kaum Sprachunterstützung: \codeinline{struct log_t} kann man leicht falsch halten!{
+      \bi
+      \ii Benutzer kann Invarianten verletzen:\btSetTab\codeinline{L->fd = 23;}
+      \ii Use-after-free Bugs: \btUseTab\codeinline{log_deinit(L); log(L, ERROR, "panic");}
+      \ii Vergessen das Objekt frei zu geben $\rightarrow$ Memory Leak
+      \ei
+    }
+    \ei
+    
+  \end{frame}
+#+end_src
 * Geburt von Objekten
 ** Speicher-Allokation
 ** Initialisierung
