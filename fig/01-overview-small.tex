@@ -57,7 +57,17 @@
     Überladene Funktionen\\
     Dynamische Namensauflösung
   };
-  \node[below=of type.south west,topic,principle, lecture=7,highlight on=4] (operation) {
+
+  \node[below=of type.south west,topic,principle,lecture=6,highlight on=5] (object) {
+    \Title{Objekte}\\
+    Erzeugung \& Initialisierung\\
+    Referenz- \& Wertesemantik\\
+    Immutable Data \& Lebenszeiten\\
+    Referenzzähler\\
+    Garbage Collection
+  };
+
+  \node[right=of object.north east,topic,principle, lecture=7,highlight on=4] (operation) {
     \Title{Operationen}\\
     Standardkonstrukte\\
     Auswertungsstrategie\\
@@ -66,20 +76,12 @@
     Verhaltenskomposition
   };
 
-  \node[right=of operation.north east,topic,principle,lecture=6,highlight on=5] (object) {
-    \Title{Objekte}\\
-    Data Abstraction\\
-    Erzeugung \& Initialisierung\\
-    Lebenszeiten \& Ownership\\
-    Mixin Vererbung\\
-    Prototype Vererbung
-  };
 
   \node[above=of type.north west,yshift=4mm,topic,paradigm,topic double,anchor=west, lecture=13,highlight on=7] (function) {
     \Title{Das Funktionale Paradigma}
   };
 
-  \node[below=of operation.south west,yshift=-4mm,topic,paradigm,topic double,anchor=west,lecture=12] (oo) {
+  \node[below=of object.south west,yshift=-4mm,topic,paradigm,topic double,anchor=west,lecture=12] (oo) {
     \Title{Das Objektorientierte Paradigma}
   };
 \end{scope}
