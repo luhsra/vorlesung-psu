@@ -1,0 +1,28 @@
+\documentclass{lecturefig}
+
+\usetikzlibrary{chains}
+
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[start chain=going right,
+    seg/.style={draw,align=center,on chain,font=\small,minimum height=1cm},
+    node distance=0,
+    ]
+    \node[seg,fill=badbee!30](text){\texttt{.text}\\\small Code};
+    \node[seg,fill=badbee!30](data){\texttt{.data}\\\small Init. Data};
+    \node[seg,fill=badbee!30](bss){\texttt{.bss}\\\small Uninit. Data};
+    \node[seg,fill=safegreen!30](heap){Heap};
+    \draw[->] (heap.east) --++(east:1cm);
+    \node[seg,draw=none](free){\hspace{4cm}};
+    \node[seg,fill=safegreen!30](stack){Stack};
+    \draw[->] (stack.west) --++(west:1cm);
+    \draw[dashed] (stack.north west) -- (heap.north east);
+    \draw[dashed] (stack.south west) -- (heap.south east);
+
+    \draw[>=|,<->] (text.south west)++(down:1em) coordinate(@) node[above,anchor=north west]{\texttt{0x1000}}
+          -- node[below]{Adressraum des Prozesses} (@-|stack.east)
+          node[above,anchor=north east]{\texttt{0xff..ff}};
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

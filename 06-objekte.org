@@ -181,7 +181,6 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
 * Geburt von Objekten
 ** Speicher-Allokation
 #+begin_src latex
-  %%ONLY%%
   \dividerframe{Geburt von Objekten}
 
   \begin{frame}[fragile]{Allokation: Wo kommt der Speicherplatz her?}
@@ -241,6 +240,83 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
   \end{frame}
 #+end_src
 ** Initialisierung
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}{Initialisierung und Konstruktoren}
+    \begin{btBlock}{}
+      Wie wird aus dem allokierten, noch blanken, Speicherbereich ein Objekt?    
+    \end{btBlock}
+
+    \bi
+    \ii \structure{Sprachabhängige} Initialisierung etabliert Meta-Informationen\\[1ex]
+        \small\emph{Was macht ein Stück Speicher für meine Sprache zu einem Objekt?}\\[1ex]
+        {
+          \bi
+          \ii Einige Sprachfeatures  erfordern zusätzliche Informationen an jedem Objekt.
+          \ii Zum Beispiel  \btSetTab -- Dynamische Typinformationen in Form eines Typ Tags.\\
+                            \btUseTab -- Registrierung des Objekts am Garbage Collector
+          \ei
+        }\medskip
+    \ii<2-> \structure{Benutzerdefinierte} Initialisierung durch \textbf{Konstruktoren}\\[1ex]{
+      \small\emph{Was möchte der Benutzer bei der Geburt eines Objekts tun?}\\[1ex]
+      \bi
+      \ii Auswahl der passenden Konstruktor-Methode, oft mittels Überladung
+      \ii Konstruktor nimmt initiale Belegungen der Objekt-Attribute vor.
+      \ii Bei Vererbung: Konstruktoren der Eltern-Klassen sollten zuerst aufgerufen.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Konstruktoren in Aktion: Java}
+    \begin{columns}
+      \begin{column}{0.4\textwidth}
+        \begin{code}[]
+          \lstinputlisting[style=java,style=smaller]{lst/06-counter.java}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.59\textwidth}
+        \bii
+        \ii \structure{Automatischer} Aufruf von Konstruktoren {
+          \bi
+          \ii Konstruktoren heißen wie die Klasse.
+          \ii Haben keinen Rückgabewert.
+          \ii Nicht-initialisierte Attribute werden automatisch 0 oder \texttt{null}
+          \ei
+        }
+        \medskip
+        \ii[{\dn[font=\scriptsize]{1}}]\footnotesize Konstruktor muss \codeinline[style=java]{final}-Attribute setzen
+        \ii[{\dn[font=\scriptsize]{2}}]\footnotesize Aufruf anderer Konstruktoren mittels \codebox{this()}
+        \ii[{\dn[font=\scriptsize]{3}}]\footnotesize Autom. Aufruf des No-Arg Elternkonstruktors
+        \ii[{\dn[font=\scriptsize]{4}}]\footnotesize Elternkonstruktor mittels \codebox{super()}
+        \eii
+
+        \begin{uncoverenv}<2->
+        \begin{code}[tag=Pseudo-C]
+          \begin{C}[style=smaller]
+            //// Counter b = new Derived("123");
+            // Allokation
+            size_t size = sizeof(Derived);
+            Derived *b = malloc(S);
+
+            // Sprachspezifisches Init
+            memset(b, 0, size);   // implizites nullen
+            b->vtable = Dervied_vtable; // type-tag
+
+            // Benutzerdefiniertes Init
+            int tmp = parseInt("123")
+            b->start = 3+tmp;
+          \end{C}
+        \end{code}
+      \end{uncoverenv}
+    \end{column}
+    \end{columns}
+
+  
+  \end{frame}
+
+
+#+end_src
 ** Referenz vs. Wertesemantik
 * Leben von Objekten
 ** Unkontrollierer Objektzugriff
