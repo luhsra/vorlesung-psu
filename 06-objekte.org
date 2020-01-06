@@ -100,9 +100,7 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
   \end{frame}
 
 #+end_src
-
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}[fragile]{Beispiel: Leben eines Loggers}
     \begin{columns}
       \begin{column}{0.49\textwidth}
@@ -182,6 +180,66 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
 #+end_src
 * Geburt von Objekten
 ** Speicher-Allokation
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Geburt von Objekten}
+
+  \begin{frame}[fragile]{Allokation: Wo kommt der Speicherplatz her?}
+    \hspace{-1em}\textbf{Meistens} residieren Objekte in einem zusammenhängenden Speicherbereich
+    \medskip
+    \begin{center}
+      \texttt{allocate(bytes\_t N)} $\longrightarrow$ Startadresse des zukünfigen Objekts
+    \end{center}
+
+    \bi
+    \ii<2-> \structure{Statische Allokation} durch Übersetzer: Lebenszeit = Programlaufzeit {
+      \bi
+      \ii Absolute Adresse des Objekts steht vor der Laufzeit fest
+      \ii Bsp.: globale Variablen, konstante Literale, Maschinencode einer Funktion
+      \ii 2 statische Objekte: \codeinline{char *global = "foobar";} 
+      \ei
+    }\medskip
+    \ii<3-> \structure{Stack Allokation}: Objekte können auf den Aufrufstapel{
+      \bi
+      \ii Allokation als Einbettung des Call-Frames einer Funktionsinstanz.
+      \ii Lebenszeit des Objekts ist $\le$ Lebenszeit des Call-Frames.
+      \ii Beispiele: Argumente, lokale Variablen, \codeinline{alloca()}
+      \ei
+    }\medskip
+    \ii<4-> \structure{Heap Allokation}: Laufzeitsystem betreibt separaten Speicherpool {
+      \bi
+      \ii Lebenszeit unabhängig von Aufrufhierarchie, beliebige Allokations-Zeitpunkte
+      \ii Benötigt komplexeres Speichermanagement und ist daher teurer.
+      \ii Speicher muss irgendwann freigeben werden (manuell oder garbage collection)
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Allokationen im größeren Kontext}
+    \begin{center}
+      \includegraphics[width=0.8\textwidth]{fig/06-process-mem}
+    \end{center}
+
+    \bi
+    \ii Im klassisches UNIX-Modell wachsen Stack und Heap aufeinander zu.{
+      \bi
+      \ii Das ELF beschreibt die statisch allokierten Objekte (.text, .data, .bss)
+      \ii Realität ist komplexer: Mehrere Stacks/Heaps, Addressspace-Randomization
+      \smallskip
+      \ii[$\rightarrow$] Genauere Betrachtung in Grundlagen der Betriebssysteme (GBS)
+      \ei
+    }\medskip
+    \ii Für Programmiersprachen und Übersetzer nehmen wir an, dass... {
+      \bi
+      \ii Wir globale Objekte im Assembler anlegen können.
+      \ii Der Prozess einen Stack hat und wir den Stackpointer kontrollieren.
+      \ii Das Laufzeitsystem \codebox{void *malloc(size\_t)}/\codebox{free(void*)} bereitstellt.
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
 ** Initialisierung
 ** Referenz vs. Wertesemantik
 * Leben von Objekten
