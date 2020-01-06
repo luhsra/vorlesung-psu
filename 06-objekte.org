@@ -1,0 +1,114 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 06 - Objekte
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+Stoffsammlung:
+  - Lebenszyklus eines Objekts, Lebenszeit
+  - Geburt und Initialisierung
+    - Speicherallokation
+    - Initialisierung 
+    - Referenz vs. Value Model
+  - Während der Lebenszeit
+    - Getter und Setter
+    - Problem: Paralleler Zugriff
+    - Ownership of an Object
+    - Read-Only Access
+    - Immutable Objects
+  - Garbage Collection  und Tod
+    - Deinitialisierung
+    - Reference Counting
+    - Automatic Garbage Collection
+
+Was soll der Studierende aus dieser Vorlesung mitnehmen?
+  - Welche Besonderheiten kann eine Sprache bzgl. ihrer Objekte haben? [Effektiv]
+  - Was bedeutet es ein Objekt zu kopieren?                            [Effizient]
+* Was ist ein "Objekt"?
+:PROPERTIES:
+:CUSTOM_ID: 06-einleitung
+:END:
+
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \begin{frame}
+    \maketitle
+  \end{frame}
+
+  \begin{frame}{Einordnung in die Vorlesung: Objekte}
+    \begin{center}
+      \includegraphics[page=13,width=0.6\linewidth]{fig/01-overview-small}
+    \end{center}
+    \bi
+    \ii Objekte sind die datentragenden Elemente in einer Laufzeitumgebung {
+      \bi
+      \ii Die virtuelle Sprach-Maschine definiert \alert{Geburt, Leben und Tod} von Objekten.
+      \ii Effiziente Programme gehen \advantage{sparsam und sorgsam} mit Objekten um.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Was ist ein Objekt?}
+    \begin{center}
+      \includegraphics[width=0.75\textwidth]{fig/06-object-types}
+    \end{center}
+    \bi
+    \ii \textbf{Erinnerung 1. Vorlesung}: Maschinenmodell der virtuellen Maschine:{
+      \bi
+      \ii \structure{Speicher/Objekte}: Wie kann man Informationen ablegen und wieder abrufen?
+      \ii \structure{Befehle/Operationen}: Wie kann man Informationen miteinander kombinieren?
+      \ei
+    }
+    \ei
+    \pause
+    \begin{btBlock}{Definition: Objekt}
+      Ein Objekt ist ein logisch-zusammengehöriger Verbund von Informationen, dessen \emph{Lebenszeit} kleiner oder gleich der Programmlaufzeit ist.
+    \end{btBlock}
+    \pause
+    \hspace{-1em}\textbf{Wichtig:} \btSetTab (1) Variablen $\ne$ Objekte! Variablen können Objekte beinhalten.\\
+    \btUseTab (2) Diese Definition umfasst auch primitive Objekte, wie Zahlen!
+  \end{frame}
+
+  \begin{frame}{Lebenszyklus eines Objekts}
+    \hspace{-1em}\textbf{Vereinfachung:} Objekte residieren in zusammenhängendem Speicher
+    \medskip
+  
+    \btAnimation[width=\textwidth]{range=1-4:<1->}{fig/06-lifecycle}
+
+    \bi
+    \ii \structure{Geburt}: Initialisierung von frisch allokiertem Speicher\\
+    \small Objekt-Zustand muss so präpariert werden, dass die Typ-Invarianten gelten.
+    \smallskip
+    \ii<2-> \structure{Leben}: Objekte transportieren Informationen im Programmablauf\\
+    \small Sprache kann es uns erleichtern die Typ-Invarianten zu erhalten, sonst: Bugs.
+    \smallskip
+    \ii<3-> \structure{Tod}: Kontrolliertes Aufräumen des Zustands und Freigabe der Ressourcen\\
+    \small Der Zeitpunkt und der Verantwortliche für das Aufräumen ist sprachabhängig.
+    \ei
+  \end{frame}
+
+#+end_src
+* Geburt von Objekten
+** Speicher-Allokation
+** Initialisierung
+** Referenz vs. Wertesemantik
+* Leben von Objekten
+** Unkontrollierer Objektzugriff
+** Read-Only Zugriff und Immutable Data
+** Lebenszeiten
+* Tod von Objekten
+** Deinitialisierung
+** Reference Counting
+** Automatic Garbage Collection

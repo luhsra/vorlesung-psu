@@ -1,0 +1,39 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture,
+    object/.style={
+      draw,
+    },
+    ]
+
+    \node[object,pin={75:Zahlen}] (obj-int) {1};
+    \newcommand\OBJ[2][]{%
+      \tikz[remember picture,baseline]\node[object,anchor=base,#1] {#2};%
+    }
+
+    \node[object,right=0.5 of obj-int]   (obj-arr-1) {12};
+    \node[object,right=0 of obj-arr-1] (obj-arr-2) {42};
+    \node[object,right=0 of obj-arr-2] (obj-arr-3) {23};
+    \node[object,fit=(obj-arr-1) (obj-arr-3),pin=-135:Arrays] (obj-arr) {};
+
+    \node[object, align=left,right=0.8 of obj-arr.south east,anchor=south west,pin=170:Record] (obj-record){
+      .x = \OBJ{1}\\
+      .y = \OBJ{3}
+    };
+
+    \node[object, align=left,right=0.5 of obj-record.south east,anchor=south west,pin=30:Einbettung] (obj-embed){
+      .x = \OBJ{.y = \OBJ{1}}%
+    };
+
+    \node[object, align=left,below=0.5 of obj-embed.south west,anchor=north west,pin=180:Referenz] (obj-ref) {
+      \strut.x = \OBJ[name=ref,fill opacity=0]{1}
+    };
+
+    \node[object, align=left,right=0.5 of obj-ref] (obj-next) {
+      \strut.y = \OBJ[]{1}
+    };
+    \draw[->](ref.center) node[circle,fill=black,inner sep=2pt] {} -- (obj-next);
+  \end{tikzpicture}
+\end{frame}
+\end{document}

@@ -1,0 +1,50 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node(alloc){Allokation};
+    \node[right=0.5 of alloc](init){Initialisierung};
+    \draw[->] (alloc) -- (init);
+    \draw[line width=1ex,safegreen] (init.south east) -- node[black,below,yshift=-1ex]{Geburt} (alloc.south west);
+    
+    \begin{scope}[visible on=<2->]
+      \node[right=1.5 of init](ownership){Besitz};
+      \node[above=0.1 of ownership](send){Weitergabe};
+      \node[above=0.1 of send](read){Auslesen};
+      \node[above=0.1 of read](write){Veränderung};
+
+      \draw[->] (init) -- coordinate[pos=0.35](@1) (ownership);
+      \draw[->] (@1) |- (read);
+      \draw[->] (@1) |- (send);
+      \draw[->] (@1) |- (write);
+
+    \end{scope}
+
+    \begin{scope}[visible on=<3->]
+      \node[right=1.5of ownership](deinit){Deinitialisierung};
+      \node[right=0.5 of deinit](dealloc){Freigabe};
+
+      \draw[->] (ownership) -- coordinate[pos=0.70](@2) (deinit);
+      \draw[] (read)  -| (@2);
+      \draw[] (send)  -| (@2);
+      \draw[] (write) -| (@2);
+
+      \draw[->] (deinit) -- (dealloc);
+
+      \draw[line width=1ex,brown] (dealloc.south east) -- node[black,below,yshift=-1ex]{Tod} (deinit.south west);
+    \end{scope}
+
+
+    \begin{visible}<2->
+      \draw[line width=1ex,orange] ($(@2)+(down:2ex)$)   -- node[black,below,yshift=-1ex]{Leben} ($(@1)+(down:2ex)$);
+    \end{visible}
+    
+
+    \begin{scope}[visible on=<4->, c/.style={yshift=-2.5em}]
+      \draw[>=|,<->] ([c]dealloc.south east) -- node[below,yshift=-1ex]{Lebenszeit des Objekts} ([c]alloc.south west);
+    \end{scope}
+    
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}
