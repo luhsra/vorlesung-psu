@@ -1,0 +1,22 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    remember picture,
+    var/.style={draw,align=left,fill=badbee!50},
+    obj/.style={draw,align=left,fill=luhblue!40,rectangle split, rectangle split parts=2,},
+    ]
+    \only<1>{
+      \node[var]{\texttt{var\_foo}\\[1ex]
+        \hspace{1em}\tikz\node[obj]{object\nodepart{two}type=object\\x=...};
+      };
+    }
+    \only<2>{
+      \node[var](var){\texttt{var\_foo} \tikz\node[draw](ref){};};
+
+      \node[obj,below=0.3 of var](obj){object\nodepart{two}type=object\\x=...};
+      \draw[->] (ref.center) node[circle,fill=black,inner sep=1.5pt] {} -- (obj);
+    }
+  \end{tikzpicture}
+\end{frame}
+\end{document}

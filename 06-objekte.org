@@ -363,7 +363,6 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
 
 
 #+end_src
-
 #+begin_src latex
   \begin{frame}[fragile]{Was sollte \textbf{mein} Konstruktor leisten?}
     \begin{btBlock}{\small Sinnvolle Konvention: Konstruktoren stellen semantische Invarianten her}\small
@@ -415,12 +414,139 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
 
     }
     \ei
-  
-
   \end{frame}
 #+end_src
 * Leben von Objekten
 ** Referenz vs. Wertesemantik
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[t]{Wie werden Objekte gebunden und weitergereicht?}
+    \textbf{Erinnerung (binding time):} Ein Objekt wird an einen Namen gebunden.
+
+    \begin{center}
+      \codebox{var\_foo = new object();}\hspace{1cm}\codebox{foo(var\_foo);}
+    \end{center}
+
+    \hspace{-1em}Mittels gebundener Namen können wir Objekte \alert{ansprechen und weitergeben}.\\[0.5ex]
+    \uncover<2->{
+      \hspace{-1em}\textbf{Aber:} Ist der Wert einer Variable das Objekt oder eine Objekt-Referenz?
+    }
+
+    \begin{columns}<3->
+      \begin{column}{0.49\textwidth}
+        \begin{center}
+          \includegraphics[page=1,height=2cm]{fig/06-val-refs}
+        \end{center}
+        \STRUCTURE{Wertemodell für Variablen}
+        \bii
+        \ii Objekte \enquote{leben} in Variablen
+        \ii Zuweisung erzeugt eine \textbf{Kopie}
+        \ii Referenzen sind separate Objekte
+        \ii[$\Rightarrow$] C, C++, Rust
+        \eii
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{center}
+          \includegraphics[page=2,height=2cm]{fig/06-val-refs}
+        \end{center}
+        \STRUCTURE{Referenzmodell für Variablen}
+        \bii
+        \ii Variable speichert nur Referenz
+        \ii Zuweisung erzeugt weitere Referenz
+        \ii Keine separaten Referenzobjekte
+        \ii[$\Rightarrow$] Java (mostly), Python, Ruby
+        \eii
+      \end{column}
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}[fragile]{Wertemodell: Vor- und Nachteile}
+    \begin{columns}
+      \begin{column}{0.45\textwidth}
+        \begin{code}[tag=C++11]
+          \begin{CPP}
+            class foo_t { int x; };
+            ...
+            foo_t A { 23 };
+            foo_t B = A;
+            A.x = 42; // B.x == 23
+          \end{CPP}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.53\textwidth}
+        \bii
+        \ii A und B enthalten \alert{verschiedene} Objekte
+        \ii Initialisierung von B durch Kopie
+        \ii Objekte-Inhalte/Speicher werden kopiert
+        \eii
+      \end{column}
+    \end{columns}
+    \medskip
+
+    \bi
+    \iiad<2-> Das Wertemodell is \advantage{flexibler} und kann \advantage{effizienter} sein. {
+      \bi
+      \ii Indirektion nur auf Nachfrage; kleine Objekte lassen sich effizient kopieren.
+      \ii Referenzen sind explizit im Code sichtbar (als Zeiger-Typ)
+      \ii Objekte in lokalen Variablen können am Stack alloziert werden.
+      \ei
+    }\medskip
+    \iida<3-> Das Wertemodell ist \alert{komplexer} und \alert{schwieriger zu beherrschen}. {
+      \bi
+      \ii Referenzen machen das Programmiermodell komplexer.
+      \ii Häufiges Kopieren \emph{kann} unsichtbaren Overhead erzeugen.
+      \ii Initialisierung durch Kopieren (oder Verschieben) ist eigentlich ein Sonderfall\\
+      $\Rightarrow$ C++ kennt 3 Sorten von Konstruktoren: Init-, Copy-, Move-Konstruktoren
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Referenzmodell: Vor- und Nachteile}
+      \begin{columns}
+      \begin{column}{0.45\textwidth}
+        \begin{code}[tag=Java]
+          \begin{java}
+            class foo { public int x; }
+            ...
+            foo A = new foo();
+            A.x   = 23;
+            foo B = A;
+            // B.x == 23
+          \end{java}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.53\textwidth}
+        \bii
+        \ii Beide referenzieren das \alert{gleiche Objekt}
+        \ii Automatisch Dereferenzierung
+        \ii Objekterzeugung nur mittels \codeinline[style=java,style=smaller]{new T()}
+        \eii
+      \end{column}
+    \end{columns}
+    \medskip
+
+    \bi
+    \iiad<2-> Im Referenzmodell sind Variablen und Objekte \advantage{orthogonal}. {
+      \bi
+      \ii Objekte existieren \textbf{immer} unabhängig von Variablen und Funktionsaufrufen
+      \ii Weitergabe quer zur Aufrufhierarchie ist trivial.
+      \ii Keine Probleme mit Kind-Klassen die mehr Speicher brauchen.\\
+          Problematisch in C++: \codeinline[style=CPP,style=smaller]{Base func() { Derived d; return d; }}
+      \ei
+    }\medskip
+    \iida<3-> Im Referenzmodell tragen wir immer \alert{die Kosten} der Indirektion {
+      \bi
+      \ii Ohne Optimierungen müssen alle Objekte am Heap alloziert werden.
+      \ii Todeszeitpunkt von Objekten ist unklar.
+      \ii Primitive Typen: Jeder Integer hinter einem Pointer? \\
+          Java: Wertemodell für Zahlen, außer wenn nicht (Auto(un-)boxing).
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
 ** Unkontrollierer Objektzugriff
 ** Read-Only Zugriff und Immutable Data
 ** Lebenszeiten
