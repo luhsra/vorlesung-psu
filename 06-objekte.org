@@ -693,7 +693,33 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
   \end{frame}
 
 #+end_src
-** Read-Only Zugriff und Immutable Data
+** Fallstudie: Immutable Objects
+#+begin_src latex
+  \begin{frame}[fragile]{Fallstudie: Unveränderliche Objekte}
+    \begin{btBlock}{Unveränderliche Obejekte (immutable objects)}
+      Gibt es für ein Objekt, im gesamten Programm, keine read-write Referenzen, so ist sein Inhalt unveränderlich.
+    \end{btBlock}
+  
+    \bi
+    \ii<2-> Immutability für ein Objekt bringt spannende Eigenschaften {
+      \bi
+      \ii Thread-Safety: Keine Probleme mit konkurrierenden Schreibzugriffen
+      \ii Werte- und Referenzmodell werden equivalent.
+      \ii Deduplikation von Objekten ist möglich (=interning).
+      \ii \textbf{Aber:} Verändernde Operation müssen das Objekt verändert kopieren
+      \ei
+    }\medskip
+    \ii<3-> Manche Objekte sind natürlichweise Immutable {
+      \bi
+      \ii \structure{Zahlen}: Die Zahl 5 kann nicht so verändert werden, dass alle Fünfen im gesamten Programm plötzlich Achten sind.
+      \smallskip
+      \ii \structure{String-Literale}: Der Übersetzer legt literale Zeichenketten (\codeinline[style=C,style=smaller]{"Hello"}) nur einmal in die Binärdatei.
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
 ** Lebenszeiten
 * Tod von Objekten
 ** Deinitialisierung
