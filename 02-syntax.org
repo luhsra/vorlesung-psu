@@ -609,7 +609,7 @@ Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setz
 ** Parser mit rekursivem Abstieg
 #+begin_src latex
   \begin{frame}{Determinstische Linksableitende Grammatiken}
-    \textbf{Informell:} Bei einer LL(1)-Grammatik kann man am aktuellen Zeichen sicher erkennen, welche Regel als nächsten angewendet werden soll.
+    \textbf{Informell:} Bei einer LL(1)-Grammatik kann man am aktuellen Zeichen sicher erkennen, welche Regel als nächstes angewendet werden soll.
     \bigskip\medskip
 
   \begin{columns}
