@@ -720,6 +720,8 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
   \end{frame}
 #+end_src
 
+https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de
+
 ** Lebenszeiten
 * Tod von Objekten
 ** Deinitialisierung
