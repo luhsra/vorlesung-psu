@@ -417,10 +417,10 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
   \end{frame}
 #+end_src
 * Leben von Objekten
-** Referenz vs. Wertesemantik
+** Werte- und Referenzmodell
 #+begin_src latex
-  %%ONLY%%
-  \begin{frame}[t]{Wie werden Objekte gebunden und weitergereicht?}
+  \dividerframe{Leben von Objekten}
+  \begin{frame}[t]{Wie werden Objekte abgelegt und weitergereicht?}
     \textbf{Erinnerung (binding time):} Ein Objekt wird an einen Namen gebunden.
 
     \begin{center}
@@ -546,8 +546,153 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
     }
     \ei
   \end{frame}
+
 #+end_src
-** Unkontrollierer Objektzugriff
+** Objektzugriff auf Objektdaten
+#+begin_src latex
+  \begin{frame}{Zugriff auf Objekte}
+    \begin{center}
+      \includegraphics[page=1]{fig/06-access}
+    \end{center}
+
+    \bi
+    \ii Welche \structure{Arten von Zugriffen} gibt es? {
+      \bi
+      \ii Daten aus dem einem Objekt auslesen oder verändern.
+      \ii Direkter Speicherzugriff oder gefiltert über getter/setter.
+      \ii Ableitung weiterer Referenzen (z.B. Subobjekte: \codebox{\&obj.x}). \hfill \ALERT<1>{Gefährlich!}
+      \ei
+    }\smallskip
+    \ii Wer ist der \structure{Benutzer} eines Objekts? {
+      \bi
+      \ii Eigentlich: Das laufende Programm (aktiv) greift auf ein Objekt (passiv) zu.
+      \ii Nützliche Präzisierungen: Zugreifende Funktion, zugreifender Thread
+      \ei
+    }\smallskip
+    \ii Welche \structure{Berechtigungen} hat der Benutzer? {
+      \bi
+      \ii Referenzen sind Befähigungen (Capabilities) ein Objekt zu nutzen.
+      \ii Nicht jede Referenz auf ein Objekt muss gleich mächtig sein.
+      \ei
+    }
+    \ei
+
+    \uncover<2->{
+      \begin{center}
+        \vfill{}
+        \OrangeBox{
+          \textbf{Wer} greift \textbf{Wie} mit \textbf{welchem Recht} zu?        
+        }
+    \end{center}
+    }
+
+  \end{frame}
+
+  \begin{frame}[fragile]{Gefilterter Zugriff über Getter und Setter}
+    \begin{columns}
+      \begin{column}{0.44\textwidth}
+        \begin{btBlock}{Direkter Speicherzugriff}
+          \centering
+          \texttt{obj.length = -1;}\\
+          User kann Invarianten verletzen
+        \end{btBlock}      
+      \end{column}
+      \begin{column}{0.10\textwidth}
+        \centering
+        \Huge$\leftrightarrow$
+      \end{column}
+      \begin{column}{0.44\textwidth}
+        \begin{btBlock}{Nur Methodenzugriff}
+          \centering \texttt{obj.setLength(-1);}\\
+          Boilerplate, reine Konvention
+        \end{btBlock}      
+      \end{column}
+    \end{columns}
+
+    \pause\bigskip
+
+    \btAnimation{center,padding,2:<1->}{fig/06-access}
+    \bi
+    \ii Einige Sprachen erlauben den gefilterten Zugriff auf einzelne Attribute {
+      \begin{columns}
+        \begin{column}{0.55\textwidth}
+          \bi
+          \ii Verwendung sieht aus wie direkter Zugriff
+          \ii \texttt{set()} beim Schreiben eines Attributs\\[-0.5ex]
+          \ii \texttt{get()} zum Lesen eines Attributs
+          \ii Kann \textbf{nachträglich} eingefügt werden, ohne die Benutzer zu ändern!
+          \ei
+        \end{column}\hfill
+        \begin{column}{0.45\textwidth}
+          \begin{code}[tag=C\#]
+            \begin{sharpc}
+              public class Student {
+                private string name;
+              
+                public string Name {
+                  get { return name; }
+                  set { name = value; }
+                }
+              }
+            \end{sharpc}
+          \end{code}
+        \end{column}
+      \end{columns}
+
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Benutzer-abhängige Zugriffseinschränkungen}
+    \btAnimation{center,padding,3:<1->}{fig/06-access}
+    \medskip
+    \bi
+    \ii \textbf{Ziel:} Benutzergruppen mit unterschiedlichen Zugriffsrechten {
+      \bi
+      \ii Identifikation der unterschiedlichen Gruppen \hfill(Wer greift zu?)
+      \ii Einteilung anhand der zugreifenden Instruktionadresse
+      \ii[$\Rightarrow$] Wir können den Code mit unbeschränktem Zugriff kontrollieren.
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Implementierung:} Einschränkung der Sichtbarkeit des Namens {
+      \bi
+      \ii Wenn der externe Nutzer einen Namen nicht sieht, kann er nicht zugreifen.
+      \ii \textbf{Aber:} Gibt ein interner Nutzer eine Referenz auf ein privates Attribut heraus, bricht die Abstraktion. \textbf{Referenzen geben Kontrolle heraus!}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Referenzen-abhängige Zugriffseinschränkungen}
+    \btAnimation{center,padding,4:<1->}{fig/06-access}
+    \medskip
+
+    \bi
+    \ii \textbf{Ziel:} Einschränkbare Referenzen erlauben kontrolliertes Sharing {
+      \bi
+      \ii Über eingeschränkte Referenzen dürfen nicht alle Zugriffe erfolgen
+      \ii Referenzen dürfen nur weiter eingeschränkt und nicht geweitet werden.
+      \ii Beispiel: Ableitung einer read-only Referenz aus einer read-write Referenz
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Implementierung (const):}  Erweiterung des Typsystems{
+      \bi
+      \ii Weiterer Zeiger-Typkonstruktor:    \typeinline{const\_pointer(T)}\\[.5ex]
+      \ii Implizite Typumwandlung zur read-only Referenz\\[.5ex]
+      \ii Asymmetrische Typ-Kompatibilität:  \typeinline{const\_pointer(T)} $\ll$ \typeinline{pointer(T)}\\[.5ex]
+      \ei
+    }
+    \ii<3-> Standardverhalten in verschiedenen Sprachen{
+      \bi
+      \ii \structure{C++}:  \hspace{1ex}\btSetTab Read-only ist die Ausnahme \hfill(\texttt{T*, const T\*}).
+      \ii \structure{Rust}: \btUseTab Read-only ist die Regel \hfill(\texttt{\&T, \&mut T})
+      \ii \structure{Java}: \btUseTab Alle Referenzen dürfen alles. 
+      \ei
+    }
+    \ei
+  \end{frame}
+
+#+end_src
 ** Read-Only Zugriff und Immutable Data
 ** Lebenszeiten
 * Tod von Objekten

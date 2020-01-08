@@ -61,3 +61,12 @@
 \setbeamercolor{example text}{fg=beamergreen}
 
 \newenvironment<>{visible}[1][]{\begin{scope}[visible on=#2,#1]}{\end{scope}}
+
+% Include the commons file
+\def\@@lecturenumber#1-#2\@nnil{\if&#1&\else\def\@lecturenumber{#1}\fi}
+\expandafter\@@lecturenumber\jobname-xxx\@nnil
+\IfFileExists{fig/\@lecturenumber-common.sty}{
+  \RequirePackage{fig/\@lecturenumber-common}
+}{
+  \typeout{No commons file found..}
+}

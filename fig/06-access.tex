@@ -1,0 +1,96 @@
+\documentclass{lecturefig}
+\usepackage{fig/06-common}
+\usepackage{soul}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[object with elements] (obj) {
+      object\nodepart{two}
+      x = 23;\\
+      y = 42;\\
+      z = 'a';
+    };
+
+    \draw[<-] (obj.text split west) ++(down:1em)   -- node[above]{read}  ++(west:2cm) coordinate(read);
+    \draw[<-] (obj.text split west) ++(down:1.5em)   -- node[below]{write} ++(west:2cm) coordinate(write);
+
+    \coordinate(user-left) at ($(read)!0.5!(write)$);
+
+    \node[fill=luhgray!30,align=center,left=0 of user-left] {Benutzer\\des\\Objekts};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[object with elements] (obj) {
+      object\nodepart{two}
+      x = 23;\\
+      y = 42;
+    };
+
+    \tikzset{pipe/.style={
+        cylinder,
+        font=\ttfamily,
+        cylinder uses custom fill,
+        cylinder end fill=#1!50,
+        cylinder body fill=#1!25,draw
+      }
+    }
+        
+
+    \node[pipe=safered, right=0.4 of obj.text split east,yshift=1ex,] (setter) {set()};
+    \node[pipe=safegreen, below=0.2 of setter] (getter) {get()};
+
+    \draw[->]($(getter.before top)!0.5!(getter.after top)$)--++(east:2em);
+    \draw[  ]($(setter.before top)!0.5!(setter.after top)$)--++(east:2em);
+
+    \draw[->] (setter) -- (setter -| obj.east);
+    \draw (getter) -- (getter -| obj.east);
+    
+  \end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[object with elements=3] (obj) {
+      object\nodepart{two}
+      private:\\
+      x = 23;
+      \nodepart{three}
+      public:\\
+      z = 'a';
+    };
+
+    \draw[<-,srared] (obj.text split west) ++(down:1em) node[anchor=north east]{\Lightning}   -- node[above]{read/write}  ++(west:2cm) coordinate(read);
+    \draw[<-,safegreen] (obj.three split west) ++(down:1.5em)   -- node[below]{read/write} ++(west:2cm) coordinate(write);
+    \coordinate(user-left) at ($(read)!0.5!(write)$);
+
+    \draw[ultra thick,srared] (obj.text split west) -- (obj.two split west);
+
+    \node[fill=luhgray!30,align=center,left=0 of user-left,minimum height=2.5cm] {Externer\\Benutzer};
+
+    \draw[<-,safegreen] (obj.text split east) ++(down:1em)   -- node[above]{read/write}  ++(east:2cm) coordinate(read);
+    \draw[<-,safegreen] (obj.three split east) ++(down:1.5em)   -- node[below]{read/write} ++(east:2cm) coordinate(write);
+    \coordinate(user-right) at ($(read)!0.5!(write)$);
+
+    \node[fill=luhgray!30,align=center,right=0 of user-right,minimum height=2.5cm] {Interner\\Benutzer};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[object with elements=2] (obj) {
+      object\nodepart{two}
+      x = 23;
+    };
+
+    \draw[<-] (obj.text split west) ++(down:1em)   -- node[above]{read/\alert{\st{write}}}  ++(west:2cm) coordinate(left);
+
+    \draw[<-] (obj.text split east) ++(down:1em)   -- node[above]{read/write}  ++(east:2cm) coordinate(right);
+
+    \node[fill=luhgray!30,align=center,left=0 of left] {const object\&};
+    \node[fill=luhgray!30,align=center,right=0 of right] {object\&};
+  \end{tikzpicture}
+\end{frame}
+\end{document}

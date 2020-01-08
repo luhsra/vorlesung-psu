@@ -93,6 +93,14 @@
     moredelim=**[is][\color{orange}]{@@}{@@},
     moredelim=**[is][\color{srared}]{@@@}{@@@},
   }
+  \lstdefinestyle{sharpc}{style=basestyle,
+    language=[Sharp]C,
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
   \lstdefinestyle{ada}{
     style=basestyle,
     language={ada},
@@ -231,7 +239,9 @@
 }
 \forcsvlist\addLangEnv{%
   C/C,pascal/pascal,JS/JS,haskell/haskell,java/java,%
-  ada/ada,codetext/text,rust/rust,CPP/CPP,py/py,lzero/lzero,asm/ASM}
+  ada/ada,codetext/text,rust/rust,CPP/CPP,py/py,lzero/lzero,asm/ASM,
+  sharpc/sharpc,
+}
 
 
 % set default for \lstinline

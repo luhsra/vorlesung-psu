@@ -1,10 +1,11 @@
 \documentclass{lecturefig}
+\usepackage{fig/06-common}
 \begin{document}
 \begin{frame}[fragile]
   \begin{tikzpicture}[
     remember picture,
     var/.style={draw,align=left,fill=badbee!50},
-    obj/.style={draw,align=left,fill=luhblue!40,rectangle split, rectangle split parts=2,},
+    obj/.style={object with elements},
     ]
     \only<1>{
       \node[var]{\texttt{var\_foo}\\[1ex]

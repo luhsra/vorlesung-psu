@@ -1,0 +1,11 @@
+\colorlet{objectcolor}{luhblue!40}
+\tikzset{
+  object with elements/.style={
+    draw,
+    align=left,
+    rectangle split,
+    rectangle split parts=#1,
+    fill=objectcolor,
+  },
+  object with elements/.default=2,
+}
