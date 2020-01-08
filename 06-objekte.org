@@ -721,8 +721,62 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
 #+end_src
 
 https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de
+** Ownership
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[fragile]{Ownership für Objekte}
+    \begin{btBlock}[type=alert]{Wem gehört ein dieses Objekt?}
+        Viele Bugs und Probleme  rühren daher, dass man sich keine Gedanken darüber gemacht hat, wer Verantwortung für ein Objekt hat.
+    \end{btBlock}
 
-** Lebenszeiten
+    \bi
+    \ii \textbf{Denkanweisung}: Wer ist der Besitzer und wo wird Besitz übertragen?{
+      \bi
+      \ii Besitzer kann ein Thread, eine Funktion oder ein anderes Objekt sein.
+      \ii Der (letzte) Besitzer ist verantwortlich für die Freigabe des Objekts.
+      \ii \alert{Geteilter Besitz} von Objekten erfordert immer \textbf{erhöhte Aufmerksamkeit}.
+      \ei
+    }
+    \ei
+
+    \begin{columns}<2->
+      \begin{column}{0.49\textwidth}
+        \begin{code}[]
+          \begin{CPP}
+            struct Cache {
+              obj_t* obj;
+              int set(obj_t* o) {
+                this->obj = o;
+              }
+            };
+            Cache cc; cc.set(obj);
+            delete obj;
+          \end{CPP}
+        \end{code}
+        \bii
+        \ii \texttt{cc} hält Referenz auf anderes Objekt
+        \ii \structure{dangling-reference problem}
+        \eii
+      \end{column}\hfill
+      \begin{column}<3->{0.49\textwidth}
+        \structure{Besitz ist Schwierig!}
+        \bii
+        \ii Besitz ist oft nur intentional!
+        \ii Referenz impliziert keinen Besitz!\\[.5ex]
+        \ii Modernste Sprachenentwicklungen:{%
+          \bi
+          \ii Hilfestellungen: \codeinline[style=CPP,style=smaller]{std::unique_ptr<T>}
+          \ii Übersetzer prüft Besitzer statisch: Rust's Borrowchecker
+          \ei
+        }
+        \eii
+      \end{column}
+    \end{columns}
+
+
+  
+  \end{frame}
+#+end_src
 * Tod von Objekten
 ** Deinitialisierung
 ** Reference Counting
