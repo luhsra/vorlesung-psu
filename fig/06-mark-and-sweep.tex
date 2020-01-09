@@ -1,0 +1,109 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture,
+    object/.style={fill=objectcolor, draw,text width=1.5cm},
+    call-frame/.style={
+      draw,
+      fill=luhgray!40,
+      rectangle split,
+      rectangle split parts=2,
+      align=left,
+      font=\scriptsize,
+      node on layer=background,
+    },
+    var/.style={
+      rectangle split parts=1,solid,inner sep=2pt,font=\scriptsize,draw,fill=orange!70
+    },
+    ]
+
+    \newcommand{\var}[2][]{\tikz[baseline,remember picture]\node[invisible,var,anchor=base,#1] {#2};}
+
+    \newcommand{\object}[3][]{
+      \node[object,#1](obj-#2){0x#2\hfill#3};
+    }
+
+    \def\D#1{\strut\only<2->{\alt<#1>{\color{safegreen!70!black}\checkmark}{\color{srared}$\times$}}}
+
+    \def\HL#1#2{
+      \node[node on layer=background,visible on={<#2>},fit=(#1),inner sep=2pt,fill=srared!40]{};
+    }
+
+    \object{20}                   {\D{10-}};\HL{obj-20}{10}
+    \object[below=of obj-20]{30}  {\D{7-}};\HL{obj-30}{7}
+    \object[below=of obj-30]{40}  {\D{6-}};\HL{obj-40}{6}
+
+    \object[right=of obj-20]{120} {\D{11-}};\HL{obj-120}{11}
+    \object[below=of obj-120]{130}{\D{12-}};\HL{obj-130}{12}
+    \object[below=of obj-130]{140}{\D{4-}};\HL{obj-140}{4}
+
+    \object[right=of obj-120,visible on=<-12>]{220}{\D{13-}};
+    \object[below=of obj-220,visible on=<-12>]{230}{\D{13-}};
+
+    \node[fit=(obj-20) (obj-220) (obj-140),inner sep=2ex,draw,label={[anchor=south,]north:\structure{Object Sprace}}](objs){};
+    
+    \node[left=of objs.north west,anchor=south east] (root-set) {\structure{Root Set}};
+
+       \node[call-frame,below=2mm of root-set] (cf-f)
+       {Call-Frame f()\nodepart{two}
+         \var[name=x]{x = 0x20}\\[1ex]
+         \var[name=y]{y = 0x30}
+       };
+       \HL{y}{8} \node[at=(y),var] (y) {y = 0x30};
+       \HL{x}{9} \node[at=(x),var] (x) {x = 0x20};
+
+
+       \node[call-frame,below=3mm of cf-f] (cf-b)
+       {Call-Frame b()\nodepart{two}
+         \var[name=z]{z = 0x40}
+       };
+       \draw[->] (cf-b) -- (cf-f);
+
+       \HL{z}{5}
+       \node[at=(z),name=z,var] (z) {z = 0x40};
+
+       \node[below=8mm of cf-b,var] (G) {G = 0x140};\HL{G}{3}
+       \node[at=(G),invisible,call-frame] (cf-G) {Call-Frame x()};
+
+
+       \node[fit=(cf-f) (cf-b),draw,label={[rotate=90,anchor=south,]west:Stack}]{};
+       \node[fit=(cf-G),       draw,label={[rotate=90,anchor=south,]west:Globals}]{};
+
+
+       \node[right=of obj-140,fill=badbee!40,draw,align=left,font=\scriptsize,
+             visible on=<2>] {\structure{0. Init}:\\Markierung\\ Zurücksetzen};
+       \node[right=of obj-140,fill=badbee!40,draw,align=left,font=\scriptsize,
+             visible on=<3-12>] {\structure{1. Mark}:\\Erreichbar-\\keitsanalyse};
+       \node[right=of obj-140,fill=badbee!40,draw,align=left,font=\scriptsize,
+             visible on=<13>] {\structure{2. Sweep}:\\Elemente\\Freigeben};
+
+       
+       \draw
+           (obj-20) edge[->](obj-120)
+           (obj-20) edge[->] (obj-30)
+           (obj-30) edge[bend left,->] (obj-40)
+           (obj-40) edge[bend left,->] (obj-30)
+           (obj-140) edge[->] (obj-40)
+           (obj-120) edge[->] (obj-130)
+           (obj-130) edge[->] (obj-30)
+           (x)       edge[->] (obj-20)
+           (y)       edge[->] (obj-30)
+           (z)       edge[->] (obj-40);
+
+        \only<-12>{\draw
+          (obj-230) edge[->] (obj-140)
+          (obj-230) edge[->] (obj-130)
+          (obj-230) edge[bend left,->] (obj-220)
+          (obj-220) edge[bend left,->] (obj-230);
+        }
+
+        \draw[->] (G.south) --++(down:1ex) -| (obj-140);
+
+
+     
+ 
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

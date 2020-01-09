@@ -1,0 +1,28 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}<1-2>[fragile]
+  \begin{tikzpicture}[]
+    \node[draw,fill=objectcolor] (objA) {objA};
+    \node[draw,fill=objectcolor] (objB) at ($(objA)+(30:2cm)$) {objB};
+    \node[draw,fill=objectcolor] (objC) at ($(objA)+(-30:2cm)$) {objC};
+
+    \draw[->,dotted] (objA) ++(up:1cm)  --  node[above,sloped]{\tiny ref} (objA);
+    \begin{visible}<1>
+      \draw[->] (objA) --            node[above,sloped]{\tiny ref} (objB);
+    \end{visible}
+    
+    \begin{visible}<2>
+      \begin{pgfonlayer}{background}
+        \node[fit=(objB) (objC),fill=srared!30,
+              label={[anchor=south east,align=center,font=\small]south west:{\ALERT{Memory}\\\ALERT{Leak!}}},
+          ] {};
+      \end{pgfonlayer}
+    \end{visible}
+
+
+    \draw[->] (objB) to[bend left] node[above,sloped]{\tiny ref} (objC);
+    \draw[->] (objC) to[bend left] node[above,sloped]{\tiny ref} (objB);
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
