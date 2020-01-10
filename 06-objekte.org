@@ -881,7 +881,6 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
 
 ** Automatic Garbage Collection
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}{Garbage Collection}
     \begin{btBlock}{\textbf{Kernidee}: Nicht-referenzierte Objekte können freigegeben werden}\small
       \structure{Schritt 1}\quad\btSetTab Finde alle Objekte, die transitiv von einem \structure{root set} erreichbar sind.\\
@@ -983,26 +982,132 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
     \end{columns}
     \medskip
     \bi
-    \ii Destruktoren macht die Seiteneffekte des Konstruktors rückgängig{
+    \ii Destruktoren sollen die Konstruktor-Seiteneffekte rückgängig machen{
       \bi
       \ii Seiteneffekte: Registrierung bei anderen Objekten, Ressourcennachforderung
       \ii Löschung oder Invalidierung aller Referenzen auf das Objekt
       \ii Destruktoren habe keine Parameter
       \ei
-    }
-    \ii Destruktoren und Vererbung: Umgekehrte Konstruktionsreihenfolge  {
+    }\medskip
+    \ii<2-> Destruktoren und Vererbung: Umgekehrte Konstruktionsreihenfolge  {
       \bi
-      \ii Destruktor...
+      \ii Destruktor für Derived, muss ein gültiges Derived-Objekt vorfinden
+      \ii \texttt{~Derived()} muss vor \texttt{~Base()} aufgerufen werden.
       \ei
-      }
+    }\medskip
+    \ii<3-> Schwierige Semantik für Sprachen mit Garbage Collection {
+      \bi
+      \ii GC: Todeszeitpunkt und Zeitpunkt der Freigabe sind entkoppelt
+      \ii GC müsste den Destruktor aufrufen, dies geschieht aber \$IRGENDWANN\\[.5ex]
+      \ii[$\Rightarrow$] Manuelle Deinitialisierung und \codeinline[style=java,style=smaller]{void finalize()}
+      \ei
+    }
     \ei
-  
   \end{frame}
 #+end_src
 
-
 #+begin_src latex
-  \begin{frame}{Fallstudie: Resource Aquisition is Initialization (RAII)}
-  
+  \begin{frame}[fragile]{Fallstudie: Resource Aquisition is Initialization (RAII)}
+    \bi
+    \ii C++: Kopplung von Scopes und der Lebenszeit lokaler Variablen{
+      \bi
+      \ii \structure{Wertemodell}: Lebenszeit von Variable und enthaltenem Objekt sind gleich
+      \ii Definition einer Variable:  \hspace{3em}\btSetTab $\Rightarrow$ Konstruktor wird aufgerufen
+      \ii Ende des umgebenden Scopes: \btUseTab $\Rightarrow$ Destruktor wird aufgerufen
+      \ei
+    }
+    \ei
+
+    \begin{columns}<2->
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=C++]
+          \begin{CPP}
+            class log {
+              level_t level;
+              int fd;
+              public:
+                log() : level(DEBUG) {
+                  fd = open("/dev/stderr");
+                }
+                ...
+                ~log(){
+                  close(fd);
+                }
+             };
+
+             void foo() {
+               log L; // Constructor
+               L.log(...)
+             } // implicit: Destructor
+           \end{CPP}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \bii
+        \ii Destruktor wird \advantage{immer} aufgerufen!{
+          \bi
+          \ii Ausführung erreicht Scope-Ende
+          \ii Vorzeitiges \codeinline[style=C,style=smaller]{return}
+          \ii Exceptions (direkt und indirekt)
+          \ei
+        }
+        \ii[$\Rightarrow$] \advantage{Garantierte} Ressourcen-Freigabe\
+        \bigskip
+        \ii<3-> Anwendbar für alle Resourcentypen\\[1ex]{
+          \begin{code}[]
+            \begin{CPP}[style=smaller]
+              mutex lock; // Das Lock-Objekt
+
+              void foo() {
+                lock_guard<mutex> X(lock);
+
+                // Lock wird immer freigegeben
+              }
+            \end{CPP}
+          \end{code}
+          }
+        \eii
+      \end{column}
+    \end{columns}
+
+    \begin{overlaybox}[inner sep=2em,fill=badbee!30]<4->
+      \textbf{Bjarne Stroustrup (Designer von C++):}\\[1ex]
+      \enquote{The RAII technique [...] is a clumsy name for a \textbf{central concept} [that] happens to be \textbf{necessary} for exception handling. [...] the \textbf{main tool} for resource management is constructors and destructors.}\\[1ex]
+
+      \hfill\scriptsize Interview mit Bill Venners, 2003
+    \end{overlaybox}
+
+  \end{frame}
+#+end_src
+
+* Zusammenfassung
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+    \bi
+    \ii Objekte sind ein \STRUCTURE{logischer Verbund} von Informationen {
+      \bi
+      \ii Objekte transportieren Informationen (typsicher) im Programmablauf
+      \ii Referenz- und Wertemodell für Variablen
+      \ei
+    }\medskip
+    \ii \STRUCTURE{Geburt}: In einem Speicherbereich entsteht ein Objekt {
+      \bi
+      \ii \structure{Allokation} des nötigen Speichers auf dem Stack, im Heap, oder statisch.
+      \ii \structure{Konstruktoren} setzen Felder, fordern Ressourcen an und etablieren Invarianten
+      \ei
+    }\medskip
+    \ii \STRUCTURE{Leben}: Kontrollierter und gefilter Zugriff auf die enthaltenen Daten {
+      \bi
+      \ii \structure{Wer} greift \structure{Wie}, mit welchem \structure{Recht}, auf das Objekt zu?
+      \ii Der \structure{Besitz} von Objekten verpflichtet zu ihrer Pflege
+      \ei
+    }\medskip
+    \ii \STRUCTURE{Tod}: Objekt verliert den letzten \structure{Besitzer} oder die letzte \structure{Referenz} {
+      \bi
+      \ii Manuelles Management, Referenzzähler oder automatische Garbage Collection
+      \ii Destruktoren geben angeforderte Resourcen wieder frei
+      \ei
+    }
+    \ei
   \end{frame}
 #+end_src
