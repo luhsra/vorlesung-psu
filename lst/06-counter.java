@@ -6,6 +6,10 @@ class Counter {
     start = n;    // `\dn{3}`
   }
 
+  public Counter() {
+      start = 0;
+  }
+
   public int inc() {
       return start+(next++);
   }

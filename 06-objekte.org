@@ -370,7 +370,7 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
 #+begin_src latex
   \begin{frame}{Initialisierung und Konstruktoren}
     \begin{btBlock}{}
-      Wie wird aus dem allokierten, noch blanken, Speicherbereich ein Objekt?    
+      Wie wird aus dem allozierten, noch blanken, Speicherbereich ein Objekt?    
     \end{btBlock}
 
     \bi
@@ -399,10 +399,10 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=C++]
           \begin{CPP}
-            class Base {
+            class Object {
               public: 
-                Base(int x)    { ... }
-                Base(string x) { ... }
+                Object(int x)    { ... }
+                Object(string x) { ... }
             };
           \end{CPP}
         \end{code}
@@ -410,9 +410,9 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=Java]
           \begin{java}
-            class Base {
-              public Base(int x)    { ... }
-              public Base(String x) { ... }
+            class Object {
+              public Object(int x)    { ... }
+              public Object(String x) { ... }
             };
           
           \end{java}
@@ -439,7 +439,77 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
     \ei
   \end{frame}
 
-  \begin{frame}[fragile]{Konstruktoren in Aktion: Java}
+  
+
+
+#+end_src
+
+Nun, da wir genügend Speicher haben, der allerdings noch und oft von undefiniertem Inhalt ist[fn::Den Speicher immer zu nullen, würde unnötige Kosten erzeugen.]
+können wir damit anfangen unser Objekt zu *initialisieren*.
+Das Ziel der Initialisierung ist es, den Speicher mit Werten zu füllen, damit er wie ein Objekt vom passenden Typen aussieht.
+Diese Bedingung, was ein Objekt ausmacht, zerfällt in zwei separate Teilaspekte:
+den Sprachspezifischen und den Nutzerspezifischen.
+
+Der *sprachabhängige Teil der Initialisierung* ist vom Sprachprozessor (Übersetzer bzw.
+Interpreter) und der Laufzeitumgebung abhängig.
+So müssen wir alle Informationen, die wir zur Laufzeit benötigen um die Features der Sprachezu implementieren, mit in das Objekt schreiben.
+Unterstützt unsere Sprache, zum Beispiel, dynamische Typen, so müssen wir die Typinformationen, in Form eines Typ-Tags der eines ~vtable~-Zeigers, in den Speicherbereich des Objekts schreiben.
+Andernfalls hätten wir später keine Möglichkeit mehr den dynamischen Typen des Objekts heraus zu finden.
+
+Eine andere Sorte der sprachabhängigen Initialisierung ist die Registrierung des Objekts beim Garbage Collector (GC). Wie wir später sehen werden, benötigt der GC eine globale Sicht auf alle existierenden Objekte. Eine Möglichkeit dies zu schaffen ist es, jedes Objekt, bei seiner Erstellung, in eine verkettete Liste einzufügen. 
+
+Zum Vergleich: Bei der Sprache C gibt es keine sprachabhängige Initialisierung von Objekten.
+Jedes Stück Speicher sieht für ein C Programm erstmal wie ein valides Objekt aus.
+Sie können sich denken, welche Probleme, aber auch welche Effizienz, wir durch diese Entscheidung bekommen.
+
+Bei der *benutzerdefinierten Initialisierung*, darf der Benutzer Code ausführen, der die Felder des Objekts nach seinem Geschmack richtig belegt.
+Diesen Code nennen wir *Konstruktor* und es ist die Aufgabe des Konstruktors die semantischen Invarianten des Typs zu etablieren.
+Außerdem können Konstruktoren noch weitere Resourcen (wie Dateideskriptoren oder andere Objekte) anfordern.
+Nach der Ausführung des Konstruktors ist das Objekt nicht nur aus Sicht der Laufzeitumgebung, sondern auch aus Sicht des Programmierers ein vollständiges, ordentliches, einsatzfähiges Objekt; es ist ausgewachsen!
+
+Wie wir bereits am Beispiel des C-Loggers gesehen haben, hat nicht jede Sprache eingebaute Unterstützung für Konstruktoren.
+In solchen Fällen, verwenden wir normale Funktionen um das Konstrukt "Konstruktor" ab zu bilden.
+Jedoch bleibt die Idee die Gleiche:
+Ein Konstruktor bekommt einen Speicherbereich übergeben, in den es ein Objekt vom entsprechnenden Typen hinein-initialisiert.
+
+In Sprachen, die Konstruktoren als Konzept bieten, werden diese meist mit dem Typen zusammen definiert. 
+Um die Initialisierung von Objekten flexibel zu gestalten, sind Konstruktoren normalerweise parametrisierbar und teilen sich ansonsten die meiste Syntax mit Funktionen.
+Definieren wir keine eigenen Konstruktoren, so erstellt der Übersetzer einen Default-Konstruktor für uns.
+
+Wie Funktionen, lassen sich Konstruktoren in C++ und Java überladen, besitzen aber keinen Rückgabewert, da das Ergebnis des Konstruktors klar ist: ein fertig initialisiertes Objekt. 
+Wie bei allen Methoden, wird das zu bearbeitende Objekt als nullter Parameter (~this~-Zeiger) übergeben.
+Außerdem haben Konstruktoren auch eine Sichtbarkeit. 
+
+Gehen Sie einen Moment zurück... was soll das heißen, Konstruktoren haben eine Sichtbarkeit?! Wie sollten wir denn jemals einen Konstruktor aufrufen der ~private~ ist, wenn dies nur durch Methoden geschehen kann die innerhalb der Klasse definiert sind. Und wozu wäre dies Überhaupt gut? Die Antwort darauf sind ~statische Methoden~, die auch ohne ein existierendes Objekt aufgerufen werden können. Ein Beispiel, wo ein privater Konstruktor Sinn ist folgendes Stück Code:
+
+#+begin_src C++
+class Object() {
+private:
+  Object() {}
+
+public:
+  static Object * Create() { 
+    return new Object();
+ }
+};
+#+end_src
+
+Die einzige Art diesen Typen zu instantiieren ist es die ~Create()~-Methode aufzurufen, welche immer eine Heapallokation mittels ~new~ durchführt.
+Es kann niemals geschehen, dass ein Benutzer ein solches Objekt aus Versehen auf dem Stack anlegt.
+Grund für eine solche Beschränkung kann sein, dass das Objekt sehr groß ist und daher leicht einen Stacküberlauf provozieren könnte. Weitere Gründe für einen privaten Konstruktor finden sich in [[https://stackoverflow.com/questions/2062560/what-is-the-use-of-making-constructor-private-in-a-class][dieser Diskussion auf Stackoverflow]].
+
+Generell werden Konstruktoren automatisch vom Sprachprozessor bzw.
+der Laufzeitumgebung aufgerufen.
+Dadurch kann es niemals sein, dass es ein Objekt vom passenden Typen gibt, für das kein Konstruktor gelaufen ist.
+
+Bei Sprachen mit Vererbung muss der Sprachprozessor allerdings eine gewisse Sorgfalt walten lassen, in welcher Reihenfolge die Konstruktoren von Eltern- bzw.
+Kindsklasse aufgerufen werden.
+Generell gilt:
+Die Konstruktoren der Elternklasse werden von den Konstruktoren der Kindsklasse aufgerufen.
+Auf diese Weise findet ein Konstruktor der Kindsklasse bereits ein vollständig konstruiertes und valides Eltern-Objekt als ~this~-Zeiger vor.
+
+#+begin_src latex
+\begin{frame}<handout:1,3>[fragile]{Konstruktoren in Aktion: Java}
     \begin{columns}
       \begin{column}{0.4\textwidth}
         \begin{code}[]
@@ -465,7 +535,7 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
           \ei
         }
         \medskip
-        \ii<3-> { Wie sähe eine manuelle Konstruktion aus?
+        \ii<3-|handout:3-> { Wie sähe eine manuelle Konstruktion aus?
           \begin{minipage}{0.9\linewidth}
             \begin{code}[tag=Pseudo-C]
               \begin{C}[style=smaller]
@@ -487,9 +557,23 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
     \end{column}
     \end{columns}
   \end{frame}
-
-
 #+end_src
+
+Wir werfen nun einen genaueren Blick auf Konstruktoren bei Java.
+Zum Ersten fällt auf, dass in Java Konstruktoren so wie ihre Klasse heißen müssen und überladen sein können.
+Im Fall von ~new Derived("123")~ startet die benutzerdefinierte Initialisierung beim Konstruktor ~Derived(String)~.
+Hier parsen wir den String zur Ganzzahl 123 und rufen den anderen Konstruktor (~Derived(int)~) in gleichen Klasse mittels ~this()~ auf.
+Die Delegation zwischen Konstruktoren erlaubt es uns weniger Code zu duplizieren.
+
+Im ~Derived(int)~ Konstruktor rufen wir explizit einen gewissen Konstruktor (~Counter(int)~) der Elternklasse mittels ~super()~ auf.
+Hätten wir keinen expliziten ~super()~-Aufruf platziert, so hätte Java automatisch den "no-arg"-Konstruktor ~Counter()~ aufgerufen.
+
+Schließlich angekommen in ~Counter(int)~, initialisieren wir das Feld ~start~. Da diese Feld ~final~ ist, zwingt uns Java dieses Feld in einem Konstruktor zu initialisieren; sein Wert kann später nicht mehr geändert werden.
+Der Sprachstandard von Java sieht weiterhin vor, dass das Feld ~next~  automatisch auf ~0~ initialisiert wird. Auf diese Weise verhindert Java, dass es uninitialisierte Felder gibt.
+
+Auf den Folien habe ich außerdem noch ein Stück Pseudo-C Code aufgeschrieben, welches eine ähnliche Initialisierung durchführen würde, wie die Java Laufzeitumgebung.
+Besonders interessant ist hier das ~memset(..., 0, ...)~ welches die automatische Nullung durchführt und das setzen des ~vtable~-Zeigers, welches für virtuelle Methodenaufrufe nötig ist.
+
 #+begin_src latex
   \begin{frame}[fragile]{Was sollte \textbf{mein} Konstruktor leisten?}
     \begin{btBlock}{\small Sinnvolle Konvention: Konstruktoren stellen semantische Invarianten her}\small
@@ -543,6 +627,30 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
     \ei
   \end{frame}
 #+end_src
+
+Ich habe bereits angeschnitten, dass eine Aufgabe von Konstruktoren ist die semantischen Invarianten des Types zu etablieren.
+Da dies ein wichtiger Punkt ist, komme ich noch einmal darauf zurück.
+Klar ist, dass dieser Punkt nicht mit den Sprachregeln zu tun hat, sondern eher eine sinnvolle Konvention darstellt.
+Niemand hält Sie davon ab, im Konstruktor eines Objekts dumme Dinge zu tun.
+Sie sollten allerdings zu Ihrem und zum Wohle der Welt davon absehen.
+
+Invarianten sind Annahmen, die über die gesamte Lebenszeit eines Objektes, vom Konstruktor bis zum Tod des Objekts gelten.
+Alle Operationen/Methodenaufrufe, die auf diesem Objekt arbeiten, können sich auf diese Invarianten verlassen.
+Wenn sie allerdings verändern, müssen sie dafür Sorgen, dass die Invarianten nach Beendigung der Operation wieder gelten.
+Während die Operation ausgeführt wird, dürfen die Invarianten kurzzeitig verletzt werden[fn::Denken Sie an dieser Stelle darüber nach, wie Nebenläufigkeit und semantische Invarianten zusammenspielen und alles kompliziert machen. Überlegen Sie sich auch wie ~synchronized~ das Problem auf Java-Sprachebene löst.].
+
+Das Beispiel auf den Folien zeigt eine Art Array, für welches der Konstruktor genügend Speicher alloziert, die Länge des Arrays abspeichert und ~ptr~ auf das erste Array-Element zeigen lässt. 
+Diese drei Operationen im Konstruktor etablieren die aufgelisteten Invarianten, auf diese sich dann auch die Funktion  ~void set(int)~ verlässt, wenn sie Blind den Zeigern ~ptr~ dereferenziert und den übergebenen Parameter in das entsprechende Array-Element speichert.
+
+Wenn Sie selbst eine Klasse definieren, überlegen Sie sich, welche Invarianten gelten sollten. *All* ihre Konstruktoren sollten das Objekt so hinterlassen, dass diese Invarianten erfüllt sind. 
+Jede Methode darf sich dann auf diese Invarianten verlassen, muss aber das Objekt so valide zurück lassen, wie es vorgefunden wurde.
+
+Besonders gut ist ihre *Datenabstraktion*, wenn es dem externen Benutzer unmöglich ist, das Objekt in einen Zustand zu bringen in dem seine Invarianten verletzt sind.
+Besonders öffentlich-schreibare Felder, bei denen nicht jede Belegung die Invarianten erfüllt, sind ein häufiges Problem, was diesem Ziel entgegen steht.
+
+
+
+
 * Leben von Objekten
 :PROPERTIES:
 :CUSTOM_ID: 06-life
