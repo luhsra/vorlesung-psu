@@ -1,3 +1,65 @@
+class StudipForum {
+    
+    constructor() {
+        this.api_url =    "https://gbs.sra.uni-hannover.de";
+        this.studip_url = "https://studip.uni-hannover.de";
+        this.cid = "d1a0a07773f07528690db1234a7385de"; // V_GBS_TEST
+    }
+
+    categories(cb) {
+        var url = `${this.api_url}/info/forum/${this.cid}/categories/`;
+        $.ajax({url: url, dataType: "json", data: {"limit": 10000},
+                success: function(data) {
+                    var categories = data.entries.collection;
+                    var ret = {};
+                    for (let cat in categories) {
+                        var name = categories[cat].entry_name;
+                        var category_id = categories[cat].category_id;
+                        ret[name] = category_id;
+                    }
+                    cb(ret)
+                }});
+    }
+
+    topics(category_id, cb) {
+        var url = `${this.api_url}/info/forum/${this.cid}/areas/${category_id}/`;
+        $.ajax({url: url, dataType: "json", data: {"limit": 10000},
+                success: function(data) {
+                    var topics = data.entries.collection;
+                    var ret = {};
+                    for (let cat in topics) {
+                        var name = topics[cat].subject;
+                        var topic_id = topics[cat].topic_id;
+                        ret[name] = topic_id;
+                    }
+                    cb(ret)
+                }});
+    }
+
+    entries(topic_id, cb) {
+        var url = `${this.api_url}/info/forum/${this.cid}/entries/${topic_id}`;
+        $.ajax({url: url, dataType: "json", data: {"limit": 10000},
+                success: function(data) {
+                    cb(data.entries.children);
+                }});
+    }
+}
+
+function insert_entries(forum, entries) {
+    var html = "<ul>";
+    for (let idx in entries) {
+        var entry = entries[idx];
+        var id = entry.topic_id;
+        var url = "https://studip.uni-hannover.de/plugins.php/coreforum/index/index/";
+        var subject = $(entry.subject).text();
+        var date = new Date(parseInt(entry.mkdate)*1000);
+        html += `<li><a href="${url}${id}?cid=${forum.cid}#{id}">${subject}</a> (${date.toLocaleString()})</li>`;
+    }
+    html += "</ul><p></p>"
+    var list = $($.parseHTML(html)).wrapAll("<ul></ul>");
+    list.insertAfter(".forum-title");
+}
+
 $( document ).ready(function() {
     $.urlParam = function(name){
         var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -42,6 +104,21 @@ $( document ).ready(function() {
             $('<span>]</span>').appendTo('#table-of-contents');
             var url = window.location.href.replace('.html', '.html?print=true');
             $('<a href="'+url+'">[Druckversion]</a>').appendTo('#table-of-contents');
+
+            // The Forum
+            var forum = new StudipForum();
+            var vorlesung = $(".subtitle").text();
+
+            forum.categories(function(categories) {
+                forum.topics(categories["Skript"], function(topics) {
+                    if (typeof topics[vorlesung] == 'undefined') return;
+                    // Sorry, Mum!
+                    $('.content').prepend(`<h3 class='forum-title'><span class="section-number-2">0</span> StudIP-Forum: Skript/${vorlesung}</h3>`);
+                    forum.entries(topics[vorlesung], function(entries) {
+                        insert_entries(forum, entries);
+                    });
+                })
+            });
         }
 
         $("h2, h3").each(function(idx, headline) {
