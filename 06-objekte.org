@@ -74,14 +74,56 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
     \ei
     \pause
     \begin{btBlock}{Definition: Objekt}
-      Ein Objekt ist ein logisch-zusammengehöriger Verbund von Informationen, dessen \emph{Lebenszeit} kleiner oder gleich der Programmlaufzeit ist.
+      Ein Objekt ist ein existentiell-abhängiger Verbund von Informationen.
     \end{btBlock}
     \pause
-    \hspace{-1em}\textbf{Wichtig:} \btSetTab (1) Variablen $\ne$ Objekte! Variablen können Objekte beinhalten.\\
+    \hspace{-1em}\textbf{Wichtig:} \btSetTab (1) Variablen $\subset$ Objekte! Variablen können Objekte beinhalten.\\
     \btUseTab (2) Diese Definition umfasst auch primitive Objekte, wie Zahlen!
   \end{frame}
+#+end_src
 
-  \begin{frame}{Lebenszyklus eines Objekts}
+Nachdem wir uns im Kapitel zur semantischen Analyse stark mit Techniken beschäftigt haben, welche in einem Übersetzer zum Einsatz kommen, wollen wir uns in diesem Kapitel wieder den *Konzepten von Programmiersprachen* widmen.
+Genauer gesagt, wollen wir betrachten, was eigentlich ein *Objekt* ausmacht und welchen Wandel ein einzelnes Objekt im Verlauf eines Programms durchmacht.
+Dabei werde ich ein viel breiteres und gleichzeitig viel engeres Verständnis von "Objekt" annehmen, als man dies in den sogenannten Objekt-Orientierten Programmiersprachen verwendet.
+Breiter deshalb, weil ich jedes Datum und jede Ansammlung von Daten als Objekt betrachte, und enger, weil ich dabei nur auf die passiven Informationen und nicht auf die damit verbundenen (aktiven) Operationen eingehe.
+Diese werde ich erst im nächsten Kapitel genauer diskutieren.
+
+Es lohnt sich jedoch Objekt einmal in Isolation, losgelößt von ihren Operationen, zu betrachten.
+Objekte sind jene Entitäten mit deren Hilfe wir Informationen im Programmverlauf hin und her werfen.
+Daher ist es für den /effektiven Programmierer/ essentiell zu verstehen wie Objekte entstehen, wie wir sie verwenden und wie sie zerstört werden.
+Um diesen Wandel einzelner Objekte zu verdeutlichen, werde ich für diese Vorlesung die Metapher vom Lebenszyklus eines Objekts verwenden, welche sich in vielen etablierten programmiersprachlichen Begriffen, wie der Lebenszeit eines Objekts, wiederfindet.
+Der /effiziente Programmierer/ lernt in dieser Vorlesung, welche Kosten bei unterschiedlichen Typen von Objekten und Zugriffen entstehen und was es bedeutet wenn eine Sprache automatisches Speichermanagement (Garbage Collection) durchführt.
+
+Zunächst müssen wir aber definieren, was wir, für diese Vorlesung, unter einem "Objekt" überhaupt verstehen.
+Dazu möchte ich noch einmal das Maschinenmodell aus der ersten Vorlesung in Erinnerung rufen:
+Die virtuelle Maschine der Sprache definiert wie wir Informationen ablegen (Objekte im Speicher) und wie wir diese Daten verarbeiten können (Operationen).
+Schauen wir mit dieser Brille auf einen real-existierenden Prozessor, so kennt dessen Maschinenmodell nur Zahlen als Objekte, welche in Registern bzw. dem Hauptspeicher abgelegt werden können.
+Weiterhin ist jede Zahl ein Verbund von 8, 16, 32 oder 64 einzelnen Bits, welche die grundlegendste informations-tragende Entität ist.
+
+Verallgemeinern wir dies, so könnten wir sagen, dass ein Objekt ein Verbund von Informationen ist, der existentiell voneinander abhängig ist und logisch zusammengehört.
+Logisch-zusammengehörig deswegen, weil die Definition unabhängig davon ist, an welchen Orten die Informationen gespeichert sind.
+So sind die einzelnen Bits eines Maschinenworts in unterschiedlichen Flip-Flops bzw.
+DRAM-Zellen[fn::Im Fall von DRAM können die einzelnen Bits einer Speicherzelle sogar auf mehrere Chips verteilt sein.]
+verteilt.
+Dies hält uns aber nicht davon ab, die logisch-zusammengehörigen Bits als eine Zahl zu sehen. Löschen wir die Zahl, zum Beispiel durch überschreiben der Speicherzelle, so gehen auch die Wahrheitswerte der einzelnen Bits verloren. Die Bits sind also in ihrer Existenz abhängig von der Zahl.
+
+Betten wir ein Objekt ein, so entsteht ein neues, größeres Objekt und die Einbettung wird existentiell abhängig:
+Das Array von Zahlen ist ein Verbund einzelner Zahlen, löschen wir das Array von Zahlen, so löschen wir auch die enthaltenen Zahlen.
+Dabei ist egal, dass die Zahlen weiterhin im Speicher an der Stelle stehen, wo früher das Objekt stand. Für die Programmiersprache sind die Zahl-Objekte verloren.
+
+Auf Ebene der Programmiersprache haben wir eine deutlich größere Auswahl an verschiedenartigen und strukturierten Objekten als einfach nur Zahlen.
+Einen Einblick in solch strukturierte Daten haben wir bereits in der Typen-Vorlesung kennen gelernt[fn::Damals haben wir Typen, unter anderem, *denotationell* definiert: Typen sind die Menge von Objekten die sie beschreiben.
+Die Objekte dieser Typen sind es, mit denen wir uns nun beschäftigen werden.]:
+Zahlen, Arrays, Records, Referenzen, etc.
+Diese Objekte können alleine stehen (die Zahl) oder als Einbettung eines größeren Objekts auftreten (Array von Zahlen).
+Auf den Folien ist jeder umrandete Kasten ein einzelnes Objekt.
+
+Anders ist es, wenn wir eine Referenz auf ein anderes Objekt einbetten.
+In diesem Fall haben wir zwei unterschiedliche Objekte, da das referenzierte Objekt *unabhängig* von referenzierenden Objekt existieren könnte.
+Das Löschen des einen Objekts führt nicht zwingend zur Löschung des anderen Objekts.
+
+#+begin_src latex
+  \begin{frame}<handout:4>{Lebenszyklus eines Objekts}
     \hspace{-1em}\textbf{Vereinfachung:} Objekte residieren in zusammenhängendem Speicher
     \medskip
   
@@ -98,8 +140,10 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
     \small Der Zeitpunkt und der Verantwortliche für das Aufräumen ist sprachabhängig.
     \ei
   \end{frame}
-
 #+end_src
+
+Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Lebenszyklus* von Objekten, denn viele Sprachkonstrukte drehen sich um das Management dieses Lebenszyklus.
+
 #+begin_src latex
   \begin{frame}[fragile]{Beispiel: Leben eines Loggers}
     \begin{columns}
@@ -178,6 +222,7 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
     
   \end{frame}
 #+end_src
+
 * Geburt von Objekten
 ** Speicher-Allokation
 #+begin_src latex
@@ -1084,7 +1129,7 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
-    \ii Objekte sind ein \STRUCTURE{logischer Verbund} von Informationen {
+    \ii Objekte sind ein \STRUCTURE{existentieller Verbund} von Informationen {
       \bi
       \ii Objekte transportieren Informationen (typsicher) im Programmablauf
       \ii Referenz- und Wertemodell für Variablen
