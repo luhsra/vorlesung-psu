@@ -43,6 +43,10 @@ class StudipForum {
                     cb(data.entries.children);
                 }});
     }
+
+    link(topic_or_entry_id) {
+        return `https://studip.uni-hannover.de/plugins.php/coreforum/index/index/${topic_or_entry_id}/?cid=${this.cid}#{topic_or_entry_id}`;
+    }
 }
 
 function insert_entries(forum, entries) {
@@ -50,10 +54,10 @@ function insert_entries(forum, entries) {
     for (let idx in entries) {
         var entry = entries[idx];
         var id = entry.topic_id;
-        var url = "https://studip.uni-hannover.de/plugins.php/coreforum/index/index/";
+
         var subject = $(entry.subject).text();
         var date = new Date(parseInt(entry.mkdate)*1000);
-        html += `<li><a href="${url}${id}?cid=${forum.cid}#{id}">${subject}</a> (${date.toLocaleString()})</li>`;
+        html += `<li><a href="${forum.link(id)}">${subject}</a> (${date.toLocaleString()})</li>`;
     }
     html += "</ul><p></p>"
     var list = $($.parseHTML(html)).wrapAll("<ul></ul>");
@@ -88,7 +92,7 @@ $( document ).ready(function() {
         content.wrapAll("<div class='container'><div id='main-row' class='row'><div class='col-md-9'></div></div></div>");
         content.children().unwrap();
 
-        $('#table-of-contents').wrapAll("<div class='card bg-light mb-2 pb-1'></div>");
+        $('#table-of-contents').wrapAll("<div id='toc-well' class='card bg-light mb-2 pb-1'></div>");
         $('#table-of-contents').addClass("well");
 
         if (window.location.href.match(/.*handout.html/)) {
@@ -113,7 +117,9 @@ $( document ).ready(function() {
                 forum.topics(categories["Skript"], function(topics) {
                     if (typeof topics[vorlesung] == 'undefined') return;
                     // Sorry, Mum!
-                    $('.content').prepend(`<h3 class='forum-title'><span class="section-number-2">0</span> StudIP-Forum: Skript/${vorlesung}</h3>`);
+                    var url = forum.link(topics[vorlesung]);
+                    var headline = $(`<h3 class='forum-title'><span class="section-number-2">0</span> StudIP-Forum: <a href="${url}">Skript/${vorlesung}</a></h3>`);
+                    headline.insertAfter('#toc-well');
                     forum.entries(topics[vorlesung], function(entries) {
                         insert_entries(forum, entries);
                     });
