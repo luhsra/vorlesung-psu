@@ -234,7 +234,7 @@ Mit diesen drei Phasen des Lebenszyklus (Geburt, Leben und Tod) werden wir uns i
   \end{frame}
 #+end_src
 
-Um den Lebenszyklus eines Objekts zu verdeutlichen schauen wir uns ein Logger in C an.
+Um den Lebenszyklus eines Objekts zu verdeutlichen schauen wir uns einen Logger in C an.
 Hier werden die drei Phasen besonders deutlich, da nichts vom Lebenszyklus durch Sprachkonstrukte vor unserem Auge versteckt bzw.
 abstrahiert wird.
 
@@ -285,7 +285,7 @@ Alle hängen damit zusammen, wie uns die Sprache erlaubt Objekte zu erzeugen und
       \bi
       \ii Absolute Adresse des Objekts steht vor der Laufzeit fest
       \ii Bsp.: globale Variablen, konstante Literale, Maschinencode einer Funktion
-      \ii 2 statische Objekte: \codeinline{char *global = "foobar";} 
+      \ii 2 statische Objekte: \codeinline{char *global = "foobar";}
       \ei
     }\medskip
     \ii<3-> \structure{Stack Allokation}: Objekte können auf den Aufrufstapel{
@@ -329,6 +329,40 @@ Alle hängen damit zusammen, wie uns die Sprache erlaubt Objekte zu erzeugen und
     \ei
   \end{frame}
 #+end_src
+
+Der erste Schritt bei der Geburt eines Objekts ist die *Allokation von Speicher*.
+Das Ziel der Allokation ist es eine Menge von Speicherzellen für dieses Objekt zu reservieren. Diese Speicherzellen sind dann ausschließlich für dieses Objekt reserviert.
+Dabei können wir meinst davon ausgehen, dass der Speicherbereich für das Objekt zusammenhängend ist; die Speicherzellen, ab einer Startadresse, fortlaufend für das Objekt reserviert werden[fn::Wie alles in der Informatik, ist auch dies kein Naturgesetz, sondern eine Entscheidung des Menschen. Wenn man sehr viele gleichartige Objekte hat, kann man die Objekte an den Attributen aufteilen und spaltenweise speichern. Dazu gibt es einen sehr guten Talk von Mike Acton auf der CppCon2014: [[https://www.youtube.com/watch?v=rX0ItVEVjHc][Data-Oriented Design and C++]]].
+Um genügend Speicher zu reservieren, brauchen wir die Größe des Objekts, eine Information, die uns normalerweise das Typssystem liefert und rufen eine Allokator-Funktion auf.
+
+Die Ihnen wahrscheinlich bekannteste Allokationsfunktion ist wahrscheinlich ~malloc()~.
+Allerdings gibt es noch weitere Arten Speicher für Objekte zu reservieren, die nicht zwingend mit dem Aufruf einer Funktion verbunden sind.
+
+Bei der *statischen Allokation* übernimmt der Übersetzer, zusammen mit dem Linker und Loader, die Allokation des Speicherbereichs.
+Dabei wird, von vornherein, eine Ort für das Objekt in der Binärdatei vorgemerkt, sodass die Adresse des Objekts bereits vor der Laufzeit fest steht.
+Die Lebenszeit dieser statisch allokierten Objekte ist normalerweise gleich mit der Laufzeit des Programms; sie werden beim Start des Programs[fn::Oft vor der ~main()~-Funktion.] initialisiert und erst vor dem Beenden des Prozesses werden sie wieder zerstört.
+Das klassische Beispiel für statische Allokation ist die Definition einer *globale Variable*. Aber auch konstante Literale, wie ~"foobar"~ oder die übersetzten Funktionen[fn::In der Binärdatei wird jede Funktion zu eine Sequenz von Maschineninstruktionen. Auch diese benötigen Platz und haben eine Startadresse.] werdem vom Übersetzer statisch alloziert.
+Die statische Allokation ist die inflexibelste Art Speicher zu reservieren, da die maximale Anzahl der Objekte bereits vor der Laufzeit fest stehen muss.
+Allerdings ist sie auch die effizienteste, da keinerlei Kosten zur Laufzeit entstehen.
+
+Bei der *Stackallokation*, wird der Laufzeit- bzw. Aufrufstapel verwendet um Speicher für Objekte zu allokieren.
+Diesen Mechanismus haben wir bereits im Kapitel über Namensauflösung{{{see(04-call-frames, Function-Call Frames)}}} kennen gelernt, als wir uns mit Funktions-lokalen Variablen beschäftigt haben.
+Objekte, die mittels Stackallokation alloziert werden, sind Einbettung des Function-Call Frames und leben daher maximal so lange wie dieser existiert.
+Normalerweise endet die Lebenszeit der stack-allozierten Objekte also mit der Rückkehr aus der Funktion[fn::Rufen Sie sich in Erinnerung, wann dies nicht der Fall ist.].
+Verglichen mit der statischen Allokation, ist die Stackallokation deutlich flexibler, da wir nun dynamisch Objekte allozieren können.
+Allerdings ist die Lebenszeit dieser Objekte strikt and die Aufrufhierarchie gebunden und wir können nicht einfach die Adresse eines stack-allozierten Objekts zurückgeben.
+Da die Allokation nur aus der Subtraktion der Objektgröße auf den Stackzeiger besteht, hat bringt die Stackallokation nur wenig Laufzeitkosten.
+
+Mit der *Heap Allokation* (~malloc()~) überwinden wir die Einschränkung der statischen und der Stackallokation, handeln uns aber höhere Verwaltungskosten ein.
+Durch der Aufruf von ~malloc()~ reservieren wir einen Speicherbereich, der völlig unabhängig von der Programmstruktur ist; die darin abgelegeten Objekte können eine beliebige Lebenszeit haben.
+Die so allozierten Speicherbereiche müssen allerdings, da ihne Lebenszeit nicht am Programmablauf hängt, explizit freigegeben werden (~free()~).
+Dies kann entweder manuell geschehen oder automatisch durch einen Garbage Collector (dt.
+Speicherbereinigung).
+Später in dieser Vorlesung werden wir uns noch Strategien zur (semi-)automatischen Speicherbereinigung anschauen.
+
+In allen Fällen, ist das Ergebnis der Speicherallokation die Startadresse des resevierten Speicherbereichs.
+Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Objekt leben.
+
 ** Initialisierung
 :PROPERTIES:
 :CUSTOM_ID: 06-init
