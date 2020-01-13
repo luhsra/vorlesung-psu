@@ -142,7 +142,18 @@ Das Löschen des einen Objekts führt nicht zwingend zur Löschung des anderen O
   \end{frame}
 #+end_src
 
-Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Lebenszyklus* von Objekten, denn viele Sprachkonstrukte drehen sich um das Management dieses Lebenszyklus.
+Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Lebenszyklus* von Objekten, denn viele Sprachkonstrukte drehen sich um das Management dieses Lebenszyklus:
+Durch Allokation und Initialisierung wird ein Objekt geboren.
+Während des Lebens, hat es einen, oder mehrere, Besitzer, die es ausgelesen, verändern und an Dritte weitergegeben.
+Und mit der Deinitialisierung und der Freigabe des Speichers, verlässt es uns wieder.
+
+Während der gesamten Lebenszeit ist ein Objekt nur deswegen Objekt, weil es die Regeln seines Typen, die *Typ-Invarianten*, einhält.
+Diese Invarianten werden bei der Objekt-Geburt, durch die passende Belegung des Speichers, etabliert und müssen während der gesamten Lebenszeit aufrecht erhalten werden.
+Verletzen wir diese Invarianten, zum Beispiel indem wir das 0-Byte am Ende eines C-Strings überschreiben, so verletzen wir das Typsystem und es kommt zu einem Bug.
+Erst beim Tod des Objekts dürfen die Typinvarianten wieder verletzt werden.
+Die Dauer dieses Lebenszyklus ist die *Lebenszeit* eines Objekts.
+
+Mit diesen drei Phasen des Lebenszyklus (Geburt, Leben und Tod) werden wir uns in dieser Vorlesung beschäftigen.
 
 #+begin_src latex
   \begin{frame}[fragile]{Beispiel: Leben eines Loggers}
@@ -223,8 +234,42 @@ Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Leb
   \end{frame}
 #+end_src
 
+Um den Lebenszyklus eines Objekts zu verdeutlichen schauen wir uns ein Logger in C an.
+Hier werden die drei Phasen besonders deutlich, da nichts vom Lebenszyklus durch Sprachkonstrukte vor unserem Auge versteckt bzw.
+abstrahiert wird.
+
+Die ~log_t~-Objekte sind durch eine C-struct Deklaration beschrieben, und sie bestehen aus einem Log-Level (~level_t~) und einem Unix-Dateideskriptor. Beide Unterobjekte sind als Einbettung in der Struktur existentiell abhängig von den ~log_t~-Objekten[fn::Allerdings ist der Dateideskriptor, ohne dass wir das auf Sprachebene sehen, eine Referenz auf ein Objekt im Betriebssystem. Aber das ist Thema von Grundlagen der Betriebssysteme.].
+
+Die Geburt eines ~log_t~-Objekts findet in der ~log_init()~-Funktion statt.
+Dort wird der nötige Speicher alloziert und die beiden Felder so initialisiert, dass sie die Invarianten des Objekts erfüllen.
+Leider sind diese Invarianten an dieser Stelle nicht gut sichtbar, weswegen ich sie ihnen verrate:
+(1) ~level~ is ein valides Loglevel.
+(2) ~fd~ is ein offener Dateideskriptor.
+Die anderen Funktionen (~log()~, ~log_deinit()~) verlassen sich auf diese Invarianten um nicht jedesmal prüfen zu müssen ob das übergebene Argument wirklich ein valides ~log_t~-Objekt ist.
+
+Die ~log_init()~-Funktion gibt eine Referenz auf das Objekt zurück, womit die ~main()~-Funktion der Besitzer des Objekts wird.
+Als Besitzer kann ~main()~ das Objekt verändern, indem es zum Beispiel das Loglevel neu setzt oder das Objekt per Parameterübergabe weitergibt.
+
+Das Ende unseres Objekts findet in ~log_deinit()~ statt:
+Dort wird der, bei der Konstruktion, angeforderte Dateideskriptor geschlossen und der angeforderte Speicher zurück gegeben.
+Nach diesem Zeitpunkt existiert das Objekt nicht mehr.
+
+Auch sichtbar an diesem Beispiel wird, dass uns C nicht sehr dabei hilft sorgsam mit Objekten umzugehen:
+So erlaubt es uns C nicht die Typ-Invarianten zu beschreiben und kann uns daher nicht daran hindern diese zu verletzen.
+Auch wäre es möglich den Speicher an dem einst das Objekt gelebt hat, weiter zu verwenden und einen use-after-free Bug zu provozieren, da die Referenz in ~L~ nicht invalidiert wird.
+Außerdem wäre es ein leichtes gewesen die Freigabe des Objekts zu vergessen, womit ein Speicherleck (Memory Leak) entstanden wäre.
+In anderen Sprachen, Konstrukte und Regeln die es uns schwer oder vollständig unmöglich machen solche Probleme und Bugs zu provozieren.
+Alle hängen damit zusammen, wie uns die Sprache erlaubt Objekte zu erzeugen und mit ihnen um zu gehen.
+
+
 * Geburt von Objekten
+:PROPERTIES:
+:CUSTOM_ID: 06-birth
+:END:
 ** Speicher-Allokation
+:PROPERTIES:
+:CUSTOM_ID: 06-allocation
+:END:
 #+begin_src latex
   \dividerframe{Geburt von Objekten}
 
@@ -285,6 +330,9 @@ Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Leb
   \end{frame}
 #+end_src
 ** Initialisierung
+:PROPERTIES:
+:CUSTOM_ID: 06-init
+:END:
 #+begin_src latex
   \begin{frame}{Initialisierung und Konstruktoren}
     \begin{btBlock}{}
@@ -462,7 +510,13 @@ Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Leb
   \end{frame}
 #+end_src
 * Leben von Objekten
+:PROPERTIES:
+:CUSTOM_ID: 06-life
+:END:
 ** Werte- und Referenzmodell
+:PROPERTIES:
+:CUSTOM_ID: 06-value-reference-model
+:END:
 #+begin_src latex
   \dividerframe{Leben von Objekten}
   \begin{frame}[t]{Wie werden Objekte abgelegt und weitergereicht?}
@@ -594,6 +648,9 @@ Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Leb
 
 #+end_src
 ** Objektzugriff auf Objektdaten
+:PROPERTIES:
+:CUSTOM_ID: 06-access
+:END:
 #+begin_src latex
   \begin{frame}{Zugriff auf Objekte}
     \begin{center}
@@ -739,6 +796,9 @@ Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Leb
 
 #+end_src
 ** Fallstudie: Immutable Objects
+:PROPERTIES:
+:CUSTOM_ID: 06-immutable-objects
+:END:
 #+begin_src latex
   \begin{frame}[fragile]{Fallstudie: Unveränderliche Objekte}
     \begin{btBlock}{Unveränderliche Obejekte (immutable objects)}
@@ -767,6 +827,9 @@ Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Leb
 
 https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de
 ** Ownership
+:PROPERTIES:
+:CUSTOM_ID: 06-ownership
+:END:
 #+begin_src latex
   \begin{frame}[fragile]{Ownership für Objekte}
     \begin{btBlock}[type=alert]{Wem gehört ein dieses Objekt?}
@@ -822,6 +885,9 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
   \end{frame}
 #+end_src
 * Tod von Objekten
+:PROPERTIES:
+:CUSTOM_ID: 06-death
+:END:
 #+begin_src latex
   \dividerframe{Tod von Objekten}
 
@@ -868,6 +934,9 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
 
   #+end_src
 ** Referenzzählung
+:PROPERTIES:
+:CUSTOM_ID: 06-refcount
+:END:
 #+begin_src latex
   \begin{frame}[fragile]{Referenzzählung}
   \begin{columns}
@@ -925,6 +994,9 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
   #+end_src
 
 ** Automatic Garbage Collection
+:PROPERTIES:
+:CUSTOM_ID: 06-garbage-collection
+:END:
 #+begin_src latex
   \begin{frame}{Garbage Collection}
     \begin{btBlock}{\textbf{Kernidee}: Nicht-referenzierte Objekte können freigegeben werden}\small
@@ -999,6 +1071,9 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
 #+end_src
 
 ** Deinitialisierung
+:PROPERTIES:
+:CUSTOM_ID: 06-deinit
+:END:
 #+begin_src latex
   \begin{frame}[fragile]{Destruktoren}
     \begin{columns}

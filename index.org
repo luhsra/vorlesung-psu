@@ -22,9 +22,8 @@ Abschnitte: {{{headlines(./04-namen.org)}}}
 * [[file:05-semantische-analyse.org][Übersetzer: Semantische Analyse]]
 Abschnitte: {{{headlines(./05-semantische-analyse.org)}}}
 
-* COMMENT [[06-objekte.org][Sprachen: Objekte]]
- - Sprachen: Objekte
-    - Data Abstraction, Objekterzeugung, Lebenszeiten, Ownership, Initialisierung, Mixins, Prototype-Inheritance,
+* [[file:06-objekte.org][Sprachen: Objekte]]
+Abschnitte: {{{headlines(./06-objekte.org)}}}
 
 * COMMENT Sprachen: Operationen
      - Standardkonstrukte
