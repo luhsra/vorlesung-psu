@@ -1094,9 +1094,9 @@ Allerdings, Sie sehen das Problem bereits, das ganz artet, wenn man es von Anfan
 Und man muss es von Anfang an durchführen, weil ansonsten das hinzufügen eines Zugriffsfilters Änderung an allen Benutzer des Objekts nach sich ziehen würde.
 Jeder direkte Zugriff müsste dann, in der gesamten Code-Basis, bei allen Kunden und deren Enkeln, zu einem Methodenaufruf umgebogen werden.
 
-Daher bieten manche Sprache es an, Getter- und Setter-Methoden zu definieren, die beim Benutzer syntaktisch genauso aussehen, wie ein direkter Speicherzugriff. Ein Beispiel davon für C# sehen sie auf den Folien. Dort kann der Benutzer weiterhin ~obj.Name = "Max Mustermensch"~ schreiben und es wird dennoch die passende Getter-Funktion aufgerufen. Diese Syntaktische Gleichheit erlaubt es auch, solche Zugriffsmethoden im Nachhinein hinzuzufügen. In Python können Sie sich den ~@property~-Dekorator [[https://docs.python.org/3/library/functions.html#property][anschauen]].
+Daher bieten manche Sprache es an, Getter- und Setter-Methoden zu definieren, die beim Benutzer syntaktisch genauso aussehen, wie ein direkter Speicherzugriff. Ein Beispiel davon für C# sehen sie auf den Folien. Dort kann der Benutzer weiterhin ~obj.Name = "Max Mustermensch"~ schreiben und es wird dennoch die passende Setter-Funktion aufgerufen. Diese Syntaktische Gleichheit erlaubt es auch, solche Zugriffsmethoden im Nachhinein hinzuzufügen. In Python können Sie sich den ~@property~-Dekorator [[https://docs.python.org/3/library/functions.html#property][anschauen]].
 
-** Fallstudie: Immutable Objects
+** Fallstudie: Unveränderliche Objekte
 :PROPERTIES:
 :CUSTOM_ID: 06-immutable-objects
 :END:
@@ -1126,8 +1126,48 @@ Daher bieten manche Sprache es an, Getter- und Setter-Methoden zu definieren, di
   \end{frame}
 #+end_src
 
-https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de
-** Ownership
+Wir wollen uns nun eine Sorte von Objekten ansehen, bei denen mehrere Aspekte des Objekt-Zugriffs zusammen kommen:
+*Unveränderliche Objekte*.
+Diese Objekte werden nur während der Initialisierungsphase verändert und in ihrem gesamten weiteren Leben gibt es keine Schreibzugriffe mehr.
+Dies ist gleichbedeutend damit, dass es im gesamten Programm keine Referenzen mit Schreibrechten gibt.
+
+Diese unveränderlichen Objekte haben einige spannende Eigenschaften: Das sie nie verändert werden, gibt es keinerlei Probleme mit konkurierenden Zugriffen in  nebenläufigen Programmen; es gibt keine read-write oder write-write Wettlaufsituationen (race conditions), wenn es kein "write" gibt.
+
+Außerdem ist das Werte- und das Referenzmodell zu weiten Teilen bei unveränderlichen Objekten gleich.
+Da diese Objekte niemals verändert werden, kann ich sie zwar, wie vom Wertemodell gefordert, bei einer Zuweisung kopieren, aber der Übersetzer kann auch einfach eine Referenz weiter geben, falls dies effizienter ist.
+
+Weiterhin können wir unveränderliche Objekte auch einfach *deduplizieren*, wenn ihr Konstruktor nur von der Parametern abhängt. Deduplizieren bedeutet, dass wir die Daten mehrerer gleicher Objekte nur einmal speichern und die gleiche Referenz mehrfach heraus geben. Ein klassisches Beispiel für diese Deduplizierung ist die *Internalisierung von Strings*[fn::In Python: https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de]:
+
+#+include: ../lst/06-intern.py
+
+In diesem Beispiel übersetzen wir die Argumente von ~Intern()~ in eine Ganzzahl und tragen diese in zwei Tabellen ein, welche wir für die bidirektionale Übersetzung verwenden können.
+Die Rückggabewerte von ~Intern()~ sind Referenzen in auf die tatsächlichen Strings, können aber deutlich schneller herumgereicht und auf Gleichheit geprüft werden.
+
+Was in diesem Beispiel sehr Hemdsärmlig und nur Skizzenhaft gezeigt ist, ist eine Technik des Übersetzerbaus, die bei der Implementierung der Symboltabelle zum Einsatz kommt. Dort müssen Bezeichner in der Symboltabelle schnell wieder gefunden werden, was viele Vergleiche von Strings erfordert. Da die Anzahl der Bezeichner in einem Programm allerdings meist begrenzt ist, kann die Internalisierung von Strings signifikant Laufzeit sparen.
+
+Es gibt auch Objekte, die klassischerweise unveränderlich sind:
+Dazu gehören normalerweise Zahlen und Literale.
+So macht es keinen Sinn die Zahl 5 an sich zu verändern.
+Sicherlich möchten wird nicht, dass ~a = 5; a++~ dazu führt, dass alle Fünfen im gesamten Programm zu einer Sechs werden.
+Ebenso wenig wäre es hilfreich, wenn die Modifikation eines String-Literals (~a = "abc"; a[1] = 'x';~) dazu führt, dass alle literal notierten Strings ~"abc"~ plötzlich den Wert ~"axc"~ hätten.
+Daher sind diese Objekte in jeder vernünftigen Sprache unveränderlich.
+Zu diesem Thema lasse ich ihnen als Rätsel das folgende Stück Code da. Die Ausgabe ist ~Six times Seven = 43~.
+Zur Hilfe lasse ich ihnen noch die Stichwörter Autoboxing und Integer-Cache da:
+
+#+begin_src java
+import java.lang.reflect.*;
+
+class IntReflection {
+    public static void main(String[] args) throws Exception {
+        Field value = Integer.class.getDeclaredField("value");
+        value.setAccessible(true);
+        value.set(42, 43);
+        System.out.printf("Six times Seven = %d%n", 6 * 7);
+    }
+}
+#+end_src
+
+** Besitz von Objekten
 :PROPERTIES:
 :CUSTOM_ID: 06-ownership
 :END:
@@ -1151,18 +1191,19 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
       \begin{column}{0.49\textwidth}
         \begin{code}[]
           \begin{CPP}
-            struct Cache {
-              obj_t* obj;
-              int set(obj_t* o) {
-                this->obj = o;
-              }
+            class Proxy {
+              obj_t* ref;
+              public:
+                void set(obj_t* o) { ref = o; }
+                void call()    { ref->call(); }
             };
-            Cache cc; cc.set(obj);
+            Proxy p; p.set(obj);
             delete obj;
+            p.call();
           \end{CPP}
         \end{code}
         \bii
-        \ii \texttt{cc} hält Referenz auf anderes Objekt
+        \ii \texttt{p} glaubt Besitzer von \texttt{obj} zu sein.
         \ii \structure{dangling-reference problem}
         \eii
       \end{column}\hfill
@@ -1185,6 +1226,37 @@ https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-i
   
   \end{frame}
 #+end_src
+
+Das andere Thema auf das ich beim Komplex "Objekte in Programmiersprachen" noch unbedingt eingehen möchte ist das Konzept des *Besitzers eines Objekts*.
+In den meisten Programmiersprachen, mit Rust als erste wirkliche Ausnahme, ist der Besitz eines Objekts ein informelles und intentionales Konzept.
+Entweder der Entwickler denkt darüber nach, wem ein gewisses Objekt gehört, oder er begibt sich in die Gefahr Bugs am laufenden Band zu produzieren.
+
+Den was bedeutet Besitz bei Objekten:
+Besitzer eines Objekts bedeutet mehr als eine Referenz auf ein Objekt in Händen zu halten.
+*Besitz bedeutet Verantwortung*.
+Wer ein Objekt besitzt, der ist für den Lebenszyklus des Objekts verantwortlich.
+Insbesondere bedeutet dies, dass der letzte Besitzer eines Objekts die Deinitialisierung einleiten muss.
+Hat das Objekt, zum Beispiel, Ressourcen im Konstruktor nachgefordert, so müssen diese geordnet freigegeben werden.
+
+Als Beispiel sei hier ein Netzwerksocket genannt.
+Im Konstruktor bzw.
+zu Beginn seines Lebens wurde, wurde der Netzwerksocket geöffnet.
+Bevor nun der letzte Besitzer seinen Anspruch an dem Socket abgibt, sollte dieser den Socket schließen, da sonst irgendwann die Zahl der gleichzeitig offenen Sockets (ein Limit des Betriebssystems) erreicht wird und keine weiteren Sockets geöffnet werden können.
+
+Besonders schwierig wird das Konzept von Besitz, wenn es mehrere unabhängige Besitzer zum gleichen Zeitpunkt geben kann. Dies kann zum Beispiel auftreten, wenn mehrere Threads sich den Besitz eines Objekts teilen und diesen in unbestimmter Reihenfolge aufgeben können. In diesem Fall ist es, aufgrund der Nebenläufigkeit, besonders schwierig den letzten Besitzer ausfindig zu machen. 
+
+Das andere Problem, welches mit Besitz zu tun hat ist das *dangling-reference problem*, wie es auf den Folien zu sehen ist.
+In diesem Beispiel gibt es unterschiedliche Auffassungen über den Besitz des Objekts ~obj~:
+Das Proxy-Objekt ~p~ hält eine Referenz auf ~obj~, was erstmal keinen Besitzanspruch impliziert.
+Allerdings geht der Code von Proxy davon aus (Invariante!), dass es Besitzer des referenzierten Objekts ist und dieses nicht einfach verschwindet.
+Der umgebende Code gibt das Objekt allerdings einfach frei (~delete obj~), weil es davon ausgeht, dass es der letzte Besitzer des Objekts ist.
+Der nachfolgende Aufruf ~p.call()~ führt nun dazu, dass der Referenz ~p.ref~ gefolgt wird, obwohl das referenzierte Objekt längst freigegeben wurde; das sogenannte dangling-reference problem.
+Denn die Freigabe des Objekts führt nicht dazu, dass alle Referenzen auf das Objekt im gesamten Programm gelöscht werden, da dies viel zu aufwändig wäre.
+
+Da Besitz von Objekten schwierig ist, gibt es moderne Sprachkonzepte, wie den ~std::unique_ptr<>~ von C++ und den Borrowchecker von Rust, die es leichter machen beim Besitzen von Objekten weniger falsch zu machen.
+Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, so lohnt es sich dennoch immer zu überlegen:
+*Wer ist aktuell der Besitzer dieses Objekts?* und *An welchen Stellen übergebe, oder gar teile, ich den Besitz dieses Objekts*.
+
 * Tod von Objekten
 :PROPERTIES:
 :CUSTOM_ID: 06-death
