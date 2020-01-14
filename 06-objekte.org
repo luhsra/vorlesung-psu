@@ -870,7 +870,7 @@ Aber dazu später, bei der Deinitialisierung mehr.
 
 Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem Wertemodell, lässt sich gut Arbeiten und beide Modelle haben ihre Vor- und Nachteile. Ich persönlich finde das Wertemodell angenehmer, weil ich darin expliziter Ausdrücken kann, was ich haben möchte.
 
-** Objektzugriff auf Objektdaten
+** Zugriff auf ein Objekt
 :PROPERTIES:
 :CUSTOM_ID: 06-access
 :END:
@@ -881,13 +881,6 @@ Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem We
     \end{center}
 
     \bi
-    \ii Welche \structure{Arten von Zugriffen} gibt es? {
-      \bi
-      \ii Daten aus dem einem Objekt auslesen oder verändern.
-      \ii Direkter Speicherzugriff oder gefiltert über getter/setter.
-      \ii Ableitung weiterer Referenzen (z.B. Subobjekte: \codebox{\&obj.x}). \hfill \ALERT<1>{Gefährlich!}
-      \ei
-    }\smallskip
     \ii Wer ist der \structure{Benutzer} eines Objekts? {
       \bi
       \ii Eigentlich: Das laufende Programm (aktiv) greift auf ein Objekt (passiv) zu.
@@ -900,6 +893,13 @@ Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem We
       \ii Nicht jede Referenz auf ein Objekt muss gleich mächtig sein.
       \ei
     }
+    \ii Welche \structure{Arten von Zugriffen} gibt es? {
+      \bi
+      \ii Daten aus dem einem Objekt auslesen oder verändern.
+      \ii Direkter Speicherzugriff oder gefiltert über getter/setter.
+      \ii Ableitung weiterer Referenzen (z.B. Subobjekte: \codebox{\&obj.x}). \hfill \ALERT<1>{Gefährlich!}
+      \ei
+    }\smallskip
     \ei
 
     \uncover<2->{
@@ -910,10 +910,120 @@ Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem We
         }
     \end{center}
     }
+  \end{frame}
+#+end_src
+Nun, da wir Objekte herumreichen, und mittels Variablen in unserem Code verankern können, wollen wir natürlich auch auf diese Zugreifen, Informationen auslesen und Informationen verändern.
+Dazu müssen wir zunächst die Akteure eines Zugriffs identifizieren:
+Ganz klar und naheliegend ist, dass das Objekt auch das *Objekt des Zugriffs*[fn::In einem grammatikalischen Sinne von Subjekt - Verb - Objekt.] ist.
 
+Aber welche Entitäten können Subjekt, also Handelnder, des Zugriffs sein?
+Hier müssen wir uns anschauen, was die aktiven Teile unseres Programms sind, all diese können wir als *Benutzer eines Objekts* bezeichnen. Da haben wir zum einen das Stück Code von dem aus der Zugriff erfolgt; meist ist dies eine zugreifende Funktion. Aber auch der Thread von dem aus der Zugriff geschieht kann als Benutzer auftreten. Wichtig wird diese Festlegung, wie wir noch diskutieren werden, des Benutzers, wenn wir den Benutzerkreis eines Objekts einschränken wollen.
+
+Der zweite Teil eines Zugriffs besteht aus der Frage:
+Mit welchem Recht wir zugegriffen.
+Dabei ist der Besitz einer Referenz auf das Objekt das Notwendige um einen Zugriff durch zu führen.
+Aber nicht jede Referenz muss gleich mächtig sein, und es kann eingeschränkte Referenzen (wie read-only Referenzen) geben, über die nicht jeder Zugriff möglich ist.
+Daher können wir Referenzen auch als Capabilities bzw. Befähigungen{{{wikipedia_de(Capability-based security)}}} zum Objektzugriff ansehen. 
+
+Die letzte Frage ist welche Arten von Zugriffen es gibt. Hier fallen einem Sofort lesen und schreiben ein. Aber eigentlich ist auch das Erzeugen einer neuen Referenz ein Zugriff auf das Objekt, da wir mit einer Referenz Macht über ein Objekt weiter geben können. Wir wollen uns hier mit expliziten Setter und Getter Methoden auseinander setzen, die den Zugriff auf das Objekt filtern können.
+
+Zusammenfassen kann man die Frage des Objekt-Zugriffs mit der Frage: *Wer greift Wie und mit welchem Recht auf ein Objekt zu?*
+
+#+begin_src latex
+  \begin{frame}{Benutzer-abhängige Zugriffseinschränkungen}
+    \btAnimation{center,padding,3:<1->}{fig/06-access}
+    \medskip
+    \bi
+    \ii \textbf{Ziel:} Benutzergruppen mit unterschiedlichen Zugriffsrechten {
+      \bi
+      \ii Identifikation der unterschiedlichen Gruppen \hfill(Wer greift zu?)
+      \ii Einteilung anhand der zugreifenden Instruktionadresse
+      \ii[$\Rightarrow$] Wir können den Code mit unbeschränktem Zugriff kontrollieren.
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Implementierung:} Einschränkung der Sichtbarkeit des Namens {
+      \bi
+      \ii Wenn der externe Nutzer einen Namen nicht sieht, kann er nicht zugreifen.
+      \ii \textbf{Aber:} Gibt ein interner Nutzer eine Referenz auf ein privates Attribut heraus, bricht die Abstraktion. \textbf{Referenzen geben Kontrolle heraus!}
+      \ei
+    }
+    \ei
+  \end{frame}
+  #+end_src
+
+Beginnen wir also bei den Benutzern eines Objekts und beschränken uns darauf von welcher Codestelle ein Zugriff erfolgt.
+Die Idee einen Zugriff anhand des Zugreifenden einzuschränken haben wir bereits, mit der Sichtbarkeit von Feldern in Klassen, kennen gelernt.
+Dort unterscheiden wir zwischen Zugriffen, die von innerhalb der Klasse kommen und solchen die von außerhalb kommen.
+Private Felder dürfen nur von innen, öffentliche Felder von überall her zugegriffen werden.
+
+Generell müssen wir bei der Benutzer-abhängigen Zugriffseinschränkung die einzelnen Nutzergruppen definieren und ihnen gewisse Rechte zuschreiben. Bei der Sichtbarkeit von Felder geschiet diese Unterscheidung daran ob eine Funktion innerhalb der Klasse als Methode definiert wurde, oder außerhalb. Interne Benutzer bekommen bei dieser Einschränkung weitere Rechte.
+
+Der große Vorteil einer solchen Einschränkung der externen Nutzer ist, dass wir sicher sein können, dass es in der gesamten Code-Basis keinen Zugriff auf die privaten Felder gibt, der nicht von einer unserer Methoden ausgeht.
+*Alle Zugriffe auf private Felder laufen über Methoden.*
+Auf diese Weise können wir viel leichter sicherstellen, dass die Invarianten des Objekts nicht verletzt werden. 
+Außerdem können wir das Innere der Klasse beliebig verändern, da keine externer Benutzer Abhängigkeiten entwickeln konnte.
+Dies ermöglicht es uns Implementierung und Daten zu *kapseln*.
+
+Allerdings wird eine solche Kapselung löchrig, wenn wir in einer Methode eine Referenz auf ein eingebettetes Objekt an einen externen Benutzer heraus geben.
+Mit solchen *flüchtenden Referenz* verlieren wir die Kontrolle über unser Objekt, unsere Invarianten und überhaupt alles an unserem Objekt.
+Überlegen Sie sich demnach immer gut, ob Sie Code der Form ~inner_t* Object::method() {return &(this->inner);}~ schreiben sollten.
+
+#+begin_src latex
+  \begin{frame}{Referenzen-abhängige Zugriffseinschränkungen}
+    \btAnimation{center,padding,4:<1->}{fig/06-access}
+    \medskip
+
+    \bi
+    \ii \textbf{Ziel:} Einschränkbare Referenzen erlauben kontrolliertes Sharing {
+      \bi
+      \ii Über eingeschränkte Referenzen dürfen nicht alle Zugriffe erfolgen
+      \ii Referenzen dürfen nur weiter eingeschränkt und nicht geweitet werden.
+      \ii Beispiel: Ableitung einer read-only Referenz aus einer read-write Referenz
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Implementierung (const):}  Erweiterung des Typsystems{
+      \bi
+      \ii Weiterer Zeiger-Typkonstruktor:    \typeinline{const\_pointer(T)}\\[.5ex]
+      \ii Implizite Typumwandlung zur read-only Referenz\\[.5ex]
+      \ii Asymmetrische Typ-Kompatibilität:  \typeinline{const\_pointer(T)} $\ll$ \typeinline{pointer(T)}\\[.5ex]
+      \ei
+    }
+    \ii<3-> Standardverhalten in verschiedenen Sprachen{
+      \bi
+      \ii \structure{C++}:  \hspace{1ex}\btSetTab Read-only ist die Ausnahme \hfill(\texttt{T*, const T\*}).
+      \ii \structure{Rust}: \btUseTab Read-only ist die Regel \hfill(\texttt{\&T, \&mut T})
+      \ii \structure{Java}: \btUseTab Alle Referenzen dürfen alles. 
+      \ei
+    }
+    \ei
   \end{frame}
 
-  \begin{frame}[fragile]{Gefilterter Zugriff über Getter und Setter}
+#+end_src
+
+Die zweite Frage, die wir betrachten wollen ist die der *eingeschränkten Referenzen*.
+Wie bereits gesagt, sind Referenz (bzw. Zeiger) Befähigungen über ein Objekt: 
+Wer eine Referenz hat, hat Macht über ein Objekt.
+Da nicht jede Nutzung eines Objekts volle Rechte braucht, erlauben es viele Sprachen Referenzen zu erzeugen, die *nicht* Allmächtig sind und nicht jede Art von Zugriff erlauben.
+Der klassische Vertreter der *Referenz-abhängigen Zugriffseinschränkung* ist die read-only Referenz.
+
+Sehen wir eine eingeschränkten Referenz, so können wir uns sicher sein, dass der Nutzer nur eine eingeschränkte Menge von Zugriffsarten durchführen wird.
+So kann der Besitzer einer read-only Referenz das Objekt nur auslesen, nicht aber verändern.
+Wichtig ist, dass Referenzen nur weiter eingeschränkt werden dürfen.
+So sollte es dem Nutzer einer read-only Referenz (eigentlich) nicht möglich sein, wieder eine read-write Referenz abzuleiten.
+
+Implementiert sind solche Referenz-abhängigen Zugriffseinschränkungen in Programmiersprachen normalerweise mittels unterschiedlicher Referenz-Typen.
+Dort gibt es dann nicht nur den normalen Typkonstruktor für eine Referenz (~pointer(T)~), sondern noch weitere Referenztypen, die beispielsweise nur Lesezugriff erlauben (~const_pointer(T)~).
+Die Propagierung der Zugriffseinschränkung und ihre Durchsetzung geschieht dann im Typ-spezifischen Teil der semantischen Analyse.
+
+Bemerkenswert ist auch, wie unterschiedliche Sprachen den Read-only oder den read-write Fall zum Standardverhalten machen.
+Bei C++ ist der normale Zeiger eine allmächtige Referenz auf ein Objekt und der Entwickler muss explizit mittels ~const~ angeben, wenn eine eingeschränkte Referenz vorliegt.
+Bei Rust ist es genau umgekehrt.
+Dort sind Referenzen per Default schreibgeschützt und wir müssen explizit veränderbare Referenzen erzeugen (~&mut~), für die dann noch weitere Einschränkungen gelten.
+Java hat diese Art der eingeschränkten Referenzen nicht implementiert, da es das Erlernen der Sprache schwieriger macht.
+Ein Stichwort, mit dem man C++-Entwickler an dieser Stelle gut reizen kann ist [[https://isocpp.org/wiki/faq/const-correctness][Const Correctness]].
+
+#+begin_src latex
+  \begin{frame}[fragile]{Gefilterter Zugriff über Zugriffsmethoden}
     \begin{columns}
       \begin{column}{0.44\textwidth}
         \begin{btBlock}{Direkter Speicherzugriff}
@@ -927,7 +1037,7 @@ Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem We
         \Huge$\leftrightarrow$
       \end{column}
       \begin{column}{0.44\textwidth}
-        \begin{btBlock}{Nur Methodenzugriff}
+        \begin{btBlock}{Zugriffsmethoden}
           \centering \texttt{obj.setLength(-1);}\\
           Boilerplate, reine Konvention
         \end{btBlock}      
@@ -967,57 +1077,25 @@ Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem We
     }
     \ei
   \end{frame}
-
-  \begin{frame}{Benutzer-abhängige Zugriffseinschränkungen}
-    \btAnimation{center,padding,3:<1->}{fig/06-access}
-    \medskip
-    \bi
-    \ii \textbf{Ziel:} Benutzergruppen mit unterschiedlichen Zugriffsrechten {
-      \bi
-      \ii Identifikation der unterschiedlichen Gruppen \hfill(Wer greift zu?)
-      \ii Einteilung anhand der zugreifenden Instruktionadresse
-      \ii[$\Rightarrow$] Wir können den Code mit unbeschränktem Zugriff kontrollieren.
-      \ei
-    }\medskip
-    \ii<2-> \textbf{Implementierung:} Einschränkung der Sichtbarkeit des Namens {
-      \bi
-      \ii Wenn der externe Nutzer einen Namen nicht sieht, kann er nicht zugreifen.
-      \ii \textbf{Aber:} Gibt ein interner Nutzer eine Referenz auf ein privates Attribut heraus, bricht die Abstraktion. \textbf{Referenzen geben Kontrolle heraus!}
-      \ei
-    }
-    \ei
-  \end{frame}
-
-  \begin{frame}{Referenzen-abhängige Zugriffseinschränkungen}
-    \btAnimation{center,padding,4:<1->}{fig/06-access}
-    \medskip
-
-    \bi
-    \ii \textbf{Ziel:} Einschränkbare Referenzen erlauben kontrolliertes Sharing {
-      \bi
-      \ii Über eingeschränkte Referenzen dürfen nicht alle Zugriffe erfolgen
-      \ii Referenzen dürfen nur weiter eingeschränkt und nicht geweitet werden.
-      \ii Beispiel: Ableitung einer read-only Referenz aus einer read-write Referenz
-      \ei
-    }\medskip
-    \ii<2-> \textbf{Implementierung (const):}  Erweiterung des Typsystems{
-      \bi
-      \ii Weiterer Zeiger-Typkonstruktor:    \typeinline{const\_pointer(T)}\\[.5ex]
-      \ii Implizite Typumwandlung zur read-only Referenz\\[.5ex]
-      \ii Asymmetrische Typ-Kompatibilität:  \typeinline{const\_pointer(T)} $\ll$ \typeinline{pointer(T)}\\[.5ex]
-      \ei
-    }
-    \ii<3-> Standardverhalten in verschiedenen Sprachen{
-      \bi
-      \ii \structure{C++}:  \hspace{1ex}\btSetTab Read-only ist die Ausnahme \hfill(\texttt{T*, const T\*}).
-      \ii \structure{Rust}: \btUseTab Read-only ist die Regel \hfill(\texttt{\&T, \&mut T})
-      \ii \structure{Java}: \btUseTab Alle Referenzen dürfen alles. 
-      \ei
-    }
-    \ei
-  \end{frame}
-
 #+end_src
+
+Der letzte Teil unserer Zugriffsbetrachtungen ist das "Wie?":
+Wie greifen wir auf ein Objekt zu?
+Der einfachste Fall, der am wenigsten Kosten verursacht und auf den am Ende /alle Zugriffe abgebildet werden müssen/ ist der *direkte Speicherzugriff*.
+Bei diesem leiten wir aus der Objektadresse eine Zugriffsadresse ab (z.B. auf ein Feld) und lesen bzw. schreiben die Informationen des Objekts. 
+Wie bereits mehrfach erwähnt, kann es problematisch sein, jedem direkten Speicherzugriff auf unser Objekt zu geben, da wir dadurch die Kontrolle über die Zugriffe verlieren und Invarianten verletzt werden könnte.
+
+Gut wäre es, wenn wir bei Objekt-Zugriffen aktiven Code dazwischen schalten könnten.
+Genau dies wird bei *Zugriffsmethoden*{{{wikipedia_en(Mutator_method)}}} gemacht.
+Bei diesem Entwicklungsmuster verbietet man den Zugriff von Außen mittels Sichtbarkeit und legt Zugriffsmethoden mit kanonischen Namen an (~getLength(), ~setLength()~). 
+Auf diese Weise können wir Zugriffe auf das Objekte Filtern und sicherstellen, dass der (externe) Nutzer des Objekts die Invarianten nicht verletzt.
+
+Allerdings, Sie sehen das Problem bereits, das ganz artet, wenn man es von Anfang an, konsequent umsetzen will in eine richtige Boilerplate-Schlacht aus.
+Und man muss es von Anfang an durchführen, weil ansonsten das hinzufügen eines Zugriffsfilters Änderung an allen Benutzer des Objekts nach sich ziehen würde.
+Jeder direkte Zugriff müsste dann, in der gesamten Code-Basis, bei allen Kunden und deren Enkeln, zu einem Methodenaufruf umgebogen werden.
+
+Daher bieten manche Sprache es an, Getter- und Setter-Methoden zu definieren, die beim Benutzer syntaktisch genauso aussehen, wie ein direkter Speicherzugriff. Ein Beispiel davon für C# sehen sie auf den Folien. Dort kann der Benutzer weiterhin ~obj.Name = "Max Mustermensch"~ schreiben und es wird dennoch die passende Getter-Funktion aufgerufen. Diese Syntaktische Gleichheit erlaubt es auch, solche Zugriffsmethoden im Nachhinein hinzuzufügen. In Python können Sie sich den ~@property~-Dekorator [[https://docs.python.org/3/library/functions.html#property][anschauen]].
+
 ** Fallstudie: Immutable Objects
 :PROPERTIES:
 :CUSTOM_ID: 06-immutable-objects
