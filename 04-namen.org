@@ -600,6 +600,9 @@ In diesem Unterkapitel werden wir diese Einschränkung aufweichen und es zulasse
 Zur Unterscheidung zwischen diesen Objekten verwenden wir eine dynamische Namensauflösung, bei der nicht nur die statische Struktur der hierarchischen Namensräume verwendet wird, sondern auch weiteres Laufzeitwissen.
 
 ** Binding Time
+:PROPERTIES:
+:CUSTOM_ID: 04-binding-time
+:END:
 #+begin_src latex
   \dividerframe{Dynamische Namensauflösung}
   \begin{frame}{Zeitpunkt der Namensbindung}

@@ -646,15 +646,17 @@ Wenn Sie selbst eine Klasse definieren, überlegen Sie sich, welche Invarianten 
 Jede Methode darf sich dann auf diese Invarianten verlassen, muss aber das Objekt so valide zurück lassen, wie es vorgefunden wurde.
 
 Besonders gut ist ihre *Datenabstraktion*, wenn es dem externen Benutzer unmöglich ist, das Objekt in einen Zustand zu bringen in dem seine Invarianten verletzt sind.
-Besonders öffentlich-schreibare Felder, bei denen nicht jede Belegung die Invarianten erfüllt, sind ein häufiges Problem, was diesem Ziel entgegen steht.
-
-
-
+Besonders öffentlich-schreibbare  Felder, bei denen nicht jede Belegung die Invarianten erfüllt, sind ein häufiges Problem, was diesem Ziel entgegen steht.
 
 * Leben von Objekten
 :PROPERTIES:
 :CUSTOM_ID: 06-life
 :END:
+Nachdem wir wissen wie Objekte ins Leben kommen, stellt sich die Frage, was wir zu ihren Lebzeiten damit machen können.
+Wir müssen diese Objekte im Programmtext, genauer gesagt mittels Variablen, ablegen, wiederfinden und weitergeben können. 
+Außerdem wollen wir die Informationen des Objekts auslesen und gegebenfalls verändern können.
+Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwickler leicht machen sollte die Objekt-Invarianten aufrecht zu erhalten.
+
 ** Werte- und Referenzmodell
 :PROPERTIES:
 :CUSTOM_ID: 06-value-reference-model
@@ -669,11 +671,11 @@ Besonders öffentlich-schreibare Felder, bei denen nicht jede Belegung die Invar
     \end{center}
 
     \hspace{-1em}Mittels gebundener Namen können wir Objekte \alert{ansprechen und weitergeben}.\\[0.5ex]
-    \uncover<2->{
+    \uncover<2-|handout:2->{
       \hspace{-1em}\textbf{Aber:} Ist der Wert einer Variable das Objekt oder eine Objekt-Referenz?
     }
 
-    \begin{columns}<3->
+    \begin{columns}<3-|handout:2->
       \begin{column}{0.49\textwidth}
         \begin{center}
           \includegraphics[page=1,height=2cm]{fig/06-val-refs}
@@ -789,6 +791,85 @@ Besonders öffentlich-schreibare Felder, bei denen nicht jede Belegung die Invar
   \end{frame}
 
 #+end_src
+
+Die grundlegendste Frage für die Verbindung von Programmtext und Objekten ist, wie diese abgelegt und weitergereicht werden.
+Also wie die Verbindung von Namen und Objekten genau aussieht und wie ein Teil des Programms ein Objekt an einen anderen Teil des Programms weiter geben kann.
+
+Dazu erinnern wir uns an die Vorlesung zur Namensauflösung{{{see(04-binding-time, Binding Time)}}}: Zum Bindezeitpunkt wird ein konkretes Objekt an einen Namen gebunden, sodass das Objekt über diesen Namen wieder aufgefunden werden kann.
+Damals haben wir auch gesagt, dass das Ergebnis der *vollständigen Namensauflösung* die Startadresse des Objekts ist. Es schließt sich hier also der Kreis: die Startadresse, an der wir das Objekt initialisiert haben, wird zum Bindezeitpunkt an einen Namen gebunden. Ein solcher Name kann eine Variable sein, wie wir das in den Folien bei ~var_foo~ beispielhaft sehen.
+
+Allerdings stellt sich eine wichtige, zunächst aber philosophisch anmutende, Frage:
+Beinhaltet eine gebundene Variable das Objekt oder beinhaltet sie nur eine Referenz auf das Objekt.
+Die Antwort auf diese Frage hat weitreichende Folgen:
+Wenn eine Variable das Objekt beinhaltet, was wir das *Wertemodell für Variablen* nennen, so kann keine andere Variable das selbe Objekt beinhalten.
+Dies hat zur Folge, dass jedes Objekt in maximal einer Variable gespeichert ist.
+Wollen wir ein Objekt mit zwei Namen in Verbindung bringen, so müssen wir beim Wertemodell ein explizites Zwischenobjekt, eine Referenz bzw.
+einen Pointer, anlegen und abspeichern.
+Wertemodell bedeutet also, dass es separate Referenz-Objekte gibt.
+
+Dass ein Objekt in maximal einer Variable abgelegt werden kann, führt auch dazu, dass Zuweisungen zwischen Variablen zwangsläufig eine *Objekt-Kopie* erfordern.
+Um ein Objekt zu kopieren, allozieren wir Speicher für ein zweites Objekt und kopieren die enthaltenen Informationen in den neuen Speicher.
+Das kopieren der Informationen kann entweder über bitweises Kopieren des Speichers geschehen (~memcpy()~) oder über einen nutzerdefinierten Copy-Konstruktor (C++).
+In beiden Fällen läuft beim Kopieren der normale Konstruktor nicht.
+
+Klassische Vertreter für das Wertemodell sind C, C++ oder, in modernen Zeiten, Rust.
+Überlegen Sie sich für das folgende Stück C-Code, an wie viele und welche Objekte es gibt und wann es zu einer Objekt-Kopie kommt:
+
+#+begin_src C
+typedef struct { int x; } object_t;
+object_t  a;
+object_t  b = a;
+object_t *c = &b;
+object_t *d = c;
+#+end_src
+
+Der Gegenentwurf zum Wertemodell ist das *Referenzmodell für Variablen*, bei dem Variablen und Objekte unabhängig voneinander existieren und die Variable nur eine Referenz auf ein Objekt speichert.
+Die Variable steht aber weiterhin für das Objekt und es bedarf keiner manuellen Dereferenzierung des Zeigers durch den Entwickler; die Sprache dereferenziert automatisch und unbedingt beim Zugriff auf das Objekt.
+Da jede Variable nur Referenzen enthält, führen Zuweisungen zu keinen Objekt-Kopien, sondern es wird nur die Referenz von der einen Variable in die andere kopiert.
+Am Ende stehen zwei Variablen für dasselbe Objekt.
+Da Variablen alle Objekten nur referenzieren, benötigt eine Sprache, die nach dem Referenzmodell arbeitet, keine separaten Referenz-Objekte.
+
+Die meisten Skriptsprachen verwenden das Referenzmodell.
+Auch Java arbeitet hauptsächlich mit dem Referenzmodell, macht aber bei primitiven Datentypen (~int~, ~float~) eine Ausnahme und wendet für diese das Wertemodell an.
+Etwas, was jedem Java-Lernendem zuerst komisch vorkommen muss.
+
+Sowohl das Wertemodell, als auch das Referenzmodell haben ihre *Vor- und Nachteile*.
+Wenn wir versuchen die Brille des effektiven Programmierers auf zu setzen, so ist ein reines Referenzmodell einfacher zu erlernen, da Objekte unabhängig von Variablen existieren und wir uns keine Gedanken darüber machen müssen ob wir eine Kopie oder eine Referenz weiter reichen wollen.
+Außerdem werden Objekte beim Referenzmodell niemals implizit durch Kopieren angelegt, sonder immer explizit und mit Hilfe der Konstruktoren.
+Diese Reduktion der Variablen-Objekt Abhängigkeit ist auch der Grund, wieso Java und die meisten Skriptsprachen das Referenzmodell bevorzugen; es ist einfacher zu handhaben.
+
+Die Komplexität des Wertemodells können wir aber auch als eine Stärke auffassen:
+Da alle Referenzen sichtbar und explizit sind, erlaubt uns das Wertemodell fein-granular zu steuern wann wir ein Objekt referenzieren und wann es in einer Variable lebt.
+Dies erlaubt uns effizientere Programme zu schreiben:
+Beim Referenzmodell tragen wir immer die Kosten für die Indirektion über die Referenz.
+Beim Wertemodell müssen wir explizit danach verlangen eine Indirektion zu bekommen.
+So kann es effizienter sein ein Objekt als Kopie an eine Funktion zu übergeben, als eine Referenz zu übergeben, die dann dereferenziert wird.
+Dazu kommt, dass das Referenzmodell eigentlich nur mit Heap-allozierten Objekten richtig gut funktioniert, was zusätzliche Kosten erzeugt.
+Beim Wertemodell können wir Objekte viel leichter auf dem Stack allozieren.
+Aber Vorsicht, die starke Kopplung von Variablen und Objekten und die implizierte Kopien können beim Wertemodell zu Overheads führen, die auf den ersten Blick nicht sichtbar sind.
+So alloziert das folgende Stück C-Code 8192 Bytes vom Stack und kopiert 4096 Bytes in einer unscheinbaren Zuweisung:
+
+#+begin_src C
+typedef struct { char stack[4096]; } thread_t;
+
+void foo() {
+  thread_t user_stack;
+  thread_t tmp = user_stack;
+}
+#+end_src
+
+Weitere Probleme des Wertemodells tritt bei Vererbung auf.
+Wenn abgeleitete Klassen mehr Felder haben ihre Elternklassen, is das Kind-Objekt größer als das Elternobjekt.
+Daher passt es, vom benötigten Speicherplatz her, nicht mehr in Variablen vom Elterntyp.
+Dies spiegelt sich in C++ im Object Slicing{{{wikipedia_en(Object_slicing)}}} und in der Beschränkung, dass dynamische Typumwandlung nur mit Zeigern funktioniert, wieder.
+
+Das andere Aspekt des Wertemodells, was sowohl Segen als auch Fluch ist, ist eine Folge der Starken Bindung der Lebenszeit eines Objekts an die Gültigkeit einer Variable.
+Ein Objekt, welches in einer Variable residiert, muss zwangsläufig sterben, wenn die Variable ihre Gültigkeit verliert.
+So sterben Objekte in lokalen Variablen, wenn die Funktion beendet wir.
+Aber dazu später, bei der Deinitialisierung mehr.
+
+Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem Wertemodell, lässt sich gut Arbeiten und beide Modelle haben ihre Vor- und Nachteile. Ich persönlich finde das Wertemodell angenehmer, weil ich darin expliziter Ausdrücken kann, was ich haben möchte.
+
 ** Objektzugriff auf Objektdaten
 :PROPERTIES:
 :CUSTOM_ID: 06-access

@@ -39,11 +39,11 @@ def make_carousel(label, title, files):
         ret += '</div>'
         active=''
     ret += '</div>'
-    ret += '<a class="carousel-control-prev" href="#slides-'+label+'" role="button" data-slide="prev">'
+    ret += '<a class="carousel-control-prev" href="#slides-'+label+'" data-slide="prev">'
     ret += '<span class="carousel-control-prev-icon" aria-hidden="true"></span>'
     ret += '<span class="sr-only">Previous</span>'
     ret += '</a>'
-    ret += '<a class="carousel-control-next" href="#slides-'+label+'" role="button" data-slide="next">'
+    ret += '<a class="carousel-control-next" href="#slides-'+label+'" data-slide="next">'
     ret += '<span class="carousel-control-next-icon" aria-hidden="true"></span>'
     ret += '<span class="sr-only">Next</span>'
     ret += '</a>'
@@ -92,6 +92,6 @@ if __name__ == "__main__":
         blocks = list(find_blocks(lines))
         for (topic,block_number), svgs in reversed(topics.items()):
             start, end, title = blocks[int(block_number)-1]
-            lines[start:end+1] = make_carousel(topic + block_number, title, svgs)
+            lines[start:end+1] = make_carousel(block_number, title, svgs)
 
         print("".join(lines))
