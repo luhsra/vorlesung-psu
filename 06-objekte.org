@@ -1253,9 +1253,9 @@ Der umgebende Code gibt das Objekt allerdings einfach frei (~delete obj~), weil 
 Der nachfolgende Aufruf ~p.call()~ führt nun dazu, dass der Referenz ~p.ref~ gefolgt wird, obwohl das referenzierte Objekt längst freigegeben wurde; das sogenannte dangling-reference problem.
 Denn die Freigabe des Objekts führt nicht dazu, dass alle Referenzen auf das Objekt im gesamten Programm gelöscht werden, da dies viel zu aufwändig wäre.
 
-Da Besitz von Objekten schwierig ist, gibt es moderne Sprachkonzepte, wie den ~std::unique_ptr<>~ von C++ und den Borrowchecker von Rust, die es leichter machen beim Besitzen von Objekten weniger falsch zu machen.
+Da Besitz von Objekten schwierig ist, gibt es moderne Sprachkonzepte, wie den ~std::unique_ptr<>~ von C++ und den Borrowchecker von Rust[fn::Siehe: Rust Manual, [[https://doc.rust-lang.org/1.8.0/book/ownership.html][Ownership]]], die es leichter machen beim Besitzen von Objekten weniger falsch zu machen.
 Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, so lohnt es sich dennoch immer zu überlegen:
-*Wer ist aktuell der Besitzer dieses Objekts?* und *An welchen Stellen übergebe, oder gar teile, ich den Besitz dieses Objekts*.
+*Wer ist aktuell der Besitzer dieses Objekts?* und *An welchen Stellen übergebe, oder gar teile, ich den Besitz dieses Objekts*. 
 
 * Tod von Objekten
 :PROPERTIES:
@@ -1289,7 +1289,7 @@ Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, 
       \begin{column}{0.49\textwidth}
         \structure{Referenzzählung}
         \bii
-        \ii Kontinuierliches Zählen aller Besitzer
+        \ii Zählen der existierenden Referenzen
         \ii Exakter Todes-Zeitpunkt
         \ii Probleme mit Referenz-Zyklen
         \eii
@@ -1306,6 +1306,37 @@ Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, 
   \end{frame}
 
   #+end_src
+
+Kommen wir nur zur letzten Phase im Lebenszyklus eines einzelnen Objekts: seinem Tod und der Freigabe all seiner angeforderten Ressourcen. Dabei gibt es zwei grundlegende Fragen: "Wann endet die Lebenszeit eines Objekts?" und "Wann und Wie wird das Objekt freigegeben?". Diesen beiden Fragen werden wir nun nachgehen.
+
+Ganz generell können wir sagen, dass die Freigabe eines Objekts erst dann erfolgen darf, wenn seine Lebenszeit geendet hat.
+Eine Verletzung dieses Prinzips haben wir gerade eben, beim dangling-reference problem, gesehen.
+Aber wann genau endet denn die Lebenszeit eines Objekts?
+
+Mit der Definition auf den Folien verknüpfen wir die Lebenszeit eines Objekts mit seiner Nützlichkeit.
+Wenn wir seinen Nutzen, der durch die enthaltenen Informationen oder seine pure Existenz[fn::Stellen Sie sich ein Objekt vor, das solange es existiert ein Relais geschlossen hält.
+Dieses Objekt ist sogar dann nützlich, wenn wir nicht mehr darauf zugreifen. Aber weil dieser Fall eher Esoterisch ist, ignorieren wir ihn ab jetzt.], weiterhin benötigen.
+Wie wir schon sehen, genauso wie Besitz, ist die genaue Feststellung der Lebenszeit schwierig, da wir im vor hinein nicht wissen, ob später noch einmal ein Zugriff auf das Objekt stattfinden wird. 
+
+Allerdings gibt es einige Indikatoren, die das Ende der Lebenszeit eines Objekts anzeigen können.
+So ist es notwendig, dass kein Teil des Programms noch einen Besitzanspruch auf das Objekt erhebt.
+Als eine Überabschätzung können wir diesen Zustand technisch feststellen, wenn es keine gültige Referenz mehr auf das Objekt gibt.
+Denn wo es keine Referenzen mehr gibt, da kann es auch keine Zugriffe mehr geben. Diese Bedingung ist daher sogar hinreichend.
+
+Umgekehrt gilt dies übrigens nicht:
+Nur weil es keinen Besitzer gibt, der sich verantwortlich fühlt, kann es dennoch sein, dass noch eine Referenz existiert; Der letzte Besitzer könnte vergessen haben die Referenz zu löschen.
+
+Die einfachste Lösung, jedenfalls aus Sicht der Programmiersprache, ist die *Explizite Freigabe*. Dort gibt der Programmierer ein Objekt ganz explizit selbst frei und tut damit kund: Dieses Objekt hat seine Lebenszeit überschritten, wir können es freigeben! Damit zieht sich die Programmiersprache ganz fein aus der Affäre und überlässt die Verantwortung über die Lebenszeit ganz und gar dem Entwickler... ausgefuchst, diese faulen Sprachentwickler....
+
+Im Code sieht das dann so aus, dass es explizite Funktionsaufrufe zu Freigabefunktionen (~log_deinit()~) bzw.
+dedizierte Schlüsselwörter zur Freigabe (~delete~) gibt.
+Solche explizite Freigabe ist die Grundlage aller Methoden zur Freigabe von Objekten:
+Ganz am Ende steht immer der Aufruf von ~free()~.
+
+Da explizite Freigabe von Objekten, und dem für sie reservierten Speicher, mühsam und fehleranfällig ist[fn::Mal gibt man zu früh (dangling-reference problem), mal zu spät (Speicherleck) frei], haben die Designer von Programmiersprachen Mechanismen zur *automatischen Objektfreigabe* entwickelt. 
+Diese lassen sich in zwei große Bereiche einteilen: *Referenzzählen* und die Nutzung eines *Garbage Collectors*. 
+Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt, das Ungültig-werden der letzten Referenz. Funktionieren aber gänzlich unterschiedlich.
+
 ** Referenzzählung
 :PROPERTIES:
 :CUSTOM_ID: 06-refcount
@@ -1365,6 +1396,7 @@ Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, 
     \ei
   \end{frame}
   #+end_src
+
 
 ** Automatic Garbage Collection
 :PROPERTIES:
