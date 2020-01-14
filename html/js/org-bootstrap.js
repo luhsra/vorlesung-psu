@@ -50,16 +50,37 @@ class StudipForum {
 }
 
 function insert_entries(forum, entries) {
-    var html = "<ul>";
+    var html = "<ul class='studip-forum-entries'>";
     for (let idx in entries) {
         var entry = entries[idx];
         var id = entry.topic_id;
+        console.log(entry);
 
         var subject = $(entry.subject).text();
-        var date = new Date(parseInt(entry.mkdate)*1000);
-        html += `<li><a href="${forum.link(id)}">${subject}</a> (${date.toLocaleString()})</li>`;
+        var mkdate = new Date(parseInt(entry.mkdate)*1000);
+        var chdate = new Date(parseInt(entry.chdate)*1000);
+        var delta = new Date(new Date() - chdate);
+        var deltaHours = delta.getUTCHours()
+        var humandate= Math.floor(deltaHours/24)+"d"+(deltaHours%24)+"h"+delta.getUTCMinutes()+"m";
+
+        var listItem = `<li>[<span class='date'>${mkdate.toLocaleDateString()}</span>, updated:<span class='delta'>${humandate}</span>] <a href="${forum.link(id)}">${subject}</a></li>`;
+        html += listItem;
+
+        var m = new RegExp('\\[([0-9]{2}-[^[]*)\]').exec(subject);
+        if (m != null) {
+            $(`h2#${m[1]}, h3#${m[1]}`).each(function(idx, headline) {
+                console.log(headline);
+                var list = headline
+                if (!$(headline).next().hasClass('studip-forum-entries')) {
+                    list = $("<ul class='studip-forum-entries'></ul>");
+                    list.insertAfter(headline);
+                }
+                list.append(listItem);
+            });
+        }
+
     }
-    html += "</ul><p></p>"
+    html += "</ul>"
     var list = $($.parseHTML(html)).wrapAll("<ul></ul>");
     list.insertAfter(".forum-title");
 }
@@ -118,7 +139,7 @@ $( document ).ready(function() {
                     if (typeof topics[vorlesung] == 'undefined') return;
                     // Sorry, Mum!
                     var url = forum.link(topics[vorlesung]);
-                    var headline = $(`<h3 class='forum-title'><span class="section-number-2">0</span> StudIP-Forum: <a href="${url}">Skript/${vorlesung}</a></h3>`);
+                    var headline = $(`<h3 class='forum-title'><span class="section-number-2">0</span> StudIP-Forum: <a href="${url}">PSÜ/Skript/${vorlesung}</a></h3>`);
                     headline.insertAfter('#toc-well');
                     forum.entries(topics[vorlesung], function(entries) {
                         insert_entries(forum, entries);

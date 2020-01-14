@@ -82,6 +82,10 @@ button.execute {
     display: inline-block;
 }
 
+.studip-forum-entries .date { color: #e83e8c; }
+.studip-forum-entries .delta { color: #006699; }
+
+
 
 /* Set the colors in <pre> blocks from the Leuven theme */
 pre                                      {background-color:#FFFFFF;}
