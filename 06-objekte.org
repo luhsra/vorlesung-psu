@@ -1320,22 +1320,25 @@ Wie wir schon sehen, genauso wie Besitz, ist die genaue Feststellung der Lebensz
 
 Allerdings gibt es einige Indikatoren, die das Ende der Lebenszeit eines Objekts anzeigen können.
 So ist es notwendig, dass kein Teil des Programms noch einen Besitzanspruch auf das Objekt erhebt.
-Als eine Überabschätzung können wir diesen Zustand technisch feststellen, wenn es keine gültige Referenz mehr auf das Objekt gibt.
+Als eine Überabschätzung können wir diesen Zustand technisch feststellen, indem wir feststellen ob es noch gültige Referenzen auf das Objekt gibt.
 Denn wo es keine Referenzen mehr gibt, da kann es auch keine Zugriffe mehr geben. Diese Bedingung ist daher sogar hinreichend.
 
 Umgekehrt gilt dies übrigens nicht:
-Nur weil es keinen Besitzer gibt, der sich verantwortlich fühlt, kann es dennoch sein, dass noch eine Referenz existiert; Der letzte Besitzer könnte vergessen haben die Referenz zu löschen.
+Nur weil es keinen Besitzer gibt, der sich verantwortlich fühlt, kann es dennoch sein, dass noch eine Referenz existiert.
+Der letzte Besitzer könnte schlicht und ergreifend vergessen haben die Referenz zu löschen.
 
-Die einfachste Lösung, jedenfalls aus Sicht der Programmiersprache, ist die *Explizite Freigabe*. Dort gibt der Programmierer ein Objekt ganz explizit selbst frei und tut damit kund: Dieses Objekt hat seine Lebenszeit überschritten, wir können es freigeben! Damit zieht sich die Programmiersprache ganz fein aus der Affäre und überlässt die Verantwortung über die Lebenszeit ganz und gar dem Entwickler... ausgefuchst, diese faulen Sprachentwickler....
-
-Im Code sieht das dann so aus, dass es explizite Funktionsaufrufe zu Freigabefunktionen (~log_deinit()~) bzw.
+Die einfachste Lösung, jedenfalls aus Sicht der Programmiersprache, ist die *Explizite Freigabe*.
+Dort gibt der Programmierer ein Objekt ganz explizit und selbständig frei und er tut damit kund:
+"Dieses Objekt hat seine Lebenszeit überschritten, wir können es freigeben!"
+Damit zieht sich die Programmiersprache ganz fein aus der Affäre und überlässt die Verantwortung über die Lebenszeit ganz und gar dem Entwickler...
+ausgefuchst, diese faulen Sprachentwickler...
+Im Code sieht die explizite Freigabe dann so aus, dass es dedizierte Aufrufe zu Freigabefunktionen (~log_deinit()~) bzw.
 dedizierte Schlüsselwörter zur Freigabe (~delete~) gibt.
-Solche explizite Freigabe ist die Grundlage aller Methoden zur Freigabe von Objekten:
-Ganz am Ende steht immer der Aufruf von ~free()~.
 
-Da explizite Freigabe von Objekten, und dem für sie reservierten Speicher, mühsam und fehleranfällig ist[fn::Mal gibt man zu früh (dangling-reference problem), mal zu spät (Speicherleck) frei], haben die Designer von Programmiersprachen Mechanismen zur *automatischen Objektfreigabe* entwickelt. 
-Diese lassen sich in zwei große Bereiche einteilen: *Referenzzählen* und die Nutzung eines *Garbage Collectors*. 
-Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt, das Ungültig-werden der letzten Referenz. Funktionieren aber gänzlich unterschiedlich.
+Da explizite Freigabe von Objekten, und dem für sie reservierten Speicher, mühsam und fehleranfällig ist[fn::Mal gibt man zu früh (dangling-reference problem), mal zu spät (Speicherleck) frei], haben die Designer von Programmiersprachen Mechanismen zur *automatischen Freigabe*, auch automatische Speicherbereinigung genannt, entwickelt.
+Diese lassen sich in zwei große Bereiche einteilen:
+*Referenzzähler* und die Nutzung eines *Garbage Collectors*.
+Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt (keine gültige Referenz mehr), funktionieren aber gänzlich unterschiedlich.
 
 ** Referenzzählung
 :PROPERTIES:
