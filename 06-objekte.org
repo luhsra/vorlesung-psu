@@ -1266,13 +1266,13 @@ Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, 
 
   \begin{frame}[fragile]{Wann endet die Lebenszeit eines Objekts?}
     \begin{btBlock}{Ende der Lebenszeit}
-      Wenn ein Objekt, oder sein Seiteneffekt, nicht mehr benötigt wird, endet seine Lebenszeit und wir können es freigeben.
+      Wenn ein Objekt nicht mehr benötigt wird, endet seine Lebenszeit und wir können es freigeben.
     \end{btBlock}
 
     \bi
     \ii Indikatoren für das Ende der Lebenszeit {
       \bi
-      \ii Keine zukünftigen Zugriffe auf das Objekt \hfill Seiteneffekte?
+      \ii Keine zukünftigen Zugriffe auf das Objekt
       \ii Letzter Besitzanspruch erlischt         \hfill $\Rightarrow$ Notwendig
       \ii Letzte Referenz auf das Objekt wird ungültig \hfill $\Rightarrow$ Hinreichend
       \ei
@@ -1313,10 +1313,8 @@ Ganz generell können wir sagen, dass die Freigabe eines Objekts erst dann erfol
 Eine Verletzung dieses Prinzips haben wir gerade eben, beim dangling-reference problem, gesehen.
 Aber wann genau endet denn die Lebenszeit eines Objekts?
 
-Mit der Definition auf den Folien verknüpfen wir die Lebenszeit eines Objekts mit seiner Nützlichkeit.
-Wenn wir seinen Nutzen, der durch die enthaltenen Informationen oder seine pure Existenz[fn::Stellen Sie sich ein Objekt vor, das solange es existiert ein Relais geschlossen hält.
-Dieses Objekt ist sogar dann nützlich, wenn wir nicht mehr darauf zugreifen. Aber weil dieser Fall eher Esoterisch ist, ignorieren wir ihn ab jetzt.], weiterhin benötigen.
-Wie wir schon sehen, genauso wie Besitz, ist die genaue Feststellung der Lebenszeit schwierig, da wir im vor hinein nicht wissen, ob später noch einmal ein Zugriff auf das Objekt stattfinden wird.
+Mit der Definition auf den Folien verknüpfen wir die Lebenszeit eines Objekts mit seiner Nutzung; Wird ein Objekt in der Zukunft nicht mehr verwendet werden, so endet seine tatsächliche Lebenszeit nach dem letzten Zugriff.
+Wie wir schon sehen ist die genaue Feststellung der Lebenszeit schwierig, da wir im vor hinein nicht wissen, ob später noch einmal ein Zugriff auf das Objekt stattfinden wird.
 
 Allerdings gibt es einige Indikatoren, die das Ende der Lebenszeit eines Objekts anzeigen können.
 So ist es notwendig, dass kein Teil des Programms noch einen Besitzanspruch auf das Objekt erhebt.
@@ -1452,9 +1450,9 @@ Um dies am Beispiel zu verdeutlichen: Der Typausdruck für eine Ganzzahlzeiger i
 
 Gekoppelt mit dem Wertemodell für Variablen kann so eine automatische Referenzzählung durchgeführt werden:
 Bei jeder Kopie eines ~shared_ptr<T>~-Refernzobjekts wird ~claim()~ im Kopier-Konstruktor ausgeführt.
-Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der es lebt ungültig wird, so ruft der Destruktor ~release()~ auf. 
+Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der es residiert ungültig wird, so ruft der Destruktor ~release()~ auf. 
 
-** Automatic Garbage Collection
+** Garbage Collector
 :PROPERTIES:
 :CUSTOM_ID: 06-garbage-collection
 :END:
@@ -1493,8 +1491,75 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
 
    \btAnimation[width=\textwidth]{center,range=1-13:<1->}{fig/06-mark-and-sweep}
   \end{frame}
+  #+end_src
 
-  \begin{frame}[fragile]{Fallstudie: Der CPython3 Garbage Collector}
+Die zweite Art der automatischen Speichververaltung ist die Verwendung eines *Garbage Collectors*.
+Dieser findet tote Objekte ebenfalls mittels der hinreichenden Bedingung, dass jedes Objekt, welches nicht mehr referenziert wird auf jeden Fall tot ist. 
+Der Kernbegriff für den Garbage Collector ist die Erreichbarkeit eines Objekts im Referenzgraphen.
+
+Der *Referenzgraph* ist ein gerichteter Graph, bei dem jedes existierende Objekt ein Knoten ist
+Für jede Referenz, die von einem Objekt ausgeht, gibt es im Referenzgraphen eine ausgehende Kante auf das referenzierte Objekt.
+Stellen Sie sich aber nicht vor, dass dabei eine separate Datenstruktur reference_graph_t aufgebaut wird. Der Referenzgraph ist nur implizit über die Belegung der Felder gegeben.
+
+Um in diesem Geflecht aus sich gegenseitig referenzierenden Objekten, die toten Objekte zu finden, drehen wir die hinreichende Bedingung auf den Kopf und finden all jene Objekte, die vielleicht noch nicht tot sind.
+Bewaffnet mit einem sogenannten "root set" finden wird alle Objekte die transitiv über die Kanten des Referenzgraphen erreichbar sind.
+Alle Objekte, die nicht erreichbar sind, sind auf jeden Fall tot und können freigegeben werden.
+
+Das *root set* beinhaltet all Entitäten über die ein Zugriff auf ein Objekt starten kann.
+Dies beinhaltet die lokalen Variablen, alle globalen Variablen, aber auch der aktuelle Inhalt der Prozessorregister.
+Zu einem späteren Zeitpunkt könnte nämlich das Programm ein Element aus dem root sets herausnehmen, mehreren Referenzen folgen und auf ein Objekt tief im Referenzgraphen zugreifen. Daher muss jedes Objekt, welches potentiell noch verwendet werden könnte erhalten bleiben.
+
+Für die Verwendung eines Garbage Collectors gibt es allerdings einige Vorbedingungen (siehe Folien), die alle damit zusammen hängen, dass wir das existierende Geflecht der Referenzen korrekt erfassen. Wir dürfen auf keinen Fall eine Referenz übersehen, sonst löschen wir vielleicht Objekte, die noch gebraucht werden.
+Um dies präzise durch zu führen, braucht es daher eine typsichere Sprache, bei der der Benutzer keine beliebigen Referenzen aus dem Nichts erzeugen kann und bei der für jedes Objekt klar ist, welche anderen Objekte referenziert werden. 
+Dies ist auch der Grund, wieso Sprachen wie C und C++ keinen Garbage Collector anbieten.
+
+Ein anderer Nachteil bei der Verwendung eines Garbage Collectors ist, dass der Todeszeitpunkt und der Moment der Löschung eines Objekts voneinander entkoppelt sind.
+Der Garbage Collector läuft in Intervallen, da das Iterieren über alle existierende Objekte eine teure Operation ist.
+Daher kann es beliebig lange[fn::Eine Strategie den Garbage Collector zu starten ist:
+Wir allokieren solange aus einem Speicherpool, bis dieser leer ist.
+Finden wir für eine angeforderte Allokation keinen Platz im Pool, so starten wir den Garbage Collector.
+Ist danach immer noch kein Platz, vergrößern wir den Pool.]
+dauern bis ein totes Objekt freigegeben wird.
+Daher ist es bei der Verwendung des Garbage Collectors schwierig die Freigabe von nachgeforderten Ressourcen (z.B.
+offener Socket) an die Löschung des Objekts zu koppeln.
+Daher muss es in Java mehr ~deinit()~-Funktionen als in C++ geben.
+
+Ein konkrete Technik für Garbage Collection ist der *Mark-and-Sweep Garbage Collector*, für den Sie auf den Folien eine Animation seiner Funktionsweise finden.
+Dieser Garbage Collector arbeitet mit einer Markierung an jedem Objekt. Nachdem die Welt angehalten wurde, wird das root-set bestimmt und die Marke an allen Objekten zurück gesetzt. Mittels Tiefensuche im Graph, markiert der Mark-and-Sweep GC alle Erreichbaren Objekte (die Mark Phase).
+Dabei starten wir die Suche von jedem Element des root sets, aber brechen die Suche immer dann ab, wenn wir auf eine Positiv-Marke treffen; ab dort haben wir bereits alles Erreichbare markiert.
+In der Sweep Phase, iterieren wir über alle existierenden Objekte und geben jene Objekte frei, die in der Mark Phase nicht markiert wurde.
+Fertig. Ein Mark-and-Sweep GC als Python-Pseudocode sähe in etwa so aus:
+
+#+begin_src python
+  def prepare():
+     for obj in objects:
+        obj.mark = False
+
+  def mark(obj):
+     obj.mark = True
+     for ref in obj.references():
+        if ref.mark:
+           continue
+        mark(ref)
+
+  def sweep():
+     for obj in objects:
+        if obj.mark is False:
+           free(obj)
+
+  def GC():
+     prepare()
+     for obj in root_set:
+        mark(obj)
+     sweep()
+#+end_src
+
+In realen Laufzeitumgebungen werden weitere Verfeinerungen vorgenommen um den Garbage-Collection Prozess effizienter zu machen.
+So können die Objekte in mehrere Generationen eingeteilt werden, je nachdem wie viele GC Läufe sie bereits überlebt haben.
+Es hat sich nämlich heraus gestellt, dass die meisten Objekte nicht besonders lange leben, sondern nur für kurze Zeit in Verwendung sind.
+
+#+begin_src latex
+\begin{frame}[fragile]{Fallstudie: Der CPython3 Garbage Collector}
     \bi
     \ii Leistungsfähiger GC für eine Sprache bei der alles ein Objekt ist {
       \bi
@@ -1530,6 +1595,15 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
 
   \end{frame}
 #+end_src
+
+CPython3 ist die Standardimplementierung von Python 3 (geschrieben in der Programmiersprache C).
+Dieser GC verwendet eine Kombination von Referenzzählung und gelegentlicher Garbage Collection mit einem Mark-and-Sweep GC mit drei Genreationen.
+Diese Kombination ist deswegen möglich, da ein Referenzzähler von ~0~ bereits eine hinreichende Bedinung für ein totes Objekt ist.
+Nur für die zyklische Referenzkringel brauchen wir eine globale Sicht auf den Referenzgraphen.
+
+Das schöne bei diesem GC ist, dass wir auf ihn aus der Sprache heraus mit dem Modul ~gc~ zugreifen können.  So können wir uns mit ~gc.get_objects()~ die Liste aller existierenden Objekte geben lassen. Außerdem können wir uns die Vorgänger und die Nachfolger eines Objekts im Referenzgraphen anzeigen lassen. Das Objekt, welches von der Variable ~x~ referenziert wird [fn::Python folgt dem Referenzmodell!] (eine Liste), referenziert sein einziges Element und selbst wird es vom Wurzelnamensraum Referenziert. Daher hat diese Liste eine eingehende und eine ausgehende Kante im Referenzgraphen.
+
+Zusätzlich können wir uns den Referenzzähler der Liste mittels ~sys.getrefcount()~ anzeigen lassen. Hier ist besonders, das nicht nur die eine eingehende Kante vom Wurzelnamensraum gezählt wird, sondern auch die Referenz, die durch die Übergabe an ~getrefcount()~ entsteht, mitgezählt wird. Daher ist der ausgegebene Referenzzähler ~2~.
 
 ** Deinitialisierung
 :PROPERTIES:
@@ -1573,7 +1647,7 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
     \ii<2-> Destruktoren und Vererbung: Umgekehrte Konstruktionsreihenfolge  {
       \bi
       \ii Destruktor für Derived, muss ein gültiges Derived-Objekt vorfinden
-      \ii \texttt{~Derived()} muss vor \texttt{~Base()} aufgerufen werden.
+      \ii \texttt{\~Derived()} muss vor \texttt{\~Base()} aufgerufen werden.
       \ei
     }\medskip
     \ii<3-> Schwierige Semantik für Sprachen mit Garbage Collection {
@@ -1586,6 +1660,15 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
     \ei
   \end{frame}
 #+end_src
+
+Nachdem wir die toten Objekte gefunden haben, entweder durch explizites Freigaben, durch Referenzzählung, oder durch einen Garbage Collector, müssen wir sie nur noch wirklich Freigeben.
+Dazu ruft die Laufzeitumgebung zuerst eine benutzerdefinierte *Destruktormethode( auf, bevor der Speicher an die Speicherverwatung zurückgegeben wird.
+
+Die Aufgabe des Destruktors ist es die Effekte des Konstruktors rückgängig zu machen.
+Dies bezieht sich insbesondere auf die Rückggabe von nachgeforderten Ressourcen. Auch muss das Objekt jedeweden Besitz an anderen Objekten aufgeben[fn::Fast schon philosophisch an dieser Stelle: Mit dem Tod gibt ein Objekt all seinen Besitz auf], was zu weiteren Freigaben führen kann.
+Bei expliziter Freigabe, muss das Objekt auch noch dafür sorgen, dass es nicht mehr bei anderen Objekten registriert ist.
+
+Bei Vererbung wird immer zuerst der Destruktor des Kindes und dann das der Elternklasse aufgerufen. Also in der umgekehrten Reihenfolge wie die Konstruktoren. Hintergrund ist, das jeder Destruktor ein valides Objekt seines Typs vorfindet.
 
 #+begin_src latex
   \begin{frame}[fragile]{Fallstudie: Resource Aquisition is Initialization (RAII)}
@@ -1651,7 +1734,7 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
       \end{column}
     \end{columns}
 
-    \begin{overlaybox}[inner sep=2em,fill=badbee!30]<4->
+    \begin{overlaybox}[inner sep=2em,fill=badbee!30]<4-|handout:2->
       \textbf{Bjarne Stroustrup (Designer von C++):}\\[1ex]
       \enquote{The RAII technique [...] is a clumsy name for a \textbf{central concept} [that] happens to be \textbf{necessary} for exception handling. [...] the \textbf{main tool} for resource management is constructors and destructors.}\\[1ex]
 
@@ -1660,6 +1743,21 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
 
   \end{frame}
 #+end_src
+
+Mit den Destruktoren haben wir alles beisammen um ein zentrales Konzept des C++ Ökosystems kennen zu lernen: *Resource Aquisition is Initialization* oder kurz *RAII*. Im Grunde habe ich ihnen, dies dies ganze Zeit bereits heimlich unter geschoben, als ich meinte, das Konstruktoren weitere Ressourcen nachfordern können. Aber hinter RAII steht noch viel mehr.
+
+C++ folgt dem Wertemodell für Variablen.
+Dies bedeutet, dass die Lebenszeit von Objekten, die in lokalen Variablen leben, mit dem Ende des aktuellen Scopes endet.
+Für diese Objekte *garantiert* C++, dass der Destruktor in *jedem* Fall aufgerufen wird, wenn der Scope verlassen wird.
+Dies ist insbesondere auch dann der Fall, wenn der Scope durch eine Exception verlassen wird!
+Wirft also irgendeine Unterfunktion eine Exception, die erst irgendwo ganz oben im Programm gefangen wird, so werden *alle* Destruktoren aller lokalen Variablen, die auf dem Weg sind ausgeführt.
+
+Diese Garantie erlaubt es uns, das wir den Besitz von nachgeforderten Ressourcen in Stack-allozierten lokalen Objekten bündeln können.
+Die Funktion besitzt die lokale Variable samt Objekt, und das Objekt besitzt alle nachgeforderten Ressourcen. Endet die Funktion, so gibt sie den Besitz an der lokalen Variable auf, und der gesamte Untergraph im Referenzgraphen wird frei gegeben. Dabei kommt es zu keinen Problemen mit nicht aufgeräumten Ressourcen, falls uns eine Exception um die Ohren fliegt.
+
+Das RAII Konzept lässt sich auch auf Ressourcen anwenden, die sich nicht in einer Referenz manifestieren.
+So kann man mit einem *Lock-Guard* Objekt (~std::lock_guard~) den Besitz eines Mutexes koppeln.
+Mit der Definition des Lock-Guards (~X~) nehmen wir uns das Lock, mit dem Ende des Scopes wird es automatisch wieder frei gegeben.
 
 * Zusammenfassung
 #+begin_src latex
