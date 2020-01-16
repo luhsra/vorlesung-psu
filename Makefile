@@ -54,7 +54,7 @@ $(1).all:             $(1).html $(1).handout $(1).handout.html
 $(1).wc:
 	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $(2).org | wc -w
 $(1).publish:   build/html/index.html $(1).all
-	cd build/html; rsync -aLv  ./index.html ./css ./js ./lst ./fig ./$(2)* ${REMOTE}
+	cd build/html; rsync -aLv  ./index.html ./img ./css ./js ./lst ./fig ./$(2)* ${REMOTE}
 endef
 
 # Wordcount
@@ -78,7 +78,7 @@ emacs/start:
 	@echo "Started Emacs"
 
 emacs/stop:
-	@emaacsclient -s psu  -e '(kill-emacs 0)' >/dev/null 2>&1 || true
+	@emacsclient -s psu  -e '(kill-emacs 0)' >/dev/null 2>&1 || true
 	@pgrep -l -f "^emacs.*--daemon=psu" || true
 	@pkill -f "^emacs.*--daemon=psu" || true
 
