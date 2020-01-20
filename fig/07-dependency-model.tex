@@ -1,0 +1,37 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[operation,alt=<1>{}{text opacity=0}] (A)                             {a:=1};
+    \node[operation,alt=<1>{}{text opacity=0},right=0.5 of A,yshift=-3em] (B)  {a++};
+    \node[operation,alt=<1>{}{text opacity=0},right=0.2 of B,yshift=3.5em] (C) {b:=a};
+    \node[operation,alt=<1>{}{text opacity=0},right=1.5 of B] (D)              {++b};
+
+    \only<2->{
+      \node at(A) {$\alpha$};
+      \node at(B) {$\beta$};
+      \node at(C) {$\gamma$};
+      \node at(D) {$\delta$};
+    }
+    \only<3>{
+      \draw[->,dashed] (A) to[out=0,in=160] (C);
+      \draw[->,dashed] (B) to[out=60,in=195] (C);
+    }j
+    \only<4->{
+      \draw[->] (A) -- (C.160);
+      \draw[->] (B) -- (C);
+      \draw[->] (C) -- (D);
+    }
+    \node[fit=(A) (B) (C) (D),draw,label={[anchor=south west]south west:\texttt{f()}}]{};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every op/.style={minimum width=2em,fill=operatorcolor}]
+    \begin{opAxis}[label={[fill=white,inner sep=1pt,draw]center:\tiny f()}]
+      \opString[]{$\alpha$,$\beta$,$\gamma$,$\delta$}
+    \end{opAxis}    
+  \end{tikzpicture}
+\end{frame}
+\end{document}
+

@@ -195,10 +195,7 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 
-
 #+begin_src latex
-  %%ONLY%%
-
   \begin{frame}{Die Zuweisungs-Operation (\texttt{:=})}
     \bi
     \ii Auswertung der rechten Seite $\rightarrow$ Ergebnis in der linken Seite speichern{
@@ -257,3 +254,41 @@ Effizienz: Seiteneffekte
    \ei
   \end{frame}
 #+end_src
+
+* Sprachkonstrukte zur Kontrolle der Auswertungsreihenfolge
+
+#+begin_src latex
+  \begin{frame}{Umgang mit impliziten Abhängigkeiten}
+    \begin{center}
+      \btAnimation[height=2.5cm]{padding,range=1-3:<1->,4:<4->}{fig/07-dependency-model}
+    \end{center}
+    \medskip
+  
+    \bi
+    \ii \textbf{Ausgangspunkt} und geistiges Modell für die folgenden Folien {
+      \bi
+      \ii<2-> \textbf{Gegeben}: Menge von Operationen mit Seiteneffekten ($\alpha, \beta,\gamma, \ldots$)
+      \ii<3-> Die Operationen hängen implizit voneinander ab (gestrichelte Linie)
+      \ii<4-> Sprachmittel machen Abhängigkeiten explizit und geben Reihenfolge vor
+      \ii<5->  \textbf{Ziel}: \btSetTab Eine wohldefinierte Auswertungsreihenfolge, welche die\\
+                              \btUseTab gewünschten Seiteneffekte nach Außen zeigt\\[2ex]
+      \begin{center}
+        \includegraphics[height=2cm,page=5]{fig/07-dependency-model}
+      \end{center}
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+#+end_src
+
+** Sequenzierung: Statements und Goto
+
+** Funktionsaufrufe
+
+** Selektion: Bedingte Ausführung
+
+** Iteration: Wiederholte Ausführung
+
+* Vom Instruktionsstrom zum Kontrollflussgraphen
+
