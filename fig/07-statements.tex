@@ -1,0 +1,26 @@
+\documentclass{lecturefig}
+\usetikzlibrary{chains}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[start chain,node distance=0cm]
+    \node[on chain, draw,minimum height=2em] {$\alpha$};
+    \node[on chain] {;};
+    \node[on chain, draw,minimum height=2em] {$\beta$};
+    \node[on chain] {;};
+    \node[on chain, draw,minimum height=2em] {$\gamma$};
+
+    \node[on chain,xshift=1cm]{\Large $\Rightarrow$};
+
+    \node[on chain,xshift=1cm,operation=$\alpha$](A){};
+    \node[on chain,xshift=2em,operation=$\beta$](B){};
+    \node[on chain,xshift=2em,operation=$\gamma$](C){};
+
+    \draw[<-] (A) -- (B);
+    \draw[<-] (B) -- (C);
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
+
+

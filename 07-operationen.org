@@ -281,8 +281,89 @@ Effizienz: Seiteneffekte
   
   \end{frame}
 #+end_src
-
 ** Sequenzierung: Statements und Goto
+
+
+#+begin_src latex
+
+  \begin{frame}[fragile]{Sequenzierung: Statements}
+    \bi
+    \ii \structure{Sequenzierung}: Einfachste Form der Abhängigkeitsnotation {
+      \bi
+      \ii Der Sequenzoperator (\codebox{;})führt seine Kinder in eine strikten Reihenfolge aus
+      \ii Die Operanden des Sequenzoperators heißen \structure{Statements}
+      \ii Ergebnisse werden verworfen oder das erste/letzte wird zurückgegeben
+      \ei
+    }
+    \ii<2-> Statements sind das grundlegende Sprachmittel in imperativen Sprachen\\ {
+      \btAnimation{center,padding,1:<1->}{fig/07-statements}
+    }
+    \ei
+
+    \medskip
+
+    \begin{columns}<3->
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=C]
+          \begin{C}
+            int a, b;
+            void foo() {
+              a = 1; a++; b = (a+=4, a * 3);
+            }
+          \end{C}
+        \end{code}
+        \structure{C/C++}
+        \bii
+        \ii Sequenzierung: Komma, Semikolon
+        \ii \texttt{$\alpha$;$\beta$} hat kein Ergebnis
+        \ii \texttt{$\alpha$,$\beta$} liefert letztes Teilergebnis ($\beta$)
+        \eii
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=Ruby]
+          \begin{ruby}
+            a = (1+2 ; begin
+                  x = 1 + 2
+                  x * 3
+                end + 1)
+          \end{ruby}
+        \end{code}
+        \structure{Ruby}
+        \bii
+        \ii Sequenzierung: \texttt{'\textbackslash n'}, Semikolon
+        \ii Letztes Statement liefert  den Rückggabewert
+        \eii
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}[fragile]{Unterscheidung zwischen Expressions und Statements}
+    \OrangeBox{Die meisten Sprachen treffen diese Unterscheidung}\medskip
+
+    \bi
+    \ii \structure{Ausdrücke/Expressions} {
+      \bi
+      \ii Haben einen Rückgabewert
+      \ii Haben einen Rückggabetypen (bei statischer Typisierung)
+      \ii Können Operanden anderer Expressions sein
+      \ei
+    }\medskip
+    \ii \structure{Statements} {
+      \bi
+      \ii Haben keinen Rückggabewert und daher auch keinen Typen
+      \ii Dienen als Elemente der Sequenzierung und anderer Programmstrukturen
+      \ii Entsprechen (in etwa) einer Zeile Code
+      \ii Werden in Code-Blöcken bzw. Compound-Statements zusammengefasst.
+      \ei
+    }\medskip
+    \ii<2-> Manche Operationen haben eine Expression- und eine Statement-Form\\
+    C: \codeinline{if (cond) { then_block } else { else_block}}\hfill%
+    \codeinline{ cond ? then_expr : else_expr}
+
+    
+    \ei
+  \end{frame}
+#+end_src
 
 ** Funktionsaufrufe
 

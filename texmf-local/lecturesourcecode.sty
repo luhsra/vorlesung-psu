@@ -155,6 +155,18 @@
     moredelim=**[is][\color{orange}]{@@}{@@},
     moredelim=**[is][\color{srared}]{@@@}{@@@},
   }
+  \lstdefinestyle{ruby}{
+    style=basestyle,
+    language={ruby},
+    includerangemarker=false,
+    rangeprefix={\#},
+    morekeywords={self},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
   \lstdefinestyle{haskell}{
     style=basestyle,
     language={haskell},
@@ -240,7 +252,7 @@
 \forcsvlist\addLangEnv{%
   C/C,pascal/pascal,JS/JS,haskell/haskell,java/java,%
   ada/ada,codetext/text,rust/rust,CPP/CPP,py/py,lzero/lzero,asm/ASM,
-  sharpc/sharpc,
+  sharpc/sharpc,ruby/ruby,
 }
 
 
