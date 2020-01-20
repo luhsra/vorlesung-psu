@@ -1,0 +1,259 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 07 - Operationen
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+- Expressions
+  - Arithmetric
+  - Relational
+  - Zuweisung, L-Values, R-Values
+- Kontrollfluss
+  - Die sequentielle Maschine
+  - Seiteneffekte & Ausführungsreihenfolge
+  - Sequencing: Statements ung Goto
+  - Invocation: call, return; Call-by-value, Call-by-ref
+  - Selection (if, cond, case, Short-Circuit Semantic?)
+  - Iteration (Logical-Controlled Loops, Enumeration-Controlled Loops, Iteratoren)
+- Vom Instruktionsstrom zum Kontrollflussgraphen
+  - Kontrollflussgraphen
+  - Basisblöcke
+  - Kontrollflussgraphen auf mehreren Ebenen
+
+Effektiv:  Welche Werkzeuge habe ich den potentiellen Instruktionsstrom zu Formen?
+Effizienz: Seiteneffekte 
+
+* Was ist eine "Operation"?
+:PROPERTIES:
+:CUSTOM_ID: 07-einleitung
+:END:
+
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \begin{frame}
+    \maketitle
+  \end{frame}
+
+  \begin{frame}{Einordnung in die Vorlesung: Operationen}
+    \begin{center}
+      \includegraphics[page=12,width=0.6\linewidth]{fig/01-overview-small}
+    \end{center}
+    \bi
+    \ii Operation \alert{kombinieren Daten} und \alert{manipulieren Objekte} {
+      \bi
+      \ii Operationen hängen implizit und/oder explizit voneinander ab
+      \ii Abbildung des virtuellen Operationsstrom auf die reale, sequentielle Maschine
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[t,fragile]{Was ist eine "Operation"?}
+    \btAnimation{center,padding,1:<1->}{fig/07-operations}
+    \bi
+    \ii \textbf{Erinnerung 1. Vorlesung}: Maschinenmodell der virtuellen Maschine:{
+      \bi
+      \ii \structure{Speicher/Objekte}: Wie kann man Informationen ablegen und wieder abrufen?
+      \ii \structure{Befehle/Operationen}: Wie kann man Informationen miteinander kombinieren?
+      \ei
+    }\medskip
+    \ii Operationen sind Aktiv $\leftrightarrow$ Objekte sind Passiv {
+      \bi
+      \ii \structure{Quelloperanden}: Eingabeobjekte, die von der Operation gelesen werden.
+      \ii \structure{Abbildungsvorschrift}: Kombinationsregel für die gelesenen Daten.
+      \ii \structure{Zieloperanden}: Ausgabeobjekt nimmt das Rechenergebnis auf
+      \ei
+    }
+    \ii[]<2->{
+    \begin{code}
+      \begin{codetext}[style=smaller]
+        Operation: "+"
+          Quelloperand: LHS (Typ: 32-Bit Integer), RHS (Typ: 32-Bit Integer)
+          Zieloperand:  ret (Typ: 32-Bit Integer)
+          Abbildungsvorschrift: 
+             L   = eval(LHS) // Linke Seite auswerten
+             R   = eval(RHS) // Rechte Seite auswerten
+             ret = modulo(add(L, R), 32)
+       \end{codetext}
+     \end{code}
+   }\ei
+  \end{frame}
+
+#+end_src
+
+* Einfache Operationen
+
+#+begin_src latex
+  \dividerframe{Einfache\\Operationen}
+  \begin{frame}[fragile]{Arithmetische, Bit-weise und logische Operationen}
+    \begin{center}
+      {\Large \verb!+ - * / %     ~ & | ^ << >>  < <= == => >!}
+      \OrangeBox<2->{Notation, Vorrang und Assoziativität wird vom Parser aufgelöst.}
+    \end{center}
+    \def\op{\textit{op}}
+    \def\codebox#1{\Colorbox{codecolor}{\scriptsize\texttt #1}}
+    \setbeamercovered{still covered={\opaqueness<1->{0}},again covered={\opaqueness<1->{30}}}
+    \bi
+    \ii<-2> \structure{Notationen} in unterschiedlichen Sprachen {
+      \bi
+      \ii Prefix: \codebox{\op{} A B} oder \codebox{\op(A,B)} oder \codebox{(\op{} A B)} \hfill Lisp, Scheme
+      \ii Infix:  \codebox{A \op{} B}  \hfill C, C++, Java, \ldots
+      \ii Postfix: \codebox{A B \op}   \hfill Forth, PostFix
+      \ei
+    }\medskip
+    \ii<-2> \structure{Vorrang} (Precedence): Bindet Multiplikation stärker als Addition?\\{
+      \codebox{1*2+3*4} $\rightarrow$ \btSetNamedTab{\first}\codebox{(1*2)+(3*4)} (14) \hspace{1em} \btSetNamedTab{\second} $\vee$ \hspace{1em}  \codebox{1*(2+3)*4} (20)
+    }\medskip
+    \ii<-2> \structure{Assoziativität}: Wird links oder rechts geklammert? \\{
+       \codebox{1-2-3-4} $\rightarrow$ \first\codebox{(((1-2)-3)-4)} (-8)  \second $\vee$\hspace{1em} \codebox{1-(2-(3-4))} (-2)
+     }
+    \ei
+    \bi
+    \ii<3-> \ALERT{Wichtige} Eigenschaften dieser Operationen {
+      \bi
+      \ii Quelloperanden werden \alert{alle ausgewertet, bevor} die Operation ausgeführt wird
+      \ii Keine \structure{Seiteneffekte} und genau ein \structure{temporäres Objekt} als Zieloperand
+      \ei
+    }
+    \ei
+  \end{frame}
+
+
+  \begin{frame}{Auswertungsreihenfolge von einfachen Operationen}
+    \bi
+    \ii Semantische Lücke zwischen virtueller und realer Maschine {
+      \bi
+      \ii Operationen auf Sprachebene sind als (expliziter oder impliziter) Baum notiert
+      \ii Alle realen Maschinen sind \structure{Sequentielle Maschinen}\smallskip
+      \ei
+    }
+    \ei
+    \begin{btBlock}{Auswertungsreihenfolge}
+      Abbildung der Operationen des ASTs auf eine lineare Befehlssequenz.
+    \end{btBlock}
+
+    \begin{columns}<2->
+      \begin{column}{0.3\textwidth}
+        \includegraphics[width=\textwidth,page=1]{fig/07-simple-expr}
+      \end{column}\hfill
+      \begin{column}{0.69\textwidth}
+        \bii
+        \ii \enquote{Links nach Rechts}      \hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=3}]{fig/07-simple-expr}
+        \ii \enquote{Rechts nach Links}      \hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=4}]{fig/07-simple-expr}
+        \ii \enquote{Beliebiges Kind zuerst}:\hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=5}]{fig/07-simple-expr}
+        \eii
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}{Abhängigkeiten zwischen Operationen}
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \centering
+        \includegraphics[height=2cm,page=2]{fig/07-simple-expr}
+        \par
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \btAnimation[width=\textwidth,page=6]{range=6-7:<1->,8:<3->}{fig/07-simple-expr}
+      \end{column}
+    \end{columns}
+    \medskip
+
+    \bi
+    \ii \structure{Abhängigkeit}: Eine Operationen hängt vom Ergebnis einer anderen ab{
+      \bi
+      \ii Abhängige Operationen müssen zuerst ausgewertet werden
+      \ii Bei der Auswertungsreihenfolge: Keine Abhängigkeiten in die Zukunft
+      \ii AST definiert hierarchische Abhängigkeiten zwischen Eltern und Kind
+      \ei
+    }\medskip
+    \ii<3-> \advantage{\textbf{Freiheiten}} in der Auswertungsreihenfolge {
+      \bi
+      \ii Haben Operationen keine Abhängigkeit ist ihre Reihenfolge \textbf{\advantage{beliebig}}
+      \ii[$\Rightarrow$] Übersetzer kann Reihenfolge frei wählen um Ausführung zu optimieren\\
+         z.B: Weniger Speicherlatenz durch Einschieben von unabhängigen Operationen
+      \ei
+    }
+    \ei
+
+    \begin{btBlock}<4->{}\small
+      Viele Sprachkonstrukte und -regeln führen \textbf{zusätzliche, querschneidende Abhängigkeiten} ein.
+      So können wir die \structure{Auswertungsreihenfolge formen}.
+    \end{btBlock}
+
+  \end{frame}
+#+end_src
+
+
+#+begin_src latex
+  %%ONLY%%
+
+  \begin{frame}{Die Zuweisungs-Operation (\texttt{:=})}
+    \bi
+    \ii Auswertung der rechten Seite $\rightarrow$ Ergebnis in der linken Seite speichern{
+      \bi
+      \ii Linke und rechte Seite werden \alert{nicht} symmetrisch übersetzt!
+      \ii \structure{R-Wert}: Auf der rechten Seite berechnen wir das Ergebnis eines Ausdrucks
+      \ii \structure{L-Wert}: Auf der linken Seite muss berechnet werden wohin das Ergebnis soll
+      \ei
+      \btAnimation[height=1.5cm]{center,padding,1:<1->}{fig/07-lvalue}
+    }
+    \ii<2-> Nicht jede Operation hat einen L-Wert \hfill (\codebox{char *c}){
+      \bi
+      \ii Konstanten (\codebox{1}, \codebox{"abc"}) haben keinen L-Wert\hfill\codebox{1 := 2}
+      \ii Temporäre Zwischenergebnisse haben keinen L-Wert             \hfill\codebox{c + 10 := 2}
+      \ei
+    }
+    \ii<3-> Unterschied bei L-Werten zwischen Werte- und Referenzmodell{
+      \bi
+      \ii \structure{Referenzmodell}: Alles was eine Referenz speichern kann ist ein L-Wert\\
+          Variablen, Array-Elemente und Felder.\\[0.5ex]
+      \ii \structure{Wertemodell}: Alles was ein Objekt speichern kann ist ein L-Wert\\
+          zusätzlich: Dereferenzierung: \codebox{*(ptr)}, Referenzen: \codebox{char\& operator[](...)}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Seiteneffekte und Idempotenz}
+    \begin{btBlock}{}
+      Die Zuweisungs-Operation hat den gewollten \structure{Seiteneffekt} den Zustand der virtuellen Maschine zu verändern.
+    \end{btBlock}
+
+    \bi
+    \ii \structure{Idempotenz}: Wiederholte Auswertung liefert immer dasselbe Ergebnis {
+      \bi
+      \ii Operationen mit Seiteneffekten sind nicht \structure{idempodent}\hfill \codebox{i = i + 1}
+      \ii Rechnen und lesen (meistens) haben keine Seiteneffekte.
+      \ii Nur beobachtbare Seiteneffekte sind ein Problem (seiteneffektfreie Funktion)
+      \ii Strikt-Funktionale Sprachen (Haskell): Verbot jeglicher Seiteneffekte 
+      \ei
+    }\medskip
+    \ii<2-> Wer sich auf Seiteneffekte verlässt erzeugt eine implizite Abhängigkeit.\\[0.5ex]{
+     \begin{columns}
+       \begin{column}{0.27\textwidth}
+         \btAnimation[width=\textwidth] {padding,center,1:<-2>,2:<3->}{fig/07-side-effect}
+       \end{column}\hfill
+       \begin{column}{0.7\textwidth}
+         \bi
+         \ii Das Ergebnis von \codebox{(a := 2) + (b := a)} hängt von der Auswertungsreihenfolge ab
+         \ii Ohne strikt-definierte Auswertungsreihenfolge ist das Ergebnis \ALERT{undefiniert}!
+         \ii Sprachregeln und -konstrukte \textbf{vermeiden} implizite Abhängigkeiten oder \textbf{machen sie explizit}.
+         \ei
+       \end{column}
+     \end{columns}
+   }
+   \ei
+  \end{frame}
+#+end_src

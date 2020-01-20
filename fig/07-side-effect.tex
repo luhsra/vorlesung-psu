@@ -1,0 +1,24 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    level 1/.style={sibling distance=5em},
+    level 2/.style={sibling distance=2.5em},
+    edge from parent/.style={draw,->},
+    ]
+    \node[operation] {+}
+       child { node[operation] (eq-1) {:=}
+         child {node[operand]{a}}
+         child {node[operand]{2}}
+       }
+       child { node[operation] (eq-2) {:=}
+         child {node[operand]{b}}
+         child {node[operand](a-2) {a}}
+       };
+
+       \only<2>{
+         \draw[<-,dashed] (eq-1) -- (a-2.north west);
+         }  
+  \end{tikzpicture}
+\end{frame}
+\end{document}

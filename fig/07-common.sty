@@ -1,9 +1,22 @@
+\colorlet{operatorcolor}{luhblue!20}
+\colorlet{operandcolor}{safegreen!20}
+
 \tikzset{
+  operation/.style={
+    circle, draw,
+    label={[anchor=center,]center:#1},
+    minimum height=2em,
+    fill=operatorcolor,
+  },
+  operand/.style={
+    minimum size=2em, draw,fill=operandcolor,
+  },
   op/.style={
     right=-\pgflinewidth of instr,
     op/size,
     draw,
     every op/.try,
+    /tikz/every op/.try,
   },
   op/.search also={/tikz},
   op/.cd,
@@ -21,14 +34,15 @@
   }
 }
 \newcommand\opBlock[2][]{
-  \foreach \i in {1,...,#2}{
-    \node[op,op/.cd,name=instr-#1, #1] {};
+  \foreach \i [count=\ix] in {1,...,#2}{
+    \node[op,op/.cd,instr-\ix, #1] {};
   }
 }
 
 \newenvironment{opAxis}[1][]{
-  \node[#1](cpu) {\includegraphics[width=1cm]{fig/07-cpu}};
+  \node[#1](cpu) {\includegraphics[width=2em]{fig/07-cpu}};
   \node[fit=(cpu),name=instr,inner sep=0]{};
 }{
   \draw[->](cpu.south east) -- (cpu.south west-|instr.east) node[right,name=label]{\textit{t}};
 }
+

@@ -6,6 +6,10 @@
     \begin{opAxis}[label={[fill=white,inner sep=1pt,draw]center:\tiny foo()}]
       \opString[,fill=safegreen!40]{,,,call}
       \opString[invisible,fill=luhblue!40]{,,,ret}
+      \begin{visible}<2->
+        \draw[decorate,decoration={snake}] (instr-1.west) -- (instr.east);
+        
+      \end{visible}
       \opString[visible on=<3->,fill=safegreen!40]{,,,ret}
     \end{opAxis}
 
@@ -24,12 +28,17 @@
       \opString[fill=luhblue!60]{+,:=,<,ite}
       \draw[decorate,decoration={brace,amplitude=5pt}] (instr-1.north west) -- node[above,yshift=5pt]{iteration 0} (instr.north east);
 
+      
+      \begin{visible}<2->
       \opString[fill=luhblue!30]{+,:=,<,ite}
       \draw[decorate,decoration={brace,amplitude=5pt}] (instr-1.north west) -- node[above,yshift=5pt]{iteration 1} (instr.north east);
+    \end{visible}
 
+
+    \begin{visible}<3->
       \opString[fill=luhblue!60]{+,:=,<,ite}
       \draw[decorate,decoration={brace,amplitude=5pt}] (instr-1.north west) -- node[above,yshift=5pt]{iteration 2} (instr.north east);
-
+    \end{visible}
     \end{opAxis}
   \end{tikzpicture}
 \end{frame}

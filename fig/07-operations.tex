@@ -1,0 +1,29 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[operand/.style={
+      minimum size=2em, draw,fill=safegreen!20,
+    },
+    operation/.append style={
+      fill=luhblue!20,
+    },
+    ]
+    \node(plus)  [operation=+] {};
+    \node(equal) [right=1 of plus,operation={:=}, pin=-10:Operation] {};
+
+    \node[operand, left=1 of plus,     pin={[name=operand,yshift=-.5cm]180:\small(Quell-)Operand}] (four) {4};
+    \node[operand, below=0.5 of four] (var) {B};
+    \draw[help lines] (operand.south east) -- (var);
+
+    \node[operand, below=0.5 of plus,pin=0:\small(Ziel-)Operand] (var-A) {A};
+
+    \draw[->] (four) -- (plus);
+    \draw[->] (var) -- (plus);
+
+    \draw[->] (plus) -- (equal);
+    
+    \draw[->] (equal) -- (var-A);
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
