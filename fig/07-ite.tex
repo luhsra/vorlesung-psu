@@ -1,0 +1,39 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[operation] (ite) {ite};
+    \node[operation, left=of ite] (A) {$\alpha$};
+    \node[operation, right=of ite] (B) {$\beta$};
+    \node[operand, below=0.5 of ite] (cond) {cond};
+    \node[operation, below=0.5 of B] (C) {$\gamma$};
+
+    \draw[every edge/.style={draw,->}]
+        (A) edge (ite)
+        (ite) edge (B)
+        (ite) edge[out=0,in=180] (C)
+        (cond) edge[<-,dashed] (ite)
+    ;
+    
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every op/.style={fill=operatorcolor,minimum width=1em}]
+    \begin{opAxis}
+      \opString{$\alpha$,ite,$\beta$}
+    \end{opAxis}
+    \coordinate(cpu-1) at (cpu.west);
+    \begin{opAxis}[at={(0,-4em)}]
+      \opString{$\alpha$,ite,$\gamma$}
+    \end{opAxis}
+    \node[operand,minimum size=0em,anchor=east,xshift=-2em]
+       at ($(cpu-1)!0.5!(cpu)$)
+       (cond){\scriptsize cond};
+
+    \draw[->] (cond) to[out=0,in=180] node[inner sep=1pt,below,sloped]{\tiny true}  (cpu-1);
+    \draw[->] (cond) to[out=0,in=180] node[inner sep=1pt,below,sloped,rotate=180]{\tiny false} (cpu);
+  \end{tikzpicture}
+  
+\end{frame}
+\end{document}

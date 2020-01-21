@@ -257,6 +257,7 @@ Effizienz: Seiteneffekte
 * Sprachkonstrukte zur Kontrolle der Auswertungsreihenfolge
 
 #+begin_src latex
+\dividerframe{Kontrolle über die Auswertungsreihenfolge}
   \begin{frame}{Umgang mit impliziten Abhängigkeiten}
     \begin{center}
       \btAnimation[height=2.5cm]{padding,range=1-3:<1->,4:<4->}{fig/07-dependency-model}
@@ -482,7 +483,81 @@ Effizienz: Seiteneffekte
 #+end_src
 ** Selektion: Bedingte Ausführung
 
+#+begin_src latex
+  \begin{frame}{Selektion: Bedingte Ausführung}
+    \begin{btBlock}{Sequenzoperator, Sprüngen und Funktionsaufrufe}
+      Wir können nur einen \textbf{linearen} Kontrollfluss vorschreiben; nur endlose Schleifen/Rekursionen sind möglich.
+    \end{btBlock}
+    \bigskip
+    \bi
+    \ii<2-> \ALERT{Wichtiger} als Operationen zu reihen, ist es Operationen auszulassen {%
+      \bi
+      \ii if-then-else--Operation (\texttt{ite}) wählt eine der Nachfolge-Operationen aus
+      \ii Auswahl der nächsten Operation erfolgt anhand des \textbf{Programmzustandes}
+      \ei
+    }
+    \ei
+    \smallskip
+    \begin{columns}
+      \begin{column}<2-> {0.49\textwidth}\centering
+        \includegraphics[width=0.7\textwidth,page=1]{fig/07-ite}
+      \end{column}\hfill
+      \begin{column}<3->{0.49\textwidth}\centering
+        \includegraphics[width=0.7\textwidth,page=2]{fig/07-ite}
+      \end{column}
+    \end{columns}
+    \smallskip
+    \bii
+    \ii<3-> Mit Bedingungen gibt es plötzlich \structure{mehrere Kontrolflüsse} durch das Programm
+    \ii<4-> Variationen von Bedingungen: Wie viele Nachfolger? Wie wird ausgewählt?
+    \eii
 
+  \end{frame}
+
+  \begin{frame}[t]{Die Selektion-Operation ist eine seltsame Operation}
+    \vspace{-1.5em}
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \centering
+        \structure{Normale Operationen}
+      \end{column}\hfill
+      \begin{column}<5->{0.49\textwidth}
+        \centering
+        \structure{Selektion }
+      \end{column}
+    \end{columns}
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \btAnimation[width=0.45\textwidth]{raisebox,center,padding,range=1-3:<1->,4:<4->}{fig/07-ite-ast}
+      \end{column}\hfill
+      \begin{column}<5->{0.49\textwidth}
+        \btAnimation[width=0.7\textwidth]{raisebox,center,padding,range=5-6:<5->,7:<7->}{fig/07-ite-ast}
+      \end{column}
+    \end{columns}
+
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \bii
+        \ii Operation hängt von \textbf{allen} Kinder ab
+        \ii Kinder werden zuerst ausgeführt
+        \ii Reihenfolge der Kinder nicht zwingend
+        \eii
+      \end{column}\hfill
+      \begin{column}<5->{0.49\textwidth}
+        \bii
+        \ii Hängt \textbf{immer} von der Bedingung ab
+        \ii Nur ein anderes Kind wird ausgeführt
+        \ii Auswertung wird Daten-sensitiv
+        \ii[$\Rightarrow$] \structure{hat programmierbare Abhängigkeit}\\[2ex]
+        \eii
+      \end{column}
+    \end{columns}
+
+    \begin{btBlock}<8>{}
+      McCarthy (Erfinder von Lisp), 1960: \enquote{[...] but the notion of conditional expression is believed to be new, and the use of conditional expressions permits functions to be defined recursively in a new and convenient way.}
+    \end{btBlock}
+  \end{frame}
+#+end_src
 ** Iteration: Wiederholte Ausführung
 
 * Vom Instruktionsstrom zum Kontrollflussgraphen

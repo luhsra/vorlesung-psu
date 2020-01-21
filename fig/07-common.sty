@@ -40,7 +40,7 @@
 }
 
 \newenvironment{opAxis}[1][]{
-  \node[#1](cpu) {\includegraphics[width=2em]{fig/07-cpu}};
+  \node[#1,inner ysep=0](cpu) {\includegraphics[width=2em]{fig/07-cpu}};
   \node[fit=(cpu),name=instr,inner sep=0]{};
 }{
   \draw[->](cpu.south east) -- (cpu.south west-|instr.east) node[right,name=label]{\textit{t}};

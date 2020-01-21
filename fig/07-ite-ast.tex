@@ -1,0 +1,42 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[edge from parent/.style={alt=<-2>{}{<-},draw},L/.style={above,sloped,font=\scriptsize,visible on=<4->}]
+    \node[operation=+](p1){}
+       child{ node[operand] (a1) {1} edge from parent node[L] {1} }
+       child{ node[operation] (p2) {+} 
+         child { node [operand] (a2) {2} edge from parent node[L] {2}}
+         child { node [operand] (a3) {3} edge from parent node[L] {3}}
+         edge from parent node[L] {5}
+       }
+    ;
+    \draw[->] (p1) -- node[L]{6} ++(up:2em);
+
+    \only<2-3>{
+      \draw[dashed,<-] (a2) to[in=-90] (p2);
+      \draw[dashed,<-] (a3) to[out=135,in=-90] (p2);
+      \draw[dashed,<-] (a1) to[in=-90] (p1);
+      \draw[dashed,<-] (p2) to[out=135,in=-90] (p1);
+    }
+    \begin{pgfonlayer}{background}
+      \begin{visible}<4>
+        \fill[badbee!40] \convexpath {a3,a2,p2}{1.5em};
+      \end{visible}
+    \end{pgfonlayer}
+
+   \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[edge from parent/.style={draw},L/.style={above,sloped,font=\scriptsize}]
+    \node[operation=ite](root){}
+       child{ node[operand] (cond) {A}    edge from parent[<-] node[L] {\alt<-2>{true}{false}} }
+       child{ node[operation] (then) {:=} edge from parent[alt={<-1,3>{}{<-}}] }
+       child{ node[operation] (else) {:=} edge from parent[alt=<-2>{}{<-}] }
+    ;
+    \draw[dashed,->] (root) to[out=190,in=90] (cond);
+    \only<2>{\draw[dashed,->] (root) to[out=-100,in=100] (then);}
+    \only<3>{\draw[dashed,->] (root) to[out=0, in=90] (else);}
+  \end{tikzpicture}
+\end{frame}
+\end{document}
