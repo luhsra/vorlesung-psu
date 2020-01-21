@@ -13,9 +13,10 @@
       \node at(C) {$\gamma$};
       \node at(D) {$\delta$};
     }
-    \only<3>{
-      \draw[->,dashed] (A) to[out=0,in=160] (C);
-      \draw[->,dashed] (B) to[out=60,in=195] (C);
+    \only<3-4>{
+      \draw[<-,dashed] (A) to[out=-10,in=192] (C);
+      \draw[<-,dashed] (B) to[out=60,in=195] (C);
+      \draw[<-,dashed] (C) to[out=-90,in=180] (D);
     }j
     \only<4->{
       \draw[->] (A) -- (C.160);

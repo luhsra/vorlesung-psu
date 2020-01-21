@@ -1,0 +1,42 @@
+\documentclass{lecturefig}
+\usetikzlibrary{chains}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[start chain, node distance=1mm,
+       operation/.append style={rectangle,minimum width=2em},
+       goto/.style={operation,fill=luhblue!40},
+       ]
+
+    \node[on chain,operation] (alpha) {$\alpha$};
+    \node[on chain] {;};
+    \node[on chain,goto] (goto-L1) {\textbf{goto} L1};
+    \node[on chain] {;};
+    \node[on chain,operation] (L2) {L2: $\gamma$};
+
+
+    \node[on chain,operation,below=1.5 of alpha.west,anchor=west] (L1) {L1: $\beta$};
+    \node[on chain] {;};
+    \node[on chain,operation] {$\delta$};
+    \node[on chain] {;};
+    \node[on chain,goto] (goto-L2) {\textbf{goto} L2};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every op/.style={minimum width=2em}]
+    \begin{opAxis}
+      \begin{visible}<2->
+        \opString[fill=operatorcolor]{$\alpha$}
+        \opString[fill=luhblue!40]{goto}
+      \end{visible}
+      \begin{visible}<3->
+        \opString[fill=operatorcolor]{$\beta$, $\delta$}
+        \opString[fill=luhblue!40]{goto}
+      \end{visible}
+      \begin{visible}<4->
+        \opString[fill=operatorcolor]{$\gamma$}
+      \end{visible}
+    \end{opAxis}
+  \end{tikzpicture}
+\end{frame}
+\end{document}

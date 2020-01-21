@@ -188,8 +188,7 @@ Effizienz: Seiteneffekte
     \ei
 
     \begin{btBlock}<4->{}\small
-      Viele Sprachkonstrukte und -regeln führen \textbf{zusätzliche, querschneidende Abhängigkeiten} ein.
-      So können wir die \structure{Auswertungsreihenfolge formen}.
+      Viele Sprachkonstrukte und -regeln erlauben es uns die \textbf{Auswertungsreihenfolge zu formen}, um die Abhängigkeiten explizit zu machen.
     \end{btBlock}
 
   \end{frame}
@@ -267,11 +266,11 @@ Effizienz: Seiteneffekte
     \bi
     \ii \textbf{Ausgangspunkt} und geistiges Modell für die folgenden Folien {
       \bi
-      \ii<2-> \textbf{Gegeben}: Menge von Operationen mit Seiteneffekten ($\alpha, \beta,\gamma, \ldots$)
-      \ii<3-> Die Operationen hängen implizit voneinander ab (gestrichelte Linie)
-      \ii<4-> Sprachmittel machen Abhängigkeiten explizit und geben Reihenfolge vor
+      \ii<2-> \textbf{Gegeben}: Menge von Operationen mit Seiteneffekten \hfill($\alpha, \beta,\gamma, \ldots$)
+      \ii<3-> Die Operationen hängen implizit voneinander ab             \hfill (gestrichelt)
+      \ii<4-> Sprachmittel geben Reihenfolge und Vorrang explizit vor    \hfill(durchgezogen)
       \ii<5->  \textbf{Ziel}: \btSetTab Eine wohldefinierte Auswertungsreihenfolge, welche die\\
-                              \btUseTab gewünschten Seiteneffekte nach Außen zeigt\\[2ex]
+                              \btUseTab Abhängigkeiten erfüllt\\[2ex]
       \begin{center}
         \includegraphics[height=2cm,page=5]{fig/07-dependency-model}
       \end{center}
@@ -282,25 +281,20 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 ** Sequenzierung: Statements und Goto
-
-
 #+begin_src latex
-
   \begin{frame}[fragile]{Sequenzierung: Statements}
     \bi
-    \ii \structure{Sequenzierung}: Einfachste Form der Abhängigkeitsnotation {
+    \ii \structure{Sequenzierung}: Vorgabe einer linearen, strikten Reihenfolge {
       \bi
-      \ii Der Sequenzoperator (\codebox{;})führt seine Kinder in eine strikten Reihenfolge aus
+      \ii Der Sequenzoperator (\codebox{;}) führt seine Kinder hintereinander aus
       \ii Die Operanden des Sequenzoperators heißen \structure{Statements}
       \ii Ergebnisse werden verworfen oder das erste/letzte wird zurückgegeben
       \ei
     }
-    \ii<2-> Statements sind das grundlegende Sprachmittel in imperativen Sprachen\\ {
+    \ii<2-> Statements sind das grundlegende Sprachmittel in imperativen Sprachen\\[1ex] {
       \btAnimation{center,padding,1:<1->}{fig/07-statements}
     }
     \ei
-
-    \medskip
 
     \begin{columns}<3->
       \begin{column}{0.49\textwidth}
@@ -309,7 +303,7 @@ Effizienz: Seiteneffekte
             int a, b;
             void foo() {
               a = 1; a++; b = (a+=4, a * 3);
-            }
+            } // b == 18
           \end{C}
         \end{code}
         \structure{C/C++}
@@ -325,7 +319,7 @@ Effizienz: Seiteneffekte
             a = (1+2 ; begin
                   x = 1 + 2
                   x * 3
-                end + 1)
+                end + 1) # a == 10
           \end{ruby}
         \end{code}
         \structure{Ruby}
@@ -365,9 +359,129 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 
-** Funktionsaufrufe
+#+begin_src latex
+  \begin{frame}{Sequenzierung: Goto}
+    \bi
+    \ii Ein \structure{unbedingter Sprung} verbindet syntaktisch entfernte Statements {
+      \bi
+      \ii \structure{Sprungmarke}: Gibt einer Operation einen Namen
+      \ii \structure{Sprung}: \btSetTab Auswertung wird an dieser Stelle \alert{abgebrochen} und an der\\
+                              \btUseTab genannten Sprungmarke fortgesetzt.
+      \ei
+    }
+    \ei
+    \medskip
+    \begin{columns}
+      \begin{column}{0.40\textwidth}
+        \centering\includegraphics[width=0.8\textwidth,page=1]{fig/07-goto}\par
+      \end{column}\hfill
+      \begin{column}{0.59\textwidth}
+        \btAnimation[width=\textwidth]{range=2-4:<1->,5:<3->}{fig/07-goto}
+      \end{column}
+    \end{columns}
+    \medskip
 
+    \bi
+    \ii<5-> Nachfolge-Operation einer Operation wird explizit und statisch benannt {
+      \bi
+      \ii Sprünge erlauben es Sequenzen zusammen zu stückeln
+      \ii (Endlos laufende) Schleifen sind nun möglich \hfill \textit{Rückwärtssprünge}
+      \ei
+    }
+    \ei
+
+    \begin{btBlock}<6->{Definition: Kontrollfluss \hfill \textit{(vgl. mit Kontrollwerk der CPU)}}
+      Ein Kontrollfluss ist eine \textbf{konkrete} Sequenz von Operationen, die hintereinander ausgeführt werden.
+    \end{btBlock}
+
+  \end{frame}
+#+end_src
+** Sequenzierung: Funktionsaufrufe
+#+begin_src latex
+  \begin{frame}{Sequenzierung: Funktionsaufrufe}
+    \bi
+    \ii Kontrollfluss-Brille: Sprung und Funktionsaufruf sind sehr ähnlich.{
+      \bi
+      \ii Der Kontrollfluss verlässt die aktuelle Operations-Sequenz
+      \ii Die Auswertung wird an einer entfernten, benannten Operation fortgesetzt
+      \ei
+    }\smallskip
+    \ii<2-> \textbf{Aber}: Funktionsaufrufe haben zwei \structure{grundlegende Erweiterungen} {
+      \bi
+      \ii \structure{Rücksprung}: \btSetTab Wir können von verschiedenen Stellen angesprungen werden und \\
+                                  \btUseTab zur jeweiligen verlassenen Operations-Sequenz zurückkehren.
+      \ii \structure{Argumente}: Wir können Daten an den Kontrollfluss heften
+      \ei
+    }
+    \ei
+    \bigskip
+    \begin{columns}<3->
+      \begin{column}{0.40\textwidth}
+        \centering\includegraphics[width=0.8\textwidth,page=1]{fig/07-call}\par
+      \end{column}\hfill
+      \begin{column}{0.59\textwidth}
+        \btAnimation[width=\textwidth]{2:<-3>, 3:<4>, 4:<5>,5:<6->}{fig/07-call}
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Sequenzierung: Zusammenfassung}
+    \begin{columns}
+      \begin{column}{0.3\textwidth}
+        \begin{code}\ttfamily\small
+        F1:\,\btSetNamedTab{\X}$\alpha$;\\
+            \X \textbf{goto} L1;\\
+        L2: \X $\gamma$;\\
+            \X \textbf{call} F2;\\
+            \X $\omega$;\\
+            \X \textbf{goto} F1;\\
+        L1: \X $\beta$;\\
+            \X \textbf{goto} L2;\\
+        F2: \X $\delta$;\\
+            \X \textbf{return};\\[1ex]
+        \end{code}\\
+        \medskip
+        \includegraphics[page=6,width=\textwidth]{fig/07-call}
+      \end{column}\hfill
+      \begin{column}<2->{0.65\textwidth}
+        \btUseExtraItemSep[2ex]
+        \bi
+        \ii Übersichtlichkeit von Code{
+          \bi
+        \ii Sprungmarken, Sprünge und der Aufruf von Labels werden schnell unübersichtlich.
+        \ii Dijkstra, 1968: \enquote{GOTO considered harmful}
+        \ii Manche argumentieren, dass goto einen Anwendungsfall bei der Fehlerbehandlung hat (z.B. Linus Torvalds)
+        \ii<3->[$\Rightarrow$] \structure{Funktionen mit Blockstruktur}, Sprünge nur selten:
+        % 
+        \begin{columns}
+          \begin{column}{0.45\textwidth}
+            \begin{code}[]
+              \begin{C}[escapechar=!]
+                void F1() {
+                  !$\alpha$!; !$\beta$! ; F2() ; $\omega$
+                }
+              \end{C}
+            \end{code}
+          \end{column}\hfill
+          \begin{column}{0.45\textwidth}
+            \begin{code}
+              \begin{C}[escapechar=!]
+                void F2() {
+                  !$\gamma$!; 
+                }
+              \end{C}
+            \end{code}
+          \end{column}
+        \end{columns}
+         \ei} \ei
+      \end{column}
+    \end{columns}
+  
+  \end{frame}
+#+end_src
 ** Selektion: Bedingte Ausführung
+
 
 ** Iteration: Wiederholte Ausführung
 

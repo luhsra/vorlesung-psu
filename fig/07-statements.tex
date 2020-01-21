@@ -15,8 +15,11 @@
     \node[on chain,xshift=2em,operation=$\beta$](B){};
     \node[on chain,xshift=2em,operation=$\gamma$](C){};
 
-    \draw[<-] (A) -- (B);
-    \draw[<-] (B) -- (C);
+    \draw[->] (A) -- (B);
+    \draw[->] (B) -- (C);
+
+    \draw[dashed,->] (C) to[bend left] (A);
+    \draw[dashed,->] (C) to[bend right] (B);
 
 
   \end{tikzpicture}

@@ -1,0 +1,53 @@
+\documentclass{lecturefig}
+\usetikzlibrary{chains}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[start chain, node distance=1pt,
+       operation/.append style={rectangle,minimum size=2em},
+       goto/.style={operation,fill=luhblue!40},
+       ]
+
+    \node[on chain,operation] (alpha) {$\alpha$};
+    \node[on chain] {;};
+    \node[on chain,goto] (goto-L1) {\textbf{call} F1};
+    \node[on chain] {;};
+    \node[on chain,operation] (L2) {$\delta$};
+
+
+    \tikzset{operation/.append style={fill=safegreen!20}}
+      
+    \node[on chain,operation,below=1.5 of alpha.west,anchor=west] (F1) {F1: $\beta$};
+    \node[on chain] {;};
+    \node[on chain,operation] {$\gamma$};
+    \node[on chain] {;};
+    \node[on chain,operation,fill=safegreen!40] (goto-L2) {\textbf{return}};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every op/.style={minimum height=2em}]
+    \begin{opAxis}
+      \begin{visible}<2->
+        \opString[fill=operatorcolor]{$\alpha$}
+        \opString[fill=luhblue!40]{\textbf{call}}
+      \end{visible}
+      \begin{visible}<3->
+        \opString[fill=safegreen!20]{$\beta$, $\gamma$}
+        \opString[fill=safegreen!40]{\textbf{return}}
+      \end{visible}
+      \begin{visible}<4->
+        \opString[fill=operatorcolor]{$\delta$}
+      \end{visible}
+    \end{opAxis}
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every op/.style={minimum height=2em}]
+    \begin{opAxis}
+      \opString[fill=operatorcolor]{$\alpha$,$\beta$,$\gamma$,$\delta$,$\omega$,$\alpha$}
+      \opString[]{\ldots}
+    \end{opAxis}
+  \end{tikzpicture}
+\end{frame}
+\end{document}
