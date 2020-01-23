@@ -148,7 +148,7 @@
     language={python},
     includerangemarker=false,
     rangeprefix={\#},
-    morekeywords={self},
+    morekeywords={self,in,yield},
     moredelim=**[is][\bfseries]{`}{`},
     moredelim=**[is][\slshape]{``}{``},
     moredelim=**[is][\btHL]{@}{@},
@@ -194,6 +194,17 @@
     language={pascal},
     includerangemarker=false,
     rangeprefix={\#},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
+  \lstdefinestyle{fortran}{
+    style=basestyle,
+    language={fortran},
+    includerangemarker=false,
+    rangeprefix={!},
     moredelim=**[is][\bfseries]{`}{`},
     moredelim=**[is][\slshape]{``}{``},
     moredelim=**[is][\btHL]{@}{@},
@@ -252,7 +263,7 @@
 \forcsvlist\addLangEnv{%
   C/C,pascal/pascal,JS/JS,haskell/haskell,java/java,%
   ada/ada,codetext/text,rust/rust,CPP/CPP,py/py,lzero/lzero,asm/ASM,
-  sharpc/sharpc,ruby/ruby,
+  sharpc/sharpc,ruby/ruby,fortran/fortran
 }
 
 
