@@ -590,7 +590,6 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 ** Iteration: Wiederholte Ausführung
-
 #+begin_src latex
   \begin{frame}{Iteration: Dasselbe, immer wieder tun}
     \bi
@@ -796,5 +795,52 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 
-* Vom Instruktionsstrom zum Kontrollflussgraphen
+* Vom Befehlsstrom zum Kontrollflussgraphen
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Kontrollflussgraphen}
+  \begin{frame}{Kontrollflüsse am Beispiel}
+    \textbf{Erinnerung}: \btSetTab -- Ein Kontrollfluss ist eine Sequenz von Operationen.\\
+    \btUseTab -- Mit Sprachkonstrukten manipulieren wir den Kontrollfluss.\\[3ex]
+    \pause
 
+    {
+      \btAnimation[width=0.8\textwidth]{center,padding=2ex,1:<1>,range=1-6:<2->}{fig/07-cfg}
+    }
+
+   \textbf{\advantage{Intuition}}: Im Kontrollflussgraphen sind alle potentiellen Kontrollflüsse
+
+
+  \end{frame}
+
+  \begin{frame}[t]{Der Kontrollflussgraph}
+    \begin{btBlock}{Definition: \structure{Kontrollflussgraph} (CFG)}
+      Der CFG ist die \textbf{Überlagerung aller möglichen Kontrollflüsse} durch ein Codestück. Seine Knoten sind die \structure{Basisblöcke} des Codestücks.
+    \end{btBlock}
+    \begin{btBlock}{Definition: \structure{Basisblock} (BB)}
+      Ein Basisblock ist eine Sequenz von Operationen.\\
+      Einmal gestartet, wird die Sequenz \textbf{immer} komplett abgearbeitet.
+    \end{btBlock}\only<2>{\textbf{Enschuldigung} \btSetTab für die Definitionen, aber der CFG ist \\
+      \btUseTab die zweite \ALERT{zentrale Datenstruktur} des Übersetzerbaus.}\par
+    \bi
+    \ii<3-> Fakten für Basisblöcke, die aus den Definitionen folgen{
+      \bi
+      \ii Nur die erste Instruktion eines BB kann angesprungen werden
+      \ii Nur die letzte Instruktion eines BB kann ein Sprung sein
+      \ii Eine einzelne Operation ist ein \structure{minimaler Basisblock}
+      \ei
+    }\smallskip
+    \ii<4-> Fakten über den CFG, die aus den Definitionen folgen{
+      \bi
+      \ii Können zwei BBs hintereinander ausgeführt werden, existiert eine CFG-Kante
+      \ii \textbf{Aber:} Nicht jeder Pfad durch den CFG ist ein valider Kontrolfluss
+      \ei
+    }
+    \ei
+  \end{frame}
+
+
+  \begin{frame}{Basisblöcke}
+  
+  \end{frame}
+#+end_src

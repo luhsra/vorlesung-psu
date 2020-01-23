@@ -1,0 +1,68 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every op/.style={fill=operatorcolor}]
+    \foreach \v/\o/\x in {
+      1/0/{$\alpha$,$\beta$,    $\delta$,$\rho$},
+      3/1/{$\alpha$,$\beta$,$\gamma$,$\delta$,$\rho$},
+      4/2/{$\alpha$,$\beta$,$\gamma$,$\delta$,$\delta$,$\delta$,$\rho$},
+      5/3/{$\alpha$,$\beta$,$\gamma$,$\pi$,$\delta$,$\rho$}%
+    } {
+      \begin{visible}<\v->
+        \begin{opAxis}[at={(0,-\o cm)}]
+          \typeout{\x}
+          \expandafter\opString\expandafter{\x}
+        \end{opAxis}        
+      \end{visible}
+    }
+
+    
+    \begin{visible}<-5>
+    \node[operation] at (5cm, 0cm) (A) {$\alpha$};
+    \node[operation,right=of A] (R) {$\rho$};
+    \node[operation,below=of A] (B) {$\beta$};
+    \node[operation,right=of B] (D) {$\delta$};
+
+    \begin{visible}<2->
+      \draw[->] (A) -- (B);
+      \draw[->] (B) -- (D);
+      \draw[->] (D) -- (R);
+    \end{visible}
+
+    \begin{visible}<3->
+      \node[operation,below=of B] (C) {$\gamma$};
+      \draw[->] (B) -- (C);
+      \draw[->] (C) -- (D);
+    \end{visible}
+
+    \begin{visible}<4->
+      \draw[->] (D) to[loop right] (D);
+    \end{visible}
+
+    \begin{visible}<5->
+      \node[operation,below=of D] (P) {$\pi$};
+      \draw[->] (C) -- (P);
+      \draw[->] (P) -- (D);
+    \end{visible}
+  \end{visible}
+
+  \begin{visible}[operation/.append style={rectangle}]<6->
+    \node[operation] at (5cm, 0cm) (A) {$\alpha$ ; $\beta$};
+    \node[operation,below=0.25 of A,xshift=2em]  (C) {$\gamma$};
+    \node[operation,below=0.25 of C,xshift=2em]  (P) {$\pi$};
+    \node[operation,below=0.25 of P,xshift=-4em]  (D) {$\delta$};
+    \node[operation,right=3em of D,yshift=-8pt]  (R) {$\rho$};
+    \draw[<-] (A.east) -- ++(east:2em);
+    \draw[->] (R.east) -- ++(east:2em);
+
+    \draw[->] (A) -- (D);
+    \draw[->] (A) -- (C);
+    \draw[->] (D) -- (R);
+    \draw[->] (C) -- (D);
+    \draw[->] (C) -- (P);
+    \draw[->] (P) -- (D);
+    \draw[->] (D) to[loop left] (D);
+  \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\end{document}

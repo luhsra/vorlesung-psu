@@ -7,16 +7,16 @@ class Fibonacci:
 
     def __iter__(self):
         return self
-
+    
     def __next__(self):
         a, b = self.acc
         self.acc = (a+b, a)
         return a
 
-fibs = Fibonacci()
-it   = iter(fibs)
+it = Fibonacci()
 print(next(it),next(it),next(it),
       next(it),next(it),next(it))
+
 #e0
 
 #s1
