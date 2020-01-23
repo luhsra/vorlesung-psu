@@ -1,0 +1,35 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    operation/.append style={rectangle},
+    ]
+
+    \node[operation] (loop){\textbf{loop}}
+      child{ node[operation] (inc){+=}
+        child { node[operand] {a} }
+        child { node[operand] {1} }
+      };
+
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[every op/.style={fill=operatorcolor}]
+    \begin{opAxis}
+      \opString{+=,+=,+=}
+
+      \node[fit=(instr-1) (instr-2) (instr-3),yshift=4em,operand,minimum size=0,inner sep=-0.5\pgflinewidth] (var) {a};
+      \draw[<->] (instr-3) -- (instr-3|-var.south);
+
+            \draw[<->] (instr-1) -- (instr-1|-var.south);
+      \draw[<->] (instr-2) -- node[rotate=10,ultra thick,node on layer=foreground,fill=safeyellow,draw=srared,align=center,visible on=<2>]{
+        Imperatives Programmieren\\==\\
+        "computation by side-effects"
+      } (instr-2|-var.south);
+
+    \end{opAxis}
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}
