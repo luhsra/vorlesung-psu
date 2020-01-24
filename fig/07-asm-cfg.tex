@@ -3,9 +3,15 @@
 \begin{frame}[fragile]
   \begin{tikzpicture}[
     bb/.style={align=left,font=\ttfamily,anchor=north west,
-      text width=2.8cm, onslide=<4->{draw,yshift=-1em}},
-    bb label/.style={bb,
-      label={[anchor=north east]north west:.#1:},name=#1}
+      text width=2.8cm, onslide=<4->{
+        draw,
+        yshift=-1em,
+        fill=operatorcolor,
+        label={[anchor=south east]south east:\textit{\scriptsize #1}},
+      },
+    },
+    bb label/.style={bb=#1,
+      label={[visible on=<-4>,anchor=north east]north west:.#1:},name=#1}
     ]
 
 \node[bb label=BB0]{
@@ -13,34 +19,34 @@
         cmp     ESI, 31\\
         jl      .BB3
       };
-\node[below=0 of BB0.south west,bb,onslide=<4->{xshift=1cm}](BB1){
+\node[below=0 of BB0.south west,bb=BB1,onslide=<5->{xshift=1cm}](BB1){
         mov     EAX, 3\\
         cmp     EDX, 14\\
         jl      .BB3
       };
-\node[below=0 of BB1.south west,bb,onslide=<4->{xshift=1cm}](BB2){
+\node[below=0 of BB1.south west,bb=BB2,onslide=<5->{xshift=1cm}](BB2){
   mov     EAX, 13
 };
-\node[below=0 of BB2.south west,bb label=BB3,onslide=<4->{xshift=-2cm}]{
+\node[below=0 of BB2.south west,bb label=BB3,onslide=<5->{xshift=-2cm}]{
         add     EAX, EAX\\
         inc     EDI\\
         jne     .BB3
       };
-\node[below=0 of BB3.south west,bb](BB4){
+\node[below=0 of BB3.south west,bb=BB4](BB4){
   ret
 };
 
-\begin{visible}<2-3>
+\begin{visible}<3>
   \draw[draw,srared,thick] (BB3.north west) -- (BB3.north east);
 \end{visible}
 
-\begin{visible}<3>
+\begin{visible}<2-3>
   \draw[draw,srared,thick] (BB0.south west) -- (BB0.south east);
   \draw[draw,srared,thick] (BB1.south west) -- (BB1.south east);
   \draw[draw,srared,thick] (BB3.south west) -- (BB3.south east);
 \end{visible}
 
-\begin{visible}<4>
+\begin{visible}<5>
   \draw[->] (BB0) -- (BB1);
   \draw[->] (BB1) -- (BB2);
   \draw[->] (BB2) -- (BB3);
@@ -51,6 +57,7 @@
 
 \end{visible}
 
+\node[anchor=north west, minimum width=5.5cm,minimum height=8cm]{};
 
     \end{tikzpicture}
   \end{frame}

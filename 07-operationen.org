@@ -797,7 +797,6 @@ Effizienz: Seiteneffekte
 
 * Vom Befehlsstrom zum Kontrollflussgraphen
 #+begin_src latex
-  %%ONLY%%
   \dividerframe{Kontrollflussgraphen}
   \begin{frame}{Kontrollflüsse am Beispiel}
     \textbf{Erinnerung}: \btSetTab -- Ein Kontrollfluss ist eine Sequenz von Operationen.\\
@@ -820,17 +819,16 @@ Effizienz: Seiteneffekte
     \begin{btBlock}{Definition: \structure{Basisblock} (BB)}
       Ein Basisblock ist eine Sequenz von Operationen.\\
       Einmal gestartet, wird die Sequenz \textbf{immer} komplett abgearbeitet.
-    \end{btBlock}\only<2>{\textbf{Enschuldigung} \btSetTab für die Definitionen, aber der CFG ist \\
-      \btUseTab die zweite \ALERT{zentrale Datenstruktur} des Übersetzerbaus.}\par
+    \end{btBlock}
     \bi
-    \ii<3-> Fakten für Basisblöcke, die aus den Definitionen folgen{
+    \ii<2-> Fakten für Basisblöcke, die aus den Definitionen folgen{
       \bi
       \ii Nur die erste Instruktion eines BB kann angesprungen werden
       \ii Nur die letzte Instruktion eines BB kann ein Sprung sein
       \ii Eine einzelne Operation ist ein \structure{minimaler Basisblock}
       \ei
     }\smallskip
-    \ii<4-> Fakten über den CFG, die aus den Definitionen folgen{
+    \ii<3-> Fakten über den CFG, die aus den Definitionen folgen{
       \bi
       \ii Können zwei BBs hintereinander ausgeführt werden, existiert eine CFG-Kante
       \ii \textbf{Aber:} Nicht jeder Pfad durch den CFG ist ein valider Kontrolfluss
@@ -840,7 +838,54 @@ Effizienz: Seiteneffekte
   \end{frame}
 
 
-  \begin{frame}{Basisblöcke}
-  
+  \begin{frame}[fragile]{Kontrollflussgraphen im Übersetzungsprozess}
+    \vspace{-1.5em}
+    \begin{columns}[t]
+ 
+      \begin{column}{0.49\textwidth}
+        \begin{onlyenv}<-7>
+        \bi
+        \ii Übersetzer: AST $\rightarrow$ CFG {
+          \bi
+          \ii CFG ist zentrale Datenstruktur
+          \ii Codeerzeugung: if,\ldots $\rightarrow$ \texttt{goto}
+          \ii Nur Sprünge (und \enquote{Durchfallen})
+          \ii Bereits nahe an realen Maschinen
+          \ei
+        } \medskip
+        \ii<2-> CFG-Struktur im Maschinencode{
+          \bi
+          \ii<3-> BB endet nach Sprüngen
+          \ii<4-> BB endet vor Sprungmarken
+          \ii<5-> BBs sind Instruktionssequenzen
+          \ii<6-> Kanten anhand von Sprüngen und beim Durchfallen.
+          \ei
+        }\medskip
+        \ii<7-> Vorteile des CFG vs. AST {
+          \bi
+          \ii Flachegeklopfte Hierarchie
+          \ii Nähe zum Maschinenmodell
+          \ii Optimierung durch Graphalgorithmen
+          \ei
+        }
+        \ei
+      \end{onlyenv}%
+      \begin{onlyenv}<8->
+        \begin{code}[tag=C]
+            \lstinputlisting[style=C,linerange=s0-e0]{lst/07-cfg.c}
+          \end{code}
+          \medskip
+
+        \Large \textbf{Nächste Vorlesung:}\\
+        \hspace{-1em}Codeerzeugung (AST$\rightarrow$CFG)
+        
+      \end{onlyenv}
+    \end{column}\hfill
+       \begin{column}{0.49\textwidth}
+        \uncover<2->{
+          \btAnimation[width=\textwidth]{raisebox,1:<1>,range=1-5:<2->,5:<7->}{fig/07-asm-cfg}
+        }
+      \end{column}
+    \end{columns}
   \end{frame}
 #+end_src
