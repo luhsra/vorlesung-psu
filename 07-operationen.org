@@ -560,7 +560,6 @@ Effizienz: Seiteneffekte
 #+end_src
 
 #+begin_src latex
-  %%ONLY%%
 
   \begin{frame}[fragile]{Verschiedene Formen der Selektion}
 
@@ -945,7 +944,7 @@ Effizienz: Seiteneffekte
           \bi
           \ii<3-> BB endet nach Sprüngen
           \ii<4-> BB endet vor Sprungmarken
-          \ii<5-> BBs sind Instruktionssequenzen
+          \ii<5-> \structure{Maximale Basisblöcke}
           \ii<6-> Kanten anhand von Sprüngen und beim Durchfallen.
           \ei
         }\medskip
@@ -975,5 +974,87 @@ Effizienz: Seiteneffekte
         }
       \end{column}
     \end{columns}
+  \end{frame}
+#+end_src
+
+#+begin_src latex
+  \begin{frame}{Einordnung des CFGs in die Vorlesung}
+    \includegraphics[page=2,width=\textwidth]{fig/01-overview-small}
+  
+  \end{frame}
+#+end_src
+
+#+begin_src latex
+  \begin{frame}[t]{Kontrollflussgraph auf mehreren Ebenen}
+    \setbeamercovered{still covered={\opaqueness<1->{0}},again covered={\opaqueness<1->{30}}}
+    \begin{center}
+      \OrangeBox{\textbf{Frage}: Beendet ein \texttt{call} den aktuellen Basisblock?}
+    \end{center}
+    \begin{columns}[t]
+      \begin{column}<2->{0.49\textwidth}
+        \ALERT{Nein}: Calls sind  Komplexbefehle
+
+        \centerline{$\Downarrow$}
+
+        \columntitle{Funktions-lokaler CFG}
+
+        \bii
+        \ii Nur Sprünge teilen einen BB
+        \ii CFG überdeckt nur eine Funktion
+        \ii Anwendung: lokalen Optimierungen\\[1ex]
+        \ii[$\Rightarrow$] Der \enquote{normale} CFG
+        \eii
+      \end{column}\hfill
+      \begin{column}<-5>{0.49\textwidth}
+        \ADVANTAGE{Ja}: Ein Call ist ein Jump
+
+        \centerline{$\Downarrow$}
+
+        \columntitle{Interprozeduraler CFG}
+        \bii
+        \ii Kante: \texttt{call}$\rightarrow$Aufgerufene Funktion
+        \ii Alle Blöcke aus allen Funktionen
+        \ii Whole-Program Analysis\\[1ex]
+        \ii[$\Rightarrow$] Der selten-verwandte CFG
+        \eii
+      \end{column}
+    \end{columns}
+
+    \bigskip\bigskip
+    \uncover<4->{
+      \btAnimation[width=0.8\textwidth]{center,1:<1-4>,2:<5-6>}{fig/07-icfg}
+    }
+    \smallskip
+  \end{frame}
+#+end_src
+
+* Zusammenfassung
+#+begin_src latex
+
+  \begin{frame}{Zusammenfassung: Operationen}
+    \bi
+    \ii \structure{Operationen} lesen Objekte, verarbeiten Daten und liefern Ergebnisse {
+      \bi
+      \ii \structure{Abhängigkeiten} zu anderen Operationen müssen zuerst ausgewertet werden
+      \ii \structure{Seiteneffekte}: Operation verändert ein Objekt oder eine Variable
+      \ii \structure{Auswertungsreihenfolge} bildet Operationen auf lineare Operationssequenz ab
+      \ei
+    }\medskip
+    \ii Sprachkonstrukte formen die möglichen \structure{Kontrolflüsse}{
+      \bi
+      \ii \structure{Sequenzierung} \btSetTab Operationen werden direkt hintereinander ausgeführt
+      \ii \structure{Invokation} \btUseTab Einschub einer Funktionsausführung, Komplexbefehl
+      \ii \structure{Selektion} \btUseTab Operationen durch dynamische Entscheidungen auslassen
+      \ii \structure{Iteration} \btUseTab Operationen wegen ihrer Seiteneffekte mehrfach ausführen
+      \ei
+    }\medskip
+    \ii \structure{Kontrollflussgraphen} überdecken die möglichen Kontrolflüsse {
+      \bi
+      \ii \structure{Basisblöcke} sind ununterbrochen Operationssequenzen
+      \ii \textbf{Ausblick}: Ergebnis der Codeerzeugung und Grundlage für die Optimierung
+      \ei
+    }
+    \ei
+  
   \end{frame}
 #+end_src

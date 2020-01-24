@@ -69,13 +69,11 @@
 
   \node[right=of object.north east,topic,principle, lecture=7,highlight on=4] (operation) {
     \Title{Operationen}\\
-    Standardkonstrukte\\
-    Auswertungsstrategie\\
-    Call-By-\{Val, Ref, Name, Need\}\\
-    Seiteneffekte\\
-    Verhaltenskomposition
+    Abhängigkeiten \& Seiteneffekte\\
+    Auswertungsreihenfolge\\
+    Selektion, Invokation, Iteration\\
+    Kontrollfluss(graphen)
   };
-
 
   \node[above=of type.north west,yshift=4mm,topic,paradigm,topic double,anchor=west, lecture=13,highlight on=7] (function) {
     \Title{Das Funktionale Paradigma}
@@ -146,25 +144,24 @@
     Entfernung toten Codes
   };
 
-  \node[right=1.5 of machine.north east,topic,lecture=11,highlight on=7] (runtime) {
-    \Title{Das Laufzeitsystem}\\
-    ELF und Linker\\
-    Dynamische Bibliotheken\\
-    Standardbibliotheken
-  };
+  % \node[right=1.5 of machine.north east,topic,lecture=11,highlight on=7] (runtime) {
+  %   \Title{Das Laufzeitsystem}\\
+  %   ELF und Linker\\
+  %   Dynamische Bibliotheken\\
+  %   Standardbibliotheken
+  % };
 
 
   \draw[->] (parsing) -- node[right]{AST} (semantic);
 
   \draw[->] (semantic) -- node[above,sloped]{AST} (intermediate);
 
-  \draw[<->] (opt)--  node[above]{IR}  (intermediate);
-  \draw[->] (intermediate) -- node[left]{IR} (machine);
+  \draw[<->] (opt)--  node[above]{CFG}  (intermediate);
+  \draw[->] (intermediate) -- node[left]{CFG} (machine);
 
 
-  \node[yshift=-1cm] at ($(machine.south west)!0.5!(runtime.south east)$) (bin) {\textsc{Binärprogramm}};
-  \draw[->] (machine.south) to[out=-90,in=180] (bin);
-  \draw[->] (runtime.south) to[out=-90,in=0] (bin);
+  \node[right=of machine.east] (bin) {\textsc{Binärprogramm}};
+  \draw[->] (machine) -- (bin);
 \end{scope}
 
 \end{tikzpicture}

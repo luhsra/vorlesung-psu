@@ -229,6 +229,9 @@
 % Misc
 \usepackage{convention} % texmf-local
 \newcommand{\advantage}[1]{\bgroup\color{safegreen!80!black}#1{\egroup}}
+\newcommand{\Advantage}[1]{\advantage{\textit{#1}}}
+\newcommand{\ADVANTAGE}[1]{\advantage{\textbf{#1}}}
+
 \newcommand{\dn}[2][]{\tikz[baseline]\node[anchor=base,circle,inner sep=1pt,draw,every dn/.try,#1]{#2};}
 \renewcommand{\iiad}{\ii[\color{safegreen}\textbf{+}]}  % advantage
 \renewcommand{\iida}{\ii[\color{safered}\textbf{--}]} % disadvantage
