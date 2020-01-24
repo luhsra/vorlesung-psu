@@ -560,6 +560,92 @@ Effizienz: Seiteneffekte
 #+end_src
 
 #+begin_src latex
+  %%ONLY%%
+
+  \begin{frame}[fragile]{Verschiedene Formen der Selektion}
+
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \columntitle{if--then--else}
+        \begin{code}[tag=C]
+          \begin{C}
+            if (cond) { /* then-block */ }
+            else      { /* else-block */ }
+          \end{C}
+        \end{code}
+
+        \bii
+        \ii Weitere Selektionen im else-block
+        \ii Oder: elif, elsif, else if, \ldots
+        \ii Manchmal auch Postfix-Notation:\\
+        \codeinline[style=ruby]{expr if cond} (Ruby)
+        \eii
+      
+      \end{column}\hfill
+      \begin{column}<3->{0.49\textwidth}
+        \columntitle{Short-Circuit Expression}
+        \begin{code}[tag=C]
+          \begin{C}
+            expr1 && expr2 && expr3;
+            expr4 || expr5 || expr6;
+          \end{C}
+        \end{code}
+
+        \bii
+        \ii Frühzeitiger Auswertungs-Abbruch, sobald der Wahrheitswert feststeht.
+        \ii \texttt{!expr1} $\Rightarrow$ Übersprung von expr2/3
+        \eii
+
+      \end{column}
+    \end{columns}
+    \bigskip
+
+    \begin{columns}[t]
+      \begin{column}<2->{0.49\textwidth}
+        \columntitle{cond}
+
+        \begin{code}[tag=Lisp]
+          \begin{lisp}
+            (cond
+              (cond1 expr1)
+              (cond2 expr2)
+              (cond3 expr3))
+          \end{lisp}
+        \end{code}
+
+        \bii
+        \ii Lineares Durchlaufen der Paare
+        \ii Kurzform der if-elsif-else Kaskade
+        \eii
+      
+      \end{column}\hfill
+      \begin{column}<4->{0.49\textwidth}
+        \columntitle{Switch/Case}
+
+        \begin{code}[tag=\scriptsize Rust]
+          \begin{rust}[style=smaller]
+            match number {
+               1          => println!("One"),
+               2 | 3 | 5  => println!("Two"),
+               13..=19    => println!("Range"),
+               _          => println!("Def"),
+            }
+          \end{rust}
+        \end{code}
+
+        \bii
+        \ii Verzweigungs-Auswahl am Wert
+        \ii Wertebereiche, Default-Verzweigung
+        \ii Effizient durch Sprungtabellen
+        \eii
+      \end{column}
+    \end{columns}
+
+  
+  \end{frame}
+#+end_src
+
+#+begin_src latex
   \begin{frame}{Rekursion: Invokation und Selektion}
     \begin{columns}[b]
       \begin{column}{0.49\textwidth}
@@ -589,6 +675,8 @@ Effizienz: Seiteneffekte
     \ei
   \end{frame}
 #+end_src
+
+
 ** Iteration: Wiederholte Ausführung
 #+begin_src latex
   \begin{frame}{Iteration: Dasselbe, immer wieder tun}

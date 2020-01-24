@@ -123,6 +123,15 @@
     moredelim=**[is][\color{orange}]{@@}{@@},
     moredelim=**[is][\color{srared}]{@@@}{@@@},
   }
+  \lstdefinestyle{lisp}{
+    style=basestyle,
+    language={Lisp},
+    moredelim=**[is][\bfseries]{`}{`},
+    moredelim=**[is][\slshape]{``}{``},
+    moredelim=**[is][\btHL]{@}{@},
+    moredelim=**[is][\color{orange}]{@@}{@@},
+    moredelim=**[is][\color{srared}]{@@@}{@@@},
+  }
   \lstdefinestyle{ASM}{
     style=basestyle,
     mathescape=false,
@@ -265,7 +274,7 @@
 \forcsvlist\addLangEnv{%
   C/C,pascal/pascal,JS/JS,haskell/haskell,java/java,%
   ada/ada,codetext/text,rust/rust,CPP/CPP,py/py,lzero/lzero,asm/ASM,
-  sharpc/sharpc,ruby/ruby,fortran/fortran
+  sharpc/sharpc,ruby/ruby,fortran/fortran,lisp/lisp
 }
 
 

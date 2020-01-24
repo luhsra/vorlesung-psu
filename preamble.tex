@@ -91,6 +91,10 @@
   \renewcommand{\insertframenumber}{\theframenumber}
   \renewcommand{\InsertFrameNumber}{\insertframenumber}
 
+  \newcommand{\columntitle}[1]{
+    {\centering\structure{\strut #1}\par}
+  }
+
 
   \newcommand{\animation}[3][]{%
   \foreach \p/\s in {#2} {%
