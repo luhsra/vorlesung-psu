@@ -1,0 +1,43 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    bb/.style={align=left,font=\ttfamily,anchor=north west,
+      text width=2.8cm,
+      draw,
+      fill=operatorcolor,
+      label={[anchor=south east]south east:\textit{\scriptsize #1}},
+    },
+    bb label/.style={
+      label={[anchor=north east,inner ysep=0]north west:#1:}}
+    ]
+    
+    \node[alt=<1>{bb=BB0}{bb=BB0.1},bb label=foo] (BB0){
+      mov     EAX, 1\\call bar
+      \only<1>{\\inc EAX\\ret}
+    };
+
+    \node[bb=BB10,right=2.5 of BB0.north east,anchor=north west,bb label=bar,fill=badbee!40] (BB10) {
+      inc EAX\\
+      ret
+    };
+    
+    \begin{visible}[
+      local/.style={ultra thick, luhblue,->},
+      global/.style={ultra thick, safegreen,->},
+      ]<2->
+    \node[bb=BB0.2,below=2 of BB0.north] (BB1){
+      inc EAX\\ret
+    };
+    \draw[local] (BB0) -- (BB10);
+    \draw[local] (BB10) to[in=50,out=-90] (BB1);
+    \draw[global] (BB0) -- (BB1);
+
+    \draw[local] (BB10.south west)++(down:1.3cm) -- ++(east:1cm)  node[right,black]{Funktions-lokaler CFG};
+    \draw[global] (BB10.south west)++(down:1.9cm) -- ++(east:1cm) node[right,black]{Interprozeduraler CFG};
+    \end{visible}
+
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}
