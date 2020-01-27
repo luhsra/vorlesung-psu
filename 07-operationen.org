@@ -92,35 +92,74 @@ Effizienz: Seiteneffekte
 
 #+end_src
 
-* Einfache Operationen
+In dieser Vorlesung widmen wir uns wieder einem der essentiellen Konzepten von Programmiersprachen:
+*Operationen*.
+Im Rahmen unserer Betrachtungen, sind die Operationen der letzte Baustein um verschiedenste Programmiersprachen und Programmierparadigmen einheitlich fassen zu können.
+Für ihr geistiges Modell: Denken sie sich zunächst bei "Operation" einfach "Addition". Wir werden später auf komplexere Operationen kommen.
 
-#+begin_src latex
+So wie Typen und Namen ein zusammengehöriges Konzeptpaar sind (beide werden in der semantischen Analyse verbunden), so gehören auch Objekte und Operationen zusammen; sie sind zwei Seiten der Medaille "Laufzeitverhalten" des Programms.
+Wo Objekte die passiven Träger der Information sind, sind die Operationen die aktiven Verarbeiter dieser Informationen.
+Um bei der Addition zu bleiben: Die Objekte ~2~ und die ~3~ werden von der Operation "Addition" auf das Objekt ~5~ abgebildet.
+
+Für die Einordnung in die Vorlesung müssen Sie sich vor Augen führen, wie eng "Operationen" mit Übersetzern zusammenhängen:
+In der ersten Vorlesung habe ich ihnen das geschichtete Maschinenmodell näher gebracht.
+Dort haben wir gesagt, dass es für jede Ebene ein virtuelles Maschinenmodell, als eine Kombination aus Objekten und Operationen, gibt.
+Ein Programm für dieses Maschinenmodell, ist eine, von uns mühsam erarbeitete, Ansammlung von Operationen, welche auf den Objekten ausgeführt werden soll.
+Der Übersetzer, als ein Prozessor dieser Programme, nimmt diese virtuellen Operationen und bildet sie auf Operationen der darunter-liegende Schicht ab.
+Da unsere real-existierenden Maschinen sequentiell sind, bedeutet das für Programmiersprachen-Übersetzer, dass wir die im AST angeordneten Operationen in einen (hauptsächlich linearen) Strom von realen Operationen abbilden müssen.
+
+Aber zurück zu den Operationen selbst.
+Diese können wir über ihre Schnittstelle und ihre Verhalten beschreiben.
+An der Schnittstelle hat jede Operation *Quelloperanden* und *Zieloperanden*, aus denen bzw.
+in welche die verarbeiteten Daten fließen.
+Da in unserem Modell alle Informationen in Objekt gespeichert werden, sind die Operanden Objekte, welche Daten liefern bzw.
+aufnehmen.
+Wenn es so aussieht, als würden Daten direkt zwischen zwei Operationen fließen, wie dies auf den Folien zwischen Addition und Zuweisung der Fall ist, so ist eigentlich ein implizites *temporäres Objekt* zwischengeschaltet, welches wir nur (normalerweise) der Übersichtlichkeit halber weg lassen. 
+
+Das Verhalten einer Operation zu fassen ist deutlich schwieriger als ihre Schnittstelle zu beschreiben.
+Eine Möglichkeit ist es eine Abbildungsvorschrift anzugeben, welche die Eingabedaten auf die gewünschte Ausgabe abbildet.
+Im Beispiel beschreiben wir die 32-Bit Addition so:
+Die Addition wertet zuerst ihre beiden Quelloperanden (LHS, RHS) aus, um an die darin enthaltenen Informationen (L, R) zu kommen.
+Diese beiden Zahlen addieren wir mit der Ganzzahl-Addition und beschneiden das Ergebnis auf 32-Bit mit der Modulo Operation. Das Ergebnis wird dem Zieloperanden zugewiesen.
+
+Im Folgenden werden wir uns nicht weiter mit Abbildungsvorschriften beschäftigen und uns auf eine informale, eher gefühlte, Verhaltensbeschreibung verlassen.
+Allerdings möchte ich noch erwähnen, dass formale Beschreibungen von Operationen eine wichtige Rolle bei der Verifikation von Hard- und Software sind, da wir dort ganz genau erfassen müssen, was eigentlich das Verhalten einer Operation ist.
+Nur so kann man bei der formalen Verifikation eines Programms zeigen, dass die Komposition mehrerer Operationen das gewünschte Verhalten zeigt.
+Sollten Sie etwas neugierig auf diesen Aspekt sein, kann ich ihnen das Papier zu Beschreibungssprache [[https://www.cl.cam.ac.uk/~pes20/sail/][SAIL]] auf der POPL 2019 [[http://dx.doi.org/10.1145/3290384]["ISA Semantics for ARMv8-A, RISC-V and CHERI-MIPS"]] von Armstrong et. al. empfehlen.
+
+
+* Operationen und Seiteneffekte
+:PROPERTIES:
+:CUSTOM_ID: 07-operation-dependencies
+:END:
+
+  #+begin_src latex
   \dividerframe{Einfache\\Operationen}
   \begin{frame}[fragile]{Arithmetische, Bit-weise und logische Operationen}
     \begin{center}
       {\Large \verb!+ - * / %     ~ & | ^ << >>  < <= == => >!}
-      \OrangeBox<2->{Notation, Vorrang und Assoziativität wird vom Parser aufgelöst.}
+      \OrangeBox<2-|handout:2>{Notation, Vorrang und Assoziativität wird vom Parser aufgelöst.}
     \end{center}
     \def\op{\textit{op}}
     \def\codebox#1{\Colorbox{codecolor}{\scriptsize\texttt #1}}
     \setbeamercovered{still covered={\opaqueness<1->{0}},again covered={\opaqueness<1->{30}}}
     \bi
-    \ii<-2> \structure{Notationen} in unterschiedlichen Sprachen {
+    \ii<-2|handout:1> \structure{Notationen} in unterschiedlichen Sprachen {
       \bi
       \ii Prefix: \codebox{\op{} A B} oder \codebox{\op(A,B)} oder \codebox{(\op{} A B)} \hfill Lisp, Scheme
       \ii Infix:  \codebox{A \op{} B}  \hfill C, C++, Java, \ldots
       \ii Postfix: \codebox{A B \op}   \hfill Forth, PostFix
       \ei
     }\medskip
-    \ii<-2> \structure{Vorrang} (Precedence): Bindet Multiplikation stärker als Addition?\\{
+    \ii<-2|handout:1> \structure{Vorrang} (Precedence): Bindet Multiplikation stärker als Addition?\\{
       \codebox{1*2+3*4} $\rightarrow$ \btSetNamedTab{\first}\codebox{(1*2)+(3*4)} (14) \hspace{1em} \btSetNamedTab{\second} $\vee$ \hspace{1em}  \codebox{1*(2+3)*4} (20)
     }\medskip
-    \ii<-2> \structure{Assoziativität}: Wird links oder rechts geklammert? \\{
+    \ii<-2|handout:1> \structure{Assoziativität}: Wird links oder rechts geklammert? \\{
        \codebox{1-2-3-4} $\rightarrow$ \first\codebox{(((1-2)-3)-4)} (-8)  \second $\vee$\hspace{1em} \codebox{1-(2-(3-4))} (-2)
      }
     \ei
     \bi
-    \ii<3-> \ALERT{Wichtige} Eigenschaften dieser Operationen {
+    \ii<3-|handout:2> \ALERT{Wichtige} Eigenschaften dieser Operationen {
       \bi
       \ii Quelloperanden werden \alert{alle ausgewertet, bevor} die Operation ausgeführt wird
       \ii Keine \structure{Seiteneffekte} und genau ein \structure{temporäres Objekt} als Zieloperand
@@ -128,9 +167,30 @@ Effizienz: Seiteneffekte
     }
     \ei
   \end{frame}
+#+end_src
 
 
-  \begin{frame}{Auswertungsreihenfolge von einfachen Operationen}
+Zunächst beschäftigen wir uns mit *arithmetische, bit-weise und logische Operationen*, die in allen Programmiersprachen auftauchen, da wir ansonsten nichts ausrechnen können.
+Sie sind gewissermaßen die Brot- und Butteroperationen bei denen man nichts aufregendes erwarten darf.
+Sie haben einen (*unäre Operationen*) oder zwei (*binäre Operationen*) Quelloperanden und ein *tempräres Objekt* als Zieloperand.
+Für Ihre Schnittstelle und ihr Verhalten sind, nebst einiger kleiner Abweichungen, in allen Sprachen gleich und es gibt nur bei der Notation Unterschiede.
+
+
+Bei der Notation dieser "einfachen" Operationen gibt es drei Aspekte die wichtig sind: Wo steht die Operation in Verhältnis zu ihren Operanden? Welchen *Vorrang* hat diese Operation über andere Operationen beim Parsen? Und wird eine ungeklammerte Aneinanderreihung dieser Operationen Links- oder Rechts-Assoziativ geparst?
+All diese Fragen sind wichtig für die Syntax, werden aber vollständig von der Grammatik und vom Parser behandelt. Im AST sind all diese Fragen der Notation bereits geklärt und wir müssen uns nicht näher damit beschäftigen.
+
+Ich möchte nur noch kurz auf das "Wo steht die Operation" eingehen.
+Die meisten Programmiersprachen verwenden für die binären Operationen die Infix-Notation (~2+3~), da diese für Menschen natürlicher und leichter lesbar ist.
+Bei den unären Operationen verwendet man meist die Prefix-Notation (~!cond~, ~(-x)~).
+
+Da die notationellen Besonderheiten vom Parser aufgelöst werden, sind diese "einfachen" Operationen im Grunde langweilig.
+Aber es gibt zwei Aspekte, die dann wichtig werden, wenn wir Operationen behandeln, die sich anders verhalten.
+Zum einen werten die einfachen Operationen all ihre Operanden aus, bevor sie selbst zur Tat schreiten.
+Zum anderen haben die einfachen Operationen *keine Seiteneffekte* über ihr temporäres Zielobjekt hinaus.
+Verwerfen wir dieses temporäre Objekt, so hat eine Seiteneffekt-freie Operation keinen dauerhaften Einfluss auf den Zustand der Maschine.
+
+#+begin_src latex
+\begin{frame}{Auswertungsreihenfolge von einfachen Operationen}
     \bi
     \ii Semantische Lücke zwischen virtueller und realer Maschine {
       \bi
@@ -194,6 +254,35 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 
+Ein Programm besteht aus einer Menge an Operationen die in mit Hilfe der Sprachkonstrukte in eine logisch Beziehung (z.B.
+wenn-dies-dann-das) zueinander gesetzt werden.
+Die Extraktion dieser Strukturen ist das Parsen, welches den Abstrakte Syntaxbaum produziert.
+Jetzt haben wir bei der Übersetzung allerdings das Problem, dass die realen Maschinen keinen Baum abarbeiten können.
+Was wir haben sind sequentielle Maschinen, deren CPUs in einem einzelnen Zyklus genau eine Operation ausführen können.
+Wir müssen daher die Baumstruktur des ASTs *flachklopfen* um eine linearisierte Befehlssequenz zu erhalten, die wir mit unserem x86 oder ARM Prozessor ausführen können.
+
+Aber welche *Auswertungsreihenfolge* der Baumknoten sollen wir wählen?
+Auf der Folie sehen wir 4 Operationen mit insgesamt 5 Operanden, die in einem AST angeordnet sind.
+Auf der rechten Seite sehen wir 3 verschiedene Auswertungsreihenfolgen für die wir uns entscheiden können, diesen AST auf eine sequentielle Maschine abzubilden.
+Wir könnten uns zum Beispiel dazu entscheiden, die Kinder von ~*~ von links nach rechts, von rechts nach links oder irgendwie gemischt ab zu arbeiten, bevor wir mit den gesammelten Ergebnissen die Multiplikation durchführen.
+Diese drei Varianten sind alle valide und bei den meisten Sprachen kann der Übersetzer die Auswertereihenfolge der Kinder frei bestimmen[fn::Java ist hier eine Aufnahme, dort wird immer strikt von links nach rechts ausgewertet.].
+Diese Freiheit erlaubt dem Übersetzer eine Sequenz zu wählen, die von der CPU am schnellsten abgearbeitet wird.
+Generell gilt, dass Freiheiten bei der Auswertungsreihenfolge dem Übersetzer Möglichkeiten zur Optimierung an die Hand gibt; nur so kann er Operationen zusammenfassen und verschieben.
+
+Allerdings sind nicht alle Linearisierungen dieses Baums ein valides Programm.
+Bei den genannten dreien haben wir immer eine Post-Fix Besuchsreihenfolge angenommen, bei der die Kinder zuerst ausgewertet werden.
+Aber was würde eigentlich passieren, wenn wir die Multiplikation vor den drei Kind-Operationen ausführen wollen würden?
+Kurz gesagt: Das geht nicht bzw. es geht halt kaputt, weil die Multiplikation das Ergebnis der Addition, der Negation und des Bit-Shifts braucht.
+Wenn wir diese, etwas Umgangssprachlich umschriebene Situation etwas gewählter ausdrücken wollen würden, würden wir sagen: /"Die Multiplikation ist abhängig vom Ergebnis der Addition"/.
+Da real-existierende sequentielle Maschinen *nicht* in die Zukunft blicken können[fn::Wie schön wäre es doch nicht-deterministische Turing-Maschinen zu haben, die da viel flexibler sind.], folgt daraus direkt, dass die Addition vor der Multiplikation ausgeführt werden muss.
+
+Für die einfachen Operationen (arithmetisch, bit-weise, logisch) sind die Abhängigkeiten ganz einfach:
+Die Operation hängt von ihren jeweiligen Kindern ab, diese müssen also vorher ausgewertet werden; wir haben eine streng hierarchische Struktur von Abhängigkeiten.
+Wir werden im folgenden Unterkapitel Sprachkonstrukte kennen lernen, mit denen wir die Ausführungsreihenfolge über diese hierarchische Struktur hinaus formen können.
+Zum Beispiel indem wir sagen: Diese zwei Operationen müssen immer in dieser Reihenfolge ausgeführt werden (Sequenzierung:
+~op1 ; op2~).
+
+
 #+begin_src latex
   \begin{frame}{Die Zuweisungs-Operation (\texttt{:=})}
     \bi
@@ -205,10 +294,10 @@ Effizienz: Seiteneffekte
       \ei
       \btAnimation[height=1.5cm]{center,padding,1:<1->}{fig/07-lvalue}
     }
-    \ii<2-> Nicht jede Operation hat einen L-Wert \hfill (\codebox{char *c}){
+    \ii<2-> Nicht jede Operation hat einen L-Wert{
       \bi
-      \ii Konstanten (\codebox{1}, \codebox{"abc"}) haben keinen L-Wert\hfill\codebox{1 := 2}
-      \ii Temporäre Zwischenergebnisse haben keinen L-Wert             \hfill\codebox{c + 10 := 2}
+      \ii Konstanten (\codebox{1}, \codebox{"abc"}) haben keinen L-Wert\hfill\codebox{1   := 2}
+      \ii Temporäre Zwischenergebnisse haben keinen L-Wert             \hfill\codebox{a+b := 2}
       \ei
     }
     \ii<3-> Unterschied bei L-Werten zwischen Werte- und Referenzmodell{
@@ -216,22 +305,50 @@ Effizienz: Seiteneffekte
       \ii \structure{Referenzmodell}: Alles was eine Referenz speichern kann ist ein L-Wert\\
           Variablen, Array-Elemente und Felder.\\[0.5ex]
       \ii \structure{Wertemodell}: Alles was ein Objekt speichern kann ist ein L-Wert\\
-          zusätzlich: Dereferenzierung: \codebox{*(ptr)}, Referenzen: \codebox{char\& operator[](...)}
+          zusätzlich: Dereferenzierung: \codebox{*(ptr)}
       \ei
     }
     \ei
   \end{frame}
+  #+end_src
 
-  \begin{frame}{Seiteneffekte und Idempotenz}
+
+Eine Operation, bei der die Abhängigkeiten nicht so einfach sind, ist die *Zuweisungs-Operation*, für die ich hier die Notation ~:=~ verwende um eine deutliche Unterscheidung zur Vergleichs-Operation ~==~ zu machen.
+Ziel einer Zuweisung ist das Ergebnis einer Berechnung einer Variable, oder einem Objekt, zuzuweisen.
+Dafür hat die Zuweisungs-Operation zwei Operanden (rechte Seite/RHS und linke Seite/LHS) in denen sich die Asymmetrie des Informationsflusses wieder spiegelt.
+Die rechte Seite wird ausgewertet und dann der linken Seite zugewiesen. 
+
+Aus diese Asymmetrie folgt auch, dass die beiden Operanden auf unterschiedliche Weisen ausgewertet werden müssen[fn::Dies wird wichtig beim Übersetzerbau]. 
+Die rechte Seite wird als *R-Wert* (rvalue) ausgewertet, was bedeutet dass wir uns nur für das Ergebnis der Rechnung interessieren, unabhängig davon wie und wo dieses gespeichert wird.
+Die linke Seite wird als *L-Wert* (lvalue) ausgewertet. Dabei ist unser Ziel eine Speicheradresse zu erfahren, an die wir das Ergebnis ablegen sollen.
+Im Beispiel ~a := b~, wollen beim Auswerten der Variable ~b~ (als R-Wert) wissen was ihr Inhalt ist, beim Auswerten der Variable ~a~ (als L-Value) geht es um die Speicheradresse der Variable. 
+Gehen Sie noch einmal in sich, und wiederholen Sie: *"Zuweisungen werten ihre beiden Operanden asymmetrisch aus, bei der rechten Seite interessiert uns der Wert, bei der Linken ein Zielort für das Ergebnis"*.
+
+Die Unterscheidung beider Auswertungsarten wird noch deutlicher, wenn wir uns anschauen, dass nicht jede Operation/jeder Operand einen L-Wert hat:
+So haben Literale keinen L-Wert, da sie nicht wirklich an einem Ort gespeichert werden. Weisen wir einen C-Übersetzer an den Ausdruck ~1 = 2~ zu Übersetzen, so bekommen wir die Fehlermeldung /"error: lvalue required as left operand of assignment"/ um die Ohren gehauen. Und zurecht! Denn was sollte es denn bedeuten, wenn wir dem Literal 1 den Wert 2 zuweisen? Sollen ab jetzt alle Einsen im Programm zur Zwei werden? 
+
+Die selbe Fehlermeldung über einen fehlenden L-Wert bekommen wir, wenn wir einem temporären Ergebnisobjekt einer einfachen Operation etwas zuweisen wollen (~(a + b) = c~).
+Wir können für den Ausdruck ~a + b~ keine sinnvolle Antwort darauf geben, wo der Speicher des Ergebnisses liegt.
+Selbst wenn linke und rechte Seite vom typkompatibel sind, so hätte der Programmierer nichts davon, wenn dem temprären Objekt der Wert von c zugewiesen wird; es gibt keine Möglichkeit darauf später zuzugreifen.
+
+Welche Operationen als L-Wert ausgewertet werden können ist sprachabhängig.
+Der größte Unterschied in dieser Frage kommt aus der Entscheidung über Referenz- oder Wertemodell für Variablen.
+Beim *Referenzmodell für Variablen* gibt es keine separaten Zeiger- bzw.
+Referenzobjekte, die dem Benutzer zugänglich sind.
+Daher können nur Variablen, Feld-Zugriffe und Array-Zugriffe als L-Wert ausgewertet werden.
+Beim *Wertemodell* kommt zu diesen L-Werten noch die *Derefenzierung* hinzu.
+Während wir auf der rechten Seite dem Zeiger hinterherlaufen um den Wert aus zu lesen, schreiben wir auf der linken Seite an genau die diese Stelle das Ergebnis. 
+
+#+begin_src latex
+  \begin{frame}<handout:2,3>{Seiteneffekte und Idempotenz}
     \begin{btBlock}{}
       Die Zuweisungs-Operation hat den gewollten \structure{Seiteneffekt} den Zustand der virtuellen Maschine zu verändern.
     \end{btBlock}
 
     \bi
-    \ii \structure{Idempotenz}: Wiederholte Auswertung liefert immer dasselbe Ergebnis {
+    \ii \structure{Seiteneffekte}: Wirkung über ein temporäres Zielobjekt hinaus {
       \bi
-      \ii Operationen mit Seiteneffekten sind nicht \structure{idempodent}\hfill \codebox{i = i + 1}
-      \ii Rechnen und lesen (meistens) haben keine Seiteneffekte.
+      \ii Operationen sind nicht mehr \structure{idempodent}\hfill \codebox{i := i + 1}
       \ii Nur beobachtbare Seiteneffekte sind ein Problem (seiteneffektfreie Funktion)
       \ii Strikt-Funktionale Sprachen (Haskell): Verbot jeglicher Seiteneffekte 
       \ei
@@ -254,7 +371,37 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 
+Das mit der Asymmetrie zwischen linker und rechter Seite ist schon diffizil, aber es kommt noch schlimmer!
+Denn die Zuweisung-Operation ist der Inbegriff der *Seiteneffekt-behafteten Operation*.
+Wir führen Zuweisungen ja sogar ausschließlich wegen ihrer Seiteneffekte aus!
+Wir wollen den Zustand der virtuellen Maschine mit der Zuweisung ja ganz explizit verändern.
+
+Ich habe bereits angedeutet, dass eine Operation dann frei von Seiteneffekten ist, wenn sie ausschließlich einen temporäres Zielobjekt verändern.
+Wenn wir den gesamten Zustand der Maschine vor und nach der einer seiteneffektfreien Operation vergleichen, so gibt kommt nur ein einzelnes temporäres Ergebnisobjekt hinzu, der Rest des Speichers bleibt unverändert.
+Verwerfen wir das Ergebnis ist es als wäre nie etwas passiert. Dies bedeutet auch, dass wir die Operation immer und immer wieder direkt hintereinander ausführen können ohne das es zu einem anderen Ergebnis kommt; seiteneffektfreie Operationen sind immer *idempotent*.
+
+Ganz anderes sieht das bei Operationen mit Seiteneffekten aus.
+Dort wird nicht nur ein Ergebnis erzeugt, sondern der Speicher der Maschine verändert.
+Bei einer Zuweisung verändert sich der Informationsgehalt eines bereits vorher existierenden Objekts dauerhaft.
+Weisen wir der Variable a den Wert ~2~ zu, so wird der aktuelle Inhalt der Variable überschrieben (Informationsverlust!) und ist ab sofort, bis zur nächsten Zuweisung, 2. 
+Kommen in diese Situation noch Zeiger hinzu (Wertemodell!), so können Zuweisungen (~*ptr = 4~) schnell zu "magischen Fernwirkungen" kommen[fn:: Einstein hat die Quantentheorie damit abgelehnt, dass die "Spooky Actions at a Distance" die Relativitätstheorie verletzen würden. Tatsächlich tun Quanteneffekte dies allerdings nicht, da sie keine Informationen übertragen können.].
+Daher gibt es Programmiersprachen, die keine bzw. fast keine Operationen mit Seiteneffekten anbieten (z.B. Haskell). Dort findet der gesamte Informationsfluss über temporäre Zieloperanden statt. Haskell kennt keine Zuweisungen!
+
+Mit den Seiteneffekten der Zuweisung wird auch unsere Auswertungsreihenfolge schwieriger. Denn was passiert, wenn die Auswertung eines Operanden einen Seiteneffekt hat, auf den sich der andere Operand verlässt. In diesem Fall sollte der Übersetzer die Operanden tunlichst in der richtigen Reihenfolge auswerten, da ansonsten eine Verletzung der Abhängigkeiten vorliegt und das Programm nicht korrekt arbeitet.
+
+Im Beispiel sehen wir das zwei Zuweisungs-Operationen als Operanden für eine Addition benutzt werden.
+Semantisch bedeutet dies, dass die rechte Seite nicht nur der linken Seite zugewiesen wird, sondern zusätzlich als temporäres Objekt nach oben zur Addition fließt.
+Im Beispiel von ~(a := 2) + (b := a)~ kommt es zu gänzlich unterschiedlichen Ergebnissen wenn wir von links nach rechts oder von rechts nach links auswerten.
+Gibt die Sprache keine strikte Auswertereihenfolge vor, so können wir auch garnicht wissen für welche Variante sich der Übersetzer entscheiden wird und das Ergebnis des Programms wird *undefiniert*!
+
+Im folgenden werden wir Sprachkonstrukte kennen lernen, die es uns erlauben ein Programm so auf zu notieren, dass es nicht zu solche Uneindeutigkeiten kommt und dass die Auswertung des Programms entweder das eine (~a := 2; b := a~) oder das andere (~b := a; a := 2~) hat.
+Wir lösen die impliziten Abhängigkeiten auf, indem wir eine feste Ausführungsreihenfolge vorgegeben.
+
+
 * Sprachkonstrukte zur Kontrolle der Auswertungsreihenfolge
+:PROPERTIES:
+:CUSTOM_ID: 07-control-flow-constructs
+:END:
 
 #+begin_src latex
 \dividerframe{Kontrolle über die Auswertungsreihenfolge}
@@ -282,6 +429,9 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 ** Sequenzierung: Statements und Goto
+:PROPERTIES:
+:CUSTOM_ID: 07-sequencing
+:END:
 #+begin_src latex
   \begin{frame}[fragile]{Sequenzierung: Statements}
     \bi
@@ -398,6 +548,9 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 ** Invokation: Funktionsaufrufe
+:PROPERTIES:
+:CUSTOM_ID: 07-invocation
+:END:
 #+begin_src latex
   \begin{frame}{Invokation: Funktionsaufrufe}
     \bi
@@ -482,6 +635,9 @@ Effizienz: Seiteneffekte
   \end{frame}
 #+end_src
 ** Selektion: Bedingte Ausführung
+:PROPERTIES:
+:CUSTOM_ID: 07-selection
+:END:
 
 #+begin_src latex
   \begin{frame}{Selektion: Bedingte Ausführung}
@@ -677,6 +833,9 @@ Effizienz: Seiteneffekte
 
 
 ** Iteration: Wiederholte Ausführung
+:PROPERTIES:
+:CUSTOM_ID: 07-iteration
+:END:
 #+begin_src latex
   \begin{frame}{Iteration: Dasselbe, immer wieder tun}
     \bi
@@ -883,6 +1042,9 @@ Effizienz: Seiteneffekte
 #+end_src
 
 * Vom Befehlsstrom zum Kontrollflussgraphen
+:PROPERTIES:
+:CUSTOM_ID: 07-control-flow-graph
+:END:
 #+begin_src latex
   \dividerframe{Kontrollflussgraphen}
   \begin{frame}{Kontrollflüsse am Beispiel}

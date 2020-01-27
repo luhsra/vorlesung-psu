@@ -4,7 +4,7 @@
   \begin{tikzpicture}[
     level 1/.style={sibling distance=5em},
     level 2/.style={sibling distance=2.5em},
-    edge from parent/.style={draw,->},
+    operand/.append style={solid},
     ]
     \node[operation] {+}
        child { node[operation] (eq-1) {:=}

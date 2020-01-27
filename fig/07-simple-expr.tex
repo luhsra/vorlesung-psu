@@ -19,17 +19,18 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \begin{tikzpicture}[level 2/.style={sibling distance=2.5em},edge from parent/.style={->,draw}]
-    \node(mul)[operation=$\ast$] {}
-       child { node [operation=+] {} }
-       child { node [operation=-] {} }
-       child { node [operation=$\ll$] {} };
+  \begin{tikzpicture}[level 2/.style={sibling distance=2.5em}]
+    \node(mul)[operation=$\ast$] (a) {}
+       child { node [operation=+] (b) {} }
+       child { node [operation=-] (c) {} }
+       child { node [operation=$\ll$] (d) {} };
+
   \end{tikzpicture}
 \end{frame}
 
 
 \begin{frame}[fragile]
-  \begin{tikzpicture}[every op/.style={fill=operatorcolor,minimum width=2em}]
+  \begin{tikzpicture}[every op/.style={fill=operatorcolor,minimum width=2em}, dep/.style={densely dashed}]
     \begin{opAxis}
       \only<1>{\opString{+,-,$\ll$,$\ast$}}
       \only<2>{\opString{$\ll$,-,+,$\ast$}}
@@ -37,21 +38,21 @@
       \only<4>{
         \opString{$\ast$,+,-,$\ll$}
         \node[anchor=east,srared,inner sep=2pt] at (instr-1.east) {\Large\Lightning};
-        \draw[<-] (instr-2.north)+(down:1mm) -- ++(up:1mm) -| ($(instr-1.north)+(east:1ex)$) -- ++(down:1ex);
-        \draw[<-] (instr-3.north)+(down:1mm) -- ++(up:2mm) -| ($(instr-1.north)$) -- ++(down:1ex);
-        \draw[<-] (instr-4.north)+(down:1mm) -- ++(up:3mm) -| ($(instr-1.north)+(west:1ex)$) -- ++(down:1ex);
+        \draw[dep,<-] (instr-2.north)+(down:1mm) -- ++(up:1mm) -| ($(instr-1.north)+(east:1ex)$) -- ++(down:1ex);
+        \draw[dep,<-] (instr-3.north)+(down:1mm) -- ++(up:2mm) -| ($(instr-1.north)$) -- ++(down:1ex);
+        \draw[dep,<-] (instr-4.north)+(down:1mm) -- ++(up:3mm) -| ($(instr-1.north)+(west:1ex)$) -- ++(down:1ex);
       }
       \only<5->{
         \opString{+,-,$\ll$,$\ast$}
-        \draw[<-] (instr-3.north)+(down:1mm) -- ++(up:1mm) -| ($(instr-4.north)+(west:1ex)$) -- ++(down:1ex);
-        \draw[<-] (instr-2.north)+(down:1mm) -- ++(up:2mm) -| ($(instr-4.north)$) -- ++(down:1ex);
-        \draw[<-] (instr-1.north)+(down:1mm) -- ++(up:3mm) -| ($(instr-4.north)+(east:1ex)$) -- ++(down:1ex);
+        \draw[dep,<-] (instr-3.north)+(down:1mm) -- ++(up:1mm) -| ($(instr-4.north)+(west:1ex)$) -- ++(down:1ex);
+        \draw[dep,<-] (instr-2.north)+(down:1mm) -- ++(up:2mm) -| ($(instr-4.north)$) -- ++(down:1ex);
+        \draw[dep,<-] (instr-1.north)+(down:1mm) -- ++(up:3mm) -| ($(instr-4.north)+(east:1ex)$) -- ++(down:1ex);
         \only<6->{
           \draw ($(instr-1.south)+(up:1mm)$) node[circle,inner sep=3pt] (a){};
           \draw ($(instr-2.south)+(up:1mm)$) node[circle,inner sep=3pt] (b){};
           \draw ($(instr-3.south)+(up:1mm)$) node[circle,inner sep=3pt] (c){};
-          \draw[<->] (a) -- (b);
-          \draw[<->] (c) -- (b);
+          \draw[dep,<->] (a) -- (b);
+          \draw[dep,<->] (c) -- (b);
         }
       }
     \end{opAxis}
