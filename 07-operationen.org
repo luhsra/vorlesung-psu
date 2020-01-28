@@ -1071,7 +1071,7 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
 :CUSTOM_ID: 07-iteration
 :END:
 #+begin_src latex
-  \begin{frame}{Iteration: Dasselbe, immer wieder tun}
+  \begin{frame}<handout:2,3>{Iteration: Dasselbe, immer wieder tun}
     \bi
     \ii Operationen in \structure{Schleifen} werden wiederholt ausgeführt {
       \bi
@@ -1097,14 +1097,28 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
     \ii<4-> Wie oft wird der \structure{Schleifenkörper} (loop body) ausgewertet? {
       \bi
       \ii \structure{Logically-Controlled}: Wiederholung bis die Abbruchbedingung fehl schlägt
-      \ii \structure{Enumeration-Controlled}: Wiederholung für jedes jedes Element einer Aufzählung
+      \ii \structure{Enumeration-Controlled}: Wiederholung für jedes Element einer Aufzählung
       \ei
     }
     \ei
   \end{frame}
+#+end_src  
+
+Die letzte Klasse von Operationen, die wir uns anschauen wollen sind *Iterationen*.
+Iterationen, gemeinhin auch als Schleifen bekannt, führen ihren *Schleifenkörper* mehrfach hintereinander aus.
+Definierend für eine Iterations-Operation ist also, dass sie eine Operation als Schleifenkörper hat, die sequenziert mehrfach hintereinander ausgeführt werden kann.
 
 
-  \begin{frame}[fragile]{Logically-Controlled Loops}
+In der Regel gibt es keinen impliziten Datenfluss zwischen zwei Schleifeniterationen, sondern es werden die gleichen Operationen mit den gleichen Operanden, einfach immer und immer wieder ausgeführt.
+Ein Vorgehen, dass nur dann Sinn macht, wenn der Schleifenkörper Seiteneffekte hat; nur so können Daten zwischen den Durchläufen und zwischen der Schleife und dem Rest des Programms transportiert werden.
+Schleifen machen als in Sprachen ohne Seiteneffekten (Haskell) inhärent keinen Sinn!
+
+Im Beispiel ist die Veränderung der Variable ~a~ der Seitenkanal, der verwendet wird um Informationen zwischen den drei Durchläufen zu transportieren. Wir führen das Incrementieren mehrfach, durch weil es in jedem Durchlauf einen anderen Seiteneffekt gibt (~a := 1~, ~a := 2~, ~a := 3~,...).
+
+Wie oft der Schleifenkörper ausgeführt wird, hängt von der Art der Schleife und vom Zustand der Maschine ab. Also spalten Iterationen, ebenso wie Selektionen, den Kontrollfluss auf. Wie sich dies weiter auswirkt werden wir später sehen. Erstmal schauen wir uns die zwei groben Klassen von Iterations-Operationen an: *logisch-kontrollierte Schleifen* (logically-controlled) und *Aufzählungsschleifen* (enumeration-controlled).
+
+#+begin_src latex
+\begin{frame}[fragile]{Logically-Controlled Loops}
     \hspace{-1em}\vspace{-1.5em}\begin{columns}[t]
       \begin{column}{0.5\textwidth}
         \centering\structure{Test am Anfang}\\[1ex]
@@ -1172,6 +1186,40 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
     }
     \ei
   \end{frame}
+#+end_src
+
+Die einfachere Form der Schleife ist die logically-controlled loop.
+Bei diesen Schleifen wird der Schleifenkörper im Wechsel mit einer Bedingung ausgeführt.
+Schlägt die Bedingung fehl, so wird die Schleife beendet und der Programmablauf wird nach der Schleife fortgesetzt.
+Im Grunde ist dies ähnlich zu einer Selektion[fn::Ich möchte Sie niemals den Begriff ~if~-Schleife verwenden hören!], nur dass der Körper nicht nur einmal oder keinmal ausgeführt wird, sondern null bis unendlich oft.
+
+Die verschiedenen Formen von logisch-kontrollierten Schleifen unterscheiden sich darin, ob die Bedingung vor oder nach dem Körper ausgeführt wird.
+Dies hat zur Folge, dass die ~do {} while()~-Schleife in C ihren Körper immer mindestens einmal ausführt, während die ~while() {}~-Schleife ihren Körper auch ganz auslassen kann.
+
+In einigen Sprachen gibt es noch die komplexere Form der ~for(init ; cond ; next) {}~-Schleife.
+Obwohl diese oft dazu verwendet wird um über jedes Element einer Zahlenfolge zu iterieren, ist sie im Kern doch eine logisch-kontrollierte Schleife, da sie abgebrochen wird sobald der Test fehl schlägt.
+Dies wird klar, wenn wir die ~for(;;)~-Schleife in eine semantisch äquivalente While-Schleife übersetzen.
+So sehen wir, dass die Initialisierung (~init~) und die Schrittoperation (~next~) nur synaktischer Zucker sind die eine kompaktere Schreibweise erlauben.
+
+Zusätzlich gibt es auch noch die Möglichkeit Schleifenkörper auf halbem Wege abzubrechen. Die ~break~- und ~continue~-Operationen erlauben es uns den Test in die Mitte der Schleifenausführung zu packen:
+
+#+begin_src python
+  a = 0
+  while True:
+      a += 1
+      if a % 3 == 0:
+          print a
+          continue
+      if a > 50:
+          break
+      a *= 2
+#+end_src
+
+Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~break~ die ganze Schleife. Im Grunde sind beide Operationen spezialisierte ~goto~-Operationen,  die es uns erlauben die Schleifenausführung zu manipulieren und dabei sehr diszipliniert vor zu gehen.
+
+#+begin_src latex
+  
+  
 
   \begin{frame}[fragile]{Enumeration-Controlled Loops}
     \begin{columns}
@@ -1249,7 +1297,7 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
     \begin{columns}[t]
       \begin{column}<2->{0.49\textwidth}
         {\centering \structure{Iterator}\par}\smallskip
-        \begin{code}[tag=Python]
+        \begin{code}[tag=Python3]
           \lstinputlisting[style=py,linerange=s0-e0]{lst/07-iterator.py}
         \end{code}
       
@@ -1261,8 +1309,8 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
         \end{code}
 
         \bii
-        \ii \texttt{fib()} erzeugt Funktionsinstanz\\[0.5ex]
-        \ii Bei jedem \texttt{next(it)}:{
+        \ii \texttt{pairs()} erzeugt Funktionsinstanz\\[0.5ex]
+        \ii Bei jedem Schleifendurchgang:{
           \bi
           \ii \textbf{Fortsetzung} bis \codeinline[style=py]{yield}
           \ii Generator liefert einen Wert
@@ -1274,6 +1322,48 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
     \end{columns}
   \end{frame}
 #+end_src
+
+Die semantisch interessantere Variante von Schleifen sind die Aufzählungsschleifen.
+Diese operieren auf einer "Aufzählung von Werten", die eine Sequenz von Objekten erzeugt.
+Für jedes Objekt in der Aufzählung wird der Schleifenkörper einmal ausgeführt, wobei dieses Objekt über eine lokale Variable dem Schleifenkörper zugänglich gemacht wird.
+
+Diese Art von Schleifen ist deswegen semantisch reicher, weil sie ein Verständnis von Aufzählungen haben. Klar kann ich all das was eine Aufzählungsschleife kann auch mit einer logisch-kontrollierten Schleife erreichen. Aber ebenso kann ich alles was eine Invokation kann auch mit einem Sprung erreichen. Dennoch verwenden wir Funktionsaufrufe, weil diese semantisch reicher sind.
+
+Um Aufzählungsschleifen in einer Sprache zu haben, braucht die Sprache ein Verständnis davon bzw. eine Übereinkunft darin, was eigentlich so eine Aufzählung sein kann.
+Generell ist so eine Aufzählung eine *geordnete Sequenz von Objekten*; wir wollen die Elemente der Aufzählung ja schließlich in einer bestimmten Reihenfolge abarbeiten.
+Eine Aufzählung eines Listen-Objekts sind die Listenelemente in der Reihenfolge "von vorne nach hinten". Eine andere Aufzählung wäre die umgekehrte Reihenfolge.
+
+Aber nicht bei jeder Datenstruktur ist so definiert wie bei einer Liste. So ist die Aufzählung einer ungeordneten Menge (Python: ~set()~), erstmal egal. Für die Implementierung wird jedoch häufig eine Reihenfolge von der internen Ablage der Mengen-Elemente abgeleitet[fn::~std::set<T>~ ist intern als Rot-Schwarz-Baum gespeichert. Iterieren wir über die Elemente einer solchen Menge, bekommen wir diese in der Speicherreihenfolge].
+
+Ähnlich sieht es bei Bäumen aus, bei denen wir die Elemente des Baums in Prefix-, Infix-, Postfix-Reihenfolge abarbeiten können.
+Bietet ein Baum ein solche Aufzählungsschnittstelle an, könnten wir schreiben: ~for elem in tree.prefix_order():~.
+
+
+Sprachen die Aufzählungsschleifen besitzen, bieten dem Entwickler normalerweise eine Möglichkeiten eigene Arten von Aufzählungen zu definieren. Auf diese Weise könnten wir, zum Beispiel, die oben genannte Prefix-Order Schleife für unsere super-spezial-premium Baumklasse als Aufzählung definieren.
+Dazu wird die Aufzählung als ein *eigenständiges Objekt* instantiiert und von der Schleife abgearbeitet. Es gibt zwei Sorten von Iterationsobjekten, die das gleiche Ziel auf gänzlich unterschiedliche Weisen erreichen.
+
+Ein *Iterator* ist ein Objekt, dass eine eine ~next()~-Methode anbietet, die mit jedem Aufruf das nächste Element der Aufzählung erzeugt.
+Das Iterator-Objekt speichert in seinem internen Zustand an welcher Stelle der zu Grunde liegenden Datenstruktur wir gerade sind um das nächste Element zu errechnen.
+Die Aufzählungsschleife erzeugt also zum Beginn der Iteration ein Iterator-Objekt und ruft dann immer wieder ~next()~ auf bis die Aufzählung zu Ende ist.
+
+Im Beispiel sehen wir wie einen Iterator in Python, wo eine Aufzählungsschleife mittels ~for variable in enumeratable~ notiert wird. Für das Beispiel habe ich die Klasse ~FancyList~ erstellt, die von Liste erbt und nur dafür da ist unser eigenes Iterator-Objekt einzuschleusen. Wenn wir über eine solche ~FancyList~ iterieren wird die ~__iter__()~-Methode Aufgerufen, die ein neues ~PairIterator~-Objekt erzeugt, dem die Liste übergeben wird. Der Iterator kopiert sich zunächst die Liste weg, um bei jedem Aufruf von ~__next__()~ die ersten beiden Elemente zurück zu geben und aus seinem Zustand zu löschen. Führen wir den Code auf den Folien aus, so erhalten wir:
+
+#+begin_example
+[1, 2]
+[3, 4]
+#+end_example
+
+Die andere Variante eine Aufzählung zu definieren sind *Generatoren*, die auf den ersten Blick einem Iterator sehr ähnlich sind. Allerdings funktionieren Generatoren technisch sehr anders.
+Ein Generator ist eine Funktionsinstanz die auf halbem Wege seiner Ausführung pausiert wurde und widerholt fortgesetzt werden kann.
+Für Aufzählungsschleifen wird der Generator immer wieder ein Stückchen weiter laufen lassen um ein neues Element der Aufzählung zu generieren.
+
+Im Beispiel auf den Folien sehen wir einen Generator, der eine Liste ebenso paarweise abgeht, wie das der ~PairIterator~ macht.
+Das besondere am Generator ist das ~yield~-Statement.
+Erreicht der Kontrollfluss eines Generators dieses Statement, so wird der Operand von ~yield~ zurückgegeben und die Funktionsinstanz(!) an dieser Stelle pausiert. Sie können sich ~yield~ wie ein ~return~ vorstellen, nur dass der Kontrollfluss in der Zeile darunter fortgesetzt werden kann.
+Den Zustand, den der Generator braucht um zu wissen an welcher Stelle in der Aufzählung wir gerade sind, speichert er sich in seinen lokalen Variablen[fn::Ein Generator ist eine Funktionsinstanz, keine Funktion! Führen sie sich das vor Augen.].
+
+Um Generatoren noch besser zu verstehen, können sie zurück zum Kapitel über Function-Call Frames gehen{{{see(04-call-frames, Function-Call Frames)}}} und sich anschauen, wie Closures funktionieren. 
+Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noch ein Programmzähler gespeichert wird an dem die Closure fortgesetzt wird. 
 
 * Vom Befehlsstrom zum Kontrollflussgraphen
 :PROPERTIES:

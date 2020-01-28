@@ -1,32 +1,44 @@
 # coding: utf-8
 
 #s0
-class Fibonacci:
-    def __init__(self):
-        self.acc = (1, 1)
-
+class FancyList(list):
     def __iter__(self):
-        return self
-    
+        return PairIterator(self)
+
+class PairIterator:
+    def __init__(self, seq):
+        self.seq = seq[:]
+
     def __next__(self):
-        a, b = self.acc
-        self.acc = (a+b, a)
-        return a
+        if not self.seq:
+            raise StopIteration
+        ret = self.seq[0:2]
+        del self.seq[0:2]
+        return ret
 
-it = Fibonacci()
-print(next(it),next(it),next(it),
-      next(it),next(it),next(it))
-
+for pair in FancyList([1,2,3,4]):
+    print(pair)
 #e0
 
 #s1
-def fib():
-    a, b = 1, 1
-    while True:
-        yield a
-        a, b = (a+b, a)
+def pairs(seq):
+    i = 0
+    while i + 1 < len(seq):
+        yield seq[i:i+2]
+        i += 2
 
-it = fib()
-print(next(it),next(it),next(it),
-      next(it),next(it),next(it))
+for pair in pairs([1,2,3,4]):
+    print(pair)
 #e1
+
+
+def pairs(seq):
+    it = iter(seq)
+    try:
+        while True:
+            yield [next(it), next(it)]
+    except StopIteration:
+        pass
+
+for pair in pairs([1,2,3,4]):
+    print(pair)
