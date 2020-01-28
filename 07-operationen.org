@@ -770,7 +770,7 @@ Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit B
     \end{btBlock}
     \bigskip
     \bi
-    \ii<2-> \ALERT{Wichtiger} als Operationen zu reihen, ist es Operationen auszulassen {%
+    \ii<2-> \ALERT{Wichtiger} als Operationen zu reihen, ist es \textbf{Operationen auszuwählen} {%
       \bi
       \ii if-then-else--Operation (\texttt{ite}) wählt eine der Nachfolge-Operationen aus
       \ii Auswahl der nächsten Operation erfolgt anhand des \textbf{Programmzustandes}
@@ -801,7 +801,7 @@ Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit B
         \centering
         \structure{Normale Operationen}
       \end{column}\hfill
-      \begin{column}<5->{0.49\textwidth}
+      \begin{column}<5-|handout:5->{0.49\textwidth}
         \centering
         \structure{Selektion }
       \end{column}
@@ -823,7 +823,7 @@ Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit B
         \ii Reihenfolge der Kinder nicht zwingend
         \eii
       \end{column}\hfill
-      \begin{column}<5->{0.49\textwidth}
+      \begin{column}<5-|handout:5->{0.49\textwidth}
         \bii
         \ii Hängt \textbf{immer} von der Bedingung ab
         \ii Nur ein anderes Kind wird ausgeführt
@@ -838,6 +838,71 @@ Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit B
     \end{btBlock}
   \end{frame}
 #+end_src
+
+Durch den Sequenzoperator, Sprünge und Funktionsaufrufe können wir Operationen aneinander reihen.
+Allerdings ergibt sich dabei nur ein einziger Kontrollfluss.
+Dies bedeutet, dass es genau einen Pfad durch das Programm gibt und die Sequenz der Operation absolut klar ist, wenn wir uns den Programmtext anschauen.
+Funktionsaufrufe werden nur verwendet um Code wieder zu verwenden.
+Für die meisten Probleme ist allerdings nicht von vorne herein so klar, was zu tun ist.
+Es könnte zum Beispiel sein, dass wir erst anhand der Eingabedaten entscheiden wollen, was eigentlich zu tun ist.
+Solche *datenabhängigen Kontrollflüsse* können wir mittels Selektion ausdrücken.
+
+Der geläufigste Vertreter der *Selektions-Operatore* ist die Bedinung (~if-then-else~).
+Mit Hilfe eine Selektion ist es Möglich aufgrund eines Datenwerts zwischen zwei (oder mehr) Operationen zu wählen.
+Nur die ausgewählte Operation wird ausgewertet, alle anderen Operationen werden ausgelassen.
+Normalerweise sequenziert eine Selektion auch die Auswertung der Bedingung und die Auswertung der ausgewählten Operation[fn::"Der Then-Block wird direkt nach der Entscheidung ausgeführt und nicht irgendwann."].
+
+Mit der Selektion wird unser Programm schlagartig komplexer, denn es gibt jetzt nicht nur einen Pfad (=ein Kontrollfluss) durch das Programm, sondern die Menge der möglichen Pfade spaltet sich bei der Selektions-Operation.
+Im Beispiel sehen, dass die Selektion ~ite~ dazu führt, dass es zwei unterschiedliche Kontrollflüsse durch unser Programm gibt.
+Einmal folgt Beta, und einmal folgt Gamma auf unsere Selektionsoperation.
+Und noch besser:
+Diese Entscheidung wird abhängig vom Zustands der virtuellen Maschine getroffen.
+Dies erhöht die Mächtigkeit einer Sprache von "langweilig, linear und endlich" auf "geil, Turing-mächtig und schwer analysierbar".
+
+Wenn wir uns die Selektions-Operation anschauen, dann wirkt diese erstmal wie jede andere Operation auch, obwohl sie in ihrem Verhalten höchst besonders ist.
+Ganz ordinär können wir die stellvertretende ~ite~-Operation beschreiben als eine Operation mit 3 Operanden:
+Der erste Operand ist die Bedingung und vom Typ ~bool~.
+Der zweite und der dritte Operand sind eine beliebige andere Operation (Codeblock, Statement oder Expression), die wir wegen ihres Seiteneffekts oder ihres Rückgabwertes Willen ausführen möchten.
+
+*Aber*, ~ite~ ist eine besondere Operation, denn sie wertet nicht all ihre Kinder aus. Bei einfachen Operationen wird die eigentliche Berechung erst dann durchgeführt, wenn das Ergebnis von *allen* Kindern vorliegt; diese Operationen hängen von all ihren Kindern ab. Eine Selektion hängt nur von der Bedingung und der ausgewählten Operation ab, und sie führt auch nur diese beiden Kinder aus.
+Daher ist die Abhängigkeitstruktur der *ite*-Operation nicht vorgegeben, sondern tritt erst zur Laufzeit zutage und ist Daten-sensitiv. 
+
+Eine direkte Folge aus dieser Besonderheit ist, dass es ihnen in einer imperativen Programmiersprache nicht möglich ist eine Funktion ~ite(Cond, Then, Else)~ zu schreiben, die sich ganz genauso verhält wie das Programmkonstrukt ~ite~. Überlegen Sie sich anhand des folgenden Beispiels, was der Unterschied ist:
+
+#+begin_src python
+  def ite(Cond, Then, Else):
+      # Wir implentieren das jetzt mal mit and/or damit Sie nicht von
+      # der Implementierung abgelenkt sind. Ignorieren sie einfach die
+      # folgende Zeile und denken Sie sich: Hier passiert Magie um die
+      # es gerade nicht geht.
+      return (Cond and Then) or (not Cond and Else)
+
+  ################################################################
+  # Es Verhält sich schon ähnlich
+  a = ite(1+1 == 2, 3, 4)
+  if 1+1 == 2:
+      b = 3
+  else:
+      b = 4
+  print "Erste Ausgabe:", [a, b]
+
+  ################################################################
+  # Aber halt dann doch nicht wirklich
+  def side_effect(a):
+      print "Side-Effect:", a
+      return a
+
+  a = ite(1+1 == 2, side_effect(3), side_effect(4))
+  print "------"
+  if 1+1 == 2:
+      b = side_effect(3)
+  else:
+      b = side_effect(4)
+
+  print "Zweite Ausgabe:", [a, b]
+#+end_src
+
+Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen auswertet, die Selektion ~if-else~ aber nur die Bedingung und den ausgewählten Ast. Diese Erkenntnis, dass Selektionen sehr besondere Operationen sind, wurde schon sehr früh von McCarthy, dem Erfinder von Lisp, und seiner Forschungsgruppe gemacht. Die Gruppe hat damals versucht einen möglichst minimalen Lisp-Interpreter zu schreiben. Und sie haben fieberhaft versucht den Ausdruck ~(if cond then else)~ anders auszudrücken ohne einen Sonderfall in ihrem Interpreter dafür zu schaffen. Stellte sich heraus: Dies ist prinzipiell nicht möglich! Bedingungen sind besonders!
 
 #+begin_src latex
 
@@ -923,6 +988,8 @@ Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit B
   
   \end{frame}
 #+end_src
+
+Auf dieser Folie zeige ich ihnen einige Arten von Selektions-Operationen, die sie in unterschiedlichen Sprachen in unterschiedlichen Notationen wieder finden werden.
 
 #+begin_src latex
   \begin{frame}{Rekursion: Invokation und Selektion}
