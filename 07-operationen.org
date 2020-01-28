@@ -414,10 +414,10 @@ Wir lösen die impliziten Abhängigkeiten auf, indem wir eine feste Ausführungs
     \bi
     \ii \textbf{Ausgangspunkt} und geistiges Modell für die folgenden Folien {
       \bi
-      \ii<2-> \textbf{Gegeben}: Menge von Operationen mit Seiteneffekten \hfill($\alpha, \beta,\gamma, \ldots$)
+      \ii<2-> \textbf{Gegeben}: Operationen (mit und ohne) Seiteneffekt \hfill($\alpha, \beta,\gamma, \ldots$)
       \ii<3-> Die Operationen hängen implizit voneinander ab             \hfill (gestrichelt)
       \ii<4-> Sprachmittel geben Reihenfolge und Vorrang explizit vor    \hfill(durchgezogen)
-      \ii<5->  \textbf{Ziel}: \btSetTab Eine wohldefinierte Auswertungsreihenfolge, welche die\\
+      \ii<5-|handout:5->  \textbf{Ziel}: \btSetTab Eine wohldefinierte Auswertungsreihenfolge, welche die\\
                               \btUseTab Abhängigkeiten erfüllt\\[2ex]
       \begin{center}
         \includegraphics[height=2cm,page=5]{fig/07-dependency-model}
@@ -428,6 +428,25 @@ Wir lösen die impliziten Abhängigkeiten auf, indem wir eine feste Ausführungs
   
   \end{frame}
 #+end_src
+
+Um die verschiedenen Sprachkonstrukte und ihre Auswirkung auf die Auswertereihenfolge zu verstehen, müssen wir uns zunächst ein genaueres geistes Modell vor Augen führen.
+Das Modell beginnt damit, sich einen Entwickler vorzustellen, der mit der Aufgabe konfrontiert ist ein Programm für ein gewisses Problem zu entwickeln.
+Beim Nachdenken über dieses Problem tauchen in seinem Geist verschiedene Operationen (mit und ohne Seiteneffekte) aus, die abgearbeitet werden müssen um das Problem zu lösen.
+Im Modell ist es egal, welcher Art diese Operationen sind, weswegen ich sie mit griechischen Buchstaben abstrahiere.
+
+Beim Ordnen dieser Menge von Operationen fällt dem Entwickler auf, dass die Operationen, zum Beispiel über Seiteneffekte, voneinander abhängen.
+So muss die Operation Alpha vor der Operation Gamma ausgeführt werden; die Reihenfolge von Alpha und Beta ist egal.
+Der Entwickler wählt nun Sprachkonstrukte  aus um die Auswertungsreihenfolge der Operationen so zu formen, dass die Abhängigkeiten in jedem Fall erfüllt sind; egal welche Optimierungen der Übersetzer anweden wird.
+
+Der Übersetzer extrahiert diese Vorgaben über die Reihenfolge der Operationen aus dem Programmtext mittels Parsing und erzeugt eine Operationssequenz für die reale Maschine, die kompatibel ist mit der Regeln der Sprache und der kundgetanen Intention des Entwicklers.
+Diese linearisierte Operationssequenz wird dann von der sequentiellen Maschine ausgeführt.
+
+Im folgenden werden wir uns mit 4 Klassen von Sprachkonstrukten beschäftigen, mit denen diese Modellierung der Auswertungsreihenfolge erfolgt.
+Sie kennen all diese Konstrukte natürlich bereits (Bedingungen, Schleifen).
+Ich möchte Sie jedoch dazu anhalten, bei jedem Teilabschnitt einen Schritt zurück zu gehen von den Konstrukten, die Sie bereits kennen, und zu fragen:
+*Welche Konstrukte sind auf einer abstrakteren Ebene ähnlich zueinander?* Ziel dieser Übung ist es, Sie darin zu schulen diese Frage bei jedem neuen Konstrukt, dem Sie begegnen, erneut zu stellen.
+Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller ein effektiver Entwickler für die aktuelle Hype-Sprache zu werden.
+
 ** Sequenzierung: Statements und Goto
 :PROPERTIES:
 :CUSTOM_ID: 07-sequencing
@@ -547,6 +566,9 @@ Wir lösen die impliziten Abhängigkeiten auf, indem wir eine feste Ausführungs
 
   \end{frame}
 #+end_src
+
+
+
 ** Invokation: Funktionsaufrufe
 :PROPERTIES:
 :CUSTOM_ID: 07-invocation
@@ -634,6 +656,8 @@ Wir lösen die impliziten Abhängigkeiten auf, indem wir eine feste Ausführungs
   
   \end{frame}
 #+end_src
+
+- [ ] FIXME: Datenfluss bei Argumenten
 ** Selektion: Bedingte Ausführung
 :PROPERTIES:
 :CUSTOM_ID: 07-selection
