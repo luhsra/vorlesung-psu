@@ -501,7 +501,7 @@ Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller
     \end{columns}
   \end{frame}
 
-  \begin{frame}[fragile]{Unterscheidung zwischen Expressions und Statements}
+  \begin{frame}[fragile]{Unterscheidung zwischen Ausdrücken und Statements}
     \OrangeBox{Die meisten Sprachen treffen diese Unterscheidung}\medskip
 
     \bi
@@ -520,7 +520,7 @@ Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller
       \ii Werden in Code-Blöcken bzw. Compound-Statements zusammengefasst.
       \ei
     }\medskip
-    \ii<2-> Manche Operationen haben eine Expression- und eine Statement-Form\\
+    \ii<2-> Manche Operationen haben eine Ausdrucks- und eine Statement-Form\\
     C: \codeinline{if (cond) { then_block } else { else_block}}\hfill%
     \codeinline{ cond ? then_expr : else_expr}
 
@@ -529,8 +529,63 @@ Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller
   \end{frame}
 #+end_src
 
+
+Das erste Klasse von Sprachkonstrukten, die wir uns ansehen, haben Sie wahrscheinlich bisher noch nicht einmal als wirkliche Konstrukte wahrgenommen. Sie sind so sehr Teil von Programmierung, dass sie ihre Existenz in einer Sprache uns beinahe als gegebenes Naturgesetz vorkommen mag[fn::Es ist selten so, dass irgendetwas in einer Programmiersprache ein Naturgesetz ist. Sehr, sehr selten.]. Ich rede von der *Sequenzierung von Operationen*.
+
+Bei der Sequenzierung, nehmen wir zwei Operationen und legen fest, dass die eine Operation vor bzw. nach der anderen ausgeführt werden muss; Wir drücken eine feste Auswertungsreihenfolge aus.
+Da Sequenzierungen sehr nah an dem sind wie die reale Maschinen arbeiten, können durch-sequentialisierte Programme, bei denen alles geordnet ist, einfach übersetzt werden.
+Daher waren die ersten Programmiersprachen, die die Informatik entwickelt hat, die *imperativen Sprachen*.
+
+Zu Sequenzierung haben wir zwei grundlegende Konstrukte:
+Den *Sequenzoperator* und den *unbedingten Sprung* (~goto~).
+
+Der *Sequenzoperator*, der in Java mit dem Semikolon notiert wird, hat zwei Operanden, die jeweils Operationen sind und die wir *Statements* nennen.
+Bei der Ausführung wird das linke Statement vor dem rechten Statement ausgeführt; die Auswertungsreihenfolge ist starr.
+Um die Semantik "von links nach rechts" aufrecht zu erhalten, muss der Sequenzoperator rechts-assoziativ geparst werden bzw.
+die Statements in einer Liste gespeichert werden.
+Aus ~A; B; C;~ wird in Prefix-Form ~seq(A, seq(B, C))~ bzw.
+~seq([A, B, C])~.
+Eine Sequenz von Statements nennen wir auch *Block*, *Code-Block*, oder *Compound Statement*.
+
+Wenn wir Operationen sequenzieren, geben wir die Auswertungsreihenfolge ganz genau vor, womit wir häufig eine Überapproximation der tatsächlichen Abhängigkeiten erreichen.
+Das Programm ist also häufig strikter geordnet als die Abhängigkeiten dies verlangen würden.
+
+
+Wie mit den Ergebnissen der Statements umgegangen wird ist unterschiedlich und manche Sprachen bieten sogar unterschiedliche Sequenzierungsoperatoren.
+So gibt es in C/C++ die "normale" Sequenzierung mit dem Semikolon, bei dem alle Rechenergebnisse der Statements verworfen werden[fn::Wir führen die Statements nur um ihrer Seiteneffekte aus.].
+Zusätzlich gibt es aber noch den Komma-Operator, der deutlich unbekannter ist, bei dem die Statements ebenfalls in dieser Reihenfolge ausgeführt werden, aber das Ergebnis des letzten Statements zum Rückggabewert der gesamten Sequenz wird.
+So liefert ~1+3, 4+5, 1+1~ den Wert 2.
+
+In der Skriptsprache Ruby ist die Rückgabe des letzten Statement-Ergebnisses das Standardverhalten.
+In Ruby werden Statements durch das Neue-Zeile-Zeichen (~\n~) oder durch den Semikolon sequenziert.
+Durch die Rückggabe des letzten Ergebnisses kann ein explizites ~return~ an vielen Stellen vermieden werden:
+
+#+begin_src ruby
+  def foo(a)
+    (a + 4) * 10
+  end
+#+end_src
+
+Versuchen Sie nun nach zu vollziehen, wieso die Variable ~a~ auf den Folien am Ende der Zuweisung den Wert 10 hat.
+
+Sequenzierung und der Umgang mit Rückggabewerten führt in den meisten Programmiersprachen zu einer Unterscheidung der Operationen in *Statements* und in *Ausdrücke*.
+Jede Operation, die bei der Auswertung einen Rückggabewert liefert ist ein Ausdruck (oder auch Expression).
+Daher müssen Ausdrücke in statisch typisierten Sprachen einen Rückggabetyp haben.
+Da sie einen Wert liefern, können sie als Operanden für andere Operationen dienen. 
+Alle arithmetischen, bit-weisen und logischen Operationen sind Ausdrücke!
+
+Statements dagegen haben *keinen Rückggabewert* und können daher nicht an beliebigen Stellen als Operanden auftauchen.
+Statements dienen lediglich der Strukturierung und der Sequenzierung des Programms und sie treten als Operanden von Sprachkonstrukten auf.
+So hat eine Bedingung ein bzw.
+zwei Statements als Operand (then- und else- Block).
+
+Diese Unterscheidung von Ausdrücken und Statements führt dazu, dass es manche Sprachkonstrukte in einer Ausdrucks- und einer Statement Variante gibt.
+Bei der Ausdrucksform für Bedingungen in C (~cond ? then_expr : else_expr~) wird anhand der Bedingung geprüft welcher Ausdruck ausgewertet werden soll um ein Ergebnis zu liefern.
+Folge der Wert-Rückggabe ist, dass der Rückggabetyp von ~then_expr~ und ~else_expr~ gleich sein muss.
+Bei der Statement-Form ist die Typisierung egal.
+
 #+begin_src latex
-  \begin{frame}{Sequenzierung: Goto}
+\begin{frame}{Sequenzierung: Goto}
     \bi
     \ii Ein \structure{unbedingter Sprung} verbindet syntaktisch entfernte Statements {
       \bi
@@ -552,7 +607,7 @@ Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller
     \medskip
 
     \bi
-    \ii<5-> Nachfolge-Operation einer Operation wird explizit und statisch benannt {
+    \ii<5-|handout:5-> Nachfolge-Operation einer Operation wird explizit und statisch benannt {
       \bi
       \ii Sprünge erlauben es Sequenzen zusammen zu stückeln
       \ii (Endlos laufende) Schleifen sind nun möglich \hfill \textit{Rückwärtssprünge}
@@ -560,13 +615,30 @@ Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller
     }
     \ei
 
-    \begin{btBlock}<6->{Definition: Kontrollfluss \hfill \textit{(vgl. mit Kontrollwerk der CPU)}}
+    \begin{btBlock}<6-|handout:5->{Definition: Kontrollfluss \hfill \textit{(vgl. mit Kontrollwerk der CPU)}}
       Ein Kontrollfluss ist eine \textbf{konkrete} Sequenz von Operationen, die hintereinander ausgeführt werden.
     \end{btBlock}
 
   \end{frame}
 #+end_src
 
+Die zweite Form der Sequenzierung ist der *unbedingte Sprung*.
+Um springen zu können, müssen wir Operationen mittels Sprungmarken benennen (Folie: Beta hat das Label L1).
+Der unbedingte Sprung (~goto~) ist ein /Statement/, das eine Sprungmarke als Operand hat und das die Auswertung der aktuellen Sequenz abbricht und an der benannten Operation fortsetzt.
+
+
+Mit dem unbedingtem Sprung ist es möglich Sequenzen die textuell weit auseinander liegen hintereinander aus zu führen bzw.
+die eine Sequenz in die Ausführung der anderen Sequenz *einzuschieben*.
+Da die Sprungmarken allerdings in den meisten Sprachen statisch angegeben werden müssen (als Literale im Code), ist dieses aneinander-stückeln von Sequenzen sehr statisch.
+
+Mit dem unbedingten Sprung haben wir auch unsere erste Möglichkeit erhalten Operationen mehrfach auszuführen. Springen wir am Ende einer Sequenz wieder an den Anfang, etwas das wir Rücksprung nennen, führen wir die Sequenz mehrfach aus. Mehrfach ist allerdings eine Untertreibung, denn eigentlich muss es "für immer" heißen, denn wir haben bisher keine Möglichkeit diese Schleife abzubrechen. Dazu kommen wir später.
+
+Mit unbedingten Sprüngen kommt auch ein Konzept zu Tage, was im folgenden sehr wichtig wird: *Kontrollflüsse*. Ein Kontrollfluss ist eine strikte Sequenz von Operationen, die genau in dieser Reihenfolge von einer sequentiellen Maschine abgearbeitet wird. Der Name dieses Konzepts stammt vom "Kontrollwerk" in einer klassischen von-Neumann Maschine. Sie können sich einen Kontrollfluss als die Sequenz von Zeigern vorstellen, die der Programmzähler bei der Abarbeitung annimmt.
+
+Der Unterschied zur Auswertungsreihenfolge ist folgender:
+Die Auswertungsreihenfolge gibt normativ Regel vor wie Operationen hintereinander ausgeführt werden müssen; dabei kann es Uneindeutigkeiten geben.
+Beim einem Kontrollfluss gibt es genau eine Reihenfolge, die ausgeführt wird.
+Der Übersetzer extrahiert die Auswertereihenfolge aus dem Programm und leitet daraus einen Kontrollfluss ab.
 
 
 ** Invokation: Funktionsaufrufe
