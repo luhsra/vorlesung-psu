@@ -920,7 +920,6 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
 
         \bii
         \ii Weitere Selektionen im else-block
-        \ii Oder: elif, elsif, else if, \ldots
         \ii Manchmal auch Postfix-Notation:\\
         \codeinline[style=ruby]{expr if cond} (Ruby)
         \eii
@@ -946,7 +945,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
 
     \begin{columns}[t]
       \begin{column}<2->{0.49\textwidth}
-        \columntitle{cond}
+        \columntitle{if-elseif-else Kaskade}
 
         \begin{code}[tag=Lisp]
           \begin{lisp}
@@ -959,7 +958,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
 
         \bii
         \ii Lineares Durchlaufen der Paare
-        \ii Kurzform der if-elsif-else Kaskade
+        \ii Abbruch bei der ersten erfolgreichen Bedingung
         \eii
       
       \end{column}\hfill
@@ -989,10 +988,31 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
   \end{frame}
 #+end_src
 
-Auf dieser Folie zeige ich ihnen einige Arten von Selektions-Operationen, die sie in unterschiedlichen Sprachen in unterschiedlichen Notationen wieder finden werden.
+Auf dieser Folie zeige ich ihnen einige Arten von Selektions-Operationen, die sie in unterschiedlichen Sprachen in unterschiedlichen Notationen wieder finden werden. Alle haben gemein, dass Sie anhand von Daten-abhängigen Entscheidungen nur einen Teil ihrer Kinder ausführen. Sie *selektieren* alle ein Untermenge ihrer Operationen und führen nur diese aus.
+
+Die *if-then-else*-Operationen haben eine Bedingung und eine fixe Anzahl an Kindern. Will man mehrere Bedingungen abprüfen, so kann man im Then- oder im Else-Teil weitere Selektionen ausführen.
+
+Die etwas flexiblere Variante ist die *if-elseif-else*-Operation, die eine flexible Anzahl an Kindern hat die jeweils (bis auf den letzten) mit einem Test versehen sind.
+Die Bedingungen werden linear, von oben nach unten, ausgewertet. Bei der ersten Bedingung die erfolgreich ist, bricht die Suche ab, und der zugehörige Ast wird ausgeführt.
+Es ist ratsam, sowohl beim normalen if-else, als auch bei if-elseif-else, die Auswertung der Bedingungen frei von Seiteneffekten zu gestalten.
+
+Ähnlich zur if-elseif-else Kaskade ist die *Switch/Case-Operation*.
+Allerdings wird dort nur anhand eines einzelnen Wertes (~number~) entschieden, welcher Ast ausgeführt werden soll.
+Der Wert im Switch wird mit den Werten an jedem Case-Statement verglichen und daran entschieden.
+Die Werte-Zentrierung der Switch/Case-Operation erlaubt es dem Übersetzer erweitere Checks unseres Programms durchzuführen:
+Zum Beispiel kann der Übersetzer statisch prüfen, dass der gesamte Wertebereich abgedeckt ist oder dass keine Bedingungen überlappen.
+Außerdem kann ein Übersetzer mittels Sprungtabellen leichter effizienteren Code erstellen. Seien sie sich aber gewahr, dass optimierende Übersetzer ihr Switch/Case auch gern in eine if-elseif-else-Kaskade verwandelt, wenn es ratsam erscheint.
+
+Die vierte Variante sind *Short-Circuit-Expressions*, die auf den ersten Blick nicht wie Selektionen aussehen.
+Bei diesen Ausdrücken fallen die Bedingungen und die auszuführenden Operationen zusammen.
+Bei einem ~&&~ werden die Operationen der Reihe nach, von links nach rechts ausgewertet.
+Gibt eine der Operationen ~False~ zurück, so wird die Auswertung abgebrochen[fn::Bei ~||~ ist es genau andersrum, dort wird beim ersten ~True~ abgebrochen.].
+Hintergrund ist, dass schon zu diesem Zeitpunkt der Wahrheitswert des gesamten Ausdrucks fest steht und wir die restlichen Kinder garnicht auswerten müssen.
+Die Auswertung wird an dieser Stelle "kurzgeschlossen".
+Gehen Sie jetzt zu unserer Python Funktion ~ite()~ zurück und versuchen Sie die Implementierung mit dem wissen zu verstehen, dass ~and/or~ in Python Short-Circuit-Expressions sind.
 
 #+begin_src latex
-  \begin{frame}{Rekursion: Invokation und Selektion}
+  \begin{frame}<handout:2,3>{Rekursion: Invokation und Selektion}
     \begin{columns}[b]
       \begin{column}{0.49\textwidth}
         \includegraphics[width=\textwidth]{fig/07-rekursion}
@@ -1022,6 +1042,29 @@ Auf dieser Folie zeige ich ihnen einige Arten von Selektions-Operationen, die si
   \end{frame}
 #+end_src
 
+Bewaffnet mit der Selektion können wir uns nun noch einmal der Invokation widmen um zu sehen, dass beide Operationen in Kombination uns ordentliche Rekursion erlaubt, die auch irgendwann endet.
+Bisher war das Problem bei Rekursion, dass wir keine Chance hatten die Invokation *nicht* auszuführen.
+Die führt dazu, dass wir uns endlos im Kreis drehen werden; bis zum St. Nimmerleinstag.
+Mit eine selektierenden Operation haben wir nun die Möglichkeit die Invokation einmal aus zu lassen.
+
+Zusammen mit der Parameterisierbarkeit des Funktionsaufrufs kann auch jede Funktionsinstanz mit anderen Daten gestartet werden. Wird das Argument, zum Beispiel, in jeder Rekursionsstufe incrementiert und prüft die Bedingung ob das Argument größer als 3 wird, so endet die Rekursion irgendwann:
+
+#+begin_src python
+  def F1(P):
+      P += 1
+      print "a", P
+      if P <= 0:
+          F1(P)
+      print "b", P
+
+  F1(0)
+#+end_src
+
+Schauen wir uns die Sequenz an Operationen auf der Maschine an, so sehen wir, dass zuerst drei Alpha-Operationen (eine für jede Rekursionsstufe 1,2,3) ausgeführt wird bevor die Beta-Operationen der einzelnen Funktionsinstanzen ausgeführt werden.
+
+Durch den hierarchischen Kontrollfluss und die Kombination mit dem Datenfluss können wir Call-Operationen als *Komplexoperationen* betrachten.
+Eine Funktion ist wie andere Operationen, sie bekommt Quelloperanden (Argumente) und hat einen Zieloperanden (Rückggabewert).
+Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufzufassen, ist es deutlich einfacher ein rekursives Programm zu schreiben[fn::Außerdem versteht man in "Grundlagen der Betriebssysteme" viel besser, warum ein Systemaufruf eine komplexe Maschineninstruktion ist, die vom Betriebssystem teilinterpretiert wird.].
 
 ** Iteration: Wiederholte Ausführung
 :PROPERTIES:

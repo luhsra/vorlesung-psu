@@ -12,7 +12,9 @@
     \node[operation] (entry) {F1 : $\alpha$}; \seq
     \node[operation] (ite) {\textbf{ite}};
 
-    \node[operation, shift={(1em, 2em)},pin={[align=left,anchor=north west,font=\scriptsize]30:Eigentlich wäre hier\\ ein goto.}] (call) {\textbf{call} F1};
+    \node[operation, shift={(1em, 2em)}]
+    % ,pin={[align=left,anchor=north west,font=\scriptsize]30:Eigentlich wäre hier\\ ein goto.}]
+    (call) {\textbf{call} F1};
 
     \node[operation,, shift={(1em, -2em)}] (return) {$\beta$};\seq
     \node[operation] {\textbf{return}};
