@@ -640,20 +640,19 @@ Die Auswertungsreihenfolge gibt normativ Regel vor wie Operationen hintereinande
 Beim einem Kontrollfluss gibt es genau eine Reihenfolge, die ausgeführt wird.
 Der Übersetzer extrahiert die Auswertereihenfolge aus dem Programm und leitet daraus einen Kontrollfluss ab.
 
-
 ** Invokation: Funktionsaufrufe
 :PROPERTIES:
 :CUSTOM_ID: 07-invocation
 :END:
 #+begin_src latex
-  \begin{frame}{Invokation: Funktionsaufrufe}
+  \begin{frame}<handout:3,4,5,6>{Invokation: Funktionsaufrufe}
     \bi
-    \ii Kontrollfluss-Brille: Sprung und Funktionsaufruf sind sehr ähnlich.{
+    \ii Unbedingter Sprung und Funktionsaufruf sind sehr ähnlich.{
       \bi
       \ii Der Kontrollfluss verlässt die aktuelle Operations-Sequenz
       \ii Die Auswertung wird an einer entfernten, benannten Operation fortgesetzt
       \ei
-    }\smallskip
+    }\medskip
     \ii<2-> \textbf{Aber}: Funktionsaufrufe haben zwei \structure{grundlegende Erweiterungen} {
       \bi
       \ii \structure{Rücksprung}: \btSetTab Wir können von verschiedenen Stellen angesprungen werden und \\
@@ -673,8 +672,24 @@ Der Übersetzer extrahiert die Auswertereihenfolge aus dem Programm und leitet d
     \end{columns}
   \end{frame}
 
+#+end_src
 
-  \begin{frame}[fragile]{Teilfazit: Sequenzierung und Invokation}
+Die erste Erweiterung des unbedingten Sprungs, die wir uns anschauen werden, ist die *Invokation* oder *Funktionsaufruf* .
+Dieser funktioniert auf Ebene des Kontrollflusses sehr ähnlich wie der unbedingte Sprung: Wir verlassen die aktuelle Sequenz und setzen die Ausführung an der benannten Stelle fort. Allerdings gibt es zwei Erweiterungen.
+
+Wo der unbedingte Sprung nur ein Statement war, was wir für Hin- und Rücksprung verwendet haben, so werden diese Situationen beim Funktionsaufruf durch zwei unterschiedliche Statements herbeigeführt:
+Das Call-Statement springt an die angegebene Sprungmarke *und* speichert sich eine Rücksprungadresse.
+Auf den Folien, wäre die Rücksprungaddresse ein Zeiger auf die Operation Delta.
+Beim Return-Statement springen wir an dies Adresse zurück und setzen die Ausführung nach der Aufrufstelle fort.
+Durch einen Funktionsaufruf können wir eine entfernte Operationssequenz leicht einschieben.
+
+Zusätzlich zur Formung des Kontrollflusses hat der Funktionsaufruf auch eine *Datenfluss-Komponente*.
+Wir übertragen die Argumente an die aufgerufene Funktion und machen sie dort als Parameter verfügbar.
+Auf diese Weise können wir die aufgerufene Funktion wortwörtlich *parametrisieren*.
+Die Erfindung des Funktionsaufrufs war ein Meilenstein in der Geschichte der Informatik, da nun Wiederverwendung von Code deutlich leichter wurde. Daher sind Funktionen die Erweiterung, die uns von rein imperativen Programmiersprachen zu *prozeduralen Programmiersprachen* gebracht haben. Ein Beispiel für eine rein imperative Sprache ohne Prozeduren BASIC{{{wikipedia_de(BASIC)}}}.
+
+#+begin_src latex
+\begin{frame}[fragile]{Vergleich: Sprünge vs. Invokation}
     \begin{columns} 
       \begin{column}{0.3\textwidth}
         \begin{code}\ttfamily\small
@@ -725,11 +740,24 @@ Der Übersetzer extrahiert die Auswertereihenfolge aus dem Programm und leitet d
          \ei} \ei
       \end{column}
     \end{columns}
-  
+
   \end{frame}
 #+end_src
 
-- [ ] FIXME: Datenfluss bei Argumenten
+Da unbedingte Sprünge und Funktionsaufrufe sehr ähnlich sind, lohnt es sich die beiden Sprachmittel zu vergleichen.
+Sprünge haben der Nachteil, dass sie Code schnell unübersichtlich werden lassen, da wir immer nur einzelne Operationen anspringen und Hin- und Rücksprung von einer Sequenz völlig voneinander entkoppelt sind und syntaktisch nicht als zusammengehörig erscheinen.
+Beim Funktionsaufruf springt man nicht nur eine Operation an, an der es dann "zufällig" weiter geht, sondern wir springen ein ganzen  Programmabschnitt an.
+
+In gewissen Weise ist ein ~goto~ flexibler als ein ~call~.
+Dennoch verwenden wir kaum noch unbedingte Sprünge in unseren Programmen.
+Warum?
+Im Jahr 1968 hat Dijkstra einen Paper namens "GOTO considered harmful" veröffentlicht, bei dem er argumentiert, dass ein Programm welches *ausschließlich* durch Sprünge strukturiert wird[fn::Dijkstra meinte nicht nur Sprünge innerhalb von Funktionen, sondern wildes rumspringen durch die gesamte Codebasis.], völlig unlesbar und unverifizierbar wird.
+Im Gegensatz dazu führen Funktionsaufrufe, die den Kontrollfluss viel disziplinierter formen, zu einer klaren Hierarchie von Funktionsaufrufen.
+Funktionsaufrufe sind also ein Beispiel bei eine Einschränkung der Flexibilität zu einer Verbesserung des Programmierens geführt hat.
+Ähnlich wie dies statische Typisierung bei ihrer Einführung erreicht hat.
+
+Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit Blockstruktur. Wenn Entwickler für die Daseinsberechtigung von unbedingte Sprüngen plädieren, wie dies Linus Torvalds tut, so wird immer nur ein Sprung innerhalb einer Funktion gemeint. Niemals aber ein Sprung durch über Datei- und Modulgrenzen hinweg[fn::"Da hinten, diesen Befehl, den kann ich brauchen, lass uns dort hinspringen." -- Nein].
+
 ** Selektion: Bedingte Ausführung
 :PROPERTIES:
 :CUSTOM_ID: 07-selection
