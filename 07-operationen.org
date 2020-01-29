@@ -1363,15 +1363,15 @@ Erreicht der Kontrollfluss eines Generators dieses Statement, so wird der Operan
 Den Zustand, den der Generator braucht um zu wissen an welcher Stelle in der Aufzählung wir gerade sind, speichert er sich in seinen lokalen Variablen[fn::Ein Generator ist eine Funktionsinstanz, keine Funktion! Führen sie sich das vor Augen.].
 
 Um Generatoren noch besser zu verstehen, können sie zurück zum Kapitel über Function-Call Frames gehen{{{see(04-call-frames, Function-Call Frames)}}} und sich anschauen, wie Closures funktionieren. 
-Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noch ein Programmzähler gespeichert wird an dem die Closure fortgesetzt wird. 
+Stellen Sie sich dabei vor, dass in der Closure nicht nur der ~body~, sondern auch noch ein Programmzähler gespeichert wird an dem die Closure fortgesetzt wird. 
 
-* Vom Befehlsstrom zum Kontrollflussgraphen
+* Vom Kontrollfluss zum Kontrollflussgraphen
 :PROPERTIES:
 :CUSTOM_ID: 07-control-flow-graph
 :END:
 #+begin_src latex
   \dividerframe{Kontrollflussgraphen}
-  \begin{frame}{Kontrollflüsse am Beispiel}
+  \begin{frame}<handout:2->{Kontrollflüsse am Beispiel}
     \textbf{Erinnerung}: \btSetTab -- Ein Kontrollfluss ist eine Sequenz von Operationen.\\
     \btUseTab -- Mit Sprachkonstrukten manipulieren wir den Kontrollfluss.\\[3ex]
     \pause
@@ -1384,10 +1384,39 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
 
 
   \end{frame}
+#+end_src
 
-  \begin{frame}[t]{Der Kontrollflussgraph}
+Wir lösen uns nun von konkreten Sprachkonstrukten mit denen wir den *potentiellen* Kontrollfluss formen können und schauen uns an, wie die Idee vom Kontrollfluss als wichtigster Eigenschaft eines Programms Einzug in den Übersetzer gefunden hat.
+Dazu werden wir das Konzept des *Kontrollflussgraphen* (control-flow graph/CFG) kennen lernen.
+Für Sie ist dieses Konzept deswegen besonders wichtig, weil die gesamte zweite Hälfte des Übersetzers nicht mehr auf dem AST arbeitet, sondern auf dem CFG.
+Also los, lassen Sie uns gemeinsam das Konzept des Kontrollflussgraphen entwickeln.
+
+
+In einer Nussschale, ist der Kontrollflussgraph die *Überlagerung aller möglichen Kontrollflüsse* durch ein Programm[fn::Ich rede an dieser Stelle ganz absichtlich von "Programm" und nicht von "Funktion", da ich mich hier noch nicht festlegen möchte auf welcher Ebene wir den Kontrollflussgraphen entwickeln. Stellen Sie sich für den Moment einfach ein Stück Code vor, das völlig losgelößt von Funktionen, Klassen oder Modulen existiert.]. In den Folien sehen Sie wie wir einen solchen CFG inkrementell entwickeln, indem wir Kontrollflüsse (Sequenzen von Operationen) beobachten und in einem CFG kombinieren.
+
+Im ersten Kontrollfluss, den wir beobachten, sehen wir vier Operationen in einer gewissen Sequenz.
+Wir erstellen für jede Operation einen Knoten in unserem Kontrollflussgraphen.
+Immer dann, wenn zwei Operationen direkt hintereinander ausgeführt werden, ziehen wir eine (Kontrollfluss-)Kante zwischen den entsprechenden Knoten (z.B Alpha->Beta).
+
+Beim zweiten Kontrollfluss kennen wir schon beinahe alle Operationen und wir müssen nur noch einen Gamma-Knoten, nebst entsprechender Kanten hinzufügen. An dieser Stelle sehen wir schon, dass Beta zwei ausgehende Kanten hat. Diese ausgehenden Kanten haben die Semantik: "Nach Beta kann entweder Gamma oder Delta ausgeführt werden".
+
+Mit dem dritten Kontrollfluss lernen wir, weil Delta mehrfach hintereinander vorkommt und wir eine Kante zwischen Delta und Delta (direkt benachbarte Operationen), dass Delta in einer Schleife ausgeführt werden kann. Allerdings haben wir im Kontrolflussgraph keine Informationen darüber wie oft oder aus welchen Gründen Delta mehrfach ausgeführt wird. Man sagt, dass der Kontrollflussgraph Daten-insensitiv ist.
+
+Der vierte Kontrolfluss bringt keine Neuerungen, außer dass wir noch eine weitere Operation beobachten konnten.
+
+Im fertigen CFG sehen wir, dass Alpha die einzige Operation ist, die nur eine einzige ausgehende Kante hat; alle anderen Operationen haben mehrere Nachfolger.
+Daraus, dass es nur einen Nachfolger gibt, können wir schließen, dass Alpha und Beta immer direkt hintereinander ausgeführt werden.
+
+Aus diesem Grund fasse ich die Alpha und Beta Operationen im letzten Animationsschritt zu einem Knoten zusammen.
+Außerdem habe ich den CFG etwas umgestellt und anders formatiert und eine Eingangs- und eine Ausgangskante hinzugefügt.
+Aus diesem hübscher formatierten CFG können wir die Programmstruktur sogar einigermaßen erahnen:
+Wir haben hier ein Stück Code vor uns, bei dem zuerst eine Selektion (Beta) ausgeführt wird, die eine zweite Selektion (Gamma) enthält.
+Im Anschluss gibt es eine Iteration (Delta) an die noch abschließender Code (Rho) sequenziert wird.
+  
+#+begin_src latex
+\begin{frame}[t]{Der Kontrollflussgraph}
     \begin{btBlock}{Definition: \structure{Kontrollflussgraph} (CFG)}
-      Der CFG ist die \textbf{Überlagerung aller möglichen Kontrollflüsse} durch ein Codestück. Seine Knoten sind die \structure{Basisblöcke} des Codestücks.
+      Der CFG ist ein gerichteter Graph, der \structure{Basisblöcke} als Knoten; Kanten entsprechen den möglichen Übergängen zwischen den Blocken.
     \end{btBlock}
     \begin{btBlock}{Definition: \structure{Basisblock} (BB)}
       Ein Basisblock ist eine Sequenz von Operationen.\\
@@ -1398,7 +1427,7 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
       \bi
       \ii Nur die erste Instruktion eines BB kann angesprungen werden
       \ii Nur die letzte Instruktion eines BB kann ein Sprung sein
-      \ii Eine einzelne Operation ist ein \structure{minimaler Basisblock}
+      \ii Eine einzelne Operation ist bereits ein \structure{minimaler Basisblock}
       \ei
     }\smallskip
     \ii<3-> Fakten über den CFG, die aus den Definitionen folgen{
@@ -1409,14 +1438,39 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
     }
     \ei
   \end{frame}
+#+end_src
+
+Nachdem wir den Kontrollflussgraphen informell eingeführt haben, will ich das Konzept, weil es so wichtig ist, noch auf präzisere Füße stellen und sowohl den Kontrollflussgraphen als auch seine Knoten, die Basisblöcke, genauer definieren.
+
+Zu der Definition des CFGs, die Sie auf den Folien sehen, kommt noch die Definition des *Basisblocks* hinzu. Beide Konzepte sind untrennbar miteinander verbunden und ihre Definitionen folgen in allen Bücher immer direkt hintereinander. 
+
+Ein Basisblock ist eine lineare Sequenz von Operationen, die immer in genau dieser Reihenfolge ausgeführt wird.
+Wird die erste Operation eines Basisblocks angesprungen, so werden alle Operationen der Sequenz abgearbeitet und erst am Ende der Sequenz kann wieder irgendwo hin gesprungen werden.
+Es gibt also keine Sprünge in der Mitte eines Basisblocks.
+Außerdem gibt es keine Sprünge von außen, die in die Mitte eines Basisblocks springen könnte.
+Daher hat auch nur die erste Operation eines Basisblocks ein Label, der den gesamten Block identifizieren kann.
+
+Schauen wir uns ein Programm an, was wir gleich noch machen werden, so ist es nicht vollständig eindeutig wie groß die Basisblöcke sind.
+Enthält ein Programm eine Sequenz aus drei Operationen (~A;B;C;~), so kann jede Operation für sich auch schon ein Basisblock sein (*minimaler Basisblock*).
+Aber auch ~[A;B]~ + ~[C]~, ~[A]~ + ~[B,C]~ oder ~[A;B;C]~ sind valide Basisblöcke.
+Können wir einen Basisblock nicht weiter nach vorne oder hinten ausdehnen, ohne die Definition eines Basisblocks zu verletzen, so reden wir von einem *maximalen Basisblock*.
+Meist wollen wir mit maximalen Basisblöcken arbeiten.
+
+Beim Kontrollflussgraph ist zu sagen, dass er eine Überabschätzung der später beobachtbaren Kontrollflüsse ist.
+Das bedeutet, dass er mehr Pfade durch ein Programm enthalten kann, als tatsächlich auftreten können.
+So ist die Sequenz ~Alpha, Beta, Gamma, Pi, Delta, Delta, Delta, Rho~ im letzten CFG möglich.
+Tatsächlich haben wir einen solchen Kontrollfluss nicht beobachten können (Es gab Pi + Delta-Schleife nie zusammen).
+Eine Kante im Kontrollfluss zeigt also an, dass es vielleicht möglich wäre, dass es einen Übergang hier gibt, aber sie zeigt erstmal nicht an, dass diese auch auftreten muss.
+Diese konservative Überabschätzung macht den CFG wertvoll für den Übersetzerbau.
 
 
+#+begin_src latex
   \begin{frame}[fragile]{Kontrollflussgraphen im Übersetzungsprozess}
     \vspace{-1.5em}
     \begin{columns}[t]
  
       \begin{column}{0.49\textwidth}
-        \begin{onlyenv}<-7>
+        \begin{onlyenv}<-7|handout:-7>
         \bi
         \ii Übersetzer: AST $\rightarrow$ CFG {
           \bi
@@ -1426,15 +1480,15 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
           \ii Bereits nahe an realen Maschinen
           \ei
         } \medskip
-        \ii<2-> CFG-Struktur im Maschinencode{
+        \ii<2-|handout:2-> CFG-Struktur im Maschinencode{
           \bi
-          \ii<3-> BB endet nach Sprüngen
-          \ii<4-> BB endet vor Sprungmarken
-          \ii<5-> \structure{Maximale Basisblöcke}
-          \ii<6-> Kanten anhand von Sprüngen und beim Durchfallen.
+          \ii<3-|handout:3-> BB endet nach Sprüngen
+          \ii<4-|handout:4-> BB endet vor Sprungmarken
+          \ii<5-|handout:5-> \structure{Maximale Basisblöcke}
+          \ii<6-|handout:6-> Kanten anhand von Sprüngen und beim Durchfallen.
           \ei
         }\medskip
-        \ii<7-> Vorteile des CFG vs. AST {
+        \ii<7-|handout:7-> Vorteile des CFG vs. AST {
           \bi
           \ii Flachegeklopfte Hierarchie
           \ii Nähe zum Maschinenmodell
@@ -1443,7 +1497,7 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
         }
         \ei
       \end{onlyenv}%
-      \begin{onlyenv}<8->
+      \begin{onlyenv}<8-|handout:8->
         \begin{code}[tag=C]
             \lstinputlisting[style=C,linerange=s0-e0]{lst/07-cfg.c}
           \end{code}
@@ -1461,14 +1515,34 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
       \end{column}
     \end{columns}
   \end{frame}
-#+end_src
 
-#+begin_src latex
   \begin{frame}{Einordnung des CFGs in die Vorlesung}
     \includegraphics[page=2,width=\textwidth]{fig/01-overview-small}
   
   \end{frame}
 #+end_src
+
+Nachdem wir einen CFG aus mehreren Kontrollflüssen rekonstruiert haben, möchte ich ihnen zeigen, dass ein CFG nicht nur eine theoretisches Konstrukt ist, sondern dass wir seinen Fußabdruck im erzeugten Assemblercode wirklich wieder finden können.
+Den in der Code-Erzeugung leitet der Übersetzer einen Kontrollflussgraphen aus dem AST ab, indem er alle Kontrollstrukturen zu (un-)bedingten Sprüngen flach klopft und die Basisblöcke mit Instruktionen füllt.
+Aus diesem CFG wird dann anschließend der Assembler abgeleitet.
+
+Auf den Folien sehen wir, wie man den CFG aus einem Stück Assembler wiederherstellen kann. Dazu fügen wir schrittweise Schnittmarken ein (rote Linien): 
+
+1. Nach jedem Sprung braucht es eine Schnittmarke, da Sprünge nicht in Mitten eines Blockes stehen dürfen.
+2. Ist eine Instruktion ein Sprungziel, brauchen wir eine Schnittmarke vor der angesprungen Instruktion, da nur die erste Operation eines Basisblockes angesprungen werden darf.
+
+Zerteilen bzw. Partitionieren wir die Liste der Assemblerinstruktionen an diesen Schnittmarken, so erhalten wir automatisch *maximale Basisblöcke*.
+
+Nun verbinden wir die Basisblöcke miteinander:
+
+1. Endet ein Block ohne Sprung, so fällt der Kontrollfluss einfach zum direkt folgenden Basisblock durch (BB2).
+2. Endet ein Block mit einem bedingten Sprung, so ziehen wir eine Kante zum direkt folgenden Block (BB0->BB1) und zum Sprungziel (BB0->BB3).
+3. Endet ein Block mit einem unbedingten Sprung, so wir nur eine Kante zu diesem Block gezogen (kommt im Bild nicht vor). 
+
+In dieser Vorlesung haben wir gesehen, wie wir einen CFG aus einer Menge an beobachteten Kontrollflüssen und aus dem Assemblercode rekonstruieren konnten.
+In der nächsten Vorlesung werden wir lernen, wie wir aus dem AST einen Kontrollflussgraphen ableiten.
+Dieser Kontrollflussgraph dient dann als Datenstruktur, auf der die meisten Code-Optimierungen durchgeführt werden, und die letztendlich zum Binärprogramm übersetzt wird.
+Die Wahl eines gerichteten Graphen als Zwischenrepräsentation unseres Programms ist auch deswegen toll, weil dem Übersetzerbauer der gesamte Werkzeugkasten der Graphalgorithmen zur Verfügung steht. 
 
 #+begin_src latex
   \begin{frame}[t]{Kontrollflussgraph auf mehreren Ebenen}
@@ -1477,7 +1551,7 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
       \OrangeBox{\textbf{Frage}: Beendet ein \texttt{call} den aktuellen Basisblock?}
     \end{center}
     \begin{columns}[t]
-      \begin{column}<2->{0.49\textwidth}
+      \begin{column}<2-|handout:2->{0.49\textwidth}
         \ALERT{Nein}: Calls sind  Komplexbefehle
 
         \centerline{$\Downarrow$}
@@ -1491,7 +1565,7 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
         \ii[$\Rightarrow$] Der \enquote{normale} CFG
         \eii
       \end{column}\hfill
-      \begin{column}<-5>{0.49\textwidth}
+      \begin{column}<3|handout:3>{0.49\textwidth}
         \ADVANTAGE{Ja}: Ein Call ist ein Jump
 
         \centerline{$\Downarrow$}
@@ -1507,12 +1581,34 @@ Stellen Sie sich vor, dass in der Closure nicht nur der ~body~, sondern auch noc
     \end{columns}
 
     \bigskip\bigskip
-    \uncover<4->{
-      \btAnimation[width=0.8\textwidth]{center,1:<1-4>,2:<5-6>}{fig/07-icfg}
+    \uncover<2->{%
+      \btAnimation[width=0.8\textwidth]{center,1:<2>,2:<3>,1:<4>}{fig/07-icfg}
     }
     \smallskip
   \end{frame}
 #+end_src
+
+Bevor ich Sie für diesen Abschnitt entlasse, möchte ich sie noch auf einen Aspekt von Kontrollflussgraphen hinweisen, der mir persönlich sehr lange unklar war, wie man damit umgeht [fn::Ich musste zuerst eine Dissertation schreiben, bei dem Kontrollflussgraphen ein zentrales Thema sind, bevor ich es wirklich durchdrungen hatte. Ihnen möchte ich diesen konkreten Schmerz ersparen.].
+Die Frage:
+*Was ist eigentlich mit Funktionsaufrufen?* Beenden ~call~-Instruktionen den aktuellen Basisblock (so wie das ein ~goto~ eben tut) oder beendet er ihn nicht.
+Brauchen wir nach einem Funktionsaufruf eine Schnittmarke?
+
+Die Antwort darauf ist, dass es zwei Arten von Kontrollflussgraphen gibt, je nachdem welche Entscheidung wir in dieser Frage treffen.
+Beide Arten von Kontrollflussgraphen sind nützlich, haben jedoch einen unterschiedlichen Rahmen.
+
+Wenn wir Funktionsaufrufe nicht als Sprünge werten, sondern sagen, dass eine Invokation ein Komplexbefehl ist, dann kommen wir zum *Funktions-lokalen CFG*.
+Dieser CFG enthält nur den Code einer einzelnen Funktion und er deckt nur diejenigen Kontrollflüsse ab, die im Kontext dieser Funktion stattfinden.
+Daher ist dieser CFG dafür geeignet den Code einer einzelnen Funktion zu erzeugen und zu optimieren. Daher ist der Funktions-lokale CFG auch der normale CFG und Sie müssen sich eigentlich nur diesen merken.
+
+Wenn wir die Entscheidung treffen, dass eine Invokation ein Sprung ist, erhalten wir den *Interprozeduralen CFG* (ICFG).
+Hier verbinden wir die ~call~-Instruktion mit dem Eingangsblock der aufgerufenen Funktion und die ~ret~-Instruktion mit der Rücksprungadresse.
+Dadurch enthalten die Basisblöcke des ICFG den Code des gesamten Programms und aller aufgerufenen Funktionen.
+Der ICFG deckt den Instruktionsstrom, wie er auf der realen CPU ablaufen wird, auch viel genauer ab.
+Denn tatsächlich wird nach jeder ~call bar~ Instruktion nicht ~inc EAX~ ausgeführt, sondern ~mul EAX, 2~. Der ICFG deckt alle Kontrollflüsse im Kontext des gesamten Programms ab.
+
+Der ICFG wird allerdings nur selten verwendet.
+Aufgrund seiner Größe, eignet er sich hauptsächlich für intensive statische Analysen über das gesamte Programm.
+Für den normalen Übersetzungsprozess wird *außschließlich* der Funktions-lokale CFG benötigt.
 
 * Zusammenfassung
 #+begin_src latex

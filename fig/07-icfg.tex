@@ -27,11 +27,11 @@
       global/.style={ultra thick, safegreen,->},
       ]<2->
     \node[bb=BB0.2,below=2 of BB0.north] (BB1){
-      inc EAX\\ret
+      mul EAX, 2\\ret
     };
-    \draw[local] (BB0) -- (BB10);
-    \draw[local] (BB10) to[in=50,out=-90] (BB1);
-    \draw[global] (BB0) -- (BB1);
+    \draw[global] (BB0) -- (BB10);
+    \draw[global] (BB10) to[in=50,out=-90] (BB1);
+    \draw[local] (BB0) -- (BB1);
 
     \draw[local] (BB10.south west)++(down:1.3cm) -- ++(east:1cm)  node[right,black]{Funktions-lokaler CFG};
     \draw[global] (BB10.south west)++(down:1.9cm) -- ++(east:1cm) node[right,black]{Interprozeduraler CFG};
