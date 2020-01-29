@@ -25,13 +25,8 @@ Abschnitte: {{{headlines(./05-semantische-analyse.org)}}}
 * [[file:06-objekte.org][Sprachen: Objekte]]
 Abschnitte: {{{headlines(./06-objekte.org)}}}
 
-* COMMENT Sprachen: Operationen
-     - Standardkonstrukte
-     - Auswertungsstrategie
-     - Call-By-*
-     - Seiteneffekte
-     - Verhaltenskomposition
-     - Verhaltensableitung
+* [[file:07-operationen.org][Sprachen: Operationen]]
+Abschnitte: {{{headlines(./07-operationen.org)}}}
 
 * COMMENT TODO 6 Vorlesungen
 

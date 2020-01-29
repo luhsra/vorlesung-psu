@@ -45,7 +45,7 @@ class StudipForum {
     }
 
     link(topic_or_entry_id) {
-        return `https://studip.uni-hannover.de/plugins.php/coreforum/index/index/${topic_or_entry_id}/?cid=${this.cid}#{topic_or_entry_id}`;
+        return `https://studip.uni-hannover.de/plugins.php/coreforum/index/index/${topic_or_entry_id}/?cid=${this.cid}#${topic_or_entry_id}`;
     }
 }
 
