@@ -1588,13 +1588,13 @@ Die Wahl eines gerichteten Graphen als Zwischenrepräsentation unseres Programms
   \end{frame}
 #+end_src
 
-Bevor ich Sie für diesen Abschnitt entlasse, möchte ich sie noch auf einen Aspekt von Kontrollflussgraphen hinweisen, der mir persönlich sehr lange unklar war, wie man damit umgeht [fn::Ich musste zuerst eine Dissertation schreiben, bei dem Kontrollflussgraphen ein zentrales Thema sind, bevor ich es wirklich durchdrungen hatte. Ihnen möchte ich diesen konkreten Schmerz ersparen.].
+Bevor ich Sie für diesen Abschnitt entlasse, möchte ich sie noch auf einen Aspekt von Kontrollflussgraphen hinweisen, der mir persönlich sehr lange unklar war, wie man damit umgeht [fn::Ich musste zuerst eine Dissertation schreiben, bei dem Kontrollflussgraphen ein zentrales Thema waren, bevor ich es wirklich durchdrungen hatte. Ihnen möchte ich diesen konkreten Schmerz ersparen.].
 Die Frage:
 *Was ist eigentlich mit Funktionsaufrufen?* Beenden ~call~-Instruktionen den aktuellen Basisblock (so wie das ein ~goto~ eben tut) oder beendet er ihn nicht.
 Brauchen wir nach einem Funktionsaufruf eine Schnittmarke?
 
-Die Antwort darauf ist, dass es zwei Arten von Kontrollflussgraphen gibt, je nachdem welche Entscheidung wir in dieser Frage treffen.
-Beide Arten von Kontrollflussgraphen sind nützlich, haben jedoch einen unterschiedlichen Rahmen.
+Die Antwort ist eine Salomonische: Es zwei Arten von Kontrollflussgraphen, je nachdem welche Entscheidung wir in dieser Frage treffen.
+Beide Arten von Kontrollflussgraphen sind nützlich, haben jedoch eine unterschiedlichen Granularität und unterschiedliche Anwendungsbereiche.
 
 Wenn wir Funktionsaufrufe nicht als Sprünge werten, sondern sagen, dass eine Invokation ein Komplexbefehl ist, dann kommen wir zum *Funktions-lokalen CFG*.
 Dieser CFG enthält nur den Code einer einzelnen Funktion und er deckt nur diejenigen Kontrollflüsse ab, die im Kontext dieser Funktion stattfinden.
