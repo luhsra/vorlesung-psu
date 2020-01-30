@@ -3,7 +3,7 @@ class StudipForum {
     constructor() {
         this.api_url =    "https://gbs.sra.uni-hannover.de";
         this.studip_url = "https://studip.uni-hannover.de";
-        this.cid = "d1a0a07773f07528690db1234a7385de"; // V_GBS_TEST
+        this.cid = "a34a39c64894b4699072b396f6e4d6a5"; // Vorlesung: SS2020
     }
 
     categories(cb) {
