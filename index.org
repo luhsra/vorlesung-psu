@@ -28,6 +28,8 @@ Abschnitte: {{{headlines(./06-objekte.org)}}}
 * [[file:07-operationen.org][Sprachen: Operationen]]
 Abschnitte: {{{headlines(./07-operationen.org)}}}
 
+* COMMENT  [[file:08-codegen.org][Übersetzer: Zwischencodeerzeugung]]
+
 * COMMENT TODO 6 Vorlesungen
 
      - Übersetzer: Intermediate Code Generierung
