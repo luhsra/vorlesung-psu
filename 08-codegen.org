@@ -1,0 +1,78 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 08 - Zwischencodeerzeugung
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+- Maschinenmodell für den Zwischencode
+  - Register und Stackmaschinen
+  - Registermaschine mit unendlichen Registern
+  - 3-Address-Codes oder Quadrupel
+  - Vorstellung unserer IR Maschine
+
+
+- Abbildungen der Sprachkonstrukte
+  - Der CFG als Datenstruktur
+  - Variablenbbildung
+  - Einfache Operationen
+  - Kontrollflusskonstrukte
+  - Extra: (komplexere) Typen + dynamischer Dispatch
+
+* Was leistet die "Zwischencodeerzeugung"?
+:PROPERTIES:
+:CUSTOM_ID: 08-einleitung
+:END:
+
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \begin{frame}
+    \maketitle
+  \end{frame}
+
+  \begin{frame}{Einordnung in die Vorlesung: Zwischencodeerzeugung}
+    \begin{center}
+      \includegraphics[page=6,width=0.9\linewidth]{fig/01-overview-small}
+    \end{center}
+    \bi
+    \ii \structure{Zwischencodeerzeugung}: Linearisierung und Übersetzung des ASTs{%
+      \bi
+      \ii \structure{Zielarchitektur}: Virtuelle Maschinen mit wohldefiniertem Funktionsumfang
+      \ii Konkret genug für  Assemblererzeugung, Abstrakt genug für Optimierungen
+      \ii Wiederverwendung des Middle- und Backend für \advantage{mehrere Frontend-Sprachen}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Einordnung in den Übersetzerbau}
+    \btAnimation[width=\textwidth]{1:<-2>,2:<3>}{fig/08-retargable-compiler}%
+    \footnote{Zahlen sind für Clang (C/C++ Frontend, 700k)und LLVM 9.0 (1.4M)}
+
+    \bi
+    \ii Die Konstruktion eines Übersetzers ist aufwändig und schwierig!{
+      \bi
+      \ii Assembler im Parser erzeugen ist (manchmal) möglich \hfill(One-Pass Compiler)
+      \ii Wiederverwendung von Komponenten erleichtert das portieren (\textasciitilde 60\,\% Re-Use)
+      \ei
+    }\medskip
+    \ii<2-> \structure{Zwischenrepresentation} erhält die Programm-Semantik{
+      \bi
+      \ii AST ist bereits eine \structure{Intermediate Representation} (IR-Form)
+      \ii Der klassische IR-Code: CFG mit Instruktionen für eine virtuelle Maschine
+      \ei
+    }
+    \ei
+
+  \end{frame}
+#+end_src

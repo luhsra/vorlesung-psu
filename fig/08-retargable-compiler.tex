@@ -1,0 +1,50 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[fill=badbee!40,draw,text width=2.5cm]                      (cg-C) {CodeGen: C};
+    \node[fill=badbee!40,draw,text width=2.5cm,below=0.1 of cg-C]    (cg-Rust) {CodeGen: Rust};
+    \node[fill=badbee!40,draw,text width=2.5cm,below=0.1 of cg-Rust] (cg-Go) {CodeGen: Go};
+
+    \node[fill=safegreen!40,draw, text width=2.5cm, minimum height=8mm, yshift=4mm,  left=1.5cm of cg-C]    (frontend-C) {C-Frontend};
+    \node[fill=safegreen!40,draw, text width=2.5cm, minimum height=8mm,              left=1.5cm of cg-Rust] (frontend-Rust) {Rust-Frontend};
+    \node[fill=safegreen!40,draw, text width=2.5cm, minimum height=8mm, yshift=-4mm, left=1.5cm of cg-Go]   (frontend-Go) {Go-Frontend};
+
+
+    \node[right=6mm of cg-Rust,anchor=center,rotate=90] (label) {IR-Code};
+
+    \foreach \x in {C,Go,Rust} {
+      \draw[->] (frontend-\x) -- node[above,sloped,font=\scriptsize]{\x-AST} (cg-\x.west);
+      \draw[->] (cg-\x.east)       -- (label);
+    }
+
+    \coordinate (@) at (cg-Go.south east-|label.south);
+    \draw[->] (label.south) -- ++(east:2mm);
+
+    \node[right=4mm of label.south,align=center] {Optimi-\\mierung};
+    \draw ($(@)+(east:2mm)$) rectangle ($(@|-cg-C.north)+(east:2cm)$) coordinate(@);
+
+    \coordinate (@) at (label.south-|@);
+
+
+    \node[draw,fill=luhblue!40,text width=2.5cm,right=1cm of @]           (backend-x86) {Backend: x86};
+    \node[draw,fill=luhblue!40,text width=2.5cm,above=4mm of backend-x86] (backend-PPC) {Backend: PPC};
+    \node[draw,fill=luhblue!40,text width=2.5cm,below=4mm of backend-x86] (backend-JVM) {Backend: JVM};
+
+    \foreach \x in {x86,PPC,JVM} {
+      \draw[->] (@) -- (backend-\x.west);
+    }
+    \coordinate(opt-east) at (@);
+
+    \coordinate (@) at ($(frontend-C.north west)+(up:2mm)$);
+
+    \draw[decorate,decoration={brace,amplitude=5pt}] (@) -- node[above,yshift=5pt] {\scriptsize Sprachabhängig (37\,\%)} (@-|label.north) coordinate(@);
+
+    \draw[decorate,decoration={brace,amplitude=5pt}] (@) -- node[above,yshift=5pt] {\scriptsize Unabhängig (29\,\%)} (@-|opt-east) coordinate(@);
+
+    \draw[decorate,decoration={brace,amplitude=5pt}] (@) -- node[above,yshift=5pt] {\scriptsize Plattformabhängig (33\,\%)} (@-|backend-x86.east) coordinate(@);
+
+    \only<2->{\node[fit=(cg-C) (cg-Go),draw,srared,ultra thick]{};}
+  \end{tikzpicture}
+\end{frame}
+\end{document}
