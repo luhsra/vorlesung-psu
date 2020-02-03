@@ -76,3 +76,272 @@
 
   \end{frame}
 #+end_src
+
+* Virtuelle Maschinen für Zwischencode
+#+begin_src latex
+  \dividerframe{Virtuelle Maschinen\\für die\\Zwischencodeereugung}
+
+  \begin{frame}[fragile,t]{Virtuelle Stack- und Register-Maschinen}
+    \begin{center}
+      \begin{tikzpicture}
+        \node[operation,rectangle] {+}
+          child {node[alt=<1>{operand}{operation,rectangle}] {\alt<1>{3}{Op1}}}
+          child {node[alt=<1>{operand}{operation,rectangle}] {\alt<1>{4}{Op2}}};
+      \end{tikzpicture}
+    \end{center}
+  
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \columntitle{Stack-Maschine}
+        \bii
+        \ii Berechnung findet auf Stack statt
+        \ii Operanden gehen über den Stack
+        \ii Datenfluss ist implizit
+        \ii Unendlich großer Stack
+        \eii
+
+        \begin{code}
+          \begin{onlyenv}<1>
+          \begin{codetext}
+            push 3
+            push 4
+            add     // = push(pop() + pop())
+          \end{codetext}
+          \end{onlyenv}
+          \begin{onlyenv}<2->
+          \begin{codetext}
+            // code(Op1) ->  1 Element am Stack
+            // code(Op2) ->  1 Element am Stack
+            add     // = push(pop() + pop())
+          \end{codetext}
+          \end{onlyenv}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \columntitle{Register-Maschine}
+        \bii
+        \ii Operationen manipulieren Register
+        \ii Operanden gehen durch \enquote{Register}
+        \ii Register machen Datenfluss sichtbar
+        \ii Beliebig viele Register
+        \eii
+        \begin{code}[]
+          \begin{onlyenv}<1>
+          \begin{codetext}
+            r0 = 3
+            r1 = 4
+            r2 = add r1, r2
+          \end{codetext}
+          \end{onlyenv}
+          \begin{onlyenv}<2->
+          \begin{codetext}
+            // r1 = code(Op1)
+            // r2 = code(Op2)
+            r2 = add r1, r2
+          \end{codetext}
+          \end{onlyenv}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \bigskip
+    \uncover<3->{$\Rightarrow$ Codeerzeugung für Stack- und Register-Maschinen sieht ähnlich aus.}
+  \end{frame}
+
+  \begin{frame}{Design-Kriterien für Virtuelle Maschinen}
+    \OrangeBox{\textbf{Vorneweg}: Die Spezifikation einer Virtuellen Maschine ist schwierig}
+    \medskip
+    \bi
+    \ii Wahl des Abstraktionsniveaus: Endlicher oder \alert<2->{unendlicher Registersatz?}{%
+      \bi
+      \ii Abstraktere Semantik $\Rightarrow$ IR-Code ist näher an Programmstruktur
+      \ii Leichtere Codeerzeugung und Optimierung, komplexeres Backend
+      \ei
+    }\medskip
+    \ii Ausführungsmodell: \alert<2->{Register-Maschine} oder Stack-Maschine?{%
+      \bi
+      \ii Stack-Maschinen haben besonders kompakte Programmdarstellung
+      \ii Register-Maschinen sind näher an real-existierenden Prozessoren 
+      \ei
+    }\medskip
+    \ii Verbraucher der IR-Form: Interpreter oder \alert<2->{Übersetzer-Backend}?{
+      \bi
+      \ii Übersetzer brauchen eine gut analysierbare und veränderbare IR-Form
+      \ii Bei Interpretern soll die Ausführung möglichst schnell starten
+      \ei
+    }
+    \bigskip
+    \ii<2>[$\Rightarrow$] Wir wählen eine Register-Maschine mit unendlich vielen Registern 
+    \ei
+  \end{frame}
+
+
+#+end_src
+
+#+begin_src latex
+\begin{frame}{3-Address Code (Quadrupel-Notation) }
+    \bi
+    \ii Programm wird als Folge von Quadrupeln dargestellt {
+      \bi
+      \ii Quadrupel besteht aus einem Operator und \textbf{maximal} drei Operanden {
+        \begin{center}
+        \medskip
+        \texttt{x := op y, z} 
+        \medskip
+      \end{center}
+
+      }
+      \ii Operanden (\texttt{x,y,z}) können sein:{
+        \bi
+        \ii \structure{Variablen/temporäre Register} halten ein Maschinenwort
+        \ii \structure{Literale} als konstante Operanden
+        \ii \structure{Label} dressieren andere Operationen
+        \ei
+      }
+      \ei
+    }\medskip
+    \ii Nur (un-)bedingte Sprünge, keine Schleifen oder Bedingungen {
+      \bi
+      \ii Sprachkonstrukte werden mit \texttt{goto}/\texttt{ifgoto} linearisiert
+      \ii 3-Address Code passt perfekt in Basisblock/CFG Struktur
+      \ei
+    }
+    \ei
+    \begin{btBlock}[type=example]{Beispiel: \texttt{if ((*a) <= (4 + b)) ...}}\ttfamily
+      t1 := \ircmd{Load} a\\
+      t2 := \ircmd{Add} 4, b\\
+      t3 := \ircmd{LessEqual} t1, t2\\
+      \ircmd{IfGoto} t3, .BB1, .BB2
+    \end{btBlock}
+  \end{frame}
+#+end_src
+
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}{Für PSÜ: Ein beispielhafter Zwischencode}
+    \begin{btBlock}{}
+      Für Vorlesung und Übung entwickeln wir einen Zwischencode auf Basis einer Registermaschine mit unendlich vielen Registern. Dazu schauen wir uns Semantik und Notation an.
+    \end{btBlock}
+
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \bi
+        \ii \structure{Operanden} können sein:{
+          \bi
+          \ii (C) Konstante Ganzzahlen: \texttt{3}, \texttt{4}
+          \ii (L) Statische Label:  \texttt{.BB2}
+          \ii (V) Variablen: \texttt{a}, \texttt{t1}
+          \ei
+        }
+        \ei
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}\small
+        \bii
+        \ii \textbf{Variablen} sind funktions lokal
+        \ii Beliebig viele temporäre Variablen
+        \ii Alle Werte sind 32-Bit breit 
+        \ii Keine Typisierung
+        \eii
+      \end{column}
+    \end{columns}
+
+    \medskip
+  
+    \bi
+    \ii Einfache \structure{Operationen} (6 Befehle) {
+      \bi
+      \ii \ircmd{Assign}: Einer Variable einen Wert zuweisen \hfill\texttt{V := \ircmd{Assign} b}
+      \ii 4 arithmetrische Operationen: \ircmd{Add}, \ircmd{Sub}, \ircmd{Mul}, \ircmd{Div}  \hfill\texttt{V := \ircmd{Add} CV, CV}
+      \ii 1 logische Operation: \ircmd{LessEqual} \hfill\texttt{V := \ircmd{LessEqual} CV, CV}\\
+          Falsch: \enquote{0}, Wahr: \enquote{!= 0}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Für PSÜ: Ein beispielhafter Zwischencode (2)}
+    \bi
+    \ii \structure{Speichermanipulationen} (3 Befehle) {
+      \bi
+      \ii \ircmd{Ref}: \hspace{1.2em}\btSetTab Erzeugen einer Referenz auf eine Variable      \hfill\texttt{V := \ircmd{Ref} V}
+      \ii \ircmd{Load}: \btUseTab Lesen des addressierten Speicherwortes        \hfill\texttt{V := \ircmd{Load} V}
+      \ii \ircmd{Store}: \btUseTab Schreiben eines Wertes an ein Speicherstelle \hfill\texttt{*V := Store CV}
+      \ei
+    }\medskip
+    \ii \structure{Speichermanagement} (3 Befehle) {
+      \bi
+      \ii \ircmd{StackAlloc}: \btSetTab Speicherallokation im Call-Frame\hfill\texttt{V := StackAlloc C}
+      \ii \ircmd{HeapAlloc}:  \btUseTab Speicherallocation dem Heap\hfill\texttt{V := HeapAlloc C}
+      \ii \ircmd{HeapFree}:   \btUseTab Freigabe eines Heap-Objekts\hfill\texttt{HeapFree V}
+      \ei
+    }\medskip
+    \ii \structure{Funktions-lokale Kontrollflüsse} (2 Befehle) {
+      \bi
+      \ii \ircmd{Goto}:   Sprung an das gegebene Label \hfill\texttt{\ircmd{Goto} L}
+      \ii \ircmd{IfGoto}: Bedingter Sprung   \hfill\texttt{\ircmd{IfGoto CV, L, L}}
+      \ei
+    }\medskip
+    \ii \structure{Interprozedurale Kontrollflüsse} (2 Befehle) {
+      \bi
+      \ii \ircmd{Call}: Funktionsaufruf mit beliebig vielen Argumenten \hfill\texttt{\ircmd{Call} L, [CV]*}
+      \ii \ircmd{Return}: Rückkehr aus einer Funktionsinstanz \hfill\texttt{\ircmd{Return} CV}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Für PSÜ: Ein Beispielhafter Zwischencode (3)}
+    \bi
+    \ii \structure{Basisblöcke} {
+      \bi
+      \ii Geordnete Liste von Operationen
+      \ii Jeder Basisblock hat ein (funktions-lokal) eindeutiges Label  \hfill{\texttt{.BB0}},\ldots
+      \ii Der letzte Befehl eines Basisblocks muss ein \ircmd{Goto} oder \ircmd{IfGoto} sein.
+      \ii[$\Rightarrow$] Maximale Basisblöcke
+      \ei
+
+ 
+    }\bigskip
+    \ii \structure{Funktionen} {
+      \bi
+      \ii Ungeordnete Menge von Basisblöcken mit einem Eingangsblock
+      \ii Funktionen haben ein Label, können aber nicht direkt angesprungen werden
+      \ii Beliebig viele lokale Variablen und temporäre Register
+      \ii Beliebig viele Parameter, die als Variablen zugänglich sind
+      \ei
+    }
+    \ei
+    \medskip
+
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \begin{code}
+        \begin{py}
+          class BasicBlock:
+              def __init__(self, label):
+                  self.label = label
+                  self.instructions = []
+                  self.successors = []
+        \end{py}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}
+        \begin{py}
+          class Function:
+              def __init__(self, label):
+                  self.label = label
+                  self.parameters = []
+                  self.variables  = []
+                  self.entry_block  = None
+                  self.basic_blocks = []
+        \end{py}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+  \end{frame}
+#+end_src
+
+* Codeerzeugung für Zwischencode
+
