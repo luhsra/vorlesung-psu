@@ -562,6 +562,34 @@
   \begin{frame}{Kontrollfluss: Iteration}
     \btAnimation[width=\textwidth]{center,range=1-8:<1->}{fig/08-loop}
   \end{frame}
+
+  \begin{frame}{Diskussion: Optimierte Codegenerierung}
+    \bi
+    \ii Die gezeigte Codeerzeugung generiert \alert{ineffizienten Code} {
+      \bi
+      \ii Fehlender Else-Teil führt zu einem leeren Else-Block und doppeltem \ircmd{Goto}
+      \ii Bottom-Up Auswertung führt zu unnötigem \ircmd{Assign} bei der Zuweisung
+      \ii Keine Wiederverwendung von temporäre Variablen
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Das ist Absicht!} Es soll die Codeerzeugung vereinfachen. {
+      \bi
+      \ii Optimierte Codeerzeugung braucht viele Sonderfälle
+      \ii Komplexität erhöht die Fehleranfälligkeit
+      \ei
+    }\medskip
+    \ii<3-> Wir verlagern die Arbeit in die Optimierungsphase {
+      \bi
+      \ii \structure{Copy-Propagation} wird unötige Zuweisungen tilgen
+      \ii \structure{Constant-Folding} ersetzt Auswertungen mit konstanten Operanden
+      \ii \structure{Dead-Code Elimination}: Sprünge auf Sprünge auflösen, tote Blöcke löschen\\[1ex]
+      \ii[$\Rightarrow$] Weiterer Vorteil durch diese \textbf{Trennung der Belange}:\\ Optimierungen werden ebenfalls auf den Code des Benutzers angewendet
+      \ei
+    }
+    \ei
+
+    \OrangeBox<4->{Eine valide Entscheidung für Übersetzer, aber nicht für Interpreter.}
+  \end{frame}
 #+end_src
 ** Fallstudie für komplexe Objekte: Records
 
