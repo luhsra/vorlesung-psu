@@ -525,7 +525,6 @@
 #+end_src
 ** Codeerzeugung für Kontrollflusskonstrukte
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}[fragile]{Kontrollfluss: Sequenzierung}
     \bi
     \ii \structure{Sequenzierung}: Sequenzielle Codegenerierung für alle Statements {
@@ -592,5 +591,29 @@
   \end{frame}
 #+end_src
 ** Fallstudie für komplexe Objekte: Records
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Komplexere Objekte\\und\\Operationen}
+  \begin{frame}{Komplexere Objekte: Records}
+    \begin{btBlock}{Intentionale Unvollständigkeit der Vorlesung}\small
+      Der \advantage{Grundstock der Codeerzeugung} ist gelegt und kann beliebig erweitern werden. Um ihnen einen Einblick zu geben, ohne Sie mit endlosen Erzeugungsregeln zu langweilen, werfe ich nur ein \structure{Schlaglicht auf zwei Themen}.
+    \end{btBlock}
 
+    \bi
+    \ii Records haben mehrere benannte und typisierte Felder {
+      \bi
+      \ii Ein Record-Objekt kann größer sein als ein einzelnes Maschinenwort
+      \ii \ALERT{Aber}: Die IR-Maschine kann nur 32-Bit Zahlen speichern und verarbeiten
+      \ei
+    }\medskip
+    \ii Wir müssen eine Übersetzung des Sprachkonstrukts vornehmen:{
+        \bi
+        \ii Die Record-Objekte müssen in den Speicher gelegt werden
+        \ii Berechnung der relativen und absoluten Feldadressen
+        \ii Zugriffe erfolgen über \ircmd{Load}/\ircmd{Store} 
+        \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
 ** Fallstudie für komplexe Operationen: Dynamischer Dispatch
