@@ -339,7 +339,44 @@
         \end{code}
       \end{column}
     \end{columns}
+  \end{frame}
 
+  \begin{frame}[fragile]{Iterativer Fibonacci als Zwischencode}
+    \begin{columns}
+      \begin{column}{0.45\textwidth}
+        \includegraphics[height=0.85\textheight]{fig/08-fib-iter}      
+      \end{column}\hfill
+      \begin{column}{0.54\textwidth}
+        \bi
+        \ii Beobachtungen {
+          \bi
+          \ii BB0 initialisiert die Startwerte
+          \ii BB1/2 sind eine while-Schleife
+          \ii \texttt{Goto .BB1} spaltet BB0/1
+          \ei
+        }
+        \ei
+
+        \begin{code}[]
+          \begin{lzero}
+            func fib_iter(n : int) : int {
+              var a : int;
+              var b : int;
+              a := 0;
+              b := 1;
+              while (n >= 0) {
+                var tmp : int;
+                tmp := a;
+                a := a + b;
+                b := tmp;
+                n := n - 1;
+              }
+              return a;
+            }
+          \end{lzero}
+        \end{code}
+      \end{column}
+    \end{columns}
   \end{frame}
 #+end_src
 
