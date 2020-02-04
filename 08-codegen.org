@@ -418,7 +418,6 @@
 #+end_src
 ** Codeerzeugung für Ausdrücke
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}[fragile]{Codeerzeugung für Ausdrücke}
     \textbf{Erinnerung}: Ausdrücke sind AST-Unterbäume die Werte berechnen.
 
@@ -525,7 +524,45 @@
   \end{frame}
 #+end_src
 ** Codeerzeugung für Kontrollflusskonstrukte
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[fragile]{Kontrollfluss: Sequenzierung}
+    \bi
+    \ii \structure{Sequenzierung}: Sequenzielle Codegenerierung für alle Statements {
+      \begin{center}
+        \begin{minipage}{0.5\linewidth}
+          \begin{code}[]
+            \begin{py}
+              def visit_Block(self, block):
+                for stmt in block.statements:
+                  self.visit(stmt)
+            \end{py}
+          \end{code}
+        \end{minipage}
+      \end{center}
+      \bi
+      \ii Unterfunktionen hängen Operationen \textit{implizit} an den \codebox{\scriptsize current\_block}\\[0.5ex]
+      \ii Invariante: Nach jedem Statement kommt der Kontrollfluss wieder zusammen\\[2ex]
+      \uncover<2->{\btAnimation[width=0.7\textwidth]{center,1:<-2>,2:<3>,3:<4>,4:<5->}{fig/08-sequencing}}
+      \ei
+    }
+    \ii<5-> Die Statements etablieren die komplexeren Kontrollflüsse {
+      \bi
+      \ii Anlegen neuer Basisblöcke und Verbindung über \ircmd{Goto} und \ircmd{IfGoto}
+      \ii \textbf{Wichtig}: Ein \texttt{visit()}-Aufruf kann den \texttt{current\_block}-Zeiger umbiegen
+      \ei
+    }
+    \ei
+  \end{frame}
 
+  \begin{frame}{Kontrollfluss: Selektion}
+    \btAnimation[width=\textwidth]{center,range=1-8:<1->}{fig/08-condition}
+  \end{frame}
+
+  \begin{frame}{Kontrollfluss: Iteration}
+    \btAnimation[width=\textwidth]{center,range=1-8:<1->}{fig/08-loop}
+  \end{frame}
+#+end_src
 ** Fallstudie für komplexe Objekte: Records
 
 ** Fallstudie für komplexe Operationen: Dynamischer Dispatch

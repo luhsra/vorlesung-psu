@@ -1,0 +1,81 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[current/.style={
+      label={[fit=(\tikzlastnode),
+        visible on=#1,
+        name=current block,
+        draw,ultra thick,
+        luhgreen]center:}
+    },
+    ]
+    \node[basic block=BB0,current=<-4>] (condBlock) {
+      \ldots\\
+      \only<2->{cond := \ircmd{Assign} \ldots}\strut\\
+      \only<4->{\ircmd{IfGoto} cond, .BB1, .BB2}\strut\\
+    };
+
+    \begin{visible}<1>
+      \draw[ultra thin] (current block.east) --++ (east:2em) node[anchor=west]{\texttt{current\_block}};
+    \end{visible}
+
+    
+    \begin{visible}<2->
+      \node[anchor=north west,xshift=2em,align=left] at (condBlock.north east){
+        
+        \begin{minipage}{7cm}
+        \structure{Ablauf der Codeerzeugung}:
+        \begin{itemize}
+        \item Bedingung generieren\\ \texttt{self.visit(ifStmt.cond)}
+        \item<3-> Blöcke für Then-/Else-Teil, sowie den Sequenzierungsblock erstellen
+        \item<4-> Bedingte Kontrollflussverzeigung
+        \item<5-> Then-Block generieren\\\texttt{self.visit(ifStmt.then\_block)}
+        \item<6-> Else-Block generieren\\\texttt{self.visit(ifStmt.else\_block)}
+        \item<7-> Kontrollfluss wieder zusammenführen
+        \item<8-> \texttt{current\_block}-Invariante wiederherstellen
+        \end{itemize}
+      \end{minipage}
+
+      };
+    \end{visible}
+
+
+
+    
+    \begin{visible}<3->
+      \node[basic block=BB1,current=<5>,below=0.4 of condBlock] (thenBlock) {
+        \only<5->{Stmt1}\strut\\
+        \only<5->{Stmt2}\strut\\
+        \only<7->{\ircmd{Goto} .BB3}\strut\\
+    };
+
+
+    \node[basic block=BB2,current=<6>,below=0.4 of thenBlock] (elseBlock) {
+      \only<6->{Stmt1}\strut\\
+      \only<6->{Stmt2}\strut\\
+      \only<7->{\ircmd{Goto} .BB3}\strut\\
+    };
+
+    \begin{visible}<4->
+      \draw[->] ($(condBlock.south east)+(up:1ex)$) -- ++(east:1em) |- ($(thenBlock.north east)+(down:1ex)$);
+      \draw[->] ($(condBlock.south west)+(up:1ex)$) -- ++(west:1em) |- ($(elseBlock.north west)+(down:1ex)$);
+    \end{visible}
+    
+
+    
+    \node[basic block=BB3,current=<8>,below=0.4 of elseBlock] (afterBlock) {
+      \only<8>{\ldots}\strut\\
+      \only<8>{\ldots}\strut\\
+    };
+
+    \begin{visible}<7->
+      \draw[->] ($(thenBlock.south east)+(up:1ex)$) -- ++(east:1em) |- ($(afterBlock.north east)+(down:1ex)$);
+      \draw[->] ($(elseBlock.south west)+(up:1ex)$) -- ++(west:1em) |- ($(afterBlock.north west)+(down:1ex)$);
+    \end{visible}
+  \end{visible}
+    
+
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}

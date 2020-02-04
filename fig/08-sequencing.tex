@@ -1,0 +1,50 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[dot/.style={
+      draw,circle,fill=black,inner sep=3pt
+    },
+    node distance = 2cm,
+    flow/.style={decorate,->,decoration={snake,post length=3pt}},
+    brace/.style={decorate,decoration={brace, amplitude=5pt}}
+    ]
+    \node[dot] (A) {};
+
+    \node[anchor=north east,shift={(-1em,-2.5em)}] at (A) (cb) {\texttt{current\_block}};
+    \only<1>{\draw[safegreen,thick,->] (cb) -| (A);}
+
+    \begin{visible}<2->
+      \node[dot,right=of A] (B) {};
+      \draw[flow](A) -- (B);
+      \draw[brace] ($(A)+(up:1cm)$) coordinate(@) -- node[above,yshift=5pt](stmt1){[stmt,}(@ -| B);
+      \only<2>{\draw[safegreen,thick,->] (cb) -| (B);}
+    \end{visible}
+    \begin{visible}<3->
+      \node[dot,right=of B] (C) {};
+      \coordinate(BC) at ($(B)!0.5!(C)$);
+      \draw[flow](B) -- ($(BC)+(up:2em)$)  coordinate(@);
+      \draw[flow](@) -- (C) ;
+      \draw[flow](B) -- ($(BC)+(down:2em)$)  coordinate(@);
+      \draw[flow](@) -- (C);
+      \draw[brace] ($(B)+(up:1cm)$) coordinate(@) -- node[above,yshift=5pt](stmt2){stmt,}(@ -| C);
+      \only<3>{\draw[safegreen,thick,->] (cb) -| (C);}
+    \end{visible}
+    \begin{visible}<4->
+      \node[dot,right=of C] (D) {};
+
+      \draw[flow] (C) to[out=-20,in=-90] ($(C)!0.5!(D)$)
+      to[out=90,in=180] ++(-1em,1em)
+      -- (D)
+      ;
+      \draw[brace] ($(C)+(up:1cm)$) coordinate(@) -- node[above,yshift=5pt](stmt3){stmt]}(@ -| D);
+
+      \only<4>{\draw[safegreen,thick,->] (cb) -| (D);}
+
+    \end{visible}
+
+    \node[anchor=east,xshift=-1em] at (A|-stmt1) {\texttt{block.statements=}};
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
