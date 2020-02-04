@@ -217,7 +217,6 @@
 #+end_src
 
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}{Für PSÜ: Ein beispielhafter Zwischencode}
     \begin{btBlock}{}
       Für Vorlesung und Übung entwickeln wir einen Zwischencode auf Basis einer Registermaschine mit unendlich vielen Registern. Dazu schauen wir uns Semantik und Notation an.
@@ -263,7 +262,7 @@
     \bi
     \ii \structure{Speichermanipulationen} (3 Befehle) {
       \bi
-      \ii \ircmd{Ref}: \hspace{1.2em}\btSetTab Erzeugen einer Referenz auf eine Variable      \hfill\texttt{V := \ircmd{Ref} V}
+      \ii \ircmd{Ref}: \hspace{1.2em}\btSetTab Erzeugen einer Referenz          \hfill\texttt{V := \ircmd{Ref} LV}
       \ii \ircmd{Load}: \btUseTab Lesen des addressierten Speicherwortes        \hfill\texttt{V := \ircmd{Load} V}
       \ii \ircmd{Store}: \btUseTab Schreiben eines Wertes an ein Speicherstelle \hfill\texttt{*V := Store CV}
       \ei
@@ -283,7 +282,7 @@
     }\medskip
     \ii \structure{Interprozedurale Kontrollflüsse} (2 Befehle) {
       \bi
-      \ii \ircmd{Call}: Funktionsaufruf mit beliebig vielen Argumenten \hfill\texttt{\ircmd{Call} L, [CV]*}
+      \ii \ircmd{Call}: Funktionsaufruf mit beliebig vielen Argumenten \hfill\texttt{\ircmd{Call} LV, [CV]*}
       \ii \ircmd{Return}: Rückkehr aus einer Funktionsinstanz \hfill\texttt{\ircmd{Return} CV}
       \ei
     }
@@ -381,4 +380,152 @@
 #+end_src
 
 * Codeerzeugung für Zwischencode
+** CFG als Datenstruktur
+#+begin_src latex
+  \dividerframe{Codeerzeugung}
+  \begin{frame}{Notwendige Operationen auf CFG und Basisblöcken}
+    \begin{btBlock}{}
+    \textbf{Schlachtplan}: Wir traversieren den AST einer Funktion und erzeugen dabei einen CFG mit Basisblöcken voller IR-Operationen.
+  \end{btBlock}
 
+  \bigskip
+  \bii
+  \ii Erstelle ein Funktionsobjekt\hspace{1cm}       \btSetTab \siginline{Programm.create\_function}{string}{Function}{%
+    \bi
+    \ii Funktionen haben den Namen als Label (\scriptsize\codebox{func.label})
+    \ii Parameter und Variablen werden beim traversieren erstellt\\[2ex]
+    \ei
+  }
+  \ii Erstelle einen Basisblock          \btUseTab \siginline{Function.create\_block}{()}{BasicBlock}
+  \ii Erstelle einen Parameter           \btUseTab \siginline{Function.create\_parameter}{name}{Variable}
+  \ii Erstelle eine Variable             \btUseTab \siginline{Function.create\_variable}{}{Variable} {
+    \bi
+    \ii Variablen und Parameter werden im Funktionsscope verwaltet
+    \ii Der erste erstellte Basisblock wird automatisch zum Eingangsblock\\[2ex]
+    \ei
+  }
+
+  \ii Hänge eine Operation an            \btUseTab \siginline{BasicBlock.append}{Operation, Operands}{()}{%
+    \bi
+    \ii Das Label für den Basisblock wird automatisch von der Funktion vergeben
+    \ii Ein \ircmd{Goto}/\ircmd{IfGoto} schließt den Basisblock ab
+    \ei
+  }
+
+  \eii
+
+  \end{frame}
+#+end_src
+** Codeerzeugung für Ausdrücke
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[fragile]{Codeerzeugung für Ausdrücke}
+    \textbf{Erinnerung}: Ausdrücke sind AST-Unterbäume die Werte berechnen.
+
+    \bi
+    \ii Jeder AST-Knotentyp erzeugt anderen Code {
+      \bi
+      \ii Dynamischer Dispatch anhand des Knotentyps \hfill$\Rightarrow$ Visitor-Pattern
+      \ii Fas Ergebnis des Ausdrucks wird in einer temporäre Variable gespeichert. {\\
+        \begin{btBlock}[type=info,text width=0.85\textwidth]{}
+          Wir werden beliebig viele virtuelle Register erzeugen. Die Abbildung auf reale Register ist Aufgabe der Maschinencode-Erzeugung
+        \end{btBlock}
+      }
+      \ei
+    }\medskip
+    \ii<2-> Wer entscheidet wo das Ergebnis des Ausdrucks gespeichert wird? {
+      \bi
+      \ii \textbf{Bottom-Up}: Codegenerierung des Unterbaums erzeugt die Zielvariable{
+        \smallskip
+        \hspace{1em}\siginline{visit\_Add}{Add}{Variable}
+        \smallskip
+      }
+      \ii \textbf{Top-Down}: Codegenerierung bekommt Zielvariable als Parameter{
+        \smallskip
+        \hspace{1em}\siginline{visit\_Add}{Add, Variable}{()}
+        \smallskip
+      }
+      \ii Beide Strategien weitgehend equivalent und Mischungen sind möglich
+      \ei
+    }
+    \ei
+
+  \end{frame}
+
+  \begin{frame}[fragile]{Bottom-Up Codeerzeugung für die Addition}
+    \begin{columns}
+      \begin{column}{0.28\textwidth}
+        \btAnimation[width=\textwidth]{1:<1->}{fig/08-codegen-add}
+      \end{column}\hfill%
+      \begin{column}{0.7\textwidth}
+        \begin{code}[]
+          \begin{py}
+            class CodeGen:
+              ...
+              def visit_Add(self, expr):
+                l = self.visit(expr.LHS) # <- dynamic dispatch
+                r = self.visit(expr.RHS) # <- 
+                ret = self.current_function.create_variable()
+                self.current_block.append(Add, ret, l, r)
+                return ret
+          \end{py}
+        \end{code}
+      \end{column}
+    \end{columns}\medskip
+
+    \bi \ii Codegenerierung delegiert das Berechnen der Unterbäume { \bi \ii Alle Visit-Funktionen für Ausdrücke liefern Ergebnis als Rückgabewert \ii Nur Berechnung des R-Werts.
+  L-Wert wird Sonderfall in \ircmd{Assign} \ei }\medskip \ii Explizite Traversierung bei der Code Erzeugung{ \bi \ii Wir verwenden absichtlich keine automatische Traversierung des Baums \ii Generierungs-Funktionn verwenden Referenz auf aktuelle Funktion/Block \ii Sie haben als \textbf{Seiteneffekt} das \structure{emittieren} einzelner Instruktionen \ei } \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Code-Erzeugung für Funktionsaufruf und Zuweisung}
+    \bi
+    \ii \structure{Funktionsaufrufe}{\\[1ex]
+    \begin{code}[]
+      \begin{py}
+        def visit_CallExpr(self, call_expr):
+          args   = [self.visit(arg) for arg in call_expr.arguments]
+          callee = self.visit(call_expr.callee)
+          ret    = self.current_function.create_variable()
+          self.current_block.append(Call, ret, callee, *args)
+          return ret
+      \end{py}
+    \end{code}
+    \bi
+    \ii Wir entscheiden über eine Auswertungsreihenfolge der Argumente
+    \ii Auswertung des Callee könnte Label oder Referenz liefern
+    \ei
+  }\bigskip
+  \ii<2-> \structure{Zuweisung} braucht den L-Wert der linken Seite{
+    \bi
+    \ii Spezieller Visitor für die linken Seiten liefert Referenz \hfill\codebox{\scriptsize lvalue\_Variable()}
+    \ii Funktioniert immer: Emittieren eines \ircmd{Store} Befehls
+    \ii<3-> \advantage{Optimierung}: Sonderfall für Variablen auf der linken Seite macht IR kompakter
+    \ei
+    \begin{columns}
+      \begin{column}<2->{0.35\textwidth}
+        \begin{code}[]
+          \begin{codetext}
+            t0  := Add 2, 3
+            t1  := Reference var
+            ,*t1 := Store t0
+          \end{codetext}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}<3->{0.35\textwidth}
+        \begin{code}[]
+          \begin{codetext}
+            t0  := Add 2, 3
+            var := Assign t0
+          \end{codetext}
+        \end{code}
+      \end{column}
+    \end{columns}
+  }
+  \ei
+  \end{frame}
+#+end_src
+** Codeerzeugung für Kontrollflusskonstrukte
+
+** Fallstudie für komplexe Objekte: Records
+
+** Fallstudie für komplexe Operationen: Dynamischer Dispatch

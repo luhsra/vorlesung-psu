@@ -1,0 +1,45 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[basic block=BB0] (BB0) {
+      a := \ircmd{Assign} 0\\
+      b := \ircmd{Assign} 1\\
+      \ircmd{Goto} .BB1
+    };
+    
+    \node[basic block=BB1, below=0.4 of BB0] (BB1) {
+      t2 := \ircmd{LessEqual} 0, n\\
+      \ircmd{IfGoto} t2, .BB2, .BB3
+    };
+
+    \node[basic block=BB2, below=0.4 of BB1] (BB2) {
+      tmp := Assign a\\
+      a := Add a, b\\
+      b := Assign tmp\\
+      n := Sub n, 1\\
+      Goto .BB1
+    };
+
+    \node[basic block=BB3, below=0.4 of BB2] (BB3) {
+      \ircmd{Return} a
+    };
+
+    \draw[->](BB0) -- (BB1);
+    \draw[->](BB1) -- (BB2);
+    \draw[->](BB1.south west)++(up:1ex) -- ++(west:1em) |- (BB3);
+    \draw[->](BB2.south east)++(up:1ex) -- ++(east:1em) |- ($(BB1.north east)+(down:1ex)$);
+
+
+    \node[draw, inner sep=2em,fit=(BB0) (BB3),label=above:\texttt{fib\_iter(n : int) : int}] (func) {};
+
+    \node[below=0.2 of func,align=left,font=\ttfamily\small,width as=func,,draw]{
+      parameters = [n]\\
+      variables = [a, b, t2, tmp]\\
+      basic\_blocks = \{BB0, BB1, BB2, BB3\}\\
+      entry\_block = BB0
+    };
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}

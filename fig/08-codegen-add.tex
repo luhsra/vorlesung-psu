@@ -1,0 +1,22 @@
+\documentclass{lecturefig}
+\usepackage{fig/07-common}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[operation] (plus) {+};
+    \node[subtree,below left=2 and 0.2 of plus]  (LHS) {\small LHS};
+    \node[subtree,below right=2 and 0.2 of plus] (RHS) {\small RHS};
+
+    \draw(plus) -- node[below,sloped]{$\rightarrow$} (LHS.apex);
+    \draw(plus) -- node[below,sloped]{$\leftarrow$} (RHS.apex);
+
+    \begin{pgfonlayer}{background}
+      \draw[fill=badbee!20] ($(plus.north)+(up:2em)$)
+      -- node[above,sloped]{Add Unterbaum}($(LHS.left corner)+(-8mm,-1em)$) 
+      -- ($(RHS.right corner)+(8mm,-1em)$) 
+      -- cycle;
+    \end{pgfonlayer}
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

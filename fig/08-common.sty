@@ -1,0 +1,15 @@
+\newcommand{\ircmd}[1]{\texttt{{#1}}}
+
+\tikzset{
+  basic block/.style={
+    text width=5cm,
+    draw,
+    fill=luhblue!40,
+    font=\ttfamily,
+    align=left,
+    label={[anchor=south east]south east:\textit{\scriptsize #1}},
+  },
+  subtree/.style={
+    draw, fill=badbee!40,isosceles triangle, shape border rotate=90,
+  }
+}
