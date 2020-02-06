@@ -1,0 +1,18 @@
+\documentclass{lecturefig}
+\usepackage{fig/05-common}
+\usepackage{fig/07-common}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[ast/.style={ast with attributes,anchor=north},sibling distance=3cm,]
+    \node[ast] {FieldAccess\nodepart{two}Type=int}
+    child {
+      node[ast] {Identifier\nodepart{two}Type=struct foo}
+      edge from parent node[sloped,above,pos=0.6] {lhs}
+    }
+    child {
+      node[ast] {Identifier\nodepart{two}name=c}
+      edge from parent node[sloped,above,pos=0.6] {name}
+    };
+  \end{tikzpicture}
+\end{frame}
+\end{document}

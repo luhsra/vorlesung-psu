@@ -59,7 +59,7 @@ endef
 
 # Wordcount
 wc:
-	@make -s 01.wc 02.wc 03.wc 04.wc 05.wc 06.wc | tr "\n" " " | dc -f - -e '[+z1<r]srz1<rp'
+	@make -s 01.wc 02.wc 03.wc 04.wc 05.wc 06.wc 07.wc | tr "\n" " " | dc -f - -e '[+z1<r]srz1<rp'
 
 %.view:
 	xdg-open $< &

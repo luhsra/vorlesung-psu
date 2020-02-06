@@ -57,7 +57,7 @@
 
   \begin{frame}{Einordnung in den Übersetzerbau}
     \btAnimation[width=\textwidth]{1:<-2>,2:<3>}{fig/08-retargable-compiler}%
-    \footnote{Zahlen sind für Clang (C/C++ Frontend, 700k)und LLVM 9.0 (1.4M)}
+    \footnote{Zahlen für Clang (C/C++ Frontend, 700k) und LLVM 9.0 (18 Backends, 1.4M)}
 
     \bi
     \ii Die Konstruktion eines Übersetzers ist aufwändig und schwierig!{
@@ -69,7 +69,7 @@
     \ii<2-> \structure{Zwischenrepresentation} erhält die Programm-Semantik{
       \bi
       \ii AST ist bereits eine \structure{Intermediate Representation} (IR-Form)
-      \ii Der klassische IR-Code: CFG mit Instruktionen für eine virtuelle Maschine
+      \ii Der klassische IR-Code: CFG mit Instruktionen für eine sequentielle Maschine
       \ei
     }
     \ei
@@ -436,12 +436,12 @@
       \bi
       \ii \textbf{Bottom-Up}: Codegenerierung des Unterbaums erzeugt die Zielvariable{
         \smallskip
-        \hspace{1em}\siginline{visit\_Add}{Add}{Variable}
+        \hspace{1em}\siginline{rvalue\_Add}{Add}{Variable}
         \smallskip
       }
       \ii \textbf{Top-Down}: Codegenerierung bekommt Zielvariable als Parameter{
         \smallskip
-        \hspace{1em}\siginline{visit\_Add}{Add, Variable}{()}
+        \hspace{1em}\siginline{rvalue\_Add}{Add, Variable}{()}
         \smallskip
       }
       \ii Beide Strategien weitgehend equivalent und Mischungen sind möglich
@@ -461,9 +461,9 @@
           \begin{py}
             class CodeGen:
               ...
-              def visit_Add(self, expr):
-                l = self.visit(expr.LHS) # <- dynamic dispatch
-                r = self.visit(expr.RHS) # <- 
+              def rvalue_Add(self, expr):
+                l = self.rvalue(expr.LHS) # <- dynamic dispatch
+                r = self.rvalue(expr.RHS) # <- 
                 ret = self.current_function.create_variable()
                 self.current_block.append(Add, ret, l, r)
                 return ret
@@ -481,9 +481,9 @@
     \ii \structure{Funktionsaufrufe}{\\[1ex]
     \begin{code}[]
       \begin{py}
-        def visit_CallExpr(self, call_expr):
-          args   = [self.visit(arg) for arg in call_expr.arguments]
-          callee = self.visit(call_expr.callee)
+        def rvalue_CallExpr(self, call_expr):
+          args   = [self.rvalue(arg) for arg in call_expr.arguments]
+          callee = self.lvalue(call_expr.callee)
           ret    = self.current_function.create_variable()
           self.current_block.append(Call, ret, callee, *args)
           return ret
@@ -592,21 +592,20 @@
 #+end_src
 ** Fallstudie für komplexe Objekte: Records
 #+begin_src latex
-  %%ONLY%%
-  \dividerframe{Komplexere Objekte\\und\\Operationen}
+\dividerframe{Komplexere Objekte\\und\\Operationen}
   \begin{frame}{Komplexere Objekte: Records}
     \begin{btBlock}{Intentionale Unvollständigkeit der Vorlesung}\small
-      Der \advantage{Grundstock der Codeerzeugung} ist gelegt und kann beliebig erweitern werden. Um ihnen einen Einblick zu geben, ohne Sie mit endlosen Erzeugungsregeln zu langweilen, werfe ich nur ein \structure{Schlaglicht auf zwei Themen}.
+      Der \advantage{Grundstock der Codeerzeugung} ist gelegt und kann beliebig erweitern werden. Um ihnen einen Einblick zu geben, ohne Sie mit endlosen Erzeugungsregeln zu langweilen, werfe ich nur ein \structure{Schlaglicht auf Records}.
     \end{btBlock}
 
     \bi
-    \ii Records haben mehrere benannte und typisierte Felder {
+    \ii<2-> Records haben mehrere benannte und typisierte Felder {
       \bi
       \ii Ein Record-Objekt kann größer sein als ein einzelnes Maschinenwort
-      \ii \ALERT{Aber}: Die IR-Maschine kann nur 32-Bit Zahlen speichern und verarbeiten
+      \ii \ALERT{Aber}: Unsere IR-Maschine kann nur 32-Bit Zahlen speichern und verarbeiten
       \ei
     }\medskip
-    \ii Wir müssen eine Übersetzung des Sprachkonstrukts vornehmen:{
+    \ii<3-> Wir müssen eine Übersetzung des Sprachkonstrukts vornehmen:{
         \bi
         \ii Die Record-Objekte müssen in den Speicher gelegt werden
         \ii Berechnung der relativen und absoluten Feldadressen
@@ -615,5 +614,405 @@
     }
     \ei
   \end{frame}
+
+  \begin{frame}[t]{Record-Typen: Datenlayout}
+    \bi
+    \ii \textbf{Erinnerung (Record)}: Geordnete Sequenz von Paaren (Name, Typ)\\\medskip
+    \begin{center}
+      \texttt{type(struct bar) = }\typeinline{ = record(("a", int), ("b", foo\_t), ("c", int))}
+     \end{center}\medskip
+     \ii<2-> Um dessen Objekte im Speicher abzulegen brauchen wir ein \structure{Datenlayout}{%
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \mbox{\strut}\\
+        \texttt{layout(struct bar) = }\\[1ex]
+        {\small
+        \begin{tabular}{lrrr}\toprule
+          Name & \uncover<4->{Offset} & Typ    & \uncover<3->{Länge} \\\midrule
+          \only<7->{*TAG* & 0 & type\_t  & 4\\}
+          a    & \only<4-6>{0} \only<7->{4}    & int    & \uncover<3->{4}     \\
+          b    & \only<4-6>{4} \only<7->{8}    & foo\_t & \uncover<3->{5}     \\
+  \only<5->{-- & \only<4-6>{9} \only<7->{13}    &        & 3\\}
+          c    & \only<5-6>{12}\only<7->{16}    & int    & \uncover<3->{4}  \\\bottomrule
+        \end{tabular}
+        }
+      
+        \only<6->{\mbox{}\\[2ex]\texttt{sizeof(struct bar) = } \alt<6>{16}{20}}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \vspace{-1em}
+        \bi
+        \ii Übersetzer leitet das Layout ab {
+          \bi
+          \ii<3-> Jeder enthaltende Typ belegt eine gewisse \alert{Anzahl an Bytes} im Speicher.
+          \ii<4-> Berechnung eines \structure{Feld-Offsets}.
+          \ii<5-> Zusätzliche \structure{Alignment}-Bedingungen durch das Einfügen von Lücken.
+          \ii<6-> Es ergibt sich die Größe \textbf{dieses Typs}.
+          \ii<7-> Mit dynamische Typen: Tag-Feld
+          \ei
+        }\smallskip
+        \ii<8-> Verwendung des Layout-Deskriptors {
+          \bi
+          \ii Codeerzeugung
+          \ii Debug-Informationen
+          \ii Dynamische Introspektion
+          \ei
+        }
+        \ei
+      \end{column}
+    \end{columns}
+  }\ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Records: Codeerzeugung}
+    \bi
+    \ii Codeerzeugung muss an mehreren Stellen angepasst werden {
+      \bi
+      \ii Variablendeklarationen, Feldzugriffe, Referenzerzeugung
+      \ii Parameterübergabe, Rückgabewerte
+      \ii Wir streben (beispielhaft) ein Wertemodell für Variablen an
+      \ei
+    }\medskip
+    \ii<2-> \structure{Deklaration einer lokalen Variable} mit Record-Typ{
+      \bi
+      \ii Unsere IR-Maschine kann nur 32-Bit Variablen $\Rightarrow$ IR-Variable hält Pointer
+      \ii Allokation am Stack mittels \ircmd{StackAlloc} und \texttt{sizeof(Type)}
+      \ei
+      \begin{columns}[t]
+        \begin{column}<2->{0.49\textwidth}
+          \begin{code}[]
+            \begin{py}[style=smaller]
+              def visit_VarDecl(self, decl):
+                bb = self.current_block
+                cf = self.current_function
+
+                # IR-Variable 
+                var = cf.create_variable(decl.name)
+                decl.IR_var = var
+
+                # ggf. Objekt am Stack anlegen
+                if decl.Type.sizeof > 4:
+                  bb.append(StackAlloc(var, sizeof))
+                    if self.dynamic_types:
+                       bb.append(Store, var,
+                                 decl.Type.tag)
+               \end{py}
+          \end{code}
+        \end{column}\hfill
+        \begin{column}{0.49\textwidth}
+          \begin{code}[]
+            \begin{lzero}
+              var obj : struct foo;
+            \end{lzero}
+          \end{code}
+          \begin{center}
+            $\Downarrow$
+          \end{center}
+          \begin{code}<3->[]
+            \begin{codetext}
+              obj  := StackAlloc 20
+              *obj := Store 12345   // Typ-Tag
+            \end{codetext}
+          \end{code}\bigskip
+        
+          \uncover<4->{\textbf{Alternative}: Größere Objekte auf den Heap (\ircmd{HeapAlloc}, \ircmd{HeapFree})}
+        \end{column}
+      \end{columns}
+
+    }
+    \ei
+  \end{frame}
+  #+end_src
+#+begin_src latex
+  \begin{frame}[fragile]{Records: Zuweisungen}
+    \bi
+    \ii Für die Zuweisung brauchen wir \structure{R- und L-Wert} des Record-Objekts {
+      \bi
+      \ii \textbf{Problem}: Nur Referenz, nicht aber Objekt, passt nicht in eine IR-Variable
+      \ii Unsere einfache IR-Sprache erfordert komplexere Codeerzeugung
+      \ii<2->[$\Rightarrow$] Wir verwenden die Referenz sowohl als R- als auch als L- Wert
+      \ei
+      \medskip
+      \begin{columns}<2->
+        \begin{column}{0.49\textwidth}
+          \begin{code}[]
+            \begin{py}[style=smaller]
+              def rvalue_Identifier(self, expr):
+                ...
+                if isinstance(expr.Type, RecordType):
+                   return expr.decl.IR_var
+            \end{py}
+          \end{code}
+        \end{column}\hfill
+        \begin{column}{0.49\textwidth}
+          \begin{code}[]
+            \begin{py}[style=smaller]
+              def rvalue_Identifier(self, expr):
+                ...
+                if isinstance(expr.Type, RecordType):
+                   return expr.decl.IR_var
+            \end{py}
+          \end{code}
+        \end{column}
+      \end{columns}
+
+    }
+    \bigskip
+    \ii<3-> \structure{Zuweisungs}-Operation für größere Objekte (> 4 Bytes){
+      \bi
+      \ii Am Zuweisungskonten kommen 2 Zeiger für Quelle, als auch für Ziel an
+      \ii Verwendung der \texttt{memcpy()}-Hilfsfunktion mit konstanter Größe
+      \ei
+    }
+
+    \begin{columns}
+      \hfill
+      \begin{column}{0.30\textwidth}
+        \begin{code}[]
+          \begin{lzero}
+            var x : struct foo;
+            var y : struct foo;
+            x := y;
+          \end{lzero}
+        \end{code}
+      \end{column}\hfill$\Rightarrow$\hfill
+      \begin{column}{0.40\textwidth}
+        \begin{code}[]
+          \begin{codetext}
+            x  := StackAlloc 16
+            y  := StackAlloc 16
+            t1 := Call memcpy, y, x, 20
+          \end{codetext}
+        \end{code}
+      \end{column}
+      \hfil
+    \end{columns}
+
+    \ei
+  
+  \end{frame}
+
+  \begin{frame}[fragile]{Records: Feldzugriffe}
+    \begin{columns}
+      \begin{column}[t]{0.49\textwidth}
+        \btAnimation[width=0.8\textwidth]{raisebox,center,1:<1->}{fig/08-field-access}
+      \end{column}\hfill
+      \begin{column}[t]{0.23\textwidth}
+        \columntitle {L-Wert}
+        \begin{code}[]
+          \begin{lzero}
+            obj.c := 100;
+          \end{lzero}
+        \end{code}
+        \begin{center}
+          $\Downarrow$
+        \end{center}
+        \begin{code}[]
+        \begin{codetext}[style=smaller]
+            t0  := Add obj, 16
+            ,*t0 := Store 100
+          \end{codetext}
+        \end{code}
+      \end{column}
+      \begin{column}[t]{0.23\textwidth}
+        \columntitle {R-Wert}
+        \begin{code}[]
+          \begin{lzero}
+             y := obj.c;
+          \end{lzero}
+        \end{code}
+        \begin{center}
+          $\Downarrow$
+        \end{center}
+        \begin{code}[]
+          \begin{codetext}[style=smaller]
+            t0 := Add obj, 16
+            t1 := Load t0
+            y  := Assign t1
+          \end{codetext}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \medskip
+
+    \bi
+    \ii Ableitung der Feld-Adresse aus Objekt-Adresse und Feld-Offset\\[1ex]{
+
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \columntitle{L-Wert}
+        \bii
+        \ii L-Wert von \texttt{lhs} ist \structure{Basisadresse}
+        \ii Offset \textbf{statisch} aus Layout bestimmen
+        \ii Feldadresse ist Basis+Offset
+        \eii
+
+        \columntitle{R-Wert}
+        \bii
+        \ii Dereferenzierung des L-Werts
+        \ii Re-Use: \texttt{lvalue\_FieldAccess()}
+        \eii
+
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}[]
+          \begin{py}[style=smaller]
+            def lvalue_FieldAccess(self, expr):
+              # Basisadresse des Objekts
+              lhs_ptr = self.lvalue(expr.lhs)
+              # Konstanter Offset des Felds
+              layout = expr.Type.layout
+              offset = layout[expr.name].offset
+              # Adressberechung
+              ret = self.current_function\
+                    .create_variable()
+              self.current_block\
+                 .append(Add, ret, lhs_ptr, offset)
+              return ret
+          \end{py}
+        \end{code}
+      \end{column}
+    \end{columns}
+}
+
+    \ei
+
+
+  \end{frame}
 #+end_src
-** Fallstudie für komplexe Operationen: Dynamischer Dispatch
+
+
+#+begin_src latex
+  \begin{frame}[fragile]{Records: Funktionsaufrufe}
+    \begin{btBlock}{}
+      \textbf{Erinnerung}: Wir wollen Wertemodell für Variablen in der Sprache.
+    \end{btBlock}
+
+    \bi
+    \ii Wir müssen Record-Objekte in Funktionen und wieder heraus bekommen{%
+      \bi
+      \ii \textbf{Problem}: Wir können nur 32-Bit Wörter übergeben
+      \ii \structure{Call-by-Value}: Der Aufgerufene soll eine Kopie des Objekts bekommen{
+        \begin{columns}
+          \hfill\begin{column}{0.70\textwidth}
+            \begin{code}[]
+              \begin{lzero}
+                func f(obj : struct foo) : struct foo {
+                  obj.c := 33;
+                  return obj.c;
+                }
+              \end{lzero}
+            \end{code}
+          \end{column}\hfill
+        \end{columns}
+      }
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Lösung}: Wir führen ein \structure{Aufrufkonvention} für größere Objekte ein{
+      \bi
+      \ii Für \structure{Parameter}: \btSetTab Der Aufrufende gibt Zeiger auf Orginalobjekt mit.\\
+      \btUseTab Der Aufgerufene legt sich eine Kopie als lokales Objekt an\\[2ex]
+      \ii Für \structure{Rückgabe}: \btUseTab Aufrufer gibt Zieladdresse als zusätzlichen Parameter mit\\
+      \btUseTab Ausschleusen des Rückggabewerts durch \texttt{memcpy()}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Records: Beispiel für Funktionsaufruf}
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \columntitle{Aufrufstelle}
+        \begin{code}[]
+          \begin{lzero}
+            var src : struct foo;
+            var dst : struct foo;
+            dst := f(src);
+          \end{lzero}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \columntitle{Funktion}
+        \begin{code}[]
+          \begin{lzero}[style=smaller]
+            func f(obj :struct foo) : struct foo {
+              return obj;
+            }
+          \end{lzero}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \begin{center}
+          $\Downarrow$
+          \begin{code}[]
+            \begin{codetext}
+              src := StackAlloc 16
+              dst := StackAlloc 16
+              t0  := Call f, dst, src
+            \end{codetext}
+          \end{code}
+        \end{center}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{center}
+          $\Downarrow$
+          \begin{code}[]
+            \begin{codetext}[style=smaller]
+              <Function: f> {
+                parameters = [__ret, src]
+                variables = [__src]
+                <BB: BB0> {
+                  // Prologue
+                  __src := StackAlloc 16
+                  t0  := Call memcpy, __src, src
+                  // Function Return
+                  t1  := Call memcpy, __ret, __src
+                  Return __ret
+                }
+              }
+            \end{codetext}
+          \end{code}
+        \end{center}
+      \end{column}
+    \end{columns}
+  \end{frame}
+#+end_src
+* Zusammenfassung
+
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+    \bi
+    \ii Zwischencode für eine \structure{sequentielle virtuelle Maschine} {
+      \bi
+      \ii Stack-Maschine oder Register-Maschine mit unendlich vielen Registern
+      \ii 3-Adress-Code bzw. Quadrupel-Notation
+      \ei
+    }\medskip 
+    \ii \structure{CFG-Datenstruktur} nimmt Code während der Erzeugung auf{
+      \bi
+      \ii Erzeugen neuer Funktionen, Basisblöcke und lokaler Variablen
+      \ii Anhängen einer Operation an den aktuellen Basisblock
+      \ei
+    }\medskip
+    \ii Unterschiedliche Codeerzeugung für L-/R-Werte {
+      \bi
+      \ii \structure{L-Wert}: Visitor erzeugt eine temporäre Variable, die die Referenz enthält
+      \ii \structure{R-Wert}: Zurückgegebene Variable enthält berechneten Wert
+      \ei
+    }\medskip
+    \ii \structure{Kontrollstrukturen} (\texttt{if, while}) werden linearisiert {
+      \bi
+      \ii Erzeugen neuer Basisblöcke und Abbildung des Kontrollflusses auf \ircmd{(If)Goto}
+      \ii Trennung der Belange zwischen Codeerzeugung und Optimierer
+      \ei
+    }\medskip
+    \ii Fallbeispiel: Records als \structure{komplexeres Sprachkonstrukt}
+    \ei
+
+  \end{frame}
+#+end_src
