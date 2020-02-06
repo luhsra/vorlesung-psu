@@ -982,6 +982,33 @@
     \end{columns}
   \end{frame}
 #+end_src
+
+#+begin_src latex
+  \begin{frame}{Records: Fazit}
+    \bi
+    \ii Records und Wertemodell haben nicht gut in unser IR-Modell gepasst {
+      \bi
+      \ii Variablen sind nur 32-Bit
+      \ii Abbildung des Wertemodell auf Referenzen 
+      \ei
+    }\bigskip
+    \ii Codeerzeugung verhält sich abhängig vom Typ völlig anders {
+      \bi
+      \ii Zuweisungs-Operation bekommt Referenz auf Record-Objekte als R-Wert
+      \ii Besondere Aufrufkonvention für Record-Objekte
+      \ii Zeiger auf Record-Objekte sind kein Problem (\codebox{\scriptsize \&struct foo})
+      \ei
+    }\bigskip
+    \ii Notwendigkeit einer Bibliothek mit Laufzeitfunktionen {
+      \bi
+      \ii Übersetzer verlässt sich auf die Existenz von Bibliotheksfunktionen (\texttt{memcpy()}
+      \ii Erweiterung des IR-Codes durch Funktionen (\ircmd{Call}: Komplexbefehl)
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+#+end_src
 * Zusammenfassung
 
 #+begin_src latex
