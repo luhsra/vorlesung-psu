@@ -37,6 +37,10 @@ fig/%.pdf: fig/%.tex texmf-local/lecturefig.cls
 	${LATEXMK} $< -outdir=build
 	@cp $(patsubst fig/%,build/%,$@) $@
 
+fig/%.pdf: fig/%.dot  Makefile
+	@${MAKE} build
+	dot -Tpdf $< > $@
+
 define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung
 build/$(2).slides.pdf build/$(2).handout.pdf: $(shell find fig/ -name "$(1)-*.pdf")
 $(1):                 build/$(2).slides.pdf

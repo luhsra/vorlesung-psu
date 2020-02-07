@@ -1,0 +1,17 @@
+digraph G { graph [rankdir=TD]; node [shape=record];
+ bb_140487750167376[shape=record,label="{ .BB0 | t1 = Assign [2]\la = Assign [t1]\lIfGoto [1, .BB1, .BB2]}"];
+ bb_140487750167376 -> bb_140487750168272;
+ bb_140487750167376 -> bb_140487750168464;
+ bb_140487750168272[shape=record,label="{ .BB1 | t2 = Add [a, 3]\la = Assign [t2]\lt3 = LessEqual [1, a]\lIfGoto [t3, .BB3, .BB4]}"];
+ bb_140487750168272 -> bb_140487750230800;
+ bb_140487750168272 -> bb_140487750231056;
+ bb_140487750168464[shape=record,label="{ .BB2 | Goto [.BB6]}"];
+ bb_140487750168464 -> bb_140487750230224;
+ bb_140487750230800[shape=record,label="{ .BB3 | a = Assign [0]\lGoto [.BB5]}"];
+ bb_140487750230800 -> bb_140487750231376;
+ bb_140487750231056[shape=record,label="{ .BB4 | t4 = Assign [-1]\la = Assign [t4]\lGoto [.BB5]}"];
+ bb_140487750231056 -> bb_140487750231376;
+ bb_140487750231376[shape=record,label="{ .BB5 | Goto [.BB6]}"];
+ bb_140487750231376 -> bb_140487750230224;
+ bb_140487750230224[shape=record,label="{ .BB6 | Return [a]\lReturn [0]}"];
+}

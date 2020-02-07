@@ -1,0 +1,14 @@
+digraph G { graph [rankdir=TD]; node [shape=record];
+ bb_140635486489744[shape=record,label="{ .BB0 | t1 = Assign [2]\la = Assign [t1]\lGoto [.BB1]}"];
+ bb_140635486489744 -> bb_140635486490064;
+ bb_140635486490064[shape=record,label="{ .BB1 | t2 = Add [a, 3]\la = Assign [t2]\lt3 = LessEqual [1, a]\lIfGoto [t3, .BB3, .BB4]}"];
+ bb_140635486490064 -> bb_140635486544528;
+ bb_140635486490064 -> bb_140635486544912;
+ bb_140635486544528[shape=record,label="{ .BB3 | a = Assign [0]\lGoto [.BB5]}"];
+ bb_140635486544528 -> bb_140635486545232;
+ bb_140635486544912[shape=record,label="{ .BB4 | t4 = Assign [-1]\la = Assign [t4]\lGoto [.BB5]}"];
+ bb_140635486544912 -> bb_140635486545232;
+ bb_140635486545232[shape=record,label="{ .BB5 | Goto [.BB6]}"];
+ bb_140635486545232 -> bb_140635486488912;
+ bb_140635486488912[shape=record,label="{ .BB6 | Return [a]\lReturn [0]}"];
+}
