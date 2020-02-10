@@ -272,9 +272,6 @@
       \ei
     }
     \ei
-
-
-
   \end{frame}
 #+end_src
 
