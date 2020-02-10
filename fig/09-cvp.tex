@@ -1,0 +1,15 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[basic block=BB0](bb){
+      t1  := \alt<1>{Add 1, 1}{Assign 2}\\
+      a   := Assign \alt<-2>{t1}{2}\\
+      \mathstrut\alt<1>{IfGoto 1, .BB1, .BB2}{Goto .BB1}\\
+    };
+    \only<3>{
+      \draw[->,safegreen,ultra thick] ($(bb.north east)+(left:3em)$) -- ($(bb.south east)+(left:3em)$);
+    }
+  \end{tikzpicture}
+\end{frame}
+\end{document}
