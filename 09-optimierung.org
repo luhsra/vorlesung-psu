@@ -106,3 +106,83 @@
   \end{frame}
 #+end_src
 
+* Vorraussetzungen und Ziele
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Ziele und Vorraussetzungen\\der Optimierung}
+
+  \begin{frame}{Ziele bei IR-Level Optimierung}
+    \begin{btBlock}[type=example]{Allgemeine Optimierungsziele}
+      Ziel jeder Programm-Optimierung ist es, die \textbf{nicht-funktionalen} Eigenschaften, unter Beibehaltung der \textbf{erwarteten Funktionalität}, zu verbessern.
+    \end{btBlock}
+
+    \bi
+    \ii Nicht-Funktionale Eigenschaften nach denen wir optimieren {
+      \bi
+      \ii \structure{Ausführungszeit}: Abbildung auf weniger oder schnellere Instruktionen
+      \ii \structure{Programmgröße}: Veringerung der Binärgröße (eingebettete Systeme)
+      \ii \structure{Energieverbrauch}: Verlängerung der Batterielaufzeit
+      \ei
+    }\medskip
+    \ii<2-> Auf der Hardware-unabhängigen IR-Ebene fehlt das \alert{Kostenmodell}{
+      \bi
+      \ii Wir wissen nicht wie schnell, groß, oder Energie-hungrig einzelne Instruktionen auf der Zielplattform sein werden.
+      \ii \structure{Heuristik}: \enquote{Speicherzugriffe und Sprünge sind teuer.}
+      \medskip
+      \ii<3->[$\Rightarrow$] Generelle Reduktion der Anzahl der Instruktionen und Basisblöcke
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+
+  \begin{frame}{Wiederholung (1. Vorlesung): Korrekte Übersetzung}
+    \bi
+    \ii Die Programmiersprache definiert die \alert{beobachtbaren} Zustände. {
+      \bi
+      \ii Ein- und Ausgabe ist immer beobachtbar, oft aber auch Teile des Speichers
+      \ii Bei C: Nur das Schreiben von globalen Variablen, nicht aber von lokalen.
+      \ei
+    }\bigskip
+    \ii Ein \advantage{korrekter} Übersetzer erhält alle beobachtbaren Zustände.{
+      \bi
+      \ii Parsing+Code-Erzeugung ist eine \textbf{Abbildungsfunktion}:\\[2ex]{
+        \includegraphics[page=2,width=0.9\textwidth]{fig/01-zustand}
+      }
+      \ei
+    }\bigskip
+    \ii[$\Rightarrow$] Funktionen \advantage{dürfen verändert werden}, solange sie außen gleich aussehen {
+      \bi
+      \ii Im IR-Code: lokalen und temporären Variablen sind nicht sichtbar
+      \ii Von Außen sichtbar sind: \ircmd{Store}, \ircmd{Call}, \ircmd{Return}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Phasen und Umfang der Optimierung}
+    \begin{center}
+      \includegraphics{fig/09-analyse}
+    \end{center}
+    \bi
+    \ii Optimierung besteht immer aus \textbf{zwei Schritten} {
+      \bi
+      \ii \structure{Analyse} des Programms generiert Wissen anhand dessen wir entscheiden können, ob wie \alert{eine Optimierung anwenden dürfen}.
+      \ii \structure{Transformation} in ein semantisch äquivalentes, aber \enquote{besseres} Programm.
+      \ei
+    }\medskip
+    \ii Optimierungen analysieren und transformieren \textbf{Programmausschnitte} {
+      \bi
+      \ii Wie groß ist der Ausschnitt über den wir wissen extrahieren?
+      \ii Instruktionen, einzelne Basisblöcke, eine ganze Funktion, eine Aufrufhierarchie, mehrere interagierende Threads
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
+* Block-lokale Optimierungen
+
+* Optimierung des Kontrollflusses
+
+* Elimination toter Instruktionen

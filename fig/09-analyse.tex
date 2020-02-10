@@ -1,0 +1,26 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[draw,fill=safeorange!40,minimum width=3cm](analyse){Analyse};
+    \node[draw,fill=luhblue!40,minimum width=3cm,below=0.6 of analyse](transform){Transformation};
+
+    \node[fit=(analyse) (transform),xshift=-3.5cm,draw,inner xsep=-1em,label={[font=\scriptsize]above:Orginal}] (left) {};
+    \node[fit=(analyse) (transform),xshift=+3.5cm,draw,inner xsep=-1em,label={[font=\scriptsize]above:Optimiert}] (right) {};
+
+    \node[draw,yshift=5mm,fill=srared!40] at (left)     (ifgoto) {\tiny IfGoto 1, L0, L1};
+    \node[draw,yshift=5mm,fill=safegreen!40] at (right) (goto) {\tiny Goto L0};
+    \node[draw,yshift=-5mm,fill=badbee!40] at (left)    (add-left) {\tiny b := Add a, 1};
+    \node[draw,yshift=-5mm,fill=badbee!40] at (right)   (add-right) {\tiny b := Add a, 1};
+
+
+    \draw[->] (ifgoto) to[out=0,  in=180] (analyse);
+    \draw[->] (add-left) to[out=0,in=180] (analyse);
+    \draw[->] (analyse) -- (transform);
+    \draw[->] (transform.west-|left.east) -- (transform);
+    \draw[->] (transform.east) -- (transform.east-|right.west);
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
