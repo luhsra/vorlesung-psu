@@ -108,7 +108,6 @@
 
 * Vorraussetzungen und Ziele
 #+begin_src latex
-  %%ONLY%%
   \dividerframe{Ziele und Vorraussetzungen\\der Optimierung}
 
   \begin{frame}{Ziele bei IR-Level Optimierung}
@@ -181,7 +180,103 @@
   \end{frame}
 #+end_src
 
-* Block-lokale Optimierungen
+* Instruktions- und Block-lokale Optimierungen
+#+begin_src latex
+  \dividerframe{Einfache Optimierungen}
+
+  \begin{frame}{Algebraische Identitäten}
+    \OrangeBox{Ersetzung von Instruktionen durch algebraisch-äquivalente Instruktionen}
+
+    \bi
+    \ii<1-> \structure{Konstantenfaltung} ist eine Instruktions-lokale Optimierung\\[1ex]{
+      \hfill\fbox{\texttt{a := \ircmd{Add} 1, 2}}\hfill$\Rightarrow$\hfill\fbox{\texttt{a := Assign 3}}\hfill\mbox{}\\[1ex]
+      \bi
+      \ii \textbf{Ziel}: Ersetzung von Instruktionen mit ausschließlich konstanten Operanden
+      \ii Sprach-Semantik muss erhalten (32-Bit Programm vs. 64-Bit Übersetzer)
+      \ei
+    }\medskip
+    \ii<2-> \structure{Strength-Reduction} veringert die Ausdruckstärke einer Instruktion\\[1ex]{
+      \hfill\fbox{\texttt{a := \ircmd{Mul} x, 2}}\hfill$\Rightarrow$\hfill\fbox{\texttt{a := Add x, x}}\hfill\mbox{}\\[1ex]
+      \bi
+      \ii Arithmetische Operationen haben unterschiedliche theoretische Komplexitäten
+      \ii Multiplikation: $\mathcal{O}(n\cdot\log(n)\cdot\log(\log(n)))$ (FFT) vs. Addition: $\mathcal{O}(n)$
+      \ii Ausdrucksstärke: Potenzierung $\gg$ Multiplikation $\gg$ Addition $\gg$ Bit-Shift
+      \ei
+    }\medskip
+    \ii<3-> \structure{Technische Umsetzung}: Wende Ersetzungsregeln auf jede Instruktion an{
+      \bi
+      \ii \structure{Ersetzungsmuster} gibt Bedingungen vor, die Operanden erfüllen müssen
+      \ii Ersetze die Instruktion im umgebenden Basisblock
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Algebraische Identitäten: Beispielhafte Ersetzugsmustern}
+    \def\Var#1{\colorbox{safegreen!40}{#1}}
+    \def\Const#1{\colorbox{badbee!40}{#1}}
+    \def\Label#1{\colorbox{luhblue!40}{#1}}
+
+    \centering
+    \OrangeBox{Variablen: \Var{A}, Konstanten: \Const{x}, Labels: \Label{L}}\\[1ex]
+
+    { \ttfamily
+      \begin{tabular}{l|c|l}\toprule
+        Orginal                                        & Bedingungen      & Ersetzung                              \\\midrule
+        \multicolumn{3}{l}{\structure{Null-Operationen}}                                             \\
+        \hspace{2em}\Var{A} := \ircmd{Add} \Var{B}, \Const{0}   & --               & \Var{A} := \ircmd{Assign} \Var{B}  \\
+        \hspace{2em}\Var{A} := \ircmd{Mul} \Var{B}, \Const{1}   & --               & \Var{A} := \ircmd{Assign} \Var{B}  \\
+        \hspace{2em}\Var{A} := \ircmd{Sub} \Var{B}, \Var{B}     & --               & \Var{A} := \ircmd{Assign} \Const{0}  \\\midrule
+        \multicolumn{3}{l}{\structure{Konstantenfaltung}}                                             \\
+        \hspace{2em}\Var{A} := \ircmd{Add} \Const{b}, \Const{c}    & --               & \Var{A} := \ircmd{Assign} \Const{b+c}  \\
+        \hspace{2em}\ircmd{IfGoto} \Const{x}, \Label{A}, \Label{B} & \Const{x}!=0     & \ircmd{Goto} \Label{A}                 \\
+        \hspace{2em}\ircmd{IfGoto} \Const{x}, \Label{A}, \Label{B} & \Const{x}==0     & \ircmd{Goto} \Label{B}                 \\\midrule
+        \multicolumn{3}{l}{\structure{Strength-Reduction}}                                            \\
+        \hspace{2em}\Var{A} := \ircmd{Pow} \Var{B}, \Const{2}      & --               & \Var{A} := Mul \Var{B}, \Var{B}        \\
+        \hspace{2em}\Var{A} := \ircmd{Mul} \Var{B}, \Const{n}      & \Const{n}==$2^x$ & \Var{A} := LShift \Var{B}, \Const{x} \\
+        \bottomrule
+      \end{tabular}
+    }
+  \end{frame}
+#+end_src
+
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}{Konstanten- und Kopiepropagation}
+    \begin{columns}
+      \begin{column}{0.35\textwidth}
+        \btAnimation[width=\textwidth]{range=1-3:<1->,3:<4->}{fig/09-cvp}
+      \end{column}\hfill
+      \begin{column}{0.60\textwidth}
+        \begin{btBlock}{}\small
+          Durch die einfache Codeerzeugung und bei der Optimierung enstehen konstante oder redundante Zuweisungen.
+        \end{btBlock}
+      \end{column}
+    \end{columns}
+    \medskip
+
+    \bi
+    \ii<3-> Propagation bekannter Werte durch einen Basisblock {
+      \bi
+      \ii Zum Zeitpunkt einer Zuweisung werden rechte und linke Seite äquivalent.
+      \ii Operanden-Ersetzung in den folgenden Instruktionen
+      \ii \ALERT{Aber}: Wir dürfen nur solange ersetzen, wie die Äquivalenz sicher ist.
+      \ei
+    }\medskip
+    \ii<4-> \structure{Intuition} für die Propagation von Konstanten und Werten {
+      \bi
+      \ii Iteration über die Instruktionen eines BBs, Mitführen einer Äquivalenzliste
+      \ii Zuweisungen etablieren eine neue Äquivalenz zwischen LHS und RHS
+      \ii Andere Schreibzugriffe, die eine Variable verändern, löschen Äquivalenzen
+      \ii Bei Lesezugriffen, wird die Äquivalenzliste befragt und ggf. ersetzt.
+      \ei
+    }
+    \ei
+
+
+
+  \end{frame}
+#+end_src
 
 * Optimierung des Kontrollflusses
 
