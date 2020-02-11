@@ -476,7 +476,10 @@
           BB2 & \L{[\{a, 2\}, \{b, x, 4\}]}     \\\midrule
           BB3 &\L{[\{a, 2\}, \{b, x\}]}         \\
         \end{tabular}
-        }}
+        }
+      \bigskip\mbox{}
+      Der Merge-Code ist fummelig.
+    }
       \end{column}
     \end{columns}
 
