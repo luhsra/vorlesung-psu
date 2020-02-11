@@ -30,9 +30,9 @@ def fixpoint(init, merge, transform, graph):
             continue                    # sind wir für diesen Schritt fertig.
 #e4
 #s5
-        states[node] = d_out            # Ändert sich der Zustand eines Knotens
-        for succ in graph.successors:   # werden alle Folge-Knoten noch einmal
-            worklist.append(succ)       # besucht
+        states[node] = d_out                 # Ändert sich der Zustand eines 
+        for succ in graph.successors[node]:  # Knotens werden alle Folge-Knoten 
+            worklist.append(succ)            # noch einmal besucht.
 #e5
     return states
 
