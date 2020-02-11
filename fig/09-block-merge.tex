@@ -1,0 +1,40 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[basic block=BB0] (BB0) {
+      a := Assign 3\\
+      b := Assign 4\\
+      \alt<-2>{
+        Goto .BB1
+      }{
+        c := Assign 5\\
+        IfGoto cond, .BB2, .BB3
+      }
+    };
+
+
+    \node[basic block=BB1,below=2.5 of BB0.north] (BB1) {
+      c := Assign 5\\
+      IfGoto cond, .BB2, .BB3
+    };
+
+    \node[fill=luhblue!40,anchor=north west,draw,text width=2cm,yshift=-2em] at (BB1.south west)(BB2) {BB2};
+    \node[fill=luhblue!40,anchor=north east,draw,text width=2cm,yshift=-2em] at (BB1.south east)(BB3) {BB3};
+        
+    \draw[<-] (BB2.north) -- (BB2.north |- BB1.south);
+    \draw[<-] (BB3.north) -- (BB3.north |- BB1.south);
+
+    \only<1-2>{\draw[->] (BB0) -- (BB1);}
+    \begin{visible}<2>
+      \node[draw,srared,thick,fit=(BB0) (BB1)] {};
+    \end{visible}
+    \begin{visible}<3->
+      \draw[->] (BB0.south west)++(up:1ex) -- ++(west:1em) |- (BB2.west);
+      \draw[->] (BB0.south east)++(up:1ex) -- ++(east:1em) |- (BB3.east);
+
+    \end{visible}
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
