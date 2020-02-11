@@ -1,0 +1,44 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    basic block/.append style={text width=3cm},
+    merge/.style={
+      inner sep=0,
+      alt=<4->{fill=safegreen!20,inner sep=3pt,font=\scriptsize}{},
+    },
+    data/.style={visible on=<3->},
+    ]
+    \def\T#1{\strut\alt<-1>{BB#1}{T(BB#1, \alt<4->{$d$}{\alert{?}})$\rightarrow \alt<-2>{\text{\alert{?}}}{d_{#1}}$}}
+    \def\M#1{%
+      \alt<4->{M(\let\comma\relax\foreach \b in {#1}{\comma\global\let\comma,$d_\b$})$\rightarrow d$}{}%
+    }
+
+    
+    \node[basic block] (BB0) {\T{0}};
+    
+    \node[basic block,below=2 of BB0,xshift=-2cm] (BB1) {\T{1}};
+
+    \node[basic block,below=2 of BB0,xshift=2cm] (BB2) {\T{2}};
+
+    \node[basic block,below=2 of BB1,xshift=2cm] (BB3) {\T{3}};
+
+
+    \node[above=0 of BB0,merge] (M0) {\M{3,i}};
+    \node[above=0 of BB1,merge] (M1) {\M{0}};
+    \node[above=0 of BB2,merge] (M2) {\M{0}};
+    \node[above=0 of BB3,merge] (M3) {\M{1,2}};
+
+    \draw[->] (BB0) -- node[above,sloped,data]{$d_0$} (M1);
+    \draw[->] (BB0) -- node[above,sloped,data]{$d_0$} (M2);
+    \draw[->] (BB1) -- node[above,sloped,data]{$d_1$} (M3);
+    \draw[->] (BB2) -- node[above,sloped,data]{$d_2$} (M3);
+
+    \alt<-3>{\node[fit=(BB0), inner sep=0] (BB0Merge) {};}
+            {\node[fit=(M0), inner sep=0] (BB0Merge) {};}
+
+    \draw[->] (BB3) -- (BB3-|BB1.west) -- ++(west:1em) |- node[data,above,pos=0.75]{$d_3$} (BB0Merge.west);
+    \draw[->] (BB0.north) ++(up:1.5cm) -- node[data,right] {$d_i$} (BB0Merge.north);
+  \end{tikzpicture}
+\end{frame}
+\end{document}

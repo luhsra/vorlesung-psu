@@ -1,0 +1,101 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    basic block/.append style={
+      text width=3cm
+    },
+    state/.style={
+      text width=3cm,
+      fill=safegreen!20,inner sep=3pt,
+      font=\scriptsize,
+      align=center,
+      onslide=<1>{text opacity=0},
+    },
+    ]
+    
+    \node[basic block=BB0] (BB0) {a := Assign 2\\b := Assign 3};
+
+    \node[basic block=BB1,below=2 of BB0,xshift=-2cm] (BB1) {
+      c := Assign \alt<-3>{a}{2}\\
+      x := Assign \alt<-3>{b}{3}
+    };
+
+    \node[basic block=BB2,below=2 of BB0,xshift=2cm] (BB2) {
+      b := Assign 4\\
+      x := Assign \alt<-5>{b}{4}
+    };
+
+    \node[basic block=BB3,below=2 of BB1,xshift=2cm] (BB3) {
+      b := Add \alt<-6>{a, x}{2, b}\\
+      a := Sub \alt<-6>{a}{2}, b
+    };
+
+    \def\E{$\emptyset$}
+
+    \node[above=0 of BB0,state] (I0) {\E};
+    \node[above=0 of BB1,state] (I1) {\strut
+      \only<1-3>\E
+      \only<4->{\{a, 2\}, \{b, 3\}}
+    };
+    \node[above=0 of BB2,state] (I2) {\strut
+      \only<1-5>\E
+      \only<6->{\{a, 2\}, \{b, 3\}}
+    };
+    \node[above=0 of BB3,state] (I3) {\strut
+      \only<1-6>\E
+      \only<7->{\{a, 2\}, \{b, x\}}
+    };
+
+    % Output
+    \node[below=0 of BB0,state] (O0) {\strut
+      \only<1-2>\E
+      \only<3->{\{a, 2\}, \{b, 3\}}
+    };
+    \node[below=0 of BB1,state] (O1) {\strut
+      \only<1-3>\E
+      \only<4->{\{a, c, 2\}, \{b, x, 3\}}
+    };
+    \node[below=0 of BB2,state] (O2) {\strut
+      \only<1-5>\E
+      \only<6->{\{a, 2\}, \{b, x, 4\}}
+    };
+    \node[below=0 of BB3,state] (O3) {\strut
+      \E
+    };
+
+    \draw[->] (O0) -- (I1);
+    \draw[->] (O0) -- (I2);
+    \draw[->] (O1) -- (I3);
+    \draw[->] (O2) -- (I3);
+
+    \draw[->] (O3) -- (O3-|BB1.west) -- ++(west:1em) |- (I0.west);
+    \draw[->] (BB0.north) ++(up:1cm) node[above,state] {$\emptyset$} -- (I0.north) ;
+
+    \def\AST<#1>#2{
+      \node[visible on={<#1>},shift={(-1ex,-1ex)}] at (#2.north east) {\Huge\color{srared}$\ast$};
+    }
+    \AST<2>{BB0}
+    \AST<7>{BB0}
+    \AST<2-3>{BB1}
+    \AST<2-5>{BB2}
+    \AST<2-4>{BB3}
+    \AST<6>{BB3}
+
+
+    \def\WORK<#1>#2{
+      \node[draw,visible on={<#1>},fit=(I#2) (BB#2) (O#2),srared,thick]  {};
+    }
+
+    \WORK<3>{0}
+    \WORK<4>{1}
+    \WORK<6>{2}
+    \WORK<5>{3}
+    \WORK<7>{3}
+    \WORK<8>{0}
+
+
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}

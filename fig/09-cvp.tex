@@ -12,4 +12,58 @@
     }
   \end{tikzpicture}
 \end{frame}
+
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[line/.style={font=\ttfamily, align=left,anchor=north west,
+      yshift=\pgflinewidth,text width=5cm,fill=luhblue!40,inner sep=2pt},
+    set/.style={font=\ttfamily, anchor=west},
+    ]
+    \node[                         line] (l0) {\strut x := Assign 2};
+    \node[below=0 of l0.south west,line] (l1) {\strut y := Assign \alt<-3>{x}{2}};
+    \node[below=0 of l1.south west,line] (l2) {\strut x := Add \alt<-4>{x, y}{2, 2}};
+    \node[below=0 of l2.south west,line] (l3) {\strut t0 := Assign x};
+    \node[below=0 of l3.south west,line] (l4) {\strut t1 := Call f, \alt<-6>{t0, y}{x, 2}};
+    \node[below=0 of l4.south west,line] (l5) {\strut x := Add y, t1};
+
+
+    \node[set,visible on=<2->,xshift=2ex] (s0) at (l0.north east) {[]};
+    \node[set,visible on=<3->,xshift=2ex] (s1) at (l0.south east) {[\{x, 2\}]};
+    \node[set,visible on=<4->,xshift=2ex] (s2) at (l1.south east) {[\{x, y, 2\}]};
+    \node[set,visible on=<5->,xshift=2ex] (s3) at (l2.south east) {[\{y, 2\}]};
+    \node[set,visible on=<6->,xshift=2ex] (s4) at (l3.south east) {[\{y, 2\}, \{x, t0\}]};
+    \node[set,visible on=<8->,xshift=2ex] (s5) at (l4.south east) {\alert{Äquivalenzen noch intakt?}};
+
+    \begin{visible}<2->\draw[->] (s0) -- (l0.north east);\end{visible}
+    \begin{visible}<3->\draw[->] (s1) -- (l0.south east);\end{visible}
+    \begin{visible}<4->\draw[->] (s2) -- (l1.south east);\end{visible}
+    \begin{visible}<5->\draw[->] (s3) -- (l2.south east);\end{visible}
+    \begin{visible}<6->\draw[->] (s4) -- (l3.south east);\end{visible}
+    \begin{visible}<8->\draw[->,srared] (s5) -- (l4.south east);\end{visible}
+
+    \node[above=0 of s0,anchor=south west] {\structure{Äquivalenzmengen}};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[line/.style={font=\ttfamily, align=left,anchor=north west,
+      yshift=\pgflinewidth,text width=4.5cm,fill=luhblue!40,inner sep=2pt},
+    set/.style={font=\ttfamily, anchor=west},
+    ]
+
+    \node[line] (call) {\strut t1 := Call func, ptr, 2};
+    \node[set,above=3mm of call] (before) {[\{y, 2\}\}]};
+    \node[set,below=3mm of call,srared] (after) {?};
+    \draw[->] (before) -- (call);
+    \draw[->] (call) -- (after);
+
+    \node[line, right=2 of call] (store) {\strut *ptr := Store 2};
+    \node[set,above=3mm of store] (before) {[\{y, 2\}]};
+    \node[set,below=3mm of store,srared] (after) {?};
+    \draw[->] (before) -- (store);
+    \draw[->] (store) -- (after);
+
+    
+  \end{tikzpicture}
+\end{frame}
 \end{document}

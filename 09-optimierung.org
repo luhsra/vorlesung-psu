@@ -182,7 +182,7 @@
 
 * Instruktions- und Block-lokale Optimierungen
 #+begin_src latex
-  \dividerframe{Einfache Optimierungen}
+\dividerframe{Lokale Optimierungen}
 
   \begin{frame}{Algebraische Identitäten}
     \OrangeBox{Ersetzung von Instruktionen durch algebraisch-äquivalente Instruktionen}
@@ -241,7 +241,6 @@
 #+end_src
 
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}{Konstanten- und Kopiepropagation}
     \begin{columns}
       \begin{column}{0.35\textwidth}
@@ -265,13 +264,222 @@
     }\medskip
     \ii<4-> \structure{Intuition} für die Propagation von Konstanten und Werten {
       \bi
-      \ii Iteration über die Instruktionen eines BBs, Mitführen einer Äquivalenzliste
+      \ii Iteration über die Instruktionen eines BBs, Mitführen von Äquivalenzmengen
       \ii Zuweisungen etablieren eine neue Äquivalenz zwischen LHS und RHS
       \ii Andere Schreibzugriffe, die eine Variable verändern, löschen Äquivalenzen
       \ii Bei Lesezugriffen, wird die Äquivalenzliste befragt und ggf. ersetzt.
       \ei
     }
     \ei
+  \end{frame}
+
+  \begin{frame}{Vorgehen für Wertpropagation}
+    \btAnimation[width=0.75\textwidth]{center,range=4-11:<1->}{fig/09-cvp}
+
+    \bi
+    \ii \structure{Äquivalenzmengen} werden \enquote{durchgeschoben}, modifiziert und befragt {
+      \be
+      \ii<2-|handout:2-> Zu Beginn des Blocks ist nichts zu nichts anderem äquivalent
+      \ii<3-|handout:3-> Bei Zuweisungen werden linke und rechte Seite äquivalent
+      \ii<4-|handout:4-> Quelloperanden werden durch \advantage{äquivalente Konstanten oder Variablen} ersetzt
+      \ii<4-|handout:4-> Äquivalenzmengen können mehr als 2 Elemente haben
+      \ii<5-|handout:5-> Nicht-\ircmd{Assign} Schreiboperationen entfernen Elemente aus ihrer Menge
+      \ee
+    }
+    \ei
+
+    \OrangeBox<8>{Kann die Funktion f, die Variable x, y, oder t0 verändern?}
+  \end{frame}
+
+  \begin{frame}{Alias-Problematik bei der Datenflussanalyse}
+
+    \begin{center}
+      \includegraphics[page=12]{fig/09-cvp}
+    \end{center}
+
+
+    \bi
+    \ii Das Problem sind Zeiger, die unsere IR-Variablen \alert{verändern könnten} {
+      \bi
+      \ii Wenn \texttt{ptr} auf \texttt{y} zeigt, kann sich \texttt{y} ändern, ohne explizit Operand zu sein
+      \ii Im Funktions-lokalen Scope, wissen wir nicht was \texttt{func()} mit \texttt{ptr} macht.
+      \ii Die \ircmd{Store}-Instruktion könnte \texttt{y} auf 3 setzen
+      \ei
+    }\medskip
+    \ii<2-> Dies ist das \structure{Alias-Problem} für Zeiger {
+      \bi
+      \ii Wir müssten genau wissen auf welche Objekte ein Zeiger verweisen kann
+      \ii Dies erfordert aufwendige, teils inter-prozedurale, Analysen.
+      \ii Beim geringste Zweifel über die Alias-Relation, \textbf{wirft der Optimierer hin}
+      \ei
+    }\medskip
+    \ii<3-> Einfache Heursitik für die unsere Wertepropagation {
+      \bi
+      \ii Bei jedem \ircmd{Store} und bei jedem \ircmd{Call} werfen wir die Äquivalenzmengen weg. Better safe, than sorry.
+      \ei
+    }
+    \ei
+    \begin{overlaybox}<4>[draw=srared,ultra thick,drop shadow,inner sep=1em]
+      \columntitle{Take-Away für den effizienten Programmierer}\medskip
+
+      \bii
+      \ii Wildes Zeiger-rum-gefuchtel macht dem Übersetzer das Leben schwer.
+      \ii Variablen sind umsonst, Wertepropagation eliminiert Zuweisungen.\\[1ex]
+      \ii[$\Rightarrow$] Programmieren Sie \advantage{\textbf{verständlich}}, nicht \enquote{\ALERT{optimiert}}!
+      \eii
+    \end{overlaybox}
+  \end{frame}
+#+end_src
+
+* Funktionsweite Optimierungen
+#+begin_src latex
+  \dividerframe{Funktionsweite Optimierungen}
+  %%ONLY%%
+  %%
+  \begin{frame}{Wertepropagation über Basisblockgrenzen}
+    \textbf{Bisher}: Wertepropagation (CVP) innerhalb eines Basisblocks.
+
+    \begin{center}
+      \strut\alt<1>{
+        \siginline{CVP}{BasicBlock}{()}
+      }{
+        \siginline{CVP}{BasicBlock, Equivalences}{Equivalences}
+      }
+    \end{center}
+
+    \bi
+    \ii Wertepropagation ist eine \structure{Datenflussanalyse}{
+      \bi
+      \ii Wir verfolgen wie Datenwerte entlang des Kontrollflusses \enquote{fließen}
+      \ii In einem Basisblock ist der Kontrollfluss determiniert linear
+      \ii Die CVP propagiert eine Äquivalenzmenge durch einen Block
+      \ei
+    }\medskip
+    \ii<2-> Wir wollen die CVP auf eine ganze Funktion anweden {
+      \bi
+      \ii Blöcke werden zu Transformator-Funktionen für Äquivalenzmengen
+      \ii Äquivalenzmengen \enquote{fließen} entlang der Kontrollflusskanten
+      \ii Fixpunkt-Iteration bis keine Änderungen mehr auftreten
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Fixpunktiteration auf einem CFG}
+
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \btAnimation[width=\textwidth]{range=1-4:<1->, 4:<5->}{fig/09-fixpoint}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{btBlock}{}
+          \textbf{Problem}: Wie wenden wir eine Block-lokale Datenflussanalyse (z.B. CVP) auf eine ganze Funktion an?
+        \end{btBlock}
+
+        \medskip
+
+        \columntitle{Elemente}
+        \bii
+        \ii<2-> Transformation-Funktion: \texttt{T()}
+        \ii<3-> Propagierte Zustände: $d_n$
+        \ii<4-> Zustands-Merge-Funktion: \texttt{M()}
+        \eii
+
+        \uncover<5->{
+          \medskip
+          \columntitle{Vorgehen}
+          \bii
+          \ii Initialisiere Zustände $d_n$
+          \ii Iterierte Auswertung von \texttt{M(), T()}
+          \ii Updaten der Block-Zustände
+          \ii Stop, wenn Fixpunkt erreicht ist
+          \eii
+        }
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}{Fixpunktiteration als Worklist-Algorithmus}
+    \begin{code}[tag=Python]
+      \lstinputlisting[style=py,style=smaller,linerange=s0-e0]{lst/09-fixpoint.py}
+      \uncover<2->{\lstinputlisting[style=py,style=smaller,linerange=s1-e1]{lst/09-fixpoint.py}}
+      \uncover<3->{\lstinputlisting[style=py,style=smaller,linerange=s2-e2]{lst/09-fixpoint.py}}
+      \uncover<4->{\lstinputlisting[style=py,style=smaller,linerange=s3-e3]{lst/09-fixpoint.py}}
+      \uncover<5->{\lstinputlisting[style=py,style=smaller,linerange=s4-e4]{lst/09-fixpoint.py}}
+      \uncover<6->{\lstinputlisting[style=py,style=smaller,linerange=s5-e5]{lst/09-fixpoint.py}}
+    \end{code}
+  \end{frame}
+
+  \begin{frame}[t]{Fixpunkiteration als Datenflussanalyse}
+    \bi
+    \ii \structure{Vorraussetzungen} für die Terminierung des Worklist-Algorithmus{
+      \bi
+      \ii Init+Merge+Transform muss Knotenzustände \alert{strikt monoton} ändern
+      \ii Beliebte Datenstrukturen für die Zustand: Bitvektoren, Mengen
+      \ii Beispiel für eine strikt-monotone : {
+        \bi
+        \ii \texttt{init()}: \hspace{2cm}\btSetTab Generiere eine leere Menge
+        \ii \texttt{merge()}: \btUseTab Vereinige alle Eingabemengen
+        \ii \texttt{transform()}: \btUseTab Füge der Menge nur Elemente hinzu
+        \ei
+      }
+      \ei
+    }\medskip
+    \ii Verschiedene Geschmacksrichtungen {
+      \bi
+      \ii \structure{Vorwärts-Analyse}: Zustände werden in Richtung der CFG-Kanten propagiert
+      \ii \structure{Rückwärts-Analyse}: Zustände werden entgegen der CFG-Kanten propagiert
+      \ei
+    }\medskip
+    \ii \structure{Wertepropagation} als Fixpunktanalyse {
+      \bi
+      \ii Initialisierung mit leeren Äquivalenzmengen
+      \ii Transformation wie gehabt mit \texttt{CVP(BasicBlock, Equivalences)}
+      \ii Merge: \btSetTab Zwei Werte sind genau dann äquivalent,\\\btUseTab Wenn sie in allen Eingabemenge äquivalent sind.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile,t]{Beispiel für Wertepropagation}
+    \vspace{-2em}
+    \begin{columns}[t]
+      \begin{column}{0.55\textwidth}
+        \btAnimation[width=\textwidth]{raisebox,range=1-8:<1->}{fig/09-fixpoint-cvp}      
+      \end{column}\hfill
+      \begin{column}{0.44\textwidth}\mbox{}\\[3ex]
+        \columntitle{Worklist}
+        \centering
+          \texttt{[%
+            \only<2>{BB0, BB1, BB3, BB2}%
+            \only<3>{BB1, BB3, BB2}%
+            \only<4>{BB3, BB2}%
+            \only<5>{BB2}%
+            \only<6>{BB3}%
+            \only<7>{BB0}%
+            ]}\\[3ex]
+
+        \columntitle{Merge Logbuch}
+        \def\L{\texttt\small}\small
+        \def\E{$\emptyset$}
+        \only<5->{\colorbox{badbee!20}{\medskip
+        \begin{tabular}{lr}
+          BB1 & \L{[\{a, c, 2\}, \{b, x, 3\}]}  \\
+          BB2 & \L{\E}                          \\\midrule
+          BB3 &\L{\E}                         
+        \end{tabular}
+      }}
+      \mbox{}\bigskip\mbox{}
+      \only<7->{\colorbox{badbee!20}{\medskip
+        \begin{tabular}{lr}
+          BB1 & \L{[\{a, c, 2\}, \{b, x, 3\}]}  \\
+          BB2 & \L{[\{a, 2\}, \{b, x, 4\}]}     \\\midrule
+          BB3 &\L{[\{a, 2\}, \{b, x\}]}         \\
+        \end{tabular}
+        }}
+      \end{column}
+    \end{columns}
+
   \end{frame}
 #+end_src
 
