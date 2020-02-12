@@ -14,7 +14,7 @@
     };
 
 
-    \node[basic block=BB1,below=2.5 of BB0.north] (BB1) {
+    \node[basic block=BB1,below=2.5 of BB0.north,alt=<3>{opacity=0.5}] (BB1) {
       c := Assign 5\\
       IfGoto cond, .BB2, .BB3
     };
