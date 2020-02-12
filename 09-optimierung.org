@@ -334,8 +334,7 @@
 * Funktionsweite Optimierungen
 #+begin_src latex
   \dividerframe{Funktionsweite Optimierungen}
-  %%ONLY%%
-  %%
+
   \begin{frame}{Wertepropagation über Basisblockgrenzen}
     \textbf{Bisher}: Wertepropagation (CVP) innerhalb eines Basisblocks.
 
@@ -487,5 +486,56 @@
 #+end_src
 
 * Optimierung des Kontrollflusses
+#+begin_src latex
 
+  \dividerframe{Optimierung des Kontrollflusses}
+
+  \begin{frame}{Verschmelzen von konsekutiven Basisblöcken}
+    \begin{columns}
+      \begin{column}{0.4\textwidth}
+        \btAnimation[width=\textwidth]{range=1-3:<1->,3:<4->}{fig/09-block-merge}
+      \end{column}\hfill
+      \begin{column}{0.6\textwidth}
+        \bii
+        \ii \textbf{Problem}: Sprung zu BB1 ist überflüssig.{
+          \bi
+          \ii BB0 hat genau einen Nachfolger
+          \ii BB1 hat genau einen Vorgänger
+          \ii[$\Rightarrow$] \textbf{Ziel}: Verschmelze beide BB0 und BB1
+          \ei
+        }\medskip
+        \ii<2-> \textbf{Analyse}: Finde Block-Paar (x, y), sodass\ldots{
+          \bi
+          \ii y ist Nachfolger von x
+          \ii x hat genau einen Nachfolger
+          \ii y hat genau einen Vorgänger
+          \ei
+        }\medskip
+        \ii<3-> \textbf{Transformation}: Verschmelze $x\rightarrow y${
+          \bi
+          \ii Lösche \ircmd{Goto} aus x
+          \ii Hänge Instruktionen von y an x
+          \ii Block y wird später gelöscht
+          \ei
+        }
+        \eii
+
+        \begin{btBlock}<4->[type=info]{Trennung der Belange}\small
+          Das Aufräumen des toten Blocks (BB1) übernimmt eine andere Optimierung.
+        \end{btBlock}
+      \end{column}
+    \end{columns}
+
+  \end{frame}
+
+
+  \begin{frame}{Elimination von unbedingten Doppelsprüngen}
+  
+  \end{frame}
+
+
+  \begin{frame}{Elimination von toten Basisblöcken}
+  
+  \end{frame}
+#+end_src
 * Elimination toter Instruktionen
