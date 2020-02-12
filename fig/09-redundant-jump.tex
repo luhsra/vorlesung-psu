@@ -1,37 +1,43 @@
 \documentclass{lecturefig}
 \begin{document}
-\begin{frame}[fragile]
+\begin{frame}<-6>[fragile]
   \begin{tikzpicture}[
     basic block/.append style={text width=2.8cm,font=\scriptsize\ttfamily},
     ]
 
-    \node[basic block] (BB0)              {\ldots\\IfGoto c, .BB8, \alt<-2>{.BB2}{\alert{.BB3}}};
-    \node[basic block,right=0.5 of BB0,text width=2cm] (BB1) {\ldots\\Goto \alt<-2>{.BB2}{\alert{.BB3}}};
+    \node[basic block] (BB0)              {\ldots\\IfGoto c, .BB8, \alt<3->{\alert<3>{.BB3}}{.BB2}};
+    \node[basic block,right=0.5 of BB0,text width=1.5cm] (BB1) {\ldots\\Goto \alt<3->{\alert<3>{.BB3}}{.BB2}};
 
-    \node[basic block=BB2,yshift=-1.5cm,alt=<3>{opacity=0.5},text width=2cm] at ($(BB0)!0.5!(BB1)$) (BB2) {\strut Goto .BB3};
+    \begin{visible}<-5>
+      \node[basic block=BB2,
+      yshift=-1.5cm,alt=<3>{opacity=0.5},text width=2cm] at ($(BB0)!0.5!(BB1)$) (BB2) {\strut Goto .BB3};
+    \end{visible}
+
 
     \node[basic block=BB3,below=0.75 of BB2,]  (BB3) {\strut ...};
 
-    \draw[->] (BB0.south)++(west:1em) -- ++(-120:1cm);
+    \draw[->] (BB0.south)++(west:2em) -- ++(-120:1cm);
 
 
     \only<-2>{
       \draw[->] (BB0) -- (BB2);
       \draw[->] (BB1) -- (BB2);
     }
-    \only<2>{
+    \only<2,5>{
       \node[fit=(BB2),thick,draw,srared]{};
     }
-    \only<3>{
-      \draw[->] (BB0) to[out=-90,in=120] ($(BB3.north)+(west:3em)$);
-      \draw[->] (BB1) to[out=-90,in=60]  ($(BB3.north)+(east:3em)$);
+    \only<3->{
+      \draw[->] (BB0.south)++(west:1em) to[out=-90,in=120] ($(BB3.north)+(west:2em)$);
+      \draw[->] (BB1.south)++(east:1em) to[out=-90,in=60]  ($(BB3.north)+(east:2em)$);
     }
 
-    \draw[->] (BB2) -- (BB3);
+    \only<-5>{
+      \draw[->] (BB2) -- (BB3)
+    };
 
 
-    \draw[<-] (BB3.west)--++(west:3em);
-    \draw[<-] (BB3.east)--++(east:3em);
+    \draw[<-] (BB3.west)--++(west:2em);
+    \draw[<-] (BB3.east)--++(east:2em);
 
 
     
