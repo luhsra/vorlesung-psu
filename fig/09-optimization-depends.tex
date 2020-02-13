@@ -1,0 +1,27 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node (CF) {CF};
+    \node at (72 * 0: 2cm) (CVP) {CVP};
+    \node at (72 * 1: 2cm) (EDV) {EDV};
+    \node at (72 * 2: 2cm) (GOTO) {GOTO};
+    \node at (72 * 3: 2cm) (EDB) {EDB};
+    \node at (72 * 4: 2cm) (MB) {MB};
+
+    \draw[->] (CF)  to[bend left] (CVP);
+    \draw[->] (CVP) to[bend left] (CF);
+    \draw[->] (CVP) to[bend right] (EDV);
+    \draw[->] (EDV) to[bend right] (GOTO);
+    \draw[->] (GOTO) to[bend right] (EDB);
+    \draw[->] (EDB) to[bend left] (MB);
+    \draw[->] (MB) to[bend left]  (EDB);
+    \draw[->] (MB) to[bend right] (CVP);
+    \draw[->] (CF) -- (EDB);
+    \draw[->] (CF) -- (GOTO);
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
+
+
