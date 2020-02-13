@@ -604,6 +604,36 @@
     \end{columns}
 
   \end{frame}
+
+
+  \begin{frame}[t]{Elimination von toten Variablen}
+    \begin{center}
+      \vspace{-2em}
+      \btAnimation[width=0.5\textwidth]{range=1-9:<1->}{fig/09-dve}  
+    \end{center}
+
+    \bi
+    \ii \textbf{Problem}: Vorangegangene Optimierungen machen Variablen überflüssig{%
+      \bi
+      \ii \structure{Konstantenfaltung} ersetzt Operationen durch ihr konstantes Ergebnis
+      \ii Durch \structure{Wertepropagation} werden äquivalente Quelloperanden vereinigt
+      \ei
+    }
+    \ii<8-> \textbf{Analyse}: Finde alle lokalen Variablen, die \advantage{nie gelesen werden}{
+      \bi
+      \ii \alert{Vorsicht}: Zeiger können Variablen indirekt lesen (Alias-Problem)
+      \ii \advantage{Heuristik}: Markiere alle Variablen deren Addresse berechnet wird als \enquote{gelesen}
+      \ei
+    }
+    \ii<9-> \textbf{Transformation}: Entferne niemals gelesene lokale Variable x {
+      \bi
+      \ii Lösche Instruktionen, die x schreiben und kein \ircmd{Call} sind (Seiteneffekte!)
+      \ii Lösche x aus der umgebenden Funktion
+      \ei
+    }
+    \ei
+  
+  \end{frame}
 #+end_src
 
 * Elimination toter Instruktionen

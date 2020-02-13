@@ -1,0 +1,24 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \def\DV#1 := #2\\{%
+      \only<9>{\color{luhgray}}#1 := #2\only<8>{\hfill\bgroup\color{srared}$\leftarrow$ dead var #1\egroup}\\%
+    }
+    \node[basic block=BB0,text width=6cm] (bb) {
+      \DV t0  := \only<1>{Add 1, 2}\only<2->{Assign 3}\\
+      \DV t1  := \only<1>{Div 3, 4}\only<2->{Assign 0}\\
+      \DV t2  := \only<1-2>{Mul t0, t1}\only<3>{Mul 3, 0}\only<4->{Assign 0}\\
+      \DV t3  := \only<1>{Add 5, 6}\only<2->{Assign 11}\\
+      \DV t4  := \only<1-2>{Mul t2, t3}\only<3-4>{Mul t2, 11}\only<5>{Mul 0, 11}\only<6->{Assign 0}\\
+      \color{black} Return \only<-6>{t4}\only<7->{0}
+    };
+
+    \node[above=0 of bb,visible on=<{1}>] {\texttt{return (1+2)*(3/4)*(5+6)}};
+    \node[above=0 of bb,visible on=<{2,4,6}>,srared] {Constant-Folding!};
+    \node[above=0 of bb,visible on=<{3,5,7}>,srared] {Constant-Value Propagation!};
+
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}
