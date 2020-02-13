@@ -718,3 +718,34 @@
     \end{description}
   \end{frame}
 #+end_src
+
+* Zusammenfassung
+
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+    \bi
+    \ii Optimierungen nur die \structure{nicht-funktionalen Programmeigenschaften} {
+      \bi
+      \ii Aus Sicht der Sprache bleibt das \structure{beobachtbare Verhalten} gleich
+      \ii Verschiedene Optimierungsziele, wobei es meist um \structure{Ausführungszeit}  geht
+      \ei
+    }\medskip
+    \ii Optimierungen sind immer zweigeteilte Übersetzungsschritte {
+      \bi
+      \ii \structure{Analyse} des Programms berechnet Informationen, die wir brauchen um zu entscheiden \textbf{ob und wie} eine Optimierung angewendet wird.
+      \ii \structure{Transformation} der Zwischenrepräsentation des Programms setzt die Optimierung durch.
+      \ei
+    }\medskip
+    \ii Auf \structure{IR-Ebene} reduzieren wir die Anzahl der Instruktionen und Sprünge{
+      \bi
+      \ii \structure{Konstantenfaltung} ersetzt konstante Berechnungen durch ihr Ergebnis
+      \ii \structure{Wertepropagation} ersetzt Operanden durch äquivalente Werte/Konstanten
+      \ii \structure{Verschmelzen} von streng konsekutiv ausgeführte Blöcke
+      \ii \structure{Redundante Doppelsprünge} werden aufgelöst
+      \ii \structure{Tote Blöcke} und \structure{tote Variablen} werden entfernt
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+#+end_src
