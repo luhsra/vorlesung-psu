@@ -25,6 +25,7 @@ if __name__ == '__main__':
             for page in range(pages[0], pages[1] + 1):
                 fn = f"{output_dir}/slide-{page:04d}.svg"
                 assert os.path.exists(fn), "PDF split failed"
+                print(fn)
             continue
 
             # if not os.path.exists(output_dir):

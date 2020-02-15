@@ -2,33 +2,18 @@
 #+INCLUDE: export-prologue.org
 #+OPTIONS: toc:nil num:nil
 #+MACRO: headlines (eval (org-macro-headlines $1))
+#+MACRO: topic (eval (org-macro-topic $1 $2))
 
-
-* [[file:01-einleitung.org][Einleitung]]
-
-Abschnitte: {{{headlines(./01-einleitung.org)}}}
-
-* [[file:02-syntax.org][Übersetzer: Syntax, Lexen und Parsen]]
-
-Abschnitte: {{{headlines(./02-syntax.org)}}}
-
-* [[file:03-typen.org][Sprachen: Typen]]
-
-Abschnitte: {{{headlines(./03-typen.org)}}}
-
-* [[file:04-namen.org][Sprachen: Namen]]
-Abschnitte: {{{headlines(./04-namen.org)}}}
-
-* [[file:05-semantische-analyse.org][Übersetzer: Semantische Analyse]]
-Abschnitte: {{{headlines(./05-semantische-analyse.org)}}}
-
-* [[file:06-objekte.org][Sprachen: Objekte]]
-Abschnitte: {{{headlines(./06-objekte.org)}}}
-
-* [[file:07-operationen.org][Sprachen: Operationen]]
-Abschnitte: {{{headlines(./07-operationen.org)}}}
-
-* COMMENT  [[file:08-codegen.org][Übersetzer: Zwischencodeerzeugung]]
+{{{topic(./01-einleitung.org,fig/01-stamp.png)}}}
+{{{topic(./02-syntax.org,fig/02-stamp.png)}}}
+{{{topic(./03-typen.org,fig/03-stamp.png)}}}
+{{{topic(./04-namen.org,fig/04-stamp.png)}}}
+{{{topic(./05-semantische-analyse.org,fig/05-stamp.png)}}}
+{{{topic(./06-objekte.org,fig/06-stamp.png)}}}
+{{{topic(./07-operationen.org,fig/07-stamp.png)}}}
+{{{topic(./08-codegen.org,fig/08-stamp.png)}}}
+{{{topic(./09-optimierung.org,fig/09-stamp.png)}}}
+{{{topic(./10-maschinencode.org,fig/10-stamp.png)}}}
 
 * COMMENT TODO 6 Vorlesungen
 

@@ -1,6 +1,6 @@
 REMOTE=lab:/proj/www/sra.uni-hannover.de/Lehre/V_PSÜ/skript/.
 
-ORG_PDF=$(shell echo 0*.org)
+ORG_PDF=$(shell echo 0*.org 1*.org)
 ORG=index.org $(ORG_PDF)
 
 PDF=$(foreach i,${ORG_PDF},$(patsubst %.org,build/%.slides.pdf,${i}))
@@ -41,6 +41,26 @@ fig/%.pdf: fig/%.dot  Makefile
 	@${MAKE} build
 	dot -Tpdf $< > $@
 
+01_stamp=fig/01-t-diagram.pdf
+01_stamp_page=5
+02_stamp=fig/02-grammar.pdf
+02_stamp_page=1
+03_stamp=fig/03-polymorphismus.pdf
+03_stamp_page=0
+04_stamp=fig/04-instances.pdf
+04_stamp_page=0
+05_stamp=fig/05-js-triangle.pdf
+05_stamp_page=0
+06_stamp=fig/06-val-refs.pdf
+06_stamp_page=1
+07_stamp=fig/07-ite.pdf
+07_stamp_page=1
+08_stamp=fig/08-codegen-add.pdf
+08_stamp_page=0
+09_stamp=fig/09-optimization-depends.pdf
+09_stamp_page=0
+
+
 define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung
 build/$(2).slides.pdf build/$(2).handout.pdf: $(shell find fig/ -name "$(1)-*.pdf")
 $(1):                 build/$(2).slides.pdf
@@ -59,6 +79,8 @@ $(1).wc:
 	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $(2).org | wc -w
 $(1).publish:   build/html/index.html $(1).all
 	cd build/html; rsync -aLv  ./index.html ./img ./css ./js ./lst ./fig ./$(2)* ${REMOTE}
+fig/$(1)-stamp.png: ${$(1)_stamp}
+	convert -density 300 $$<[${$(1)_stamp_page}]  -quality 100 -geometry 200x150 $$@ 
 endef
 
 # Wordcount

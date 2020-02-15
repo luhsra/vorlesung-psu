@@ -85,6 +85,30 @@ button.execute {
 .studip-forum-entries .date { color: #e83e8c; }
 .studip-forum-entries .delta { color: #006699; }
 
+.img-index {
+    display: block;
+    max-width: 200px;
+    max-height:150px;
+    margin-right: 20px;
+    width: auto;
+    height: auto;
+
+}
+
+.media-body p {
+    margin-top: 0;
+}
+
+.media-left {
+    margin-top: auto;
+    margin-bottom:auto;
+}
+
+
+.media {
+    margin-bottom: 10px;
+}
+
 
 
 /* Set the colors in <pre> blocks from the Leuven theme */

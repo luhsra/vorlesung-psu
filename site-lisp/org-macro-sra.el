@@ -7,8 +7,17 @@
   (if new-file
       (setq org-macro--counter-table (make-hash-table :test #'equal))))
 
+(defun org-global-props (&optional property buffer)
+  "Get the plists of global org properties of current buffer."
+  (unless property (setq property "PROPERTY"))
+  (with-current-buffer (or buffer (current-buffer))
+    (org-element-map (org-element-parse-buffer) 'keyword (lambda (el) (when (string-match property (org-element-property :key el)) el)))))
+
+(defun org-global-prop-value (key)
+  "Get global org property KEY of current buffer."
+  (org-element-property :value (car (org-global-props key))))
+
 (defun org-macro-headlines (file)
-  (with-file-from-disk file
     (let ((parsetree  (org-element-parse-buffer 'headline))
 	  (res "") (sep ""))
       (org-element-map parsetree 'headline
@@ -17,11 +26,26 @@
 		(tags (org-element-property :tags headline))
 		(title (org-element-property :title headline)))
             (unless (or (not id) (member 'noexport tags))
-              (setq res (format "%s%s[[%s#%s][%s]]"
+              (setq res (format "%s%s<a href=\"%s#%s\">%s</a>"
 				res sep (s-replace ".org" ".html" file)
 				id title))
               (setq sep " - ")))))
-       res)))
+      res))
+
+(defun org-macro-topic (file img)
+ (with-file-from-disk file
+  (let ((html (s-replace ".org" ".html" file)))
+    (concat
+     "#+begin_export html\n"
+     (format "<h2><a href=\"%s\">%s</a></h2>" html (org-global-prop-value "subtitle"))
+     (format "<div class=\"media\"><div class=\"media-left\"><img class=\"img-index\" src=\"%s\"></div>" img)
+     "<div class=\"media-body\">\n"
+     
+     "<p> Abschnitte: "
+     (message "%s" (org-macro-headlines file))
+     "</p></div></div>\n"
+     "#+end_export\n"
+     ))))
 
 ;;; SRA-ADDON: Add INCLUDE to the search regexp
 (defun org-macro--collect-macros (&optional files templates)

@@ -29,7 +29,7 @@
 
 * Was leistet die "Optimierung"?
 :PROPERTIES:
-:CUSTOM_ID: 08-einleitung
+:CUSTOM_ID: 09-einleitung
 :END:
 
 #+begin_src latex
@@ -720,7 +720,6 @@
 #+end_src
 
 * Zusammenfassung
-
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
