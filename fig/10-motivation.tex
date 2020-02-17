@@ -1,0 +1,21 @@
+\documentclass{lecturefig}
+
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[basic block=BB0] (BB0) {
+      t0 := Add a, 3\\
+      t1 := Mul t0, 4\\
+      t2 := Call bar, a, t1, 19\\
+      Return t2
+    };
+    \node[draw, fit=(BB0),label=above:func foo(a: int) : int ] (func) {};
+    \node[below=0.2 of func,align=left,font=\ttfamily\small,width as=func,draw]{
+      parameters = [a]\\
+      variables = [t0, t1, t2]\\
+      basic\_blocks = \{BB0\}\\
+      entry\_block = BB0
+    };
+  \end{tikzpicture}
+\end{frame}
+\end{document}

@@ -1,0 +1,154 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 10 - Maschinencode
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+- Endgültiges Lowering auf Maschinencode
+  - Call-Frame und Call-Sequenzen
+  - Instruktionen als Snippets auswählen
+  - Spilling und Registerauswahl
+  - [Graphfärben]?
+- Tooling
+  - Assembler
+  - ELF
+  - Dynamische Libraries
+
+Effektive  Programmierer: 
+Effiziente Programmierer: 
+
+* Was leistet die "Maschinencodeerzeugung"?
+:PROPERTIES:
+:CUSTOM_ID: 10-einleitung
+:END:
+
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \begin{frame}
+    \maketitle
+  \end{frame}
+
+  \begin{frame}{Einordnung in die Vorlesung: Maschinencodeerzeugung}
+    \begin{center}
+      \includegraphics[page=8,width=0.9\linewidth]{fig/01-overview-small}
+    \end{center}
+    \bi
+    \ii Zwischencode der virtuellen Maschine auf eine \structure{reale Maschine} abbilden{%
+      \bi
+      \ii Verbleibende \alert{semantische Lücken}: Funktionsaufrufe, lokale Variablen, Befehle
+      \ii Application Binary Interface (ABI), Registervergabe, Binärformat (ELF),
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile,t]{Wo stehen wir? Wo wollen wir hin?}
+    \vspace{-1em}
+    \begin{columns}[t]
+    \begin{column}{0.49\textwidth}
+      \columntitle{Zwischencode-Maschine}
+      \vspace{-1em}
+      \btAnimation[width=0.7\textwidth]{center,raisebox,1:<1->}{10-motivation}
+      \bii
+      \ii Befehle \tikzmark{left-befehle}{
+        \bi
+        \ii Meist 3-Adress-Befehle
+        \ii \ircmd{Call}: Beliebige Argumentzahl
+        \ei
+      }
+      \ii Speicherabstraktion\tikzmark{left-memory}{
+        \bi
+        \ii unendlich viele Parameter
+        \ii unendlich viele Variablen
+        \ei
+      }\ii Speicherung des Programms\tikzmark{left-program} {
+        \bi
+        \ii Objekte im Übersetzerzustand
+        \ii Basisblöcke sind ungeordnet
+        \ei
+      }
+      \eii
+    \end{column}\hfill
+    \begin{column}{0.49\textwidth}
+      \columntitle{Reale Maschine (z.B. IA-32)}
+
+
+      {\ttfamily\footnotesize
+        \def\OPB{\bfseries\let\OP\OPA}
+        \def\OPA{\mdseries\let\OP\OPB}
+        \let\OP\OPA
+        \renewcommand{\baselinestretch}{0.8}
+        \newcommand{\B}{{\let\kern\hskip\,}}
+        \begin{minipage}{1.0\linewidth}
+          \hspace{-1ex}\textbf{foo:}\\
+          \OP c8\B 0c\B 00\B  00\B%
+          \OP 8b\B 45\B 08\B%
+          \OP bb\B 03\B 00\B 00\B00\B%
+          \OP 01\B c3\B%
+          \OP 89\B 5d\B fc\B%
+          \OP b8\B 04\B 00\B 00\B 00\B%
+          \OP 0f\B af\B d8\B%
+          \OP 89\B 5d\B f8\B%
+          \OP b8\B 13\B 00\B 00\B 00\B%
+          \OP 50\B%
+          \OP 53\B%
+          \OP 8b\B 4d\B 08\B%
+          \OP 51\B%
+          \OP e8\B bb\B ff\B ff\B ff\B%
+          \OP 83\B c4\B 0c\B%
+          \OP 89\B 45\B f4\B%
+          \OP c9\B%
+          \OP c3\B%
+        \end{minipage}
+      }{\\[1ex]\scriptsize (Keine Sorge. Wir gehen nur bis Assembler)}
+      \medskip
+      \bii
+      \ii \tikzmark{right-befehle}Befehle {
+        \bi
+        \ii 2 Operanden, Zeitgleich Quelle+Ziel
+        \ii \ircmd{call} transportiert keine Argumente
+        \ii Verschiedene Adressierungsmodi
+        \ii Komplexe Befehle (CISC)
+        \ei
+      }\medskip
+      \ii \tikzmark{right-memory}Speicherabstraktion {
+        \bi
+        \ii 6 Ganzzahl-Register (32-Bit)
+        \ii Endlicher Speicher (ausreichend)
+        \ei
+      }\medskip
+      \ii \tikzmark{right-program}Speicherung des Programms {
+        \bi
+        \ii Binärformat des Betriebssystems
+        \ii Lineare Sequenz von Befehlen
+        \ei
+      }
+      \eii
+
+    
+    \end{column}
+  \end{columns}
+
+  \only<2->{\AtBeginShipoutNext{%
+      \AtBeginShipoutUpperLeftForeground{%
+        \begin{tikzpicture}[remember picture, overlay]%
+          \draw[ultra thick,srared,->] ($(pic cs:left-befehle)+(up:3pt)$) -- ($(pic cs:right-befehle)+(-1pt,3pt)$);
+          \draw[ultra thick,srared,->] ($(pic cs:left-memory)+(up:3pt)$) --  ($(pic cs:right-memory)+(-1pt,3pt)$);
+          \draw[ultra thick,srared,->] ($(pic cs:left-program)+(up:3pt)$) -- ($(pic cs:right-program)+(-1pt,3pt)$);
+        \end{tikzpicture}
+      }
+    }
+  }
+  \end{frame}
+#+end_src
