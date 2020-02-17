@@ -157,7 +157,6 @@ Effiziente Programmierer:
 * Speicherabstraktion: Call-Frames
 
 #+begin_src latex
-  %%ONLY%%
   \dividerframe{Speicherabstraktion:\\Call-Frames}
   \begin{frame}{Funktionsaufrufe auf Maschinenebene}
     \btAnimation[width=0.8\textwidth]{center,1:<1->}{fig/10-call-terms}
@@ -283,11 +282,125 @@ Effiziente Programmierer:
 #+end_src
 
 http://www.sco.com/developers/devspecs/abi386-4.pdf ab Seite 35
-- Call-Frames
-- Application-Binary Interface
-- Slots für lokale Variablen
 
 
-* Befehle: Codierung und Registerallokation
+#+begin_src latex
+  \begin{frame}[fragile]{Lokale Variablen}
+    \begin{btBlock}{Die Welt am Beginn einer Funktion\hfill Parameter: \checkmark}\small
+      \begin{columns}
+        \begin{column}{0.7\textwidth}
+          Nachdem Sicherung des \alert{alten Basiszeigers}, sind die Parameter mit einem \structure{konstanten, positiven Offset} zum \advantage{neuen Basiszeiger} adressierbar.       
+        \end{column}\hfill
+        \hspace{-3ex}\begin{column}{0.3\textwidth}\ttfamily
+          bar:\\
+          \ \alert{push \%ebp}\\
+          \ \advantage{mov \%esp, \%ebp}\\
+          \ mov \structure{8(\%ebp)}, \%eax
+        \end{column}
+      \end{columns}
+    \end{btBlock}
 
+    \bi
+    \ii<2-> Unendlicher virtueller Registersatz (IR) vs. endlicher realer Registersatz{
+      \bi
+      \ii IR-Variablen müssen auf Speicherstellen im Call-Frame abgebildet werden
+      \ii Einfachste Variante: Jede Variable $\rightarrow$ ein \structure{Slot} im Call-Frame{\\[1ex]
+        \begin{columns}
+          \hfill\begin{column}{0.7\textwidth}
+            \begin{code}[tag=Python]
+              \begin{py}
+                for idx, var in enumerate(function.variables):
+                   var.slot       = idx
+                   var.ebp_offset = -4 + (-4 * idx)
+              \end{py}
+            \end{code}
+          \end{column}\hfill
+        \end{columns}\mbox{}\\[1ex]
+      }
+      \ii Variablen-Slots werden relativ zum Basiszeiger adressiert
+      \ei
+    }\medskip
+    \ii<3-> Komplexer: Colokation von Variablen in Slots + kluge \structure{Registerallokation}
+    \ei
+  \end{frame}
+
+
+#+end_src
+
+* Befehleauswahl und Registerallokation
+
+#+begin_src latex
+  \dividerframe{Befehlsauswahl\\und\\Registerallokation}
+
+  \begin{frame}{Übersetzung des IR-Programms}
+    \vspace{-2em}
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \begin{btBlock}{\hfill Befehlsauswahl\tikzmark{A}\hfill\mbox{}}
+          Wähle für jeden IR-Befehl eine einzelne oder einer Sequenz aus Maschinenbefehlen aus.        
+        \end{btBlock}
+
+        \bii
+        \ii<2-> Abbildung meinst nicht eindeutig {\\[1ex]
+          \enquote{AMD64 kennt 36 \texttt{mov}-Varianten}\\[1ex]
+          \bi
+          \ii Unterschiedliche Programmgröße
+          \ii Unterschiedlich Laufzeit
+          \ii Unterschiedlicher Energieverbrauch
+          \ei
+        }\medskip
+        \ii<2-> Betrachtung mehrerer IR-Befehle verbessert die Befehlsauswahl
+        \eii
+
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{btBlock}{\hfill\tikzmark{B}Registerallokation\hfill\mbox{}}
+          Bestimme in welchen Abschnitten eine IR-Variable in ihrem Slot oder in einem CPU Register lebt.
+        \end{btBlock}
+
+        \bii
+        \ii<3-> Problem bei \#Variablen$>$\#Register
+        \ii<3-> Konsistent für alle Kontrollflüsse
+        \ii<3-> Massive Performance-Auswirkung {
+          \bi
+          \ii CPU-Register: \hspace{1em}\btSetTab 1 Zyklen
+          \ii L1-Cache (Hit):     \btUseTab 4 Zyklen
+          \ii L2-Cache (Hit):     \btUseTab 10 Zyklen
+          \ii Speicher:     \btUseTab 60-100 Zyklen
+          \ei
+        }
+        \eii
+      \end{column}
+    \end{columns}
+    \begin{columns}
+      \begin{column}<2->{0.49\textwidth}
+        \bii
+        \ii[$\Rightarrow$] Für sich: \ALERT{NP-Vollständig}
+        \eii
+      \end{column}\hfill
+      \begin{column}<3->{0.49\textwidth}
+        \bii
+        \ii[$\Rightarrow$] Für sich: \ALERT{NP-Vollständig}
+        \eii
+      \end{column}
+    \end{columns}
+
+    \bigskip
+    \uncover<4->{\hspace{-1em}\ALERT{Alles noch schlimmer}: Befehlsauswahl und Registerallokation beeinflussen sich gegenseitig und sind Abhängig von der CPU-Mikroarchitektur.}
+  
+
+      \only<4>{\AtBeginShipoutNext{%
+        \AtBeginShipoutUpperLeftForeground{%
+          \begin{tikzpicture}[remember picture, overlay]%
+            \draw[ultra thick,srared,<->] ($(pic cs:A)+(up:3pt)$) -- node[above]{Interaktion}($(pic cs:B)+(-1pt,3pt)$);
+          \end{tikzpicture}
+        }
+      }
+    }
+  
+  \end{frame}
+#+end_src
+
+https://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.html
+https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-caches-and-main-memory#4087315
 * Speicherung des Programms: ELF

@@ -1,0 +1,14 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[align=left]{
+      bar:\\
+      \ \alert{push \%ebp}\\
+      \ {\color{safegreen}{mov \%esp, \%ebp}}\\
+      \ mov \structure{8(\%ebp)}, \%eax
+    };
+  \end{tikzpicture}
+\end{frame}
+\end{document}
+

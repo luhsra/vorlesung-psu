@@ -59,7 +59,7 @@ fig/%.pdf: fig/%.dot  Makefile
 08_stamp_page=0
 09_stamp=fig/09-optimization-depends.pdf
 09_stamp_page=0
-10_stamp=fig/09-optimization-depends.pdf
+10_stamp=fig/10-stamp.pdf
 10_stamp_page=0
 
 
