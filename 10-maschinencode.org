@@ -255,10 +255,34 @@ Effiziente Programmierer:
       \end{column}
     \end{columns}
 
-  
+
+  \end{frame}
+
+  \begin{frame}{Unterschiede der Aufrufkonventionen}
+    \bi
+    \ii Übergabe von \structure{Argumenten in Registern} {
+      \bi
+      \ii Die ersten N Argumente können in Registern übergeben werden
+      \ii Spart Speicherzugriffe  beim Funktionsaufruf 
+      \ei
+    }\bigskip
+    \ii<2-> \textbf{Trade-Off} zwischen Caller-save/Callee-save Register Mengen {
+      \bi
+      \ii Wenige Caller-save Register: Wenig unnötige Register-Sicherungen
+      \ii Wenige Callee-save Register: Blattfunktionen können in Registern arbeiten
+      \ei
+    }\bigskip
+    \ii<3-> Zusätzliche Parameter liefern Aufrufkontext {
+      \bi
+      \ii \textbf{thiscall}: In C++ wird der this-Zeiger in \texttt{\%ecx} übergeben
+      \ii Zieladdresse für Rückgabe-Objekte im  0. Parameter
+      \ei
+    }
+    \ei
   \end{frame}
 #+end_src
 
+http://www.sco.com/developers/devspecs/abi386-4.pdf ab Seite 35
 - Call-Frames
 - Application-Binary Interface
 - Slots für lokale Variablen

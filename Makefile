@@ -59,6 +59,8 @@ fig/%.pdf: fig/%.dot  Makefile
 08_stamp_page=0
 09_stamp=fig/09-optimization-depends.pdf
 09_stamp_page=0
+10_stamp=fig/09-optimization-depends.pdf
+10_stamp_page=0
 
 
 define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung
@@ -75,19 +77,21 @@ $(1).html.view:       build/html/$(2).html
 $(1).handout.html:    build/html/$(2).handout.html
 $(1).handout.html.view:  build/html/$(2).handout.html
 $(1).all:             $(1).html $(1).handout $(1).handout.html
+
 $(1).wc:
 	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $(2).org | wc -w
 $(1).publish:   build/html/index.html $(1).all
 	cd build/html; rsync -aLv  ./index.html ./img ./css ./js ./lst ./fig ./$(2)* ${REMOTE}
 fig/$(1)-stamp.png: ${$(1)_stamp}
-	convert -density 300 $$<[${$(1)_stamp_page}]  -quality 100 -geometry 200x150 $$@ 
+	convert -density 300 $$<[${$(1)_stamp_page}]  -quality 100 -geometry 200x150 $$@
+index: fig/$(1)-stamp.png
 endef
 
 # Wordcount
 wc:
 	@make -s 01.wc 02.wc 03.wc 04.wc 05.wc 06.wc 07.wc | tr "\n" " " | dc -f - -e '[+z1<r]srz1<rp'
 
-%.view:
+%.view: %
 	xdg-open $< &
 
 # invoke it for lecture PDF target (01-Einfuehrung.pdf, ...)
