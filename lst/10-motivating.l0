@@ -1,0 +1,11 @@
+func bar(x : int, y:int, z:int) :int{
+  return x + y + z;
+}
+
+func foo(a : int) : int {
+     return bar(a, (a + 3)*4, 19);
+}
+
+func main() :int {
+return 0;
+}

@@ -61,18 +61,19 @@ Effiziente Programmierer:
       \vspace{-1em}
       \btAnimation[width=0.7\textwidth]{center,raisebox,1:<1->}{10-motivation}
       \bii
+      \ii Speicherabstraktion\tikzmark{left-memory}{
+        \bi
+        \ii unendlich viele Parameter
+        \ii unendlich viele Variablen
+        \ei
+      }
       \ii Befehle \tikzmark{left-befehle}{
         \bi
         \ii Meist 3-Adress-Befehle
         \ii \ircmd{Call}: Beliebige Argumentzahl
         \ei
       }
-      \ii Speicherabstraktion\tikzmark{left-memory}{
-        \bi
-        \ii unendlich viele Parameter
-        \ii unendlich viele Variablen
-        \ei
-      }\ii Speicherung des Programms\tikzmark{left-program} {
+      \ii Speicherung des Programms\tikzmark{left-program} {
         \bi
         \ii Objekte im Übersetzerzustand
         \ii Basisblöcke sind ungeordnet
@@ -114,18 +115,18 @@ Effiziente Programmierer:
       }{\\[1ex]\scriptsize (Keine Sorge. Wir gehen nur bis Assembler)}
       \medskip
       \bii
+          \ii \tikzmark{right-memory}Speicherabstraktion {
+        \bi
+        \ii 6 Ganzzahl-Register (32-Bit)
+        \ii Endlicher Speicher (ausreichend)
+        \ei
+      }\medskip
       \ii \tikzmark{right-befehle}Befehle {
         \bi
         \ii 2 Operanden, Zeitgleich Quelle+Ziel
         \ii \ircmd{call} transportiert keine Argumente
         \ii Verschiedene Adressierungsmodi
         \ii Komplexe Befehle (CISC)
-        \ei
-      }\medskip
-      \ii \tikzmark{right-memory}Speicherabstraktion {
-        \bi
-        \ii 6 Ganzzahl-Register (32-Bit)
-        \ii Endlicher Speicher (ausreichend)
         \ei
       }\medskip
       \ii \tikzmark{right-program}Speicherung des Programms {
@@ -144,7 +145,7 @@ Effiziente Programmierer:
       \AtBeginShipoutUpperLeftForeground{%
         \begin{tikzpicture}[remember picture, overlay]%
           \draw[ultra thick,srared,->] ($(pic cs:left-befehle)+(up:3pt)$) -- ($(pic cs:right-befehle)+(-1pt,3pt)$);
-          \draw[ultra thick,srared,->] ($(pic cs:left-memory)+(up:3pt)$) --  ($(pic cs:right-memory)+(-1pt,3pt)$);
+          \draw[ultra thick,srared,->] ($(pic cs:left-memory)+(up:3pt)$) --node[fill=white,draw,align=center,anchor=south east,pos=0.8,yshift=-2ex]{Wir verwenden IA-32\\als Beispiel}  ($(pic cs:right-memory)+(-1pt,3pt)$);
           \draw[ultra thick,srared,->] ($(pic cs:left-program)+(up:3pt)$) -- ($(pic cs:right-program)+(-1pt,3pt)$);
         \end{tikzpicture}
       }
@@ -152,3 +153,117 @@ Effiziente Programmierer:
   }
   \end{frame}
 #+end_src
+
+* Speicherabstraktion: Call-Frames
+
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Speicherabstraktion:\\Call-Frames}
+  \begin{frame}{Funktionsaufrufe auf Maschinenebene}
+    \btAnimation[width=0.8\textwidth]{center,1:<1->}{fig/10-call-terms}
+
+    \bi
+    \ii \structure{Funktionsaufruf}: Argumente werden als Parameter übertragen {
+      \bi
+      \ii IR-Ebene: Beliebig viele Parameter kommen \enquote{magisch} beim Callee an
+      \ii \textbf{Erinnerung}: Aufrufe erzeugen \alert{Funktionsinstanz mit eigenem Call-Frame}
+      \ii Call-Frame enthält Parameter, Rücksprungadresse und lokale Variablen
+      \ei
+    }\medskip
+    \ii<2-> Für die reale Maschine müssen wir einige \textbf{Entscheidungen} treffen:{%
+      \bi
+      \ii \structure{Daten-Layout}: Welches Datum liegt an welcher Stelle?
+      \ii \structure{Verantwortung}: Wer legt den Call-Frame an und füllt ihn mit Daten?
+      \ii \structure{Invarianten}: \btSetTab Welche Teile des Maschinenzustandes bleiben über einen\\
+                                   \btUseTab Funktionsaufruf hinweg erhalten?\\[1ex]
+      \ii[$\Rightarrow$] Die Antworten hierauf ergeben die \structure{Aufrufkonvention}.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Aufrufkonventionen}
+    \begin{btBlock}{Definition:  Die Aufuf\textbf{konvention} bestimmt,\ldots}
+      \ldots wie \structure{Argumente} an Funktionen übergeben werden und\\
+      \ldots welche Teile des \structure{Maschinenzustands} der Callee erhalten muss und\\
+      \ldots wo der Caller den \structure{Rückggabewert} auslesen kann.
+    \end{btBlock}
+
+    \bi
+    \ii Das Betriebssystem und Übersetzer bestimmen die Aufrufkonvention {
+      \bi
+      \ii Funktionen können unabhängig voneinander übersetzt werden.
+      \ii Interoperabilität zwischen verschiedenen Übersetzern und Sprachen
+      \ei
+    }\medskip
+    \ii<2-> Beispiel: Sys-V Calling Convention für C auf IA-32/GNU Linux{
+      \bi
+      \ii Callee legt Call-Frame auf dem Stack an und räumt ihn wieder weg
+      \ii Argumente werden von \textbf{rechts-nach-links} auf den Stack gelegt
+      \ii Rückggabewerte: \btSetTab \texttt{\%eax} für \lstinline[style=C]{int}, \texttt{\%st0} für \lstinline[style=C]{double}\\
+                          \btUseTab Größere Argumente/Rückggabewerte: Wie in Vorlesung 8
+      \ii \structure{Callee-saved Register}: \texttt{\%esp, \%ebp, \%ebx, \%esi, \%edi}
+      \ei
+    }
+    \ei
+    \medskip
+    \uncover<3->{Andere Konvention (auf IA-32): \btSetTab syscall, optlink, pascal, stdcall, fastcall,\\
+                                                \btUseTab vectorcall, safecall, thiscall, \ldots}
+  \end{frame}
+
+
+  \begin{frame}{Call-Frame auf IA-32/Linux}
+
+    \begin{columns}
+      \begin{column}{0.4\textwidth}
+        \btAnimation[width=\textwidth]{range=1-7:<1->}{fig/10-stack}%
+        \btAnimation[width=\textwidth]{5:<8>,4:<9>,1:<10>}{fig/10-stack}
+
+      \end{column}\hfill
+      \begin{column}{0.6\textwidth}
+        \bii
+        \ii Auf der IA-32 Plattform wächst der Stack von den hohen zu den niedrigen Adressen
+        \ii Der \structure{Stackpointer} is in \texttt{\%esp}
+        \eii
+        \medskip
+
+        \columntitle{Aufrufsequenz}
+
+        \bi\ii[]\be
+        \ii<2-> Argumente von \textbf{rechts nach links} ermöglicht Funktionen mit variabler Argumentenzahl {
+          \bi
+          \ii \texttt{\texttt{push arg2}; \only<3->{\texttt{push arg1}; }\only<4->{\texttt{push arg0};}}
+          \ei
+        }
+        \ii<5-> CPU legt Rücksprungaddresse auf den Stack{
+          \bi
+          \ii \texttt{call bar}
+          \ei
+        }
+        \ii<7-> Konstante Offsets durch Basiszeiger{
+          \bi
+          \ii \texttt{push \%ebp; mov \%esp, \%ebp;}
+          \ei
+        }
+        \ii<6-> Callee kann Raum für lokale Daten anlegen{
+          \bi
+          \ii sub x, \%esp
+          \ei
+        }
+        \ii<8-> Return: in umgekehrter Reihenfolge
+        \ee\ei
+      \end{column}
+    \end{columns}
+
+  
+  \end{frame}
+#+end_src
+
+- Call-Frames
+- Application-Binary Interface
+- Slots für lokale Variablen
+
+
+* Befehle: Codierung und Registerallokation
+
+* Speicherung des Programms: ELF

@@ -1,0 +1,79 @@
+\documentclass{lecturefig}
+\begin{document}
+\definecolor{amber}{rgb}{1.0, 0.75, 0.0}
+\tikzset{stack word/.style={
+    draw, text width=2.2cm,align=center,
+    fill=#1,
+  },
+  stack word/.default={safegreen!30},
+}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    ]
+    \node[stack word,visible on=<2->] (p2) {argument 2};
+    \node[stack word,visible on=<3->,below=0 of p2] (p1) {argument 1};
+    \node[stack word,visible on=<4->,below=0 of p1] (p0) {argument 0};
+
+    \node[stack word=brown!50,visible on=<5->,below=0 of p0,] (ret) {\textbf{ret-Address}};
+
+    \node[stack word=amber!60, below=0 of ret,
+    visible on=<6->,minimum height=2.5cm,
+    ] (locals) {\mbox{}\\[2ex]Weitere Daten\\\small(x bytes)};
+
+    \node[stack word=amber!60, below=0 of ret,
+       visible on=<7->,
+    ] (ebp) {Old \%ebp};
+
+    \node[fit=(p2) (locals),inner sep=0, draw,label=above:Call-Frame] (frame) {};
+
+    
+    \def\O#1#2{\only<#1>{#2}}
+
+    \begin{visible}<1>
+      \draw[->] (frame.north) ++(down:1cm) node[above]{\texttt{0xff...ff}} -- ++(down:2cm) node[below]{\texttt{0x00...00}};
+    \end{visible}
+
+    \begin{scope}[text width=1.4cm,font=\ttfamily\scriptsize]
+      \node[visible on=<2->,right=0 of p2,text width=1.4cm] {\alt<-6>{\O20\O34\O48\O{5-6}{12}\O6{+x}(\%esp)}{16(\%ebp)}};
+      \node[visible on=<3->,right=0 of p1]                  {\alt<-6>{\O30\O44\O{5-6}8\O6{+x}(\%esp)}{12(\%ebp)}};
+      \node[visible on=<4->,right=0 of p0]                  {\alt<-6>{\O40\O{5-6}4\O6{+x}(\%esp)}{8(\%ebp)}};
+      \node[visible on=<5->,right=0 of ret]                 {\alt<-6>{\O50\O6x(\%esp)}{4(\%ebp)}};
+      \node[visible on=<7>, right=0 of ebp]                 {0(\%ebp)};
+
+      \begin{visible}<6>
+        \node[right=0 of locals.north east,anchor=north west](@1){x-4(\%esp)};
+        \node[right=0 of locals.south east,anchor=south west](@2){0(\%esp)};
+        \draw[dotted] (@1) -- (@2);
+      \end{visible}
+    \end{scope}
+
+
+
+
+
+    \def\esp<#1>(#2){\begin{visible}<#1>\draw[<-] (#2) -- ++(west:1em)node[left,yshift=-.5ex,xshift=1ex]{\scriptsize \%esp};\end{visible}}
+    \esp<1>(frame.north west);
+    \esp<2>(p2.south west);
+    \esp<3>(p1.south west);;
+    \esp<4>(p0.south west);
+    \esp<5>(ret.south west);
+    \esp<6>(locals.south west);
+    \esp<7>(locals.south west);
+    \def\ebp<#1>(#2){\begin{visible}<#1>\draw[<-] (#2) -- ++(west:1em)node[left,yshift=-.5ex,xshift=1ex]{\scriptsize \%ebp};\end{visible}}
+    \ebp<7>(ebp.south west);
+
+    \begin{visible}<4-6>
+      \draw[decorate,decoration={brace,amplitude=5pt}] (p0.south west) -- node[sloped,above,yshift=5pt] {Caller} (p2.north west);
+    \end{visible}
+    \begin{visible}<5-6>
+      \draw[decorate,decoration={brace,amplitude=5pt}] (ret.south west) -- node[sloped,above,yshift=5pt] {HW} (ret.north west);
+    \end{visible}
+    \begin{visible}<6-6>
+      \draw[decorate,decoration={brace,amplitude=5pt}] (locals.south west) -- node[sloped,above,yshift=5pt] {Callee} (locals.north west);
+    \end{visible}
+
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

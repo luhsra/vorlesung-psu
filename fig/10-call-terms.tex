@@ -1,0 +1,33 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[font=\ttfamily]
+    \node[draw,pin={[pin distance=3mm]100:\scriptsize Call-Site}] (call-site) {\ircmd{Call} bar, a, t0, 42};
+
+    
+    \node[right=2 of call-site,yshift=-8mm] (return) {\ircmd{Return} t4};
+    \node[above=1.5 of return.west,anchor=west] (header) {bar(x:int, y:int, z:int):int};
+    \node[fit=(header) (return),draw]{};
+    \draw[->] (header.south west)++(east:1em) coordinate(@) -- (@|-return.north);
+
+
+    \coordinate (top-cfg) at ($(header.north west-|call-site.east)+(west:.4cm)$);
+
+    \draw[->] (top-cfg) -- (top-cfg|-call-site.north);
+    \draw[->] (top-cfg|-call-site.south) -- ++(down:8mm);
+    
+    \draw[->,decorate,decoration={snake, post length=8pt}] (call-site.east) --
+          node[circle,draw,inner sep=2pt,fill=white] {A}
+          (header.west);
+    \draw[->,decorate,decoration={snake, post length=8pt}] (return.west)    --
+          node[circle,draw,inner sep=2pt,fill=white] {R}
+          ($(top-cfg|-call-site.south)+(down:3pt)$);
+
+
+          \node[above=of call-site] (aufrufer) {\structure{Aufrufer (Caller)}};
+
+          \node[right=2 of aufrufer] {\structure{Aufgerufener (Callee)}};
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
