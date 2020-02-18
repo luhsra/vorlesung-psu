@@ -399,8 +399,247 @@ http://www.sco.com/developers/devspecs/abi386-4.pdf ab Seite 35
     }
   
   \end{frame}
+
+  \begin{frame}{Minimale Maschinencodeerzeugung}
+    \vspace{-1em}
+    \begin{btBlock}{}
+      Wenn alles zu kompliziert ist, überlegt man sich den einfachsten Basisfall.
+    \end{btBlock}
+    \medskip
+
+    \begin{columns}
+      \begin{column}{0.6\textwidth}
+    \bi
+    \ii \structure{Befehlsauswahl}: Macroexpansion {
+      \bi
+      \ii<2-> Jeder IR-Befehl wird zu einer festen Assembler-Sequenz
+      \ii<2-> Platzhalter für Registeroperanden
+      \ii<3-> Zusätzliche Anweisungen wo und wie die Operanden vorliegen müssen
+      \ii<4-> Muster für jede Instruktion instantiieren
+      \ei
+    }\medskip
+    \ii \structure{Registerallokation}: Eager Spilling {
+      \bi
+      \ii<5-> \structure{Spilling}: Variable-Wert aus einem Register in den Speicher schreiben.\\[1ex]
+      \ii<5-> Variablen immer neuladen
+      \ii<5-> Ergebnisse direkt spillen
+      \ii<6-> Jede Variable hat einen Speicher-Slot
+      \ei
+    }
+    \ei
+      \end{column}\hfill
+      \begin{column}{0.4\textwidth}
+        { \btAnimation[width=0.6\textwidth]{center,padding,1:<1->}{fig/10-operation-selection}
+          \Large $\Downarrow$
+          \medskip
+        
+        }
+        \uncover<2->{\btAnimation[width=0.8\textwidth]{center,padding,2:<1>,range=2-6:<2->}{fig/10-operation-selection}}
+      \end{column}
+    \end{columns}
+  \end{frame}
+
 #+end_src
 
 https://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.html
 https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-caches-and-main-memory#4087315
+
+#+begin_src latex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \tikzset{solution/.style={
+      inner xsep=2em,fill=white,
+      fill opacity=0.8,
+      label={[draw=safegreen, thick, minimum width=8cm,fill=white]center:{\Large\advantage{\textbf{#1}}}}
+    }
+  }
+
+
+  \begin{frame}[fragile]{Probleme der Minimallösung}
+    \textbf{3 Probleme}: \ALERT{\uncover<2->{Ineffizient}\uncover<3->{, Ineffizient}\uncover<4->{, Ineffizient.}}
+    \bigskip
+
+    \begin{tikznodeenv}[name=A]\begin{minipage}{\textwidth}
+    \bi
+    \ii<4-> Ständig werden Register, völlig ohne Not, \alert{gesichert und geladen}{
+      \begin{columns}
+        \begin{column}{0.75\textwidth}
+          \btUseExtraItemSep[-\smallskipamount]\vspace{-1em}%
+          \bi
+          \ii Bereits in Registern vorgeladene Variablen werden veworfen
+          \ii Hauptteil des Programs macht nur noch Spilling
+          \ii Speicherzugriffe sind, trotz Cache, langsamer
+          \ei
+        \end{column}\hfill
+        \begin{column}{0.25\textwidth}
+          \begin{code}[]
+            \begin{asm}[style=smaller]
+              ...
+              mov %ebx, -8(%ebp)
+            \end{asm}
+            \vspace{1pt}\hrule\vspace{1pt}
+            \begin{asm}[style=smaller]
+              mov -8(%ebp), %eax
+              ...
+            \end{asm}
+          
+          \end{code}
+        \end{column}
+      \end{columns}
+
+    }
+    \ei
+    \end{minipage}\end{tikznodeenv}
+
+
+    \begin{tikznodeenv}[name=B]\begin{minipage}{\textwidth}
+    \bi
+    \ii<5-> Starre Ersetzungsmuster nutzen \alert{komplexe CPU Befehle} nicht{
+      \begin{columns}
+        \begin{column}{0.7\textwidth}
+          \btUseExtraItemSep[-\smallskipamount]\vspace{-1em}%
+          \bi
+          \ii Besonders bei CISC sind Befehle oft sehr mächtig
+          \ii IR-Ops sind absichtlich einfach und HW-unabhängig
+          \ii Ein Befehl überdeckt mehrere IR-Befehle
+          \ei
+        \end{column}\hfill
+        \begin{column}{0.30\textwidth}
+          \begin{code}[]
+            \begin{asm}[style=smaller]
+              imul %ebx, 8
+              add %eax, %ebx
+              mov (%ebx), %eax
+            \end{asm}
+          \end{code}%
+          \vspace{2pt}%
+          \begin{code}
+            \begin{asm}[style=smaller]
+              mov (%eax,%ebx,8), %eax
+            \end{asm}
+          \end{code}
+        \end{column}
+      \end{columns}
+    }
+    \ei
+    \end{minipage}\end{tikznodeenv}
+
+  \begin{tikznodeenv}[name=C]\begin{minipage}{\textwidth}
+    \bi
+    \ii<6-> Starre Befehlsreihenfolge \alert{ignorieren moderne Mikroarchitekturen}{
+      \bi
+      \ii Moderne Prozessoren arbeiten Pipelined, Out-of-Order und Superskalar
+      \ii Befehle können im \enquote{Windschatten} anderer Befehle ausgeführt werden
+      \ii Reihenfolge der Befehle hat massiven Einfluss auf die Ausführungszeit
+      \ei
+    }
+    \ei
+  \end{minipage} \end{tikznodeenv}
+
+          
+    \only<7->{\AtBeginShipoutNext{%
+        \AtBeginShipoutUpperLeftForeground{%
+          \begin{tikzpicture}[remember picture, overlay]
+            %
+            \node[fit=(A),solution={Globale(re) Registerallokation}]{};
+            \node[fit=(B),solution={Peephole-Optimizer}]{};
+            \node[fit=(C),solution={Instruktions-Scheduling}]{};
+          \end{tikzpicture}
+        }
+      }
+    }
+  \end{frame}
+#+end_src
+
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}[fragile]{Ein Registerallokator mit Gedächtnis}
+    \OrangeBox{Die Minimallösung vergisst nach jeder Instruktion alles.}
+    \medskip
+    \bi
+    \ii \textbf{Idee}: Der Registersatz ist \structure{Cache} für die Speicher-Variablen-Slots{
+      \bi
+      \ii Bereits in Register geladene Variablen sollen wiederverwendet werden
+      \ii Veränderte Variablen werden erst verzögert zurück geschrieben
+      \ii Variablen \structure{leben} in ihrem Slot \textbf{oder} in einem Register
+      \ei
+    }\medskip
+    \ii<2-> Registerallokation auf Granularität eines Basisblocks {
+      \bi
+      \ii Verschränkung von Registerallokation (RA) und Makroexpansion (ME)
+      \ii ME weist  RA an Variablen zu laden bzw. Register zurückzuschreiben
+      \ii RA führt währenddessen Buch über den Zustand des Registersatzes\\[1ex]{
+        \begin{code}[]
+          \begin{py}
+            def emit_Add(self, instr):  # Makroexpansion für dst := Add lhs, rhs
+               lhs = self.RA.load(instr.lhs)
+               rhs = self.RA.load(instr.rhs, modify=True)
+               self.emit_instr("add", lhs, rhs)
+               self.RA.write(rhs, instr.dst)
+          \end{py}
+        \end{code}
+      }
+      \ii LLVM bietet mit \texttt{RegAllocFast.cpp} eine ähnliche Heuristik
+      \ei
+    }
+    \ei
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Interface des Allokators}
+    \bi
+    \ii Synchronisation zwischen Allokator und Expansion mittels \structure{Hooks} {
+      \bi
+      \ii \codeinline[style=py]{def before_Function(func)} -- Variablenslots festlegen
+      \ii \codeinline[style=py]{def before_BasisBlock(bb)} -- Zurücksetzen des Allokatorzustandes
+      \ii \codeinline[style=py]{def before_Instruction(instr)} -- Sonderbehandlung von \ircmd{Call}, \ircmd{Goto}...
+      \ei
+    }\medskip
+    \ii Allokieren eines leeren Registers: \codeinline[style=py]{def alloc_register(reg=None)}{
+      \bi
+      \ii Wenn kein Register vorgegeben wird, wählt der Allokator eines aus
+      \ii Noch ungesicherte Ergebnisse werden ggf. in den Variablen-Slot gespeichert
+      \ei
+    }\medskip
+    \ii Lade Variable nach Register: \codeinline[style=py]{def load(src, dst_reg=None, modify=False)}{%
+      \bi
+      \ii Sorgt dafür dass \texttt{src} in einem Register vorliegt
+      \ii Mit \texttt{dst\_reg} können wir ein spezifisches Register verlangen
+      \ii Mit \texttt{modify} zeigen wir an, ob wir das Register verändern werden
+      \ei
+    }\medskip
+    \ii Schreibe Register nach Variable: \codeinline[style=py]{def write(src_reg, dst_var)}{%
+      \bi
+      \ii \texttt{dst\_var} wird zukünftig den Wert \texttt{src\_reg} haben
+      \ii Das Schreiben in den Speicher kann verzögert erfolgen
+      \ei
+    }
+    \ei
+
+  \end{frame}
+
+
+  \begin{frame}{Zustand des Allokators}
+    \btAnimation[width=0.6\textwidth]{center, padding, range=1-2:<1->}{fig/10-allocator}
+    \bi
+    \ii Während seiner Arbeit, trackt der Allokator den Registerzustand{
+      \bi
+      \ii \texttt{free}:  Wurde das Register für die aktuelle Instruktion schon benuzt?
+      \ii \texttt{value}: Welche Variable lebt aktuell in diesem Register?
+      \ii \texttt{dirty}: Muss der Wert noch in den Slot zurück geschrieben werden?
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Beispielbelegung} {
+      \bi
+      \ii[\structure{eax}] Nicht Herausgegeben; \btSetTab Nichts geladen
+      \ii[\structure{ebx}] Herausgegeben; \btUseTab Variable a geladen; Synchronisiert mit Speicher
+      \ii[\structure{ecx}] Nicht Herausgegeben; \btUseTab Variable b geladen; Rückschreiben erforderlich
+      \ii[\structure{edx}] Herausgegeben; \btUseTab Variable c geladen; Synchronisiert mit Speicher
+
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+#+end_src
+
 * Speicherung des Programms: ELF

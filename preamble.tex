@@ -256,6 +256,15 @@
 \newcommand{\tikznode}[2][]{%
   \tikz[baseline,remember picture]\node[anchor=base,#1]{#2};%
 }
+\newenvironment<>{tikznodeenv}[1][]{%
+  \begingroup%
+  \tikzset{tikznode@style/.style={#1}}%
+  \begin{lrbox}{\@tempboxa}%
+}{\end{lrbox}%
+  \tikz[remember picture]\node[inner sep=0,outer sep=0, tikznode@style]{\usebox{\@tempboxa}};
+  \endgroup%
+}
+
 \newenvironment<>{visible}[1][]{\begin{scope}[visible on=#2,#1]}{\end{scope}}
 
 \newsavebox{\@overlaybox}

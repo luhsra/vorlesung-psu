@@ -1,0 +1,65 @@
+\documentclass{lecturefig}
+\begin{document}
+
+    
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    cell/.style 2 args={
+      draw,rectangle,minimum width=3em,text height=0.6\baselineskip,text depth=0.2\baselineskip,
+      cell #1-#2/.try
+    },
+    text/.style 2 args={
+      cell #1/.append style={label=center:#2}
+    },
+    cell fill/.style 2 args={
+      cell #1/.append style={fill=#2}
+    },
+    % Free status
+    free/.style={
+      text={#1-free}{yes},
+      cell fill={#1-free}{safegreen!30},
+    },
+    alloc/.style={
+      text={#1-free}{no},
+      cell fill={#1-free}{srared!30},
+      % cell #1-value/.append style={label={[anchor=south east]south east:\includegraphics[width=1ex]{fig/lock.png}}},
+    },
+    dirty/.style={
+      text={#1-dirty}{yes},
+      cell fill={#1-dirty}{srared!30},
+    },
+    clean/.style={
+      text={#1-dirty}{no},
+      cell fill={#1-dirty}{safegreen!30},
+    },
+    value/.style 2 args={
+      text={#1-value}{#2},
+      cell fill={#1-value}{badbee!40},
+    }
+    ]
+
+    \only<1>{\tikzset{
+        % free/.list={eax,ebx,ecx,edx}
+      }
+    }
+    \only<2>{\tikzset{
+        free/.list={eax,ecx},
+        text={eax-value}{--},
+        text={eax-dirty}{--},
+        alloc=ebx, value={ebx}{a}, clean={ebx},
+        value={ecx}{b}, dirty={ecx},
+        value={edx}{c}, clean={edx}, alloc=edx,
+      }
+    }
+
+    \matrix[matrix of nodes,nodes in empty cells,] (state) {
+          & eax                   & ebx                   & ecx                   & edx                   \\
+    free  & |[cell={eax}{free}]|  & |[cell={ebx}{free}]|  & |[cell={ecx}{free}]|  & |[cell={edx}{free}]|  \\
+    value & |[cell={eax}{value}]| & |[cell={ebx}{value}]| & |[cell={ecx}{value}]| & |[cell={edx}{value}]| \\
+    dirty & |[cell={eax}{dirty}]| & |[cell={ebx}{dirty}]| & |[cell={ecx}{dirty}]| & |[cell={edx}{dirty}]| \\
+  };
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
