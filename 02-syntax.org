@@ -1407,7 +1407,7 @@ Hiermit zeigt der Programmierer an, dass ab der Stelle des ~typedefs~ ein Bezeic
 So führt der Ausdruck ~typedef char foo~ dazu, dass ~foo~ der Name eines Datentyps ist, der genau ein Byte groß ist und an jeder Stelle verwendet werden kann, an der auch ~char~ verwendet werden darf.
 
 Da aber einige Grammatikregeln anhand des Wissens, ob wir gerade auf den Namen einer Variable oder den Namen eines Typs schauen, eine Unterscheidung treffen, müssen wir an diesen Stellen wissen, welche Typnamen es gibt.
-Man kann dieses Problem entweder mit einer Menge Formalismus{{{wikipedia_en(Attribute_grammar}}} erschlagen, oder man gibt die Kontextfreiheit zu einem gewissen Teil auf.
+Man kann dieses Problem entweder mit einer Menge Formalismus{{{wikipedia_en(Attribute_grammar)}}} erschlagen, oder man gibt die Kontextfreiheit zu einem gewissen Teil auf.
 
 Beim [[https://en.wikipedia.org/wiki/The_lexer_hack][Lexer Hack]], lässt man Parser und Scanner miteinander reden. Der Scanner führt eine Liste mit gerade aktiven Typnamen mit und gibt unterschiedliche Token für Typnamen und für Bezeichner an den Parser. Der Parser seinerseits teilt dem Scanner beim Erkennen eines ~typedef~ mit, dass es einen neuen Typnamen gibt[fn::https://blogs.gnome.org/otte/2019/10/17/riddle-me-this/]. Dies kann in der Reduktionsregel der Grammatik erfolgen:
 
@@ -1498,7 +1498,7 @@ Es geht also um Situationen, bei denen die Struktur eines Programms selbst ein P
 Der Übersetzer wird also selbst zum Sprachprozessor für dieses Meta-Programm.
 
 Das bekannteste Beispiel hierfür sind C++-Templates:
-Mit C++ Templates kann der Programmierer Datentypen definieren, die parametrisch von anderen Datentypen abhängen.
+Mit C++-Templates kann der Programmierer Datentypen definieren, die parametrisch von anderen Datentypen abhängen.
 Ein Beispiel für einen solchen Datentyp ist die doppelt verkettete Liste von Integern (~std::deque<int>~).
 Jetzt muss der Übersetzer allerdings diese parametrischen Datentypen vollständig expandieren, um zu prüfen, ob alle Typen korrekt verwendet wurden.
 Da aber auch Templatetypen Argumente für Templatetypen sein können, hat man alle Elemente zusammen, um ein Programm zu schreiben: Rekursion und Abbruchbedingungen.
