@@ -551,7 +551,6 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
 #+end_src
 
 #+begin_src latex
-  %%ONLY%%
   \begin{frame}[fragile]{Ein Registerallokator mit Gedächtnis}
     \OrangeBox{Die Minimallösung vergisst nach jeder Instruktion alles.}
     \medskip
@@ -614,7 +613,6 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
       \ei
     }
     \ei
-
   \end{frame}
 
 
@@ -642,4 +640,72 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
   \end{frame}
 #+end_src
 
+
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}{\texttt{alloc\_register()}}
+    \btAnimation[width=0.6\textwidth]{center, padding, 2:<1>, 3:<2-3>, range=4-7:<4->}{fig/10-allocator}
+
+    \bi
+    \ii \textbf{Vorbereitung}: Vor jeder Instruktion setzen wir \texttt{free} zurück{
+      \bi
+      \ii Jedes Register kann in jeder Instruktion verwendet werden
+      \ii Herausgabe eines Registers erzeugt \structure{Kosten} für Spilling und Neuladen
+      \ei
+    }\medskip
+    \ii<3-> \structure{Priorisierte Allokation} von Registern für die Befehlsauswahl {
+      \bi
+      \ii<4-> Leere Register erzeugen keine Folgekosten                     \hfill (Kosten: 0 \texttt{mov})
+      \ii<5-> Wert-Neuladen für saubere, aber belegte Register    \hfill (Kosten: 1 \texttt{mov})\\
+              Wissen um aktuellen Wert wird gelöscht \\[1ex]
+      \ii<7-> Spilling und Wert-Neuladen für dreckige Register              \hfill (Kosten: 2 \texttt{mov})\\
+              Der Allokator emitiert direkt einen Spill-Befehl für das Register
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+
+
+  \begin{frame}[fragile]{\texttt{write(src\_reg, dst)}}
+    \uncover<2->{\btAnimation[width=0.6\textwidth]{center, padding, 8:<1-2>, 9:<3>, 10:<4-5>,11:<6->}{fig/10-allocator}}
+    \bi
+    \ii Befehlsauswahl hat Befehle emitiert die \texttt{src\_reg} beschrieben haben{
+      \bi
+      \ii Registerinhalt soll in Zukunft als \texttt{dst}-Variable verfügbar sein
+      \ii Verzögertes Rausschreiben der Variable in ihren Speicher-Slot
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Beispiel}: Zuweisung zwischen zwei Variablen \hfill \texttt{b := \ircmd{Assign} a}\\{
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{code}[]
+            \begin{py}[style=highlighting]
+              def emit_Assign(instr):
+                 @3src = self.RA.load(instr.src)@
+                 @4dst = self.RA.alloc_register()@
+                 @5self.emit_instr("mov", src, dst)@
+                 @6self.RA.write(src, instr.dst)@
+            \end{py}
+          \end{code}
+        \end{column}\hfill
+        \begin{column}{0.49\textwidth}
+          \begin{code}[]\ttfamily
+            \uncover<3->{mov -8(\%ebp), \%eax}\\
+            \uncover<5->{mov \%eax, \%ebx}
+          \end{code}
+          \vspace{-1em}%
+          \bi
+          \ii<6-> \texttt{write()} setzt nur \texttt{value} und \texttt{dirty}\\[-1ex]
+          \ii<6-> \codeinline[style=asm,style=smaller]{mov %ebx, -12(%ebx)} geschiet später
+          \ei
+
+        \end{column}
+      \end{columns}
+
+    }
+    \ei
+  \end{frame}
+
+#+end_src
 * Speicherung des Programms: ELF

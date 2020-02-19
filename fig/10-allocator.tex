@@ -35,6 +35,10 @@
     value/.style 2 args={
       text={#1-value}{#2},
       cell fill={#1-value}{badbee!40},
+    },
+    empty/.style={
+      text={#1-value}{--},
+      text={#1-dirty}{--},
     }
     ]
 
@@ -49,6 +53,21 @@
         alloc=ebx, value={ebx}{a}, clean={ebx},
         value={ecx}{b}, dirty={ecx},
         value={edx}{c}, clean={edx}, alloc=edx,
+      }
+    }
+    \only<3-7>{\tikzset{
+        alt=<-3>{free=eax,empty=eax}{alloc=eax, empty=eax},
+        alt=<-4>{free=ebx,value={ebx}{a}, clean={ebx},}{alloc=ebx, empty=ebx},
+        alt=<-5>{free=edx,value={edx}{c}, clean={edx} }{alloc=edx, empty=edx},
+        alt=<-6>{free=ecx,value={ecx}{b}, dirty={ecx},}{alloc=ecx, empty=ecx},
+      }
+    }
+    \only<8-11>{\tikzset{
+        alt=<-8>{free=eax,empty=eax}{alloc=eax, value={eax}{a}, clean={eax}},
+        alt=<-9>{free=ebx}{alloc=ebx},
+        alt=<-10>{empty=ebx}{value={ebx}{b}, dirty={ebx}},
+        free=ecx, empty=ecx,
+        free=edx, empty=edx,
       }
     }
 
