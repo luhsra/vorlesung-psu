@@ -1,0 +1,86 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    source/.style={
+      fill=safegreen!30,draw,minimum width=1.8cm,
+    },
+    asm/.style={
+      fill=badbee!40,draw,minimum width=2cm,
+    },
+    object/.style={
+      fill=luhblue!40,draw,minimum width=1.8cm
+    },
+    elf/.style={
+      fill=brown!60,minimum width=1.7cm,draw
+    }
+    ]
+    \coordinate(start) at (0,0);
+    \foreach \n/\v in {main/1-,foo/2-,bar/2-,dummy/0,spam/4-,ham/4-}{
+      \begin{visible}<\v>
+        \node[source] at (start) (src-\n) {\n.c};
+        \node[asm, right=of src-\n] (asm-\n) {\n.asm};
+        \node[object,right=of asm-\n] (obj-\n) {\n.o};
+        \draw[->] (src-\n) -- node[above](cc-\n){\texttt{cc}} (asm-\n);
+        \draw[->] (asm-\n) -- node[above](as-\n){\texttt{as}} (obj-\n);
+      \end{visible}
+      \coordinate(start) at ($(start)+(down:2em)$);
+    }
+
+    \node[right=1 of obj-main] (ld) {\texttt{ld}};
+    \node[elf,right=2 of obj-main] (elf-main) {main.elf};
+    \draw[->] (ld) -- (elf-main);
+    \draw[->] (obj-main) -- (ld);
+    \begin{visible}<2->
+      \draw[->] (obj-foo) -| (ld);
+      \draw[->] (obj-bar) -| (ld);
+    \end{visible}
+
+
+
+    \begin{visible}<4->
+      \node[right=1 of obj-spam] (ld2) {\texttt{ld}};
+      \node[right=2 of obj-spam,elf] (elf-lib) {lib.so};
+      \draw[->] (ld2) -- (elf-lib);
+      \draw[->] (obj-spam) -- (ld2);
+      \draw[->] (obj-ham) -| (ld2);
+    \end{visible}
+
+    \begin{visible}<3->
+      \node[anchor=west,xshift=1em] at ($(elf-lib)!0.5!(elf-main)$) (loader) {Loader};
+      \node[right=0.2 of loader] (cpu) {\includegraphics[width=1cm]{fig/07-cpu}};
+      \draw[->] (loader) -- (cpu);
+      \draw[->] (elf-main) |- (loader);
+      \begin{visible}<4->
+          \draw[->] (elf-lib)  |- (loader);
+      \end{visible}
+    \end{visible}
+
+    
+    \begin{visible}<1>
+      \node[fit=(src-main) (cc-main) (asm-main),draw,fill=srared!20,node on layer=background,thick] (@) {};
+      \node[below=0 of @] (@){Besprochen in PSÜ};
+      \node[below=0.5 of @,fill=luhgray!20,align=left,anchor=north] {
+        \structure{cc}: Übersetzer\\
+        \structure{as}: Assembler\\
+        \structure{ld}: Linker
+      };
+
+      \draw[help lines] (obj-main) -- ++(down:1cm) node[font=\color{black},below,text width=4cm,xshift=2em]{
+        \structure{Objekt-Datei}\\
+        -- Bereits Binärcode\\
+        -- Symbolische\\
+        \hphantom{--} Funktionsnamen
+      };
+
+      \draw[help lines] (elf-main) -- ++(down:1cm) node[font=\color{black},below,text width=4cm,xshift=2em]{
+        \structure{Binärdatei}\\
+        -- Aufgelößte Referenzen\\
+        -- Speicherlayout\\
+        \hphantom{--} ist festgelegt
+      };
+    \end{visible}
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}

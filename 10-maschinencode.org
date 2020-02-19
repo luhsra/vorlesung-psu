@@ -327,7 +327,7 @@ http://www.sco.com/developers/devspecs/abi386-4.pdf ab Seite 35
 
 #+end_src
 
-* Befehleauswahl und Registerallokation
+* Befehlsauswahl und Registerallokation
 
 #+begin_src latex
   \dividerframe{Befehlsauswahl\\und\\Registerallokation}
@@ -642,7 +642,7 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
 
 
 #+begin_src latex
-  %%ONLY%%
+
   \begin{frame}{\texttt{alloc\_register()}}
     \btAnimation[width=0.6\textwidth]{center, padding, 2:<1>, 3:<2-3>, range=4-7:<4->}{fig/10-allocator}
 
@@ -777,4 +777,29 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
 
   \end{frame}
 #+end_src
-* Speicherung des Programms: ELF
+* Programme und Prozesse
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Programme und Prozesse}
+
+  \begin{frame}{Übersicht des restlichen Übersetzungsvorgang}
+    \begin{btBlock}{}\small
+      In den letzten 10 Vorlesungen haben wir gelernt aus Quellcode Assembler zu machen.
+      Daraus muss noch ein \structure{Programm} erzeugt werden, dass als \structure{Prozess} gestartet und ausgeführt wird.
+    \end{btBlock}
+
+    \btAnimation[width=\textwidth]{range=1-4:<1->}{fig/10-linking-overview}
+
+
+    \bi
+    \ii<2-> Aber da ist noch mehr\ldots {
+      \bi
+      \ii \structure{Seperate Übersetzung} ermöglicht inkrementelles neuübersetzen
+      \ii<3-> Der \structure{Loader} bringt die Binärdatei in den Speicher
+      \ii<4-> \structure{Dynamische Bibliotheken} erlauben es Binärcode zu sharen
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
