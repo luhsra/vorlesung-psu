@@ -71,6 +71,14 @@
       }
     }
 
+    \only<12-16>{\tikzset{
+        alt=<-12>{free=eax,empty=eax}{alloc=eax, value={eax}{z}, clean={eax}},
+        alt=<-13>{free=ebx}{alloc=ebx}, value={ebx}{a}, clean={ebx},
+        alt=<-14>{free=ecx}{alloc=ecx},value={ecx}{c}, dirty={ecx},
+        alt=<-15>{free=edx,value={edx}{b}, dirty={edx},}{alloc=edx,value={edx}{b}, clean={edx}},
+      }
+    }
+
     \matrix[matrix of nodes,nodes in empty cells,] (state) {
           & eax                   & ebx                   & ecx                   & edx                   \\
     free  & |[cell={eax}{free}]|  & |[cell={ebx}{free}]|  & |[cell={ecx}{free}]|  & |[cell={edx}{free}]|  \\

@@ -707,5 +707,74 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
     \ei
   \end{frame}
 
+  \begin{frame}{\texttt{load(src)}}
+    \btAnimation[width=0.6\textwidth]{center, padding, range=12-16:<1->, 16:<6->}{fig/10-allocator}
+    \bi
+    \ii Laden einer Variable in ein beliebiges Register {
+      \bi
+      \ii<2-> \structure{Basisfall}: Variable ist nicht geladen $\rightarrow$ \texttt{alloc\_register()} + Ladebefehl
+      \ii<3-> Bereits geladen und sauber $\rightarrow$ Register allokiert markieren und herausgeben
+      \ii<4-> Variable bereits geladen, aber dreckig{
+        \bi
+        \ii Der Aufrufer will die Variable nicht verändern \btSetTab $\rightarrow$ wie geladen und sauber
+        \ii<5-> \texttt{load(src, modify=True)} \btUseTab $\rightarrow$ Register vorher spillen
+        \ei
+      }
+      \ei
+    }\medskip
+    \ii<6-> Laden einer Variable in ein spezifisches Register{
+      \bi
+      \ii Manchmal brauchen wir etwas in einem spezifischen Register \hfill\texttt{ret/\%eax}
+      \ii Bereits geladenen Wert mit \texttt{xchg} austauschen 
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Besondere Situationen für den Allokator}
+    \bi
+    \ii \structure{Datenflüsse} die die Grenzen der Basisblöcke überschreiten{
+      \bi
+      \ii Basisblock-Übergreifende Registervergabe ist \alert{viel schwieriger}
+      \ii Werte müssten in allen Vorgängern in den gleichen Registern sein\\[1ex]
+      \ii[$\Rightarrow$] Wir starten jeden Basisblock mit einem leeren Zustand
+      \ei
+    }\medskip
+    \ii<2-> \structure{Funktionsaufrufe} und \structure{Sprünge}{
+      \bi
+      \ii Funktionen/andere Basisblöcke könnten die Variablen aus dem Speicher lesen
+      \ii Funktionen können Speicher verändern\\[1ex]
+      \ii[$\Rightarrow$] Alle Register sichern und Zustand zurücksetzen
+      \ei
+    }\medskip
+    \ii<3-> \structure{Speicheroperationen} haben wieder ein \textbf{Alias-Problem}{
+      \bi
+      \ii Wir wissen nicht ob der gelesene/geschriebene Zeiger auf eine Variable zeigt
+      \ii \ircmd{Store} könnte Register-Werte invalidieren, \ircmd{Load} könnte alte Werte lesen\\[1ex]
+      \ii[$\Rightarrow$] Wir sichern/invalidieren Register, die jemals referenzierte Variablen enthält.\\
+          \hfill      \texttt{ptr := \ircmd{Reference} var}
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+
+  \begin{frame}{Benchmark}
+    \btAnimation{center,range=1-4:<1->}{fig/10-eval}
+
+    \bi
+    \ii Evaluation der beiden Allokatoren und Gegenüberstellung mit GCC{
+      \bi
+      \ii Benchmark: Iterativer Fibonacci,  \texttt{fib\_iter(100000000)}
+      \ii Evaluationssystem: i7 6600 @ 2.60 Ghz, 32-Bit Modus
+      \ii Test-Setup: \texttt{perf stat -r 10 ./a.out}
+      \ei
+    }
+    \ii[$\Rightarrow$]<3-> PSÜ-Übersetzer mit Optimierungen ist Vergleichbar mit \texttt{gcc -O0}
+    \ii[$\Rightarrow$]<4-> GCC kann natürlich noch viel besseren Code erzeugen
+    \ei
+
+
+  \end{frame}
 #+end_src
 * Speicherung des Programms: ELF

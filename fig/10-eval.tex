@@ -1,0 +1,28 @@
+\documentclass{lecturefig}
+\usepackage{pgfplots}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \begin{axis}[ybar,
+      width=8cm,
+      height=5cm,
+      ymin=0,ymax=500,bar width=1em,
+      ylabel={Run time [ms]}, symbolic x coords={Average (n=10)},xtick=data,
+      nodes near coords,
+      every node near coord/.append style={font=\scriptsize,anchor=east,rotate=-90},
+      ]
+      \addplot+[xshift=-3em,] coordinates {(Average (n=10),346.10)};
+      \addplot+[xshift=-3em,alt=<2->{}{opacity=0}] coordinates {(Average (n=10),221.33)};
+      \addplot+[xshift=-3em,alt=<3->{}{opacity=0}] coordinates {(Average (n=10),219.41)};
+      \addplot+[xshift=-3em,alt=<4->{}{opacity=0}] coordinates {(Average (n=10),41.15)};
+      \addplot+[xshift=-3em,alt=<4->{}{opacity=0}] coordinates {(Average (n=10),36.78)};
+
+      \only<1>{\legend{Minimal}}
+      \only<2>{\legend{Minimal,Cached}}
+      \only<3>{\legend{Minimal,Cached,GCC -O0}}
+      \only<4>{\legend{Minimal,Cached,GCC -O0, GCC -O1, GCC -O3}}
+    \end{axis}
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}
