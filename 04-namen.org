@@ -36,7 +36,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
       \includegraphics[page=11,width=0.6\linewidth]{fig/01-overview-small}
     \end{center}
     \bi
-    \ii Die Namensauflösung ist grundlegend für das Programmverständnis{
+    \ii Die Namensauflösung ist grundlegend für das Programmverständnis.{
       \bi
       \ii Namen etablieren kontextsensitive \structure{Querverbindungen} zu Deklarationen.
       \ii Das informatische Grundprinzip von \structure{Information Hiding} hängt an Namen.
@@ -120,12 +120,12 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   #+end_src
 
 In dieser Vorlesung soll es um das Konzept von *Namen* und *Namensauflösung* im Kontext von Programmiersprachen gehen.
-Dieses Kapitel ist der zweite Teil der Top-Down Betrachtung von Programmiersprachen, bei der wir aus Anwendersicht auf Konstrukte und grundlegende Prinzipien schauen, die in vielen Programmiersprachen vorkommen.
-Jede Programmiersprache muss eine Antwort darauf haben, wie sie Dinge (Objekte, Typen, Funktionen) an einer Stelle im Programm benennt um sie an anderer Stelle wieder zu verwenden.
+Dieses Kapitel ist der zweite Teil der Top-Down-Betrachtung von Programmiersprachen, bei der wir aus Anwendersicht auf Konstrukte und grundlegende Prinzipien schauen, die in vielen Programmiersprachen vorkommen.
+Jede Programmiersprache muss eine Antwort darauf haben, wie sie Dinge (Objekte, Typen, Funktionen) an einer Stelle im Programm benennt, um sie an anderer Stelle wieder zu verwenden.
 In dieser Vorlesung wollen wir uns damit beschäftigen, wie solche Antworten aussehen können und welche Prinzipien der Benennung und der Namensorganisation ersonnen wurden.
-Dabei wird keine Sprache alle der hier vorgestellten Prinzipien auch anwenden, sondern es wird immer nur eine Untermenge zu Anwendung kommen.
+Dabei wird keine Sprache alle der hier vorgestellten Prinzipien auch anwenden, sondern es wird immer nur eine Untermenge zur Anwendung kommen.
 
-Auf Seite des Übersetzers ist die Verbindung zwischen der Stelle an der ein Name eingeführt wird (*Deklaration*) und seinen Verwendungen (*Referenzierung*) eine wichtige Querverbindung, die das Programm zusammenhält.
+Auf Seite des Übersetzers ist die Verbindung zwischen der Stelle, an der ein Name eingeführt wird (*Deklaration*), und seinen Verwendungen (*Referenzierung*) eine wichtige Querverbindung, die das Programm zusammenhält.
 Zu jeder Verwendung eines Namens muss der Übersetzer die passende Deklaration finden; diesen Prozess, von der Verwendung zum Deklaration, nennen wir (partielle) *Namensauflösung*[fn::
 Partiell deswegen, weil wir im Übersetzer nur die Deklaration und nicht in jedem Fall das dahinterliegende Laufzeitobjekt finden.
 Vollständige Namensauflösung verbindet einen Namen mit der Speicheradresse eines Objekts.
@@ -133,41 +133,42 @@ Dazu aber später mehr.].
 Entlang dieser Verbindungen, die quer zu den Ästen und Blättern des abstrakten Syntaxbaums (AST) gezogen werden, können Informationen zwischen der Deklarationsstelle und der Verwendungsstelle fließen.
 Die wichtigste Art von transportierten Information sind die der Typen.
 
-Im Beispiel (auf den Folien), etabliert die Namensauflösung einen Link (die roten Pfeile) zwischen der Verwendungstelle ~y~ und der Deklarationsstelle ~int y~ in Klasse ~B~.
+FIXME: Paar Worte zu Speicherlayout vor Erwähnung von Offsets
+Im Beispiel (auf den Folien) etabliert die Namensauflösung einen Link (die roten Pfeile) zwischen der Verwendungsstelle ~y~ und der Deklarationsstelle ~int y~ in Klasse ~B~.
 Entlang dieses Links fließt zum einen die Information, dass ~y~ vom Typ Ganzzahl ist, aber auch dass das Feld ~y~ mit einem relativen Offset (zum ~this~ Zeiger) von 4 zu finden ist.
 Mit diesem Wissen kann der Übersetzer in der Funktion ~func()~ zum einen prüfen, dass nur valide Operationen auf ~y~ ausgeführt werden und zum anderen kann er Code erzeugen, der das Feld, relativ zu einem ~this~ Zeiger, lesen und schreiben kann.
 
-In diese Vorlesung werde ich mich hauptsächlich auf solche Deklarationen konzentrieren, hinter denen ein zur Laufzeit ein Objekt steht, welches eine Speicheradresse hat.
+In diese Vorlesung werde ich mich hauptsächlich auf solche Deklarationen konzentrieren, hinter denen zur Laufzeit ein Objekt steht, welches eine Speicheradresse hat.
 Allerdings gilt dies nicht für jede Deklaration.
-So haben, in übersetzten Sprachen, *Typdeklarationen* oft kein Pendant zur Laufzeit (es gibt keine Typobjekte), sondern nur die angehefteten Informationen an der Deklarationsstelle (z.B., der Typausdruck) is von Relevanz.
+So haben in übersetzten Sprachen *Typdeklarationen* oft kein Pendant zur Laufzeit (es gibt keine Typobjekte), sondern es sind nur die angehefteten Informationen an der Deklarationsstelle (z.B. der Typausdruck) von Relevanz.
 Allerdings gelten auch für diese Deklarationen die selben Regeln und Prinzipien zur Namensauflösung, sie ist nur schon an der Deklarationsstelle beendet und muss/kann nicht bis zu einer Speicheradresse fortgeführt werden.
 
 Auf Seiten des Sprachdesigns haben die Regeln zur Namensauflösung auch eine zentrale Rolle:
-Eines der Kernprinzipien der Softwaretechnik ist das *Information Hiding*, bei der man sein Programm in Komponenten[fn::Komponenten kein allgemein definierter Begriff, und kann in unterschiedlichen Kontexten unterschiedliches bedeuten. Das grundlegende Merkmal von Komponenten ist aber, dass es ein "Innen" und ein "Außen" gibt, zwischen denen eine Schnittstelle definiert wird.] aufteilt (z.B.
+Eines der Kernprinzipien der Softwaretechnik ist das *Information Hiding*, bei dem man sein Programm in Komponenten[fn::Komponente ist kein allgemein definierter Begriff, und kann in unterschiedlichen Kontexten unterschiedliches bedeuten. Das grundlegende Merkmal von Komponenten ist aber, dass es ein "Innen" und ein "Außen" gibt, zwischen denen eine Schnittstelle definiert wird.] aufteilt (z.B.
 Klassen).
 Diese Komponenten haben einen internen Aufbau, den wir vor der Außenwelt verstecken, und ein externes Interface (die ~public~ Attribute und Methoden), welches die Außenwelt verwenden kann.
-Durch diese Trennung ist es möglich die Interna zu ändern, ohne alle Benutzer der Komponente anzupassen.
+Durch diese Trennung ist es möglich, die Interna zu ändern, ohne alle Benutzer der Komponente anzupassen.
 Hier helfen die Sprachkonstrukte der Namensdeklaration dabei, Komponenten entlang von *hierarchischen Namensräumen* zu strukturieren und die *Sichtbarkeit von Namen* zwischen Komponenten einzuschränken.
 
 #+begin_src latex
-\begin{frame}{Grundbegriffe: Namen und Namensauflößung}
+\begin{frame}{Grundbegriffe: Namen und Namensauflösung}
     \begin{center}
       \btImage[text width=0.8\textwidth,align=center,]{fig/04-objects}
     \end{center}
 
     \bi
-    \ii \STRUCTURE{Name}: Symbolische und Statische Referenz im Programmcode{
+    \ii \STRUCTURE{Name}: symbolische und statische Referenz im Programmcode{
       \bi
-      \ii \structure{Abstraktion}: Namen ersetzen die Verwendung konkreter Speicheradressen
-      \ii \structure{Dokumentation}: Namen transportieren Informationen zwischen Entwicklern
+      \ii \structure{Abstraktion}: Namen ersetzen die Verwendung konkreter Speicheradressen.
+      \ii \structure{Dokumentation}: Namen transportieren Informationen zwischen Entwicklern.
       \ii \structure{Querverbindung}: Referenz von Deklarationen quer zum AST
       \ei
     }\medskip
-    \ii<2-> \STRUCTURE{Namensauflösung}: Auffinden des referenzierten Objekts. {
+    \ii<2-> \STRUCTURE{Namensauflösung}: Auffinden des referenzierten Objekts {
       \bi
-      \ii Wird vom Übersetzer teilweise vorbereitet oder schon ganz durchgeführt.
-      \ii Essentieller Teil der semantischen Analyse (\texttt{name 'x' is not defined})
-      \ii Sowohl statischen (Bezeichner), als auch dynamische (Pointer), Informationen
+      \ii Wird vom Übersetzer teilweise vorbereitet oder schon ganz durchgeführt
+      \ii Essenzieller Teil der semantischen Analyse (\texttt{name 'x' is not defined})
+      \ii Sowohl statischen (Bezeichner) als auch dynamische (Pointer), Informationen
       \ei
     }
     \ei
@@ -184,21 +185,21 @@ Hier helfen die Sprachkonstrukte der Namensdeklaration dabei, Komponenten entlan
     \bi
     \ii \structure{Deklaration} eines Namens für einen AST Knoten\hfill\only<2-|handout:2->{\texttt{\LET <NAME>}} {
       \bi
-      \ii Um AST Knoten wieder zu finden, geben wir ihnen \alert{einen} Namen.
+      \ii Um AST Knoten wiederzufinden, geben wir ihnen \alert{einen} Namen.
       \ii Viele Konstrukte deklarieren einen Namen (Typen, Variablen, Funktionen).
       \ei
     }\smallskip
     \ii<-3|handout:-3> \structure{Definition} von benannten Objekten {
       \bi
-      \ii Jede Definition is auch eine Deklaration und führt einen Namen ein.
+      \ii Jede Definition ist auch eine Deklaration und führt einen Namen ein.
       \ii Geht einher mit der Allokation eines Objekts (z.B. Definition einer Variablen)
-      \ii Wichtige Unterscheidung bei separater Übersetzung (C/C++).
+      \ii Wichtige Unterscheidung bei separater Übersetzung (C/C++)
       \ei
     }\smallskip
     \ii \structure{Namensraum} ist ein Container für deklarierte Namen \hfill\only<2-|handout:2->{\texttt{\{...\}}}{
       \bi
       \ii Beschränken die Sichtbarkeit eines deklarierten Namens
-      \ii \structure{Schachtelung}: Ein Namensraum kann auch weitere Namensräume beinhalten .
+      \ii \structure{Schachtelung}: Ein Namensraum kann auch weitere Namensräume beinhalten.
       \ei
     }
     \ei
@@ -210,16 +211,16 @@ Der erste Begriff ist der des *Namens*:
 Ein Name ist eine symbolische und statische Referenz im Programmcode.
 Sie sind *statisch*, weil Namen direkt im Quelltext vorkommen und nicht erst zur Laufzeit erzeugt werden. Ein Name kann also nur etwas sein, was wir mit dem Editor sehen können, wie ein Bezeichner (~obj~) oder ein komplexerer Ausdruck (~obj.x~).
 Namen sind darüber hinaus aber auch *symbolisch*, weil sie abstrakte Stellvertreter für konkrete Objekte sind.
-Bei Variablen können wir, mit ihnen, symbolischen ~obj.x~ notieren können, anstatt ganz konkret ~0x1004~ schreiben zu müssen.
-Bei Typdeklarationen, die ja keine Laufzeitadresse haben, erlauben Namen es uns ~object_t obj~ anstatt ~<Typ in Zeile 30> obj~
+Bei Variablen können wir mit ihnen symbolisch ~obj.x~ notieren, anstatt ganz konkret ~0x1004~ schreiben zu müssen.
+Bei Typdeklarationen, die ja keine Laufzeitadresse haben, erlauben Namen es uns, ~object_t obj~ anstatt ~<Typ in Zeile 30> obj~
 zu schreiben.
 
 Der zweite wichtige Begriff ist die *Namensauflösung*, bei der die symbolischen Namen durch die konkreten Objekte bzw. die konkreten Adressen ersetzt werden.
-Dazu müssen wir alle Namen, die stellvertretend für das gleiche sind, miteinander verbunden (Querverbindungen).
-Inbesondere wollen wir alle Verwendung eines Namens (Referenzen) mit jener Programmstelle verbinden, die den Namen zum ersten mal eingeführt hat (Deklaration).
+Dazu müssen wir alle Namen, die stellvertretend für das selbe sind, miteinander verbinden (Querverbindungen).
+Insbesondere wollen wir alle Verwendung eines Namens (Referenzen) mit jener Programmstelle verbinden, die den Namen zum ersten mal eingeführt hat (Deklaration).
 Falls es zu einem Namen tatsächlich ein Objekt zur Laufzeit gibt, so ist die *Adressberechnung* der abschließende Teil der Namensauflösung.
 
-Bereits erwähnt haben ich den Begriff der *Deklaration*.
+Bereits erwähnt habe ich den Begriff der *Deklaration*.
 Deklarationen sind jene Stellen im Quellcode, die einen Namen einführen und damit dem Übersetzer bekannt machen.
 Für jede Verwendung eines Namens wird der Übersetzer die, im referenzierenden Kontext sichtbare, Deklaration suchen; gibt es keine sichtbare Deklaration, so ist das Programm fehlerhaft.
 In Sprachen gibt es viele Konstrukte, die benannt sind und daher einen Namen deklarieren.
@@ -227,17 +228,17 @@ In Sprachen gibt es viele Konstrukte, die benannt sind und daher einen Namen dek
 Der Begriff der *Definition* ist eine Erweiterung der Deklaration.
 Neben der Einführung eines neuen Namens, gehen Definitionen mit der Erstellung (Allokation) des konkreten Objekts einher.
 Daher kann es zu einem Namen auch immer nur *eine Definition*, aber *viele Deklarationen* geben.
-Besonders auffällig ist der Unterschied zwischen Deklaration und Definition beim Sprachen mit separater Übersetzung (C/C++).
+Besonders auffällig ist der Unterschied zwischen Deklaration und Definition bei Sprachen mit separater Übersetzung (C/C++).
 Dort kann immer nur eine Übersetzungseinheit einen Namen definieren (die globale Variable ~int B~), aber viele Übersetzungseinheiten können diesen Namen deklarieren (~extern int B~).
-Da wir uns in dieser Vorlesungseineit mit Namen und nicht mit Objekten und ihrer Erstellung auseinander setzen wollen, werden wir im folgenden Definitionen weitgehend ignorieren und so tun als gäbe es nur Deklarationen.
+Da wir uns in dieser Vorlesungseinheit mit Namen und nicht mit Objekten und ihrer Erstellung auseinander setzen wollen, werden wir im Folgenden Definitionen weitgehend ignorieren und so tun als gäbe es nur Deklarationen.
 
 Der letzte wichtige Begriff ist der des *Namensraums*.
 Ein Namensraum ist, ganz generell, ein Container für Namensdeklarationen.
 Namensräume strukturieren die Menge aller deklarierten Namen und schränken ihre Sichtbarkeit ein.
-Ohne Namensräume müsste jeder Name einen Programm-weit eindeutigen Bezeichner haben und es gäbe genau eine lokale Variable mit dem Bezeichner ~i~. Das wäre eher unpraktisch.
+Ohne Namensräume müsste jeder Name einen programmweit eindeutigen Bezeichner haben und es gäbe genau eine lokale Variable mit dem Bezeichner ~i~. Das wäre eher unpraktisch.
 
-Für weitere Betrachtung von Namen, werde ich eine minimale, Domänen-spezifische, Sprache {{{wikipedia_de(Domänenspezifische_Sprache)}}} entwickeln, um die wichtigsten Namenskonzepte konzentriert erklären zu können.
-Diese Namensraumsprache ist nicht dazu da tatsächlich übersetzt zu werden, sondern sie soll nur jene Aspekte herausarbeiten, die relevant für die Namensauflösung sind.
+Für weitere Betrachtung von Namen werde ich eine minimale domänenspezifische Sprache{{{wikipedia_de(Domänenspezifische_Sprache)}}} entwickeln, um die wichtigsten Namenskonzepte konzentriert erklären zu können.
+Diese Namensraumsprache ist nicht dazu da, tatsächlich übersetzt zu werden, sondern sie soll nur jene Aspekte herausarbeiten, die relevant für die Namensauflösung sind.
 Die Grammatik dieser Sprache ist denkbar einfach und sie kennt nur Deklarationen (~let <NAME>~), Referenzen (~<NAME>~), und geschachtelte Namensräume (~{...}~). Im weiteren Verlauf werden wir sie allerdings noch minimal erweitern.
 Am Endes dieses Kapitels gibt es noch eine Übersicht über alle vorgestellten Konstrukte und Attribute.
 
@@ -249,12 +250,12 @@ DECL  -> 'let' NAME    // Deklaration eines Namens
 REF   -> NAME          // Verwendung  eines Namens
 #+end_example
 
-* Statische Namensauflößung
+* Statische Namensauflösung
 
 Als erstes werden wir uns mit den Regel der Namensauflösung in geschachtelten Namensräumen beschäftigen.
 Dabei wollen wir uns zunächst nur mit statischer Namensauflösung beschäftigen, bei der hinter jeder Namensdeklaration maximal ein Laufzeitobjekt sein kann.
-Der Gegensatz zu dieser *statischen Namensauflösung*, ist die dynamische Namensauflösung, bei der es zu einer Deklaration mehrere Objekte[fn::Hinter einem Attribut in einer Klasse, steht in jeder Instanz ein anderes Objekt.
-Der ~this~ Zeiger dient zur Unterscheidung.]geben kann, zwischen denen wir mit zusätzlichem Laufzeitwissen unterscheiden werden.
+Der Gegensatz zu dieser *statischen Namensauflösung* ist die dynamische Namensauflösung, bei der es zu einer Deklaration mehrere Objekte[fn::Hinter einem Attribut in einer Klasse steht in jeder Instanz ein anderes Objekt.
+Der ~this~ Zeiger dient zur Unterscheidung.] geben kann, zwischen denen wir mit zusätzlichem Laufzeitwissen unterscheiden werden.
 Dazu aber später mehr.
 
 ** Implizite Namensauflösung
@@ -263,7 +264,7 @@ Dazu aber später mehr.
 :END:
 
 #+begin_src latex
-\dividerframe{Statische Namensauflößung}
+\dividerframe{Statische Namensauflösung}
   \begin{frame}{Implizite Namensauflösung}
     \begin{columns}
       \begin{column}{0.3\textwidth}
@@ -273,20 +274,20 @@ Dazu aber später mehr.
         \bi
         \ii \enquote{Declaration before Use}{
           \bi
-          \ii Deklaration in einem umgebenden Namensraum.
-          \ii Reihenfolge von Deklaration und Referenz teilweise egal.
+          \ii Deklaration in einem umgebenden Namensraum
+          \ii Reihenfolge von Deklaration und Referenz teilweise egal
           \ei
         }\medskip
         \ii<2-|handout:2-> \enquote{Closest-nested scope rule} (CNSR){
           \bi
-          \ii Suche nach Deklarationen von Innen nach Außen
-          \ii Bei mehreren Möglichkeiten: Nimm die Innerste.
+          \ii Suche nach Deklarationen von innen nach außen
+          \ii Bei mehreren Möglichkeiten: Nimm die innerste
           \ii Im AST: Wir suchen von unten nach oben.
           \ei
         }\medskip
-        \ii<3-|handout:3-> Deklarationen können \structure{verdeckt} werden {
+        \ii<3-|handout:3-> Deklarationen können \structure{verdeckt} werden. {
           \bi
-          \ii Innere Deklarationen verdecken die Äußeren
+          \ii Innere Deklarationen verdecken die äußeren.
           \ii Die äußere Deklaration bleibt bestehen, ist aber innen nicht mehr \structure{sichtbar}.
           \ei
         }
@@ -296,21 +297,21 @@ Dazu aber später mehr.
   \end{frame}
   #+end_src
 
-Die wichtigste Art der Namensauflösung ist die *implizite Namensauflösung*, bei der der Übersetzer automatisch die "nähste" sichtbare Deklaration findet.
+Die wichtigste Art der Namensauflösung ist die *implizite Namensauflösung*, bei der der Übersetzer automatisch die "nächste" sichtbare Deklaration findet.
 Dabei sucht er für jede Referenz in einem Namensraum eine Deklaration im gleichen oder einem umgebenden Namensraum.
 Findet er bei dieser impliziten Suche keine Deklaration, so gibt es einen Übersetzerfehler.
 Im Folienbeispiel gibt es für die zweite Verwendung von A zunächst keine passende Deklaration.
 Die einzige Deklaration von A ist in einem Namensraum, der bereits geschlossen ist und daher die Sichtbarkeit des Namens beendet hat.
-Erst mit der Deklaration eines zweiten Namens mit dem Bezeichner ~A~, kann die zweite Referenz aufgelöst werden.
+Erst mit der Deklaration eines zweiten Namens mit dem Bezeichner ~A~ kann die zweite Referenz aufgelöst werden.
 
-Es ist Sprachabhängig, ob eine Deklaration im selben Namensraum wirklich vor der ersten Verwendung auftreten muss, oder ob ich alle Deklaration an das Ende eines Block packen kann.
-Sollte sich eine Sprache für eine strikte Auslegung der "Declaration before use" Regel entscheiden, so hat dies den historischen Hintergrund, dass es früher, aufgrund von schwachbrüstigen Maschinen, erstrebenswert war einen single-pass Übersetzer bauen zu können.
-Solche single-pass Übersetzer gehen nur ein einziges mal über den Quelltext und erzeugen den Binärcode direkt beim Lexen/Parsen.
+Es ist sprachabhängig, ob eine Deklaration im selben Namensraum wirklich vor der ersten Verwendung auftreten muss, oder ob ich alle Deklaration an das Ende eines Block packen kann.
+Sollte sich eine Sprache für eine strikte Auslegung der "Declaration before use"-Regel entscheiden, so hat dies den historischen Hintergrund, dass es früher, aufgrund von schwachbrüstigen Maschinen, erstrebenswert war einen single-pass-Übersetzer bauen zu können.
+Solche single-pass-Übersetzer gehen nur ein einziges mal über den Quelltext und erzeugen den Binärcode direkt beim Lexen/Parsen.
 Für solche Übersetzer ist es dann natürlich unmöglich einen Namen aufzulösen, der lexikalisch nach der Verwendung deklariert wird; dazu müsste man zwei mal über den Quelltext gehen und zunächst alle Deklarationen einsammeln, bevor man die Referenzen auflöst.
 
-Sollte bei der impliziten Namensauflösung mehrere Deklarationen in umgebenden Namensräumen gefunden werden, so verwendet man jene Deklaration die der Verwendung am "nächsten" bzw.
+Sollten bei der impliziten Namensauflösung mehrere Deklarationen in umgebenden Namensräumen gefunden werden, so verwendet man jene Deklaration, die der Verwendung am "nächsten" bzw.
 die am innersten ist.
-Dazu beginnen wir unsere Suche nach der Deklaration bei dem Namensraum der die Verwendung umschließt und arbeiten uns solange von innen nach außen, bis wir eine passende Deklaration gefunden haben.
+Dazu beginnen wir unsere Suche nach der Deklaration bei dem Namensraum, der die Verwendung umschließt, und arbeiten uns solange von innen nach außen, bis wir eine passende Deklaration gefunden haben.
 Diese Regel heißt die "Closest-nested scope rule" (CNSR).
 
 Eine Folge der CNSR ist, dass Deklarationen in untergeordneten Namensräumen *verdeckt* werden können.
@@ -326,7 +327,7 @@ Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die let
 #+begin_src latex
   \begin{frame}<handout:1-3>[fragile]{Explizite Namensräume}
     \begin{btBlock}[type=alert]{\ALERT{Problem:} Referenzen nur entlang des ASTs möglich}
-      Die implizite Namensauflösung erlaubt uns nur Namen zu referenzieren, die direkt über uns im AST sind. Namen aus einem anderen Namensraum (NS) sind nicht erreichbar
+      Die implizite Namensauflösung erlaubt uns nur Namen zu referenzieren, die direkt über uns im AST sind. Namen aus einem anderen Namensraum (NS) sind nicht erreichbar.
     \end{btBlock}
     \medskip
     \begin{columns}
@@ -354,7 +355,7 @@ Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die let
         }
         \ii<4-|handout:3-> Impliziter Wurzelnamensraum {
           \bi
-          \ii Ermöglicht es alle Namensräume zu adressieren
+          \ii Ermöglicht es, alle Namensräume zu adressieren
           \ii Vollständig qualifizierter Name ist eindeutig
           \ei
         }
@@ -368,35 +369,36 @@ Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die let
 Mit der CNSR können wir bereits einen großen Teil der Namen auflösen und mit den zugehörigen Referenzen verbinden.
 Allerdings sind die Namensräume, sofern sie nicht ineinander geschachtelt sind, voneinander abgeschottet.
 Ich kann keine Namen aus einem anderen, bereits geschlossenen Namensraum mittels CNSR referenzieren, da dieser hierarchisch nicht über mir ist.
-Wenn wir allerdings Namensräume dazu verwenden wollen um Komponenten abzubilden, wäre es durchaus wünschenswert in einen, bereits geschlossenen, Namensraum hinein greifen zu können.
+Wenn wir allerdings Namensräume dazu verwenden wollen, um Komponenten abzubilden, wäre es durchaus wünschenswert in einen bereits geschlossenen Namensraum hineingreifen zu können.
 
-Das grundlegende Problem, wenn wir bereits geschlossene Namensräume referenzieren wollen ist, dass sie bisher anonyme Konstrukte sind, also keinen eigenen Namen haben.
-Wir lösen dieses Problem, indem wir die Möglichkeit eröffnen Namensräume an Namen zu binden und eine Möglichkeit geben einem benannten Namensraum (nach unten) zu suchen.
+Das grundlegende Problem, wenn wir bereits geschlossene Namensräume referenzieren wollen, ist, dass sie bisher anonyme Konstrukte sind, also keinen eigenen Namen haben.
+Wir lösen dieses Problem, indem wir die Möglichkeit eröffnen, Namensräume an Namen zu binden und eine Möglichkeit geben, in einem benannten Namensraum (nach unten) zu suchen.
 
 #+begin_example
-DECL -> let NAME = SCOPE // Explizite, benannte Namensräume
+DECL -> let NAME = SCOPE // Explizite benannte Namensräume
 #+end_example
 
-Das erste bekommen wir in unserer domänenspezifischen Sprache hin, wenn wir die Grammatik um eine Regel zu *expliziten Namensräume* erweitern, welche dem folgenden Namensraum einen eigenen Namen geben.
+Das erste bekommen wir in unserer domänenspezifischen Sprache hin, wenn wir die Grammatik um eine Regel zu *expliziten Namensräumen* erweitern, welche dem folgenden Namensraum einen eigenen Namen gibt.
 Dieser Name ist dann an seiner Deklarationsstelle genauso sichtbar, wie das jeder andere Namen auch ist.
-Allerdings schaffen wir mit dem ~::~ Operator die Möglichkeit einen Namen innerhalb eines expliziten Namensraums zu suchen.   Diese explizite bzw. *qualifizerte Referenzierung* sucht dabei nur in dem gegebenen Namensraum und führt keine CNSR Suche durch.
+Allerdings schaffen wir mit dem ~::~-Operator die Möglichkeit, einen Namen innerhalb eines expliziten Namensraums zu suchen.   Diese explizite bzw. *qualifizierte Referenzierung* sucht dabei nur in dem gegebenen Namensraum und führt keine CNSR-Suche durch.
 Im Beispiel bedeutet der Ausdruck ~M::A~, dass wir den Namen ~A~ im expliziten Namensraum ~M~ referenzieren wollen.
 
-Da wir mit dem ~::~ Operator nur in einem Namensraum suchen können den wir mittels CNSR adressieren können, müssen wir einen impliziten *Wurzelnamensraum* einführen, in dem die Top-Level Deklarationen gespeichert werden.
+Da wir mit dem ~::~-Operator nur in einem Namensraum suchen können, den wir mittels CNSR adressieren können, müssen wir einen impliziten *Wurzelnamensraum* einführen, in dem die Top-Level-Deklarationen gespeichert werden.
 Nur so können wir uns, von der Wurzel abwärts, über explizite Namensräume zu allen erreichbaren Deklarationen referenzieren.
 
 Wir können uns den Doppelpunktoperator als einen Trenner in einem Zugriffspfad vorstellen.
-Das Pendant auf Dateisystemebene, auch einem hierarchischen Namensraum (siehe GBS), ist der Slash (~/~).
+Das Pendant auf Dateisystemebene, auch einem hierarchischen Namensraum (siehe Grundlagen der Betriebssysteme), ist der Slash (~/~).
 Ein Reihung von Bezeichnern, die durch Doppelpunkte getrennt sind, ist daher eine Art expliziter Pfad im hierarchischen Namensraum.
 Fängt dieser Pfad mit ~::~ an, so haben wir einen *vollständig qualifizierten Namen* (=absoluter Pfad), ansonsten haben wir einen relativ qualifizierten Namen (=relativer Pfad).
 
-Explizite Namensräume sind eine grundlegende Erweiterung des Namensraumkonzepts, da sie es uns erlauben  kontrolliert auf Unternamensräume zugreifen zu können und nicht nur auf die CNSR angewiesen zu sein.
-Sehr nah an dieser Erweiterung ist das C++ Konstrukt ~namespace~, welches einem Namensraum wirklich nur einen eigenen Namen gibt, und sonst nichts weiteres tut.
+Explizite Namensräume sind eine grundlegende Erweiterung des Namensraumkonzepts, da sie es uns erlauben, kontrolliert auf Unternamensräume zuzugreifen und nicht nur auf die CNSR angewiesen zu sein.
+Sehr nah an dieser Erweiterung ist das C++-Konstrukt ~namespace~, welches einem Namensraum wirklich nur einen eigenen Namen gibt, und sonst nichts weiteres tut.
 
 Noch eine spannende Bemerkung zum impliziten Wurzelnamensraum:
-Wenn eine Sprache keine Möglichkeit bietet auf diese Wurzel zugreifen zu können, so kann man einen Namensraum vom Rest des Programms isolieren.
+Wenn eine Sprache keine Möglichkeit bietet, auf diese Wurzel zugreifen zu können, so kann man einen Namensraum vom Rest des Programms isolieren.
 Innerhalb des Namensraums hat man keine Möglichkeit Namen zu notieren, die auf Deklarationen von außerhalb referenzieren.
-Nur jene Objekte, die wir (dynamisch) in diesen Namensraum hinein geben erlauben dem enthaltenen Code auf die Außenwelt zuzugreifen.
+Nur jene Objekte, die wir (dynamisch) in diesen Namensraum hinein geben, erlauben dem enthaltenen Code auf die Außenwelt zuzugreifen.
+FIXME: die auf Deklaration von außerhalb referenzieren oder auf die?
 
 ** Import von Namen
 :PROPERTIES:
@@ -405,8 +407,8 @@ Nur jene Objekte, die wir (dynamisch) in diesen Namensraum hinein geben erlauben
 
 #+begin_src latex
   \begin{frame}[fragile]{Import von entfernten Namen}
-    \begin{btBlock}[type=alert]{\ALERT{Problem:} Explizite Auflößungspfade sind zu lange}
-      Ständig den vollständigen Namen (\texttt{::A::B::C}) einer entfernten Deklaration zu verwenden ist umständlich viel Schreibarbeit.
+    \begin{btBlock}[type=alert]{\ALERT{Problem:} Explizite Auflösungspfade sind zu lange}
+      Ständig den vollständigen Namen (\texttt{::A::B::C}) einer entfernten Deklaration zu verwenden, ist umständlich viel Schreibarbeit.
     \end{btBlock}
     \medskip
     \begin{columns}
@@ -431,7 +433,7 @@ Nur jene Objekte, die wir (dynamisch) in diesen Namensraum hinein geben erlauben
         }\smallskip
         \ii<4-|handout:4-> Importe nach $N_d$ sind transitiv {
           \bi
-          \ii Importiere in die Namen können importiert werden
+          \ii Importe in die Namen können importiert werden
           \ii \codeinline{import ::X::*} enthält auch \codeinline{::N::M::B}
           \ei
         }
@@ -441,30 +443,30 @@ Nur jene Objekte, die wir (dynamisch) in diesen Namensraum hinein geben erlauben
   \end{frame}
 #+end_src
 
-Mit expliziten Namensräumen und dem ~::~ Operator haben wir die Möglichkeit geschaffen Namen zu referenzieren, die quer zur hierarchischen Namensraumstruktur deklariert wurde.
+Mit expliziten Namensräumen und dem ~::~-Operator haben wir die Möglichkeit geschaffen, Namen zu referenzieren, die quer zur hierarchischen Namensraumstruktur deklariert wurden.
 Allerdings führt die Verwendung von qualifizieren Namen zu schwer lesbarem Code, da die Zugriffspfade lang und länger werden.
-Würde eine Sprache keine weiteren Mittel anbieten dieses Boilerplate Problem zu lösen, Programmierer würden sich einfach weigern ihre Namen in eine hierarchisch, anhand der logischen Komponentenstruktur, zu deklarieren.
-Da wollen wir den Entwicklern natürlich entgegen kommen!
-Viele Sprachen bieten die Möglichkeit Deklarationen von einem Namensraum in einen anderen Namensräumen zu *importieren*.
+Würde eine Sprache keine weiteren Mittel anbieten, dieses Boilerplate-Problem zu lösen, würden sich Programmierer einfach weigern, ihre Namen hierarchisch anhand der logischen Komponentenstruktur zu deklarieren.
+Da wollen wir den Entwicklern natürlich entgegenkommen!
+Viele Sprachen bieten die Möglichkeit, Deklarationen von einem Namensraum in einen anderen Namensräumen zu *importieren*.
 
-Um den Import von Namen zu verstehen müssen wir zunächst definieren, was in einem Namensraum überhaupt sichtbar ist.
-Zum einen hat jeder Namensraum eine Menge von Namen die direkt in ihm deklariert sind.
+Um den Import von Namen zu verstehen, müssen wir zunächst definieren, was in einem Namensraum überhaupt sichtbar ist.
+Zum einen hat jeder Namensraum eine Menge von Namen, die direkt in ihm deklariert sind.
 Im Folienbeispiel deklariert der Namensraum N die Namen ~{A, M}~.
 Zweitens hat jeder Namensraum eine Menge von sichtbaren Namen, welche die, zusätzlich zur Menge der direkt deklarierten Namen, alle Namen enthält, die durch die CNSR erreichbar sind.
 Mit dem Import von Namen können wir, je nach Sprache und verwendetem Konstrukt, die eine oder die andere Menge manipulieren.
-Da die Unterscheidung zwischen beiden fällen, nur in Randfällen wirklich relevant ist, werde ich im folgenden (und auf den Folien) so tun, als würden wir immer in die Menge der direkt-deklarierten Namen importieren.
+Da die Unterscheidung zwischen beiden Fällen nur in Randfällen wirklich relevant ist, werde ich im Folgenden (und auf den Folien) so tun, als würden wir immer in die Menge der direkt-deklarierten Namen importieren.
 
-In unserer Namensraumsprache, können wir mit dem Import Statement (~import <PFAD>~) Namen aus einem explizit benanntem Namensraum importieren.
-Dabei erlauben wir nicht nur Importe einzelner Namen (~::N::A~), sondern auch Wildcard Importe (~::N::M::*~).
-Letztere haben den Vorteil, dass wir das Import Statement nicht anpassen müssen, wenn wir im exportierenden Namensraum neue Namen deklarieren[fn::Für eine Diskussion von Wildcard importen bei Python Modulen, können Sie einen Blick in [[https://www.python.org/dev/peps/pep-0008/#id23][PEP8]] werden].
+In unserer Namensraumsprache können wir mit dem Import-Statement (~import <PFAD>~) Namen aus einem explizit benannten Namensraum importieren.
+Dabei erlauben wir nicht nur Importe einzelner Namen (~::N::A~), sondern auch Wildcard-Importe (~::N::M::*~).
+Letztere haben den Vorteil, dass wir das Import-Statement nicht anpassen müssen, wenn wir im exportierenden Namensraum neue Namen deklarieren[fn::Für eine Diskussion von Wildcard-Importen bei Python-Modulen können Sie einen Blick in [[https://www.python.org/dev/peps/pep-0008/#id23][PEP8]] werfen].
 
-Wie bereits gesagt, importieren wir, der Einfachheit halber, nur in die Menge der direkt-deklarierten Namen.
-Das Import Statement wird also quasi zur Deklaration (oder, bei Wildcard Importen, zu vielen Deklarationen).
-Daher können wir die importierten Namen, von dritter Stelle wiederum importieren, falls wir den umgebenden Namensraum referenzieren können.
-Im Beispiel können wir, nachdem wir den Namen ~X~ vergeben haben, alle auf alle Deklarationen (~A,B,C~) zugreifen, wenn wird die ~import ::X::*~ schreiben.
+Wie bereits gesagt, importieren wir, der Einfachheit halber, nur in die Menge der direkt deklarierten Namen.
+Das Import-Statement wird also quasi zur Deklaration (oder, bei Wildcard-Importen, zu vielen Deklarationen).
+Daher können wir die importierten Namen von dritter Stelle wiederum importieren, falls wir den umgebenden Namensraum referenzieren können.
+Im Beispiel können wir, nachdem wir den Namen ~X~ vergeben haben, auf alle Deklarationen (~A,B,C~) zugreifen, wenn wird die ~import ::X::*~ schreiben.
 
-Manchmal ist der Import von Namen ein Seiteneffekt von anderen Sprachkonstrukten und nicht mit einem expliziten ~import~ Statement verbunden.
-So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in den Namensraum der Kindsklasse importiert.
+Manchmal ist der Import von Namen ein Seiteneffekt von anderen Sprachkonstrukten und nicht mit einem expliziten ~import~-Statement verbunden.
+So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in den Namensraum der Kindklasse importiert.
 
 
 
@@ -477,7 +479,7 @@ So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in de
 #+begin_src latex
   \begin{frame}{Einschränkung der Sichtbarkeit}
     \begin{btBlock}[type=alert]{\ALERT{Ziel:} Wir wollen Interna der Implementierung verstecken}
-      Zum Zwecke des \textbf{Information Hiding} wollen wir manche Namen nur \alert{innerhalb} eines Namensraumes sichtbar machen.
+      Zum Zwecke des \textbf{Information Hidings} wollen wir manche Namen nur \alert{innerhalb} eines Namensraumes sichtbar machen.
     \end{btBlock}
     \smallskip
 
@@ -486,7 +488,7 @@ So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in de
       \bi
       \ii Interne Deklarationen können nur über implizite Auflösung gefunden werden.
       \ii Name wird unsichtbar für alles außerhalb des aktuellen NS
-      \ii Wir können interne Namen ändern ohne externe Komponenten anzufassen.
+      \ii Wir können interne Namen ändern, ohne externe Komponenten anzufassen.
       \ei
     }
     \ei
@@ -503,8 +505,8 @@ So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in de
         \ii Interne Namen werden beim Import übersprungen.
         \ii<4-|handout:4-> Namensräume können Standardattribute haben{
           \bi
-          \ii \texttt{\LETi} macht einen Namen nur intern sichtbar
-          \ii \texttt{\LETe} macht einen Namen auch extern sichtbar
+          \ii \texttt{\LETi} macht einen Namen nur intern sichtbar.
+          \ii \texttt{\LETe} macht einen Namen auch extern sichtbar.
           \ei
         }
         \ei
@@ -515,26 +517,26 @@ So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in de
   #+end_src
 
 Ein Ziel von hierarchischen Namensräumen war, dass wir unseren Code anhand der Komponenten strukturieren wollen.
-Um allerdings richtiges *Information Hiding* betreiben zu können müssen wir es noch möglich machen, dass nicht jeder daher gelaufene Programmierer unsere Komponenten-internen Variablen und Funktionen verwenden und verändern kann.
+Um allerdings richtiges *Information Hiding* betreiben zu können, müssen wir es noch möglich machen, dass nicht jeder daher gelaufene Programmierer unsere Komponenten-internen Variablen und Funktionen verwenden und verändern kann.
 Bisher kann man an jeder Stelle des Programms mittels vollständig qualifizierten Namen (~::module::internal::my_precious~) auf alles zugreifen.
 Wir müssen also eine Möglichkeit schaffen, dass unterschiedlich Zugriffsrechte gelten, je nachdem von wo wir eine Deklaration referenzieren wollen.
 
-Um diese Ziel zu erreichen führen wir das Konzept von ~internen Deklarationen~ (auch private Deklarationen) ein.
+Um diese Ziel zu erreichen, führen wir das Konzept von ~internen Deklarationen~ (auch private Deklarationen) ein.
 Diese internen Namen können nur durch die implizite Namensauflösung, jedoch nicht durch einen qualifizierten Namen, referenziert werden können.
-Des Weiteren werden interne (oder private) Deklarationen bei einem Import Statement übersprungen.
-Durch diese Festlegung ist es nur noch von innerhalb eines Namensraums, mittels impliziter Namensauflösung, möglich Referenzen zu einem Namen zu notieren.
-Von außerhalb, wo wir qualifizierte Pfade brauche, schlägt die Namensauflösung mit einem fehl (siehe ~M::A~).
+Des Weiteren werden interne (oder private) Deklarationen bei einem Import-Statement übersprungen.
+Durch diese Festlegung ist es nur noch von innerhalb eines Namensraums, mittels impliziter Namensauflösung, möglich, Referenzen zu einem Namen zu notieren.
+Von außerhalb, wo wir qualifizierte Pfade brauchen, schlägt die Namensauflösung fehl (siehe ~M::A~).
 
 In unserer Namensraumsprache führen wir ein optionales Attribut ~I~ ein[fn::Fun Fact am Rande:
-Die gewählt Notation ist die Notation für optionale Parameter bei Latex Macros.
-Die Notation soll andeuten, dass das I ein optionales Attribut für die Deklaration ist.], welches bei der Deklaration angegeben werden kann um sie zu intern zu machen.
+Die gewählt Notation ist die Notation für optionale Parameter bei Latex-Makros.
+Die Notation soll andeuten, dass das I ein optionales Attribut für die Deklaration ist.], welches bei der Deklaration angegeben werden kann, um sie zu intern zu machen.
 Per Default sind alle Namen von überall sichtbar (~[E]~) und nur ausgewählte Deklarationen werden privat.
-Wir erlauben allerdings auch, diese default Sichtbarkeit am Beginn eines Namensraums zu ändern.
+Wir erlauben allerdings auch, diese default-Sichtbarkeit am Beginn eines Namensraums zu ändern.
 
 In richtigen Programmiersprachen gibt es noch fein-granularere Abstufungen von Sichtbarkeit.
-Zum Beispiel regelt das Sichtbarkeitsattribut ~protected~ bei Java, wie sich die Sichtbarkeit einer Deklaration beim Import durch Vererebung ändert.
+Zum Beispiel regelt das Sichtbarkeitsattribut ~protected~ bei Java, wie sich die Sichtbarkeit einer Deklaration beim Import durch Vererbung ändert.
 Aber solche Feinheiten sind immer spezifisch für eine Sprache.
-Nur das Prinzip, das die Sichtbarkeit einer Deklaration, je nach Referenzstelle, unterschiedlich sein kann, die bleibt.
+Nur das Prinzip, dass die Sichtbarkeit einer Deklaration, je nach Referenzstelle, unterschiedlich sein kann, die bleibt.
 
 #+begin_src latex
   \begin{frame}[fragile]{Fallbeispiel: Java Packages}
@@ -572,31 +574,31 @@ Nur das Prinzip, das die Sichtbarkeit einer Deklaration, je nach Referenzstelle,
 #+end_src
 
 An dieser Stelle wollen wir kurz innehalten und alle Konzepte zusammentragen, die wir bereits kennen gelernt haben.
-An dieser Stelle können wir Namensräume erzeugen, die Deklarationen enthalten.
+Wir können nun Namensräume erzeugen, die Deklarationen enthalten.
 Diese Namensräume können selbst wieder einen Namen im übergeordneten Namensraum haben und wir können mittels qualifizierten Namen beliebig entfernte Deklarationen referenzieren.
-Mit einem Import Statement können wir Namen aus anderen Namensräumen in unseren eigenen Namensraum importieren und wir können die Sichtbarkeit von Deklarationen einschränken.
+Mit einem Import-Statement können wir Namen aus anderen Namensräumen in unseren eigenen Namensraum importieren und wir können die Sichtbarkeit von Deklarationen einschränken.
 
 Mit diesen Prinzipien können wir schon einige Programmkonstrukte in ihrer Funktion erklären und in unserer Namensraumsprache abbilden.
-Wir wollen dies, beispielhaft, anhand von Java Paketen tun.
-Java Pakete stellen Namensräume für Klassen dar, sodass ein Klassename nur innerhalb eines Pakets eindeutig sein muss.
-Außerdem erlauben es Java Pakete die Sichtbarkeit von Klassen zwischen Paketen zu steuern.
+Wir wollen dies, beispielhaft, anhand von Java-Paketen tun.
+Java-Pakete stellen Namensräume für Klassen dar, sodass ein Klassenname nur innerhalb eines Pakets eindeutig sein muss.
+Außerdem erlauben es Java-Pakete die Sichtbarkeit von Klassen zwischen Paketen zu steuern.
 
 Im Beispiel sehen wir, dass Pakete, die durch das ~package <NAME>;~ "betreten" werden, eigene Namespaces sind.
 Dadurch erklärt sich bereits, wie es sein kann, dass in unterschiedlichen Paketen der gleiche Klassenname verwendet werden kann.
 Außerdem vererben Pakete ein interne Standardsichtbarkeit an die darin enthaltenen Klassen.
-Dies ist, im übrigen bei Klassen ebenso, auch dort ist die Standardsichtbarkeit private.
+Dies ist im übrigen bei Klassen ebenso, auch dort ist die Standardsichtbarkeit ~private~.
 Die Klassen A und B haben unterschiedliche Sichtbarkeiten und nur die Klasse A kann von außerhalb ihres Pakets referenziert werden.
 Daher ist es möglich, dass wir die Klasse N.A in das Paket M importieren.
 Der einzige Unterschied zu unserer Namensraumsprache ist, dass Java an jeder Stelle den ~.~ zum trennen von Namen nimmt und nicht ~::~.
 Die Klasse B ist tatsächlich intern deklariert und kann daher nur von anderen Klassen aus dem Paket M verwendet werden.
-Wir sehen, ganz nebenbei, in dem Beispiel auch, dass Funktionen Namensräume sind, die per default ~[I]~ sind; lokale Variablen sind nicht von außen zugreifbar.
+Wir sehen ganz nebenbei in dem Beispiel, dass auch Funktionen Namensräume sind, die per Default ~[I]~ sind; lokale Variablen sind nicht von außen zugreifbar.
 
 
 * Dynamische Namensauflösung
 In unserer Definition von Namensauflösung haben wir gesagt, dass für Deklaration hinter denen ein Laufzeitobjekt steht, die Adressberechnung Teil der Namensauflösung ist.
 So gehört es bei Variablen dazu nicht nur die passende Deklaration zu finden, sondern auch die Adresse zu berechnen an der die Variable im Speicher abgelegt wird.
 Bei unserem bisherigen Konzept von Namensräumen wäre dies auch prinzipiell zur Übersetzungszeit möglich, da maximal ein Laufzeitobjekt hinter einer Deklaration steht.
-In diesem Unterkapitel werden wir diese Einschränkung aufweichen und es zulassen, das eine Deklaration viele Objekte im Speicher meinen kann.
+In diesem Unterkapitel werden wir diese Einschränkung aufweichen und es zulassen, dass eine Deklaration viele Objekte im Speicher meinen kann.
 Zur Unterscheidung zwischen diesen Objekten verwenden wir eine dynamische Namensauflösung, bei der nicht nur die statische Struktur der hierarchischen Namensräume verwendet wird, sondern auch weiteres Laufzeitwissen.
 
 ** Binding Time
@@ -657,56 +659,56 @@ Zur Unterscheidung zwischen diesen Objekten verwenden wir eine dynamische Namens
 
 #+end_src
 
-Um die dynamische Namensauflösung wirklich zu verstehen, müssen wir den Begriff der *Binding Time* bzw. Bindungszeitpunkt einführen.
-Die Binding Time ist der Zeitpunkt an dem einem Namen ein konkretes Objekt zugeordnet wird, für das der Name stellvertretend ist.
+Um die dynamische Namensauflösung wirklich zu verstehen, müssen wir den Begriff der *Binding Time* bzw. des Bindungszeitpunkts einführen.
+Die Binding Time ist der Zeitpunkt, an dem einem Namen ein konkretes Objekt zugeordnet wird, für das der Name stellvertretend ist.
 Dabei können unterschiedliche Namen zu ganz unterschiedlichen Zeitpunkten gebunden werden und die Bindung kann auch wieder aufgelöst werden.
-Wichtig für die Namensauflösung ist, dass wir erst  eine Adressberechnung durchführen können, wenn ein Objekt an einen Namen gebunden ist.
+Wichtig für die Namensauflösung ist, dass wir erst eine Adressberechnung durchführen können, wenn ein Objekt an einen Namen gebunden ist.
 Dies kann, wie wir sehen werden, für manche Deklarationen erst zur Laufzeit der Fall sein.
 
-An dieser Stelle, wollen wir verschiedene, geläufige Zeitpunkte zu denen eine Bindung hergestellt wird, diskutieren.
-Die häufigst genannten ist die Übersetzungszeit (Compile-time binding) und die Laufzeit (run-time binding).
+An dieser Stelle wollen wir verschiedene geläufige Zeitpunkte, zu denen eine Bindung hergestellt wird, diskutieren.
+Die häufigst genannten sind die Übersetzungszeit (Compile-time binding) und die Laufzeit (run-time binding).
 Allerdings kann man diese Zeiten noch feiner aufschlüsseln:
 
 Beim *compile-time binding* kennt der Übersetzer bereits die Adresse des referenzierten Objekts genau.
-Er kann also jede Verwendung des Namens direkt durch die eine Konstante ersetzen und diese, beispielweise, in die Assemblerbefehle als Immediate Operanden codieren.
+Er kann also jede Verwendung des Namens direkt durch die eine Konstante ersetzen und diese beispielweise in die Assemblerbefehle als Immediate Operanden codieren.
 
-Wirklich compile-time binding, wenn wir es ganz genau nehmen, gibt es eigentlich kaum, da die meisten Werkzeugketten für übersetzte Sprachen sich in Übersetzer und Linker aufspalten.
+Wirkliches compile-time binding, wenn wir es ganz genau nehmen, gibt es eigentlich kaum, da die meisten Werkzeugketten für übersetzte Sprachen sich in Übersetzer und Linker aufspalten.
 Für viele Referenzen fügt der Übersetzer einen symbolischen Namen in den Assemblercode ein, welcher vom Linker aufgelöst wird.
-Bei diesem *link-time binding*, werden vom Übersetzer eingefügte Platzhalter im Binärcode durch die errechneten Adressen ersetzt.
+Bei diesem *link-time binding* werden vom Übersetzer eingefügte Platzhalter im Binärcode durch die errechneten Adressen ersetzt.
 Da link-time binding auch schon vor der Laufzeit stattfindet, zählt man es aber häufig auch zur Übersetzungszeit hinzu.
 
 Ganz anders ist dies beim *load-time binding*, welches stattfindet, wenn die Binärdatei in den Speicher geladen wird.
 Also direkt vor der Laufzeit des eigentlichen Programms.
-Manche Adressen werden erst beim Laden des Programms bekannt, da erst dort entschieden wird an welcher Stelle im Speicher das Programm oder die Bibliothek geladen wird.
+Manche Adressen werden erst beim Laden des Programms bekannt, da erst dann entschieden wird, an welcher Stelle im Speicher das Programm oder die Bibliothek geladen wird.
 Daher müssen die Adressen in der geladenen Binärdatei nochmal angepasst werden.
 Dies funktioniert technisch, indem der Linker sogenannte Relocation-Informationen mit in die Binärdatei packt.
 Diese Relocations haben in etwa die Form:
 "Wenn diese Bibliothek an Stelle X geladen wird, dann addiere X auf die Binärcodestelle X[1000] hinzu".
 Hierdurch kann der Übersetzer Code erzeugen, der abhängig davon ist, wo eine Bibliothek hin geladen wird.
 
-Noch später findet das *run-time binding* statt, beim dem die Adresse eines Objekts erst zur Laufzeit stattfindet.
+Noch später findet das *run-time binding* statt, beim dem die Adresse eines Objekts erst zur Laufzeit bekannt wird.
 Dies kann zum Beispiel der Fall sein, weil das Objekt auf dem Heap mittels ~malloc()~ erzeugt wurde.
 Hier können wir die Adresse einfach nicht vorher wissen und die Namen, die stellvertretend für dieses Objekt sind, müssen nach dem ~malloc()~ aufgelöst werden.
 
-Obwohl die Adresseberechnung immer erst dann stattfinden kann, wenn eine Bindung zwischen Name und Objekt etabliert ist, können wir doch Teile der Arbeit vorziehen um hinterher Zeit zu sparen.
+Obwohl die Adressberechnung immer erst dann stattfinden kann, wenn eine Bindung zwischen Name und Objekt etabliert ist, können wir doch Teile der Arbeit vorziehen, um hinterher Zeit zu sparen.
 Bei dieser *partiellen Namensauflösung* werden Informationen, die zu unterschiedlichen Zeitpunkten bekannt werden, zu einer Berechnungsvorschrift für die tatsächliche Adresse kombiniert. Ich will dies am Folienbeispiel deutlich machen.
 
-In dem Beispiel, definieren wir die globale Variable obj, was nicht nur den Namen obj deklariert, sondern auch zur Allokation eines Objekts führt.
-Wir werden nun betrachten, welche Informationen in die Adresseberechnung für den Namen ~*(obj.p)~ eingehen und wann diese zur Verfügung stehen.
-Das erste was wissen ist das relative Offset des Feldes ~p~ innerhalb der Struktur ~foo~.
-Dieses Offset berechnet der Übersetzer (compile time) , da er entscheidet wie die einzelnen Felder eines Records im Speicher liegen.
-Das zweite was wir, zur Link Time, wissen, ist der Offset des Objekts im BSS Segment (siehe GBS).
-Der Linker hat dieses wissen, da er die einzelnen global-allokierten Objekte anordnet und Code-, Daten- und BSS Segment mit ihnen auffüllt.
-Allerdings weiß der Linker noch nicht, wo das Program hingeladen wird.
-Dieses Wissen haben wir erst zur Load Time, wenn klar ist, wo das BSS Segment im Speicher zu finden ist.
-Auf diese Load-Time-Adresse (~0x1000~) können wir den relativen Offsets für das Objekt und das Feld aufaddieren, sodass wir das Felde ~obj.p~ an der Speicherstelle ~0x1204~ verorten können.
-Da wir allerdings nicht nur auf ~obj.p~ zugreifen wollen, sondern auf das Objekt auf das dieser Zeiger zeigt, müssen wir zur Laufzeit (run-time binding) noch eine Dereferenzierungsoperation durchführen um die Adresseberechnung abzuschließen.
+In dem Beispiel definieren wir die globale Variable obj, was nicht nur den Namen obj deklariert, sondern auch zur Allokation eines Objekts führt.
+Wir werden nun betrachten, welche Informationen in die Adressberechnung für den Namen ~*(obj.p)~ eingehen und wann diese zur Verfügung stehen.
+Das erste, was wir wissen, ist den relativen Offset des Feldes ~p~ innerhalb der Struktur ~foo~.
+Diesen Offset berechnet der Übersetzer (compile time), da er entscheidet, wie die einzelnen Felder eines Records im Speicher liegen.
+Das zweite, was wir zur Link Time wissen, ist der Offset des Objekts im BSS-Segment (siehe GBS).
+Der Linker hat dieses wissen, da er die einzelnen global-allokierten Objekte anordnet und Code-, Daten- und BSS-Segment mit ihnen auffüllt.
+Allerdings weiß der Linker noch nicht, wo das Programm hingeladen werden wird.
+Dieses Wissen haben wir erst zur Load Time, wenn klar ist, wo das BSS-Segment im Speicher zu finden ist.
+Auf diese Load-Time-Adresse (~0x1000~) können wir den relativen Offset für das Objekt und das Feld aufaddieren, sodass wir das Felde ~obj.p~ an der Speicherstelle ~0x1204~ verorten können.
+Da wir allerdings nicht nur auf ~obj.p~ zugreifen wollen, sondern auf das Objekt, auf das dieser Zeiger zeigt, müssen wir zur Laufzeit (run-time binding) noch eine Dereferenzierungsoperation durchführen, um die Adressberechnung abzuschließen.
 
 Da Compile-, Link- und Load-Time gut von der Werkzeugkette kontrolliert werden, gibt es Optimierungen, dass die Vorberechnung der Adresse ~&obj.p~ zu einer Konstante im Programmcode zusammenfällt.
 Daher nehmen wir, der Einfachheit halber auch an, dass es nur compile-time und run-time binding gibt.
 Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
 
-** Instantiierbare Namensräume
+** Instanziierbare Namensräume
 :PROPERTIES:
 :CUSTOM_ID: 04-namespace-instances
 :END:
@@ -733,7 +735,7 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
     \end{columns}
 
     \bi
-    \ii<2-> \structure{Namensräume} mehrfach als eigene Objekte instantiieren{
+    \ii<2-> \structure{Namensräume} mehrfach als eigene Objekte instanziieren{
       \bi
       \ii Jedes Laufzeitobjekt enthält eine Bindung für die deklarierten Namen
       \ii Laufzeitdaten werden zur Unterscheidung gebraucht (Objektadresse)
@@ -758,11 +760,11 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
       \begin{column}{0.63\textwidth}
         \btUseExtraItemSep
         \bii
-        \ii \codebox{objA.a} und \codebox{objB.a} sind verschiedenen
+        \ii \codebox{objA.a} und \codebox{objB.a} sind verschieden
         \ii \structure{Punktoperator} macht dynamische Auflösung\\{
           \texttt{<obj>.<name>}: \codeinline{&obj + offset(N::name))}
         }
-        \ii Java unterscheidet syntaktisch nicht zwischen dynamischer und statischer Namensauflösung
+        \ii Java unterscheidet syntaktisch nicht zwischen dynamischer und statischer Namensauflösung.
         \eii
       \end{column}
     \end{columns}
@@ -798,7 +800,7 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
       \bi
       \ii \texttt{\LETd <DST> = <SRC>} kopiert den NS \texttt{SRC} unter dem Namen \texttt{DST}
       \ii Wir verwenden weiterhin nur den \texttt{::} Operator.
-      \ii Die Auflösung in einem \texttt{\LETd} Namensraum erforder \textbf{D}ynamisches Wissen.
+      \ii Die Auflösung in einem \texttt{\LETd} Namensraum erfordert \textbf{d}ynamisches Wissen.
       \ei
     }
     \ei
@@ -806,14 +808,14 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
 
 #+end_src
 
-Das bisher vorgestellt Konzept von Namensräumen war sehr statisch und es ging hauptsächlich darum die Deklaration zu einer Referenz zu finden.
-Wir haben angenommen, dass hinter jeder Deklaration maximal ein, nach der Bindung genau ein, Laufzeitobjekt/Instanz steht.
-Dieses Schema passt auch sehr gut auf Sprachkonstrukte wie C++ ~namespace~ oder Java Pakete.
-Allerdings bekommen wir es mit dem bisherigen Formalismus nicht hin so etwas simples wie C ~struct~ abzubilden.
-Denn in dem Moment, wo ich eine Struktur zweimal instantiiere (~objA~, ~objB~), steht die Felddeklaration ~int a~ für zwei Ganzzahlen, jeweils eine in jedem der beiden Objekte.
-Und das kann ja irgendwie nicht sein. Wir müssen also unseren Formalismus und die Namensraumsprache erweitern um auch dieses Sprachkonstrukt abzudecken.
+Das bisher vorgestellte Konzept von Namensräumen war sehr statisch und es ging hauptsächlich darum, die Deklaration zu einer Referenz zu finden.
+Wir haben angenommen, dass hinter jeder Deklaration maximal ein, und nach der Bindung genau ein, Laufzeitobjekt/Instanz steht.
+Dieses Schema passt auch sehr gut auf Sprachkonstrukte wie C++-~namespace~ oder Java-Pakete.
+Allerdings bekommen wir es mit dem bisherigen Formalismus nicht hin, so etwas simples wie C-~struct~ abzubilden.
+Denn in dem Moment, wo ich eine Struktur zweimal instanziiere (~objA~, ~objB~), steht die Felddeklaration ~int a~ für zwei Ganzzahlen, jeweils eine in jedem der beiden Objekte.
+Und das kann ja irgendwie nicht sein. Wir müssen also unseren Formalismus und die Namensraumsprache erweitern, um auch dieses Sprachkonstrukt abzudecken.
 
-Wenn wir uns zurück erinnern, dann soll jeder Name eindeutig stellvertretend für (maximal) ein Objekt sein.
+Wenn wir uns zurückerinnern, dann soll jeder Name eindeutig stellvertretend für (maximal) ein Objekt sein.
 Diesen Grundsatz wollen wir zunächst beibehalten.
 Allerdings können wir am Folienbeispiel von ~struct N~ sehen, dass das Feld ~int a~ der beiden Objekte nicht über ~N::a~, sondern über ~objA.a~ und ~objB.a~ referenziert wird.
 Man könnte also sagen, dass unter den Namen ~objA~ und ~objB~ Kopien des Namensraums von ~struct N~ angelegt wurden.
@@ -831,17 +833,17 @@ let objA = {
 }
 #+end_example
 
-Hinzu kommt, dass bei der Adressberechung von ~objA~, die Teil der vollständigen Namensauflösung ist, noch Laufzeitwissen hinzukommt.
-Beide Aspekte, Klonen von Namensräumen und Einbringung von Laufzeitwissen, fassen wir im Begriff der *Instantiierbaren Namensräumen* zusammen.
-Dieses Konzept beschreibt, wie wir einen Namensraum, mit all seinen Sichtbarkeits- und Zugriffsregeln, nehmen und unter einem anderen Namen erneut instantiieren.
+Hinzu kommt, dass bei der Adressberechnung von ~objA~, die Teil der vollständigen Namensauflösung ist, noch Laufzeitwissen hinzukommt.
+Beide Aspekte, Klonen von Namensräumen und Einbringung von Laufzeitwissen, fassen wir im Begriff der *instanziierbaren Namensräumen* zusammen.
+Dieses Konzept beschreibt, wie wir einen Namensraum, mit all seinen Sichtbarkeits- und Zugriffsregeln, nehmen und unter einem anderen Namen erneut instanziieren.
 Somit kann ein Namensraum eine Blaupause für viele andere Namensräume werden.
 
-Das Konzept der instantiierbaren Namensräumen ist ein Schlüsselkonzept der Informatik und manifestiert sich besonders auffällig im objekt-orientierten Programmiersprachen.
+Das Konzept der instanziierbaren Namensräumen ist ein Schlüsselkonzept der Informatik und manifestiert sich besonders auffällig in Objekt-orientierten Programmiersprachen.
 Auch dort ist der Namensraum einer Klasse die Blaupause für all ihre Instanzobjekte. Aber moderne Isolationskonzepte auf Systemebene, wie Docker bzw. Container, sind Anwendungen dieses Konzepts.
 
-In unserer Namensraumsprache führen wir, um instantiierbare Namensräume aus zu drücken, das zusätzliche let-Attribut ~let [D] <NAME>~ ein und erlauben, dass wir Instanzen eines Namensraums anlegen können (~<NS>()~).
-Das zusätzliche Attribut bedeutet, dass zur Adressberechnung von ~NAME~ Laufzeitwissen benötigt wird, der Teil hinter dem ~=~ gibt an welcher Namensraum geklont werden soll.
-Im Gegensatz zu vielen Sprachen, bleiben wir dabei immer den ~::~ Operator zur Namensauflösung zu nehmen, egal ob wir dynamisches Wissen brauchen oder nicht.
+In unserer Namensraumsprache führen wir, um instanziierbare Namensräume auszudrücken, das zusätzliche let-Attribut ~let [D] <NAME>~ ein und erlauben, dass wir Instanzen eines Namensraums anlegen können (~<NS>()~).
+Das zusätzliche Attribut bedeutet, dass zur Adressberechnung von ~NAME~ Laufzeitwissen benötigt wird. Der Teil hinter dem ~=~ gibt an, welcher Namensraum geklont werden soll.
+Im Gegensatz zu vielen Sprachen, bleiben wir dabei, immer den ~::~-Operator zur Namensauflösung zu nehmen, egal ob wir dynamisches Wissen brauchen oder nicht.
 
 #+begin_src latex
   \begin{frame}<handout:2>[fragile]{Fallbeispiel: Klassen in C++}
@@ -877,7 +879,7 @@ Im Gegensatz zu vielen Sprachen, bleiben wir dabei immer den ~::~ Operator zur N
         \bii
         \ii Namensräumen
         \ii Sichtbarkeit
-        \ii Instantiierbar
+        \ii Instanziierung
         \ii<2-> Import
         \eii
 
@@ -886,7 +888,7 @@ Im Gegensatz zu vielen Sprachen, bleiben wir dabei immer den ~::~ Operator zur N
         \uncover<3->{
           Feinheiten:
           \bii
-          \ii \texttt{protected} Deklarationen ändern ihre Sichtbarkeit beim vererben.
+          \ii \texttt{protected}-Deklarationen ändern ihre Sichtbarkeit beim vererben.
           \ii \texttt{struct} ist per default \texttt{[E]}.
           \ii Man kann \texttt{public}, \texttt{protected} und \texttt{private} erben.
           \eii
@@ -899,18 +901,18 @@ Im Gegensatz zu vielen Sprachen, bleiben wir dabei immer den ~::~ Operator zur N
 
   #+end_src
 
-Mit dieser dem Wissen um instantiierbare Namensräume können wir ein C++ Beispiel recht vollständig in unsere Namensraumssprache übersetzen.
-Hierbei sehen wir, dass Klassen in C++ die bisher erwähnten Aspekte von Namensräumen (Sichtbarkeit, Import, Instantiierung) miteinander vereint.
+Mit dieser dem Wissen um instanziierbare Namensräume können wir ein C++-Beispiel recht vollständig in unsere Namensraumssprache übersetzen.
+Hierbei sehen wir, dass Klassen in C++ die bisher erwähnten Aspekte von Namensräumen (Sichtbarkeit, Import, Instanziierung) miteinander vereinen.
 Überlegen Sie sich an dem Beispiel Antworten für die folgenden Fragen:
 Welche Namen sind in dem Quellcode im Wurzelnamensraum deklariert?
 Welche Namen sind unterhalb von ~objS.*~ vom Wurzelnamensraum aus sichtbar?
 Welche Namen sind innerhalb der Namensräume S und B sichtbar?
 
-C++ in seiner Gänze, auch nur den Aspekt der Klassen, können wir nicht allerdings mit unserer Namensraumsprache nicht abbilden.
+C++ in seiner Gänze, auch nur den Aspekt der Klassen, können wir allerdings mit unserer Namensraumsprache nicht abbilden.
 So gibt es in realen Sprachen noch einige komplexere Randfälle der Sichtbarkeit.
-So führt C++ und Java noch das Schlüsselwort ~protected~ ein und es gelten noch leicht andere Regeln wenn Vererbung mit der Verdeckung von Deklarationen zusammenkommt.
-Aber ein so tiefer Einstieg in Details einzelner Sprachen ist an dieser Stelle auch nicht da Ziel der Übung.
-Sondern ich möchte bei ihnen ein Verständnis für die grundlegenden Namensraumkonzepte schaffen, die Sie dann für jede erlernte Sprache mit um Details ergänzen müssen.
+So führen C++ und Java das Schlüsselwort ~protected~ ein und es gelten noch leicht andere Regeln, wenn Vererbung mit der Verdeckung von Deklarationen zusammenkommt.
+Aber ein so tiefer Einstieg in Details einzelner Sprachen ist an dieser Stelle auch nicht das Ziel der Übung.
+Stattdessen möchte ich bei Ihnen ein Verständnis für die grundlegenden Namensraumkonzepte schaffen, die Sie dann für jede erlernte Sprache um Details ergänzen müssen.
 
 #+begin_src latex
   \begin{frame}<handout:2,3>[fragile]{Statische Felder in Klassen}
@@ -920,13 +922,13 @@ Sondern ich möchte bei ihnen ein Verständnis für die grundlegenden Namensraum
     \ii<2-> In Klassenobjekten wird jeder Name dynamisch aufgelöst (this-Zeiger). {
       \bi
       \ii Manchmal sollen Namen dennoch dasselbe Objekt referenzieren.
-      \ii \texttt{\LETs} setzt die dynamische Namensauflösung außer Kraft
+      \ii \texttt{\LETs} setzt die dynamische Namensauflösung außer Kraft.
       \ei
       \btAnimation[width=0.9\textwidth]{center,padding,1:<1-2>,2:<3->}{fig/04-static}
     }
     \ii<4-> Statische lokale Variablen in C/C++ funktionieren genauso.{
       \bi
-      \ii Die dynamische Information um die Call-Frame wird ignoriert.
+      \ii Die dynamische Information um den Call-Frame wird ignoriert.
       \ii Die Variable behält, weil sie immer das selbe Objekt referenziert, ihren Wert.\\[1ex]
       \codeinline[style=C]{int counter() { static int i = 0; return i++; }}
       \ei
@@ -937,21 +939,21 @@ Sondern ich möchte bei ihnen ein Verständnis für die grundlegenden Namensraum
 
 #+end_src
 
-Mit dem wissen um dynamische Namensauflösung in instantiierten Namensräumen können wir nun auch zu einem Thema kommen, dass ich selbst lange nicht verstanden habe: Was tut eigentlich das Schlüsselwort ~static~ an Attributen und Methoden in Java und C++[fn::Ich ignoriere an dieser Stelle bewusst ~static~ Funktionen in C. Die sind komisch, weil ~static~ dort etwas anderes bedeutet und eher so etwas wie ~private~ auf Ebene der Übersetzungseinheiten meint.]. Dazu wollen wir uns die Situation in C++ genauer anschauen.
+Mit dem Wissen um dynamische Namensauflösung in instanziierten Namensräumen können wir nun auch zu einem Thema kommen, das ich selbst lange nicht verstanden habe: Was tut eigentlich das Schlüsselwort ~static~ an Attributen und Methoden in Java und C++[fn::Ich ignoriere an dieser Stelle bewusst ~static~ Funktionen in C. Die sind komisch, weil ~static~ dort etwas anderes bedeutet und eher so etwas wie ~private~ auf Ebene der Übersetzungseinheiten meint.]. Dazu wollen wir uns die Situation in C++ genauer anschauen.
 
 In C++ wird jedes Feld innerhalb eines Namensraums, relativ zum ~this~ Zeiger des Objekts, dynamisch aufgelöst.
-Das bedeutet das jede Instanz ein eigenes Objekt hinter der gleichen Felddeklaration hat.
-Allerdings wollen Entwickler es manchmal haben, dass alle Instanzen das gleiche Objekt hinter dem selben Namen im Namensraum der Klasse sehen.
+Das bedeutet, dass jede Instanz ein eigenes Objekt hinter der gleichen Felddeklaration hat.
+Allerdings wollen Entwickler es manchmal haben, dass alle Instanzen das selbe Objekt hinter dem selben Namen im Namensraum der Klasse sehen.
 Dies hat den Vorteil, dass alle Instanzen der Klasse miteinander "reden" können, aber das Feld mit den gleichen Sichtbarkeits- und Zugriffsregeln versehen ist, wie alle anderen Felder.
 
-Daher gibt es das Schlüsselwort ~static~, dass an bei der Adressberechnung allen Einfluss von dynamischen Informationen abschneidet.
-Der Übersetzer ignoriert also beim berechnen der Adresse für ~objO::objI::A~ die ~this~-Zeiger von beiden Objekten, sodass die Namensauflösung immer zum gleichen Ergebnis kommt.
+Daher gibt es das Schlüsselwort ~static~, das an bei der Adressberechnung allen Einfluss von dynamischen Informationen abschneidet.
+Der Übersetzer ignoriert also beim Berechnen der Adresse für ~objO::objI::A~ die ~this~-Zeiger von beiden Objekten, sodass die Namensauflösung immer zum gleichen Ergebnis kommt.
 
-Um dieses Verhalten in unserer Namensraumsprache abzubilden führen wir das let-Attribut ~[S]~ ein, das alle ~[D]~ Attribute im Auflösungspfad ungültig macht.
-Wenn wir die Attribute an den Auflösungspfad schreiben, dann würden bekommen wir ~objO[D]::objI[D]::A[S]~.
+Um dieses Verhalten in unserer Namensraumsprache abzubilden, führen wir das let-Attribut ~[S]~ ein, das alle ~[D]~ Attribute im Auflösungspfad ungültig macht.
+Wenn wir die Attribute an den Auflösungspfad schreiben, dann bekämen wir ~objO[D]::objI[D]::A[S]~.
 ~[S]~ ist also zu ~[D]~ komplementär, ebenso wie ~[I]~ komplementär zu ~[E]~ ist.
 
-Mit diesem Wissen um statische Variablen, könnten wir nun auch besser verstehen, wie statische lokale Variablen in C funktionieren.
+Mit diesem Wissen um statische Variablen könnten wir nun auch besser verstehen, wie statische lokale Variablen in C funktionieren.
 Allerdings müssen wir uns dazu auch noch anschauen, wie lokale Variablen im Kontext der Adressberechnung überhaupt funktionieren. Dies machen wir im nächsten Unterkapitel.
 
 
@@ -981,10 +983,10 @@ Allerdings müssen wir uns dazu auch noch anschauen, wie lokale Variablen im Kon
     \end{columns}
     \smallskip
     \bi
-    \ii Funktionen öffnen für ihren Rumpf einen eigenen Namensraum{
+    \ii Funktionen öffnen für ihren Rumpf einen eigenen Namensraum.{
       \bi
       \ii \structure{Lokale Variablen} (und Parameter) sind nur innerhalb der Funktion sichtbar.
-      \ii Die Namen lokaler Variablen können Globale verdecken. (Folge von CNSR)
+      \ii Die Namen lokaler Variablen können globale verdecken. (Folge von CNSR)
       \ii Parameter\alert{deklarationen} werden zu Namen innerhalb der Funktion.
       \ei
     }
@@ -1035,16 +1037,16 @@ Allerdings müssen wir uns dazu auch noch anschauen, wie lokale Variablen im Kon
   \end{frame}
   #+end_src
 
-Wir wollen uns damit beschäftigen wie lokale Variablen in unser Konzept von Namensräumen passen.
+Wir wollen uns damit beschäftigen, wie lokale Variablen in unser Konzept von Namensräumen passen.
 Dabei sind besonders zwei Probleme spannend:
-Was passiert wenn eine Funktion sich mehrfach aufruft?
+Was passiert, wenn eine Funktion sich mehrfach aufruft?
 Was wäre eine sinnvolle Semantik für geschachtelte Deklarationen von Funktionen.
 Bevor wir uns allerdings diesen Fragen widmen, wollen wir wieder unsere statische Namensraumbrille aufsetzen.
 
 Bezüglich Namen hat eine Funktion zwei wichtige Aspekte:
 lokale Variablen und Parameter.
-Die Deklaration lokaler Variablen ist auf den Funktionsrumpf beschränkt und es ist weiterhin nicht möglich auf die lokalen Variablen von andern Funktionen, von außen, zuzugreifen.
-Daher können wir sagen, das Funktionen Namensräume sind und die Sichtbarkeit aller enthaltenen Deklarationen ~[I]~ ist.
+Die Deklaration lokaler Variablen ist auf den Funktionsrumpf beschränkt und es ist weiterhin nicht möglich auf die lokalen Variablen von anderen Funktionen von außen zuzugreifen.
+Daher können wir sagen, dass Funktionen Namensräume sind und die Sichtbarkeit aller enthaltenen Deklarationen ~[I]~ ist.
 Parameter sind, im Bezug auf Namensauflösung, sehr ähnlich wie lokale Variablen, da ihre Sichtbarkeit auf den Funktionsrumpf beschränkt ist.
 
 #+begin_src latex
@@ -1052,10 +1054,10 @@ Parameter sind, im Bezug auf Namensauflösung, sehr ähnlich wie lokale Variable
     \textbf{Früher:} Keine Unterstützung für rekursiven Funktionen (z.B. Fortran 77) \medskip
 
     \bi
-    \ii <2-> Funktionen werde instantiierbar; jeder Aufruf erzeugt einen \structure{Call Frame}.{
+    \ii <2-> Funktionen werden instanziierbar; jeder Aufruf erzeugt \structure{Call Frame}{
       \bi
-      \ii<4-> Ein Call-Frame hat einen Zeiger auf seinen aufrufenden Namensraum (caller)
-      \ii<5-> Dynamische Namensauflösung erfolgt \alert<4>{relativ zum Stackpointer} (SP)
+      \ii<4-> Ein Call-Frame hat einen Zeiger auf seinen aufrufenden Namensraum (caller).
+      \ii<5-> Dynamische Namensauflösung erfolgt \alert<4>{relativ zum Stackpointer} (SP).
       \ei
       \medskip
       \btAnimation[width=0.65\textwidth]{center,1:<1>,range=1-9:<2->}{fig/04-call-frame}
@@ -1066,38 +1068,38 @@ Parameter sind, im Bezug auf Namensauflösung, sehr ähnlich wie lokale Variable
 
 Spannend werden lokale Variablen (und Parameter), wenn wir Rekursion erlauben, was dazu führt, dass eine Funktion aktiv ist und dann erneut aktiviert wird; es also zwei "Instanzen" dieser Funktion gibt.
 Was passiert in diesem Fall mit den Namen lokaler Variablen?
-Lösen diese Namen in beiden *Funktionsinstanzen* zum gleichen Objekt auf, oder nicht?
-Historisch gesehen, gab es Sprachen die keine Unterstützung für Rekursion geboten haben und eine lokale Variable immer die gleiche Speicherstelle gemeint hat.
+Lösen diese Namen in beiden *Funktionsinstanzen* zum selben Objekt auf, oder nicht?
+Historisch gesehen gab es Sprachen, die keine Unterstützung für Rekursion geboten haben und eine lokale Variable immer die selbe Speicherstelle gemeint hat.
 Allerdings waren diese Sprachen sehr limitiert und heute würde niemand mehr so eine Sprache ernsthaft verwenden wollen.
 Wie sieht es also in modernen Sprachen (jünger als 50 Jahre) aus?
 
-In modernen Sprachen wird mit jedem Funktionsaufruf eine Instanz des Namensraums der Funktion, mit all seinen lokalen Variablen und Parametern erzeugt; der **Function-Call Frame*[fn::Sie wollen wirklich nicht, dass ich den Begriff Aufrufrahmen oder Stapelrahmen verwende.].
+In modernen Sprachen wird mit jedem Funktionsaufruf eine Instanz des Namensraums der Funktion, mit all seinen lokalen Variablen und Parametern, erzeugt; der *Function-Call Frame*[fn::Sie wollen wirklich nicht, dass ich den Begriff Aufrufrahmen oder Stapelrahmen verwende.].
 Die Funktions-lokalen Deklarationen werden dynamisch zu diesem Function-Call Frame aufgelöst, ebenso wie Objektattribute dynamisch zum ~this~-Zeiger aufgelöst werden.
 
 Diese Call-Frames halten für jeden Aufruf Speicherplatz für alle lokalen Variablen (und die Parameter) bereit.
-Die Namen innerhalb der Funktionsinstanz werden zum Aufrufzeitpunkt an das neu erzeugte Call-Frame Objekt gebunden (run-time binding!). Die Auflösung der Namen erfolgt dann relativ zum Stackpointer (SP), der zu jedem Zeitpunkt auf den aktuell aktiven Call-Frame zeigt.
+Die Namen innerhalb der Funktionsinstanz werden zum Aufrufzeitpunkt an das neu erzeugte Call-Frame-Objekt gebunden (run-time binding!). Die Auflösung der Namen erfolgt dann relativ zum Stackpointer (SP), der zu jedem Zeitpunkt auf den aktuell aktiven Call-Frame zeigt.
 
-Jedes Call-Frame Objekt hat zusätzlich noch einen Zeiger auf den Call-Frame aus dem heraus er aufgerufen wurde (caller).
+Jedes Call-Frame-Objekt hat zusätzlich noch einen Zeiger auf den Call-Frame aus dem heraus er aufgerufen wurde (caller).
 In den meisten Fällen ist die Beziehung zwischen Aufrufer und Aufgerufenem hierarchisch und der Aufrufer wird solange pausiert bis der Aufrufer fertig ist.
-Der ~fak(3)~ Call Frame existiert länger als der ~fak(2)~ Call Frame.
+Der ~fak(3)~-Call-Frame existiert länger als der ~fak(2)~-Call-Frame.
 Daher kann man diese Objekte sehr effizient auf einem Stack direkt hintereinander speichern.
-Dies ist allerdings nur eine Optimierung und wir könnten auch für jedes Call-Frame Objekt ~malloc()~ aufrufen.
+Dies ist allerdings nur eine Optimierung und wir könnten auch für jedes Call-Frame-Objekt ~malloc()~ aufrufen.
 
-In kurz: Funktionen sind instantiierbare Namensräume und die lokalen Variablen werden dynamisch zum Call-Frame Objekt aufgelöst.
+In kurz: Funktionen sind instanziierbare Namensräume und die lokalen Variablen werden dynamisch zum Call-Frame Objekt aufgelöst.
 
 #+begin_src latex
   \begin{frame}{Geschachtelte Funktionen und Closures}
     \bi
     \ii Funktionen in Funktionen lassen Fragen über die Bindung aufkommen.{
       \bi
-      \ii Die Deklaration zu einer Referenz ist nach CNSR klar
-      \ii \ALERT{Aber}: Wir brauchen einen \texttt{outer}-Call-Frame um \texttt{x} vollständig aufzulösen
+      \ii Die Deklaration zu einer Referenz ist nach CNSR klar.
+      \ii \ALERT{Aber}: Wir brauchen einen \texttt{outer}-Call-Frame, um \texttt{x} vollständig aufzulösen.
       \ei
       \btAnimation[width=0.65\textwidth]{padding,center,range=1-9:<1->}{fig/04-closure}
     }
     \ii<2-> \structure{Lexikalisches Scoping}: Funktionen können \alert<5->{Zustand} halten{
       \bi
-      \ii<3-> Bei der \textbf{Definition} von \texttt{inner} wird ein \structure{Closure} Objekt erstellt.
+      \ii<3-> Bei der \textbf{Definition} von \texttt{inner} wird ein \structure{Closure}-Objekt erstellt.
       \ii<4-> Die Closure speichert den Frame über die Ausführung von \texttt{outer()} hinaus.
       \ei
     }
@@ -1106,25 +1108,25 @@ In kurz: Funktionen sind instantiierbare Namensräume und die lokalen Variablen 
 #+end_src
 
 Die zweite Spannende Frage kommt auf, wenn wir Funktionen, die ja Namensräume sind, schachteln wollen.
-Also was passiert, wenn wir eine Funktion innerhalb einer Funktion definieren? Und insbesondere was passiert mit der Bindung wenn wir in der inneren Funktion eine lokale Variable aus der äußeren Funktion referenzieren?
-Die Möglichkeit Funktionen geschachtelt zu definieren bieten nicht alle Sprachen, da es schwierig ist diese Frage mit einer effizienten Implementierung zu beantworten. Wir wollen uns hier mit dem abstrakten Konzept begnügen.
+Also was passiert, wenn wir eine Funktion innerhalb einer Funktion definieren? Und insbesondere was passiert mit der Bindung, wenn wir in der inneren Funktion eine lokale Variable aus der äußeren Funktion referenzieren?
+Die Möglichkeit Funktionen geschachtelt zu definieren, bieten nicht alle Sprachen, da es schwierig ist, diese Frage mit einer effizienten Implementierung zu beantworten. Wir wollen uns hier mit dem abstrakten Konzept begnügen.
 Im Beispiel schauen wir uns JavaScript an, welches es erlaubt Funktionen zu schachteln.
 
 Zunächst einmal ist klar, dass die Referenz in der inneren Funktion sich auf die äußere Deklaration bezieht, da es keine verdeckende Deklaration in der inneren Funktion mit dem Namen ~x~ gibt.
-Jetzt ist ~x~ allerdings eine lokale Variable (dynamisch gebunden) und es braucht immer ein Call-Frame Object der Funktion ~outer()~ um eine Adresse für ~x~ zu berechnen.
+Jetzt ist ~x~ allerdings eine lokale Variable (dynamisch gebunden) und es braucht immer ein Call-Frame-Objekt der Funktion ~outer()~, um eine Adresse für ~x~ zu berechnen.
 
 Würden wir die Funktion ~inner()~ innerhalb der Funktion ~outer()~ direkt aufrufen, so könnten wir einfach einen Zeiger auf unser aktuellen Call-Frame mitgeben, vielleicht als impliziten Parameter, und die Sache wäre geritzt.
 Aber was passiert, wenn wir die Funktion ~inner()~ als Rückgabewert zurückgeben.
 Wenn wir dann ~inner()~, irgendwann später, aufrufen wollen, müssen wir einen Call-Frame für ~inner()~ erzeugen und brauchen Zugriff auf einen Call-Frame von ~outer()~. Aber, woher nehmen, wenn nicht stehlen.
 
-Die Antwort auf diese Frage, die aktuelle Skriptsprachen, wie JavaScript, für diese Frage wählen nennt sich *Lexikalisches Scoping*.
-Dabei speichern wir uns einen Zeigern auf den Call-Frame von ~outer()~, an der Stelle wo ~inner()~ definiert wird, in einem *Closure* Objekt weg.
-Dieses Closure Objekt liefert dann, wenn wir die zurückgegebene Funktion ~inner()~ aufrufen, das nötige ~outer()~-Call-Frame Objekt.
-Die Funktion ~inner()~ speichert also dauerhaft den Zustand der umgebenen Funktion zu dem Zeitpunkt an die Closure erzeugt wurde.
+Die Antwort auf diese Frage, die aktuelle Skriptsprachen, wie JavaScript, für diese Frage wählen, nennt sich *Lexikalisches Scoping*.
+Dabei speichern wir uns einen Zeigern auf den Call-Frame von ~outer()~ an der Stelle, wo ~inner()~ definiert wird, in einem *Closure*-Objekt weg.
+Dieses Closure-Objekt liefert dann, wenn wir die zurückgegebene Funktion ~inner()~ aufrufen, das nötige ~outer()~-Call-Frame Objekt.
+Die Funktion ~inner()~ speichert also dauerhaft den Zustand der umgebenen Funktion zu dem Zeitpunkt, an dem die Closure erzeugt wurde.
 
-Durch das weg sichern des ~outer()~-Call-Frames passieren zwei Dinge:
-Zum einen ist die zurückgegebene Funktion nun mit Zustands behaftet, der über mehrere Aufrufen des Rückgabewerts hinweg bestehen bleibt.
-Im Beispiel haben wir den Rückgabewert an den Namen ~f~ gebunden und jeder Aufruf von ~f()~ führ dazu, dass die Variable ~x~ um eins erhöht wird.
+Durch das Wegsichern des ~outer()~-Call-Frames passieren zwei Dinge:
+Zum einen ist die zurückgegebene Funktion nun mit Zustand behaftet, der über mehrere Aufrufe des Rückgabewerts hinweg bestehen bleibt.
+Im Beispiel haben wir den Rückgabewert an den Namen ~f~ gebunden und jeder Aufruf von ~f()~ führt dazu, dass die Variable ~x~ um eins erhöht wird.
 
 Zum anderen lebt der Call-Frame von ~outer()~ nun länger als der Code von ~outer()~ aktiv ist.
 Dies führt dazu, dass wir Call-Frames nicht mehr einfach auf einem Stack allokieren können, sondern tatsächlich ~malloc()~ aufrufen müssen.
@@ -1143,8 +1145,8 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
     \bi
     \ii<2-> Ein \structure{Zeiger} speichert das Ergebnis einer vollständigen Namensauflösung.{
       \bi
-      \ii Der \codeinline{&(<Namenspfad>)}-Operator löst den Pfad auf und gibt eine Adrese zurück
-      \ii<3-> Der \codeinline{(*<Name>)}-Operator macht das von Name referenzierte Objekt zugänglich
+      \ii Der \codeinline{&(<Namenspfad>)}-Operator löst den Pfad auf und gibt eine Adresse zurück.
+      \ii<3-> Der \codeinline{(*<Name>)}-Operator macht das von Name referenzierte Objekt zugänglich.
       \ei
       \begin{columns}
         \begin{column}{0.49\textwidth}
@@ -1173,7 +1175,7 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
         \end{column}
       \end{columns}
     }
-    \ii<4-|handout:4-> \structure{Aliase}: Mehrere Namen (\codeinline{obj}, \codeinline{*ptr}) binden nun das gleiche Objekt.{\\
+    \ii<4-|handout:4-> \structure{Aliase}: Mehrere Namen (\codeinline{obj}, \codeinline{*ptr}) binden nun das selbe Objekt.{\\
       \btAnimation[width=0.7\textwidth]{center,padding=1ex,1:<1-3>,range=1-2:<4->}{fig/04-aliase}
     }
     \ei
@@ -1188,15 +1190,15 @@ Zeiger sind Objekte, die das Ergebnis der Adressberechnung speichern können.
 Wir können also zu einem Zeitpunkt die Adresse für einen Namen berechnen und in einem Zeiger speichern.
 Diesen Zugriff auf das Ergebnis der Adressberechnung können wir in C/C++ mit dem Und-Operator (~&(Pfad)~) erreichen.
 
-Zu einem späteren Zeitpunkt können wir das gespeicherte Ergebnis verwenden um nun tatsächlich auf das Objekt zuzugreifen.
-Bei diesem nach gelagerten Schritt dereferenzieren (~(*ptr)~) wir den Zeiger und berechnen die Adresse des Objekts durch einen Blick in den Speicher. Man könnte also sagen, dass ~*ptr~ auch ein Namensauflösungspfad ist, er hängt nur von zusätzlichem Laufzeitwissen ab. Zeiger sind demnach Teil der dynamischen Namensauflösung.
+Zu einem späteren Zeitpunkt können wir das gespeicherte Ergebnis verwenden, um nun tatsächlich auf das Objekt zuzugreifen.
+Bei diesem nachgelagerten Schritt dereferenzieren (~(*ptr)~) wir den Zeiger und berechnen die Adresse des Objekts durch einen Blick in den Speicher. Man könnte also sagen, dass ~*ptr~ auch ein Namensauflösungspfad ist, er hängt nur von zusätzlichem Laufzeitwissen ab. Zeiger sind demnach Teil der dynamischen Namensauflösung.
 
-Mit Zeigern bekommen wir nun Situationen bei denen mehrere Namen Stellvertreter für das gleiche Objekt sind, sie sind *Aliase* voneinander.
-In unserem Beispiel zeigt der Name ~obj~ und der Pfad ~*ptr~ auf das gleiche Objekt, obwohl die Deklarationen beider Namen nichts miteinander zu tun haben.
-Die beiden Namen wurden erst zur Laufzeit an das gleiche Objekt gebunden.
+Mit Zeigern bekommen wir nun Situationen, bei denen mehrere Namen Stellvertreter für das selbe Objekt sind, sie sind *Aliase* voneinander.
+In unserem Beispiel zeigt der Name ~obj~ und der Pfad ~*ptr~ auf das selbe Objekt, obwohl die Deklarationen beider Namen nichts miteinander zu tun haben.
+Die beiden Namen wurden erst zur Laufzeit an das selbe Objekt gebunden.
 Solche Aliase haben eine wichtige Bedeutung für einen optimierenden Übersetzer.
 Wenn diese nicht ausschließen können, dass ein Objekt nicht zwischenzeitlich durch einen Zugriff über einen Alias verändert wurde, können sie das Objekt nicht in Registern zwischenspeichern, sondern müssen es immer wieder aus dem Speicher laden.
-Ein Beispiel wo dieses Aliasproblem{{{wikipedia_en(Pointer_aliasing)}}} den Übersetzer vom optimieren abhält sehen wir hier:
+Ein Beispiel wo dieses Aliasproblem{{{wikipedia_en(Pointer_aliasing)}}} den Übersetzer vom optimieren abhält, sehen wir hier:
 
 #+begin_src C
 int x = 0, y = 1;
@@ -1210,8 +1212,8 @@ printf("%d\n", x); // x hat einen unbekannten Wert, eine Optimierung printf("%d\
 Mit Zeigern haben wir Aliase bekommen, wo zwei Namen auf ein Objekt zeigen.
 Aber könnte auch das Gegenteil Sinn machen, wenn ein Name auf zwei unterschiedliche Objekte zeigt?
 Irgendwie wäre das doch komisch, wenn (wie im Beispiel) der Name ~fun~ auf beide Implementierungen der Funktion ~fun~ zeigt.
-Das kann doch irgendwien nicht sein, wie sollten wir denn die Adresse ~&fun~ berechnen?
-Es muss also mehr Wissen zur Unterscheidung geben als den reinen Funktionsnamen [fn::Der Dozent flüstert ihnen zu: Die Typen der Signatur!]. Und damit sind wir beim nächsten Thema angelangt: Überladung und typabhängige Namensauflösung.
+Das kann doch irgendwie nicht sein, wie sollten wir denn die Adresse ~&fun~ berechnen?
+Es muss also mehr Wissen zur Unterscheidung geben als den reinen Funktionsnamen [fn::Der Dozent flüstert Ihnen zu: Die Typen der Signatur!]. Und damit sind wir beim nächsten Thema angelangt: Überladung und typabhängige Namensauflösung.
 
 ** Typabhängige Namensauflösung
 :PROPERTIES:
@@ -1267,25 +1269,25 @@ Es muss also mehr Wissen zur Unterscheidung geben als den reinen Funktionsnamen 
 #+end_src
 
 Zunächst zur Einordnung:
-Überladung ist ein Teil des Konzepts *Polymorphismus*, dass wir bereits im Typenkapitel kennen gelernt haben.
+Überladung ist ein Teil des Konzepts *Polymorphismus*, das wir bereits im Typenkapitel kennengelernt haben.
 Bei Polymorphismus geht es darum, dass ein Objekt vielerlei Gestalt haben kann.
-Beim Subtyppolymorphismus kann eine Instanz von ~Derived~ sich sowohl wie ein ~Base~-Objekt, als auch wie ein ~Derived~-Objekt verhalten; es passt an beiden Stellen.
-Bei der Überladung von Funktionen haben wir das Funktionssymbol (~do()~), dass sich sowohl wie ein ~do(Point2D)~ als auch wie ein ~do(Point3D)~ verhalten kann; es hat also mehrerlei Gestalt.
+Beim Subtyppolymorphismus kann eine Instanz von ~Derived~ sich sowohl wie ein ~Base~-Objekt als auch wie ein ~Derived~-Objekt verhalten; es passt an beiden Stellen.
+Bei der Überladung von Funktionen haben wir das Funktionssymbol (~do()~), das sich sowohl wie ein ~do(Point2D)~ als auch wie ein ~do(Point3D)~ verhalten kann; es hat also mehrerlei Gestalt.
 
 Allerdings gibt es einen grundlegenden Unterschied zwischen Subtyping und Überladung:
 Ein Subtyp verhält sich in jeder Situation in gleicher Weise (daher universell!)
 polymorph.
-Bei der Überladung kommt es auf den Kontext der Funktionsaufrufes an, dort wird ad-hoc Entschieden welche Gestalten ~do()~ haben kann und dann auch einnimmt.
-Genauer gesagt, werden wir uns die Argumente des Funktionsaufrufs genauer anschauen und anhand ihrer Typen entscheiden, welches Funktionsobjekt in genau diesem Kontext an den Namen ~do~ gebunden und letztendlich aufgerufen wird.
+Bei der Überladung kommt es auf den Kontext der Funktionsaufrufs an. Dort wird ad-hoc entschieden, welche Gestalten ~do()~ haben kann und dann auch einnimmt.
+Genauer gesagt werden wir uns die Argumente des Funktionsaufrufs genauer anschauen und anhand ihrer Typen entscheiden, welches Funktionsobjekt in genau diesem Kontext an den Namen ~do~ gebunden und letztendlich aufgerufen wird.
 
-Um unser Konzept von Namen, bei dem jeder Name stellvertretend für genau ein Objekt steht, aufrecht zu erhalten, müssen wir unsere Namen erweitern, damit Sie, trotz Überladung, eindeutig bleiben.
+Um unser Konzept von Namen, bei dem jeder Name stellvertretend für genau ein Objekt steht, aufrechtzuerhalten, müssen wir unsere Namen erweitern, damit sie trotz Überladung eindeutig bleiben.
 Wir gehen dazu her und machen die Typen der Parameter zum Teil des (deklarierten und referenzierten) Namens.
 Die Typen der Parameter sind, zusammen mit dem Rückgabetypen, der wichtigste Teil der *Signatur* einer Funktion.
-Die meisten Sprachen schauen sich bei der Überladung nur die Paramtertypen, nicht aber den Rückgabetypen an[fn::Die Sprache Ada ist ein Gegenbeispiel.
-Dort findet Überladung auch anhand des Rückggabetypen statt.].
+Die meisten Sprachen schauen sich bei der Überladung nur die Parametertypen, nicht aber den Rückgabetypen an[fn::Die Sprache Ada ist ein Gegenbeispiel.
+Dort findet Überladung auch anhand des Rückgabetypen statt.].
 Daher wollen wir uns auf diese gängigste Art der Überladung beschränken.
 
-Bei der Überladung wir die Signatur also zum Teil des Namens.
+Bei der Überladung wird die Signatur also zum Teil des Namens.
 Bei der Deklaration schreiben wir diese Typen direkt bei den Parametern hin.
 Die Funktion ~bool isNeg(int x)~ ist also eine Deklaration für den Namen ~isNeg(int)~.
 An der Aufrufstelle, dort wo wir überladene Funktionsnamen referenzieren, ist das ganze allerdings etwas anders gelagert:
@@ -1305,7 +1307,7 @@ Wir schrieben nur ~isNeg(...)~ und der Übersetzer macht daraus eine Referenz f�
         \end{btBlock}
         \smallskip
         \be
-        \ii Overload Set bestimmen{
+        \ii Overload-Set bestimmen{
           \bi
           \ii<2-> Suche nach sichtbaren Deklaration
           \ii<2-> \alert<2-3>{Abbruch} der Suche beim ersten Treffer\\[1ex]
@@ -1318,7 +1320,7 @@ Wir schrieben nur ~isNeg(...)~ und der Übersetzer macht daraus eine Referenz f�
           \ii Liste der Parameter und der Argumente
           \ei
         }\medskip
-        \ii<5-|handout:5-> Einschränkung des Overload Sets{
+        \ii<5-|handout:5-> Einschränkung des Overload-Sets{
           \bi
           \ii Übereinstimmung in Parameteranzahl
           \ii<6-> Typen müssen gleich sein\\[1ex]
@@ -1390,36 +1392,36 @@ Wir schrieben nur ~isNeg(...)~ und der Übersetzer macht daraus eine Referenz f�
 #+end_src
 
 Wir haben die Typen der Parameter und die Typen der Argumente zum Teil der Namen gemacht.
-Wie gliedert sich diese Erweiterung in die Regeln der Namensauflösung ein.
-Dazu wollen wir uns anschauen, wie überladene Funktionen für ein monomorphes und statisches Typsystem augelöst werden[fn::Zur Erinnerung: Monomorph=Typen sind gleich oder inkompatibel zueinander. Statisch: Variablen haben annotierte Typen.]
+Wie gliedert sich diese Erweiterung in die Regeln der Namensauflösung ein?
+Dazu wollen wir uns anschauen, wie überladene Funktionen für ein monomorphes und statisches Typsystem aufgelöst werden[fn::Zur Erinnerung: Monomorph: Typen sind gleich oder inkompatibel zueinander. Statisch: Variablen haben annotierte Typen.].
 
-Wenn wir einen Namen auflösen wollen, so suchen wir zunächst das *Overload Set* mittels der bekannten Namensauflösungsregeln.
-Die kann mittels CNSR oder über expliziter Namenspfade passieren.
-Das Overload Set enthält dann alle Deklarationen, die im Namensraum der ersten Übereinstimmung, gefunden werden.
-Aus diesem Grund nehmen wir im Beispiel das äußere ~f()~ nicht mit in das Overload Set mit auf.
+Wenn wir einen Namen auflösen wollen, so suchen wir zunächst das *Overload-Set* mittels der bekannten Namensauflösungsregeln.
+Dies kann mittels CNSR oder über expliziter Namenspfade passieren.
+Das Overload-Set enthält dann alle Deklarationen, die im Namensraum der ersten Übereinstimmung, gefunden werden.
+Aus diesem Grund nehmen wir im Beispiel das äußere ~f()~ nicht mit in das Overload-Set mit auf.
 Dieser Abbruch der Suche ist dann auch der Grund, wieso es in C++/Java einen Unterschied zwischen Überschreiben und Überladen gibt.
 
-Die unvollständigen Namen aus dem Overload Set und an der Aufrufstelle geben wir an das Typsystem und bitten darum die Namen um ihre Signaturen zu vervollständigen.
-An dieser Stelle haben wir eine Interaktion zwischen Typssystem und Namensauflösung, weswegen Überladung auch eine *typabhängige Namensauflösung* ist.
+Die unvollständigen Namen aus dem Overload-Set und an der Aufrufstelle geben wir an das Typsystem und bitten darum, die Namen um ihre Signaturen zu vervollständigen.
+An dieser Stelle haben wir eine Interaktion zwischen Typsystem und Namensauflösung, weswegen Überladung auch eine *typabhängige Namensauflösung* ist.
 
-Aus dem vervollständigten Overload Set streichen wir zuerst alle Deklarationen bei der die Anzahl der Parameter nicht übereinstimmt (~f(int, int)~).
+Aus dem vervollständigten Overload-Set streichen wir zuerst alle Deklarationen, bei denen die Anzahl der Parameter nicht übereinstimmt (~f(int, int)~).
 Danach suchen wir uns die Deklaration raus, die nicht nur im Funktionsnamen, sondern auch in der Signatur zu unserer Referenz passt.
 Finden wir keine Deklaration, so gibt es einen Fehler bei der Namensauflösung.
-Da wir (erstmal) ein monomorphes Typsystem angenommen haben, kann es auch keine zwei Elemente des Overload Sets geben, die passen.
+Da wir (erstmal) ein monomorphes Typsystem angenommen haben, kann es auch keine zwei Elemente des Overload-Sets geben, die passen.
 
 Genau dieses Vorgehen, die Typen in den Namen zu codieren, sehen wir auf der technischen Ebene bei C++.
-Dort gibt es das sogenannte *Name Mangling* bei denen die Parametertypen in den Assemblernamen der Funktion codiert wird.
-Die Signatur ~isNeg(double)~ wird, sowohl an der Definitionsstelle als auch an der Aufrufstelle zu ~_Z5isNegd~ (das ~d~ steht für double); ~(int, int)~ wird zum Suffix ~ii~.
-Dies macht der Übersetzer in jeder Übersetzungseinheit (=jeder ~.o~ Datei) gleich und die Bindung des Namens geschieht dann durch den Linker, der an der Aufrufstelle eine konstante Adresse (~0x11e4) einsetzen kann.
-Wir sehen also, dass diese Art der Überladung in C++ *keine* Kosten zur Laufzeit erzeugt[fn::Dies ist ein wichtiger Punkt für effizentes Programmieren. Überladung kostet nicht generell Laufzeit. Solche "Zero-Cost" Abstraktionen sind immer von Vorteil.]!
+Dort gibt es das sogenannte *Name Mangling*, bei dem die Parametertypen in den Assemblernamen der Funktion kodiert wird.
+Die Signatur ~isNeg(double)~ wird, sowohl an der Definitionsstelle als auch an der Aufrufstelle, zu ~_Z5isNegd~ (das ~d~ steht für double); ~(int, int)~ wird zum Suffix ~ii~.
+Dies macht der Übersetzer in jeder Übersetzungseinheit (=jeder ~.o~-Datei) gleich und die Bindung des Namens geschieht dann durch den Linker, der an der Aufrufstelle eine konstante Adresse (~0x11e4) einsetzen kann.
+Wir sehen also, dass diese Art der Überladung in C++ *keine* Kosten zur Laufzeit erzeugt[fn::Dies ist ein wichtiger Punkt für effizentes Programmieren. Überladung kostet nicht generell Laufzeit. Solche "Zero-Cost"-Abstraktionen sind immer von Vorteil.]!
 
 #+begin_src latex
   \begin{frame}[fragile]{Operatorüberladung}
     \bi
-    \ii<1-> Arithmetische Operatoren (\texttt{+,-,*,/}) sind überladenen{
+    \ii<1-> Arithmetische Operatoren (\texttt{+,-,*,/}) sind überladen{
       \bi
       \ii Interpretation als Funktionsaufrufe: \codebox{2 + 3} $\rightarrow$ \codebox{+(2, 3)}
-      \ii Der Operator (z.B., \texttt{+} oder \texttt{++}) wird zum Funktionsnamen: \texttt{\colorbox{badbee!50}{++}(a)}
+      \ii Der Operator (z.B. \texttt{+} oder \texttt{++}) wird zum Funktionsnamen: \texttt{\colorbox{badbee!50}{++}(a)}
       \ii Sprachen deklarieren bereits mehrere überladene Implementierungen:{\\
         \btSetNamedTab[1cm]{\first}%
         \btSetNamedTab[4.5cm]{\second}%
@@ -1433,7 +1435,7 @@ Wir sehen also, dass diese Art der Überladung in C++ *keine* Kosten zur Laufzei
     \ii<2-> Manche Sprachen erlauben eigene Operatorüberladungen{
       \bi
       \ii Die selbst-deklarierte Überladungen müssen \enquote{magischen} Namen tragen
-      \ii Overload Set enthält Eingebaute und selbst-deklarierten Operatoren
+      \ii Overload-Set enthält eingebaute und selbst-deklarierten Operatoren
       \ei
     }
     \begin{code}[tag=C++]
@@ -1452,29 +1454,29 @@ Wir sehen also, dass diese Art der Überladung in C++ *keine* Kosten zur Laufzei
   \end{frame}
 #+end_src
 
-Mit diesem Wissen um Überladung wollen wir uns nun einem Thema nähern, dass für viele eine Art schwarze Magie zu sein scheint: *Operatorüberladung*. Dabei ist die Überladung von Operatoren eigentlich auch nicht anders als die Überladungen von Funktionen. Wir müssen uns nur folgenden Satz auf der Zunge zergehen lassen: *Operatoren sind komisch benannte Funktionen*.
+Mit diesem Wissen über Überladung wollen wir uns nun einem Thema nähern, das für viele eine Art schwarze Magie zu sein scheint: *Operatorüberladung*. Dabei ist die Überladung von Operatoren eigentlich auch nicht anders als die Überladung von Funktionen. Wir müssen uns nur folgenden Satz auf der Zunge zergehen lassen: *Operatoren sind komisch benannte Funktionen*.
 
-Operatoren (~A+B~) haben alles was andere Funktionen auch haben:
-Parameter (~A~, ~B~), einen Funktionsnamen ~+~ und wenn man sie ausführt haben sie einen Rückgabewert.
-Klarer wir das ganze, wenn wir einen Ausdruck mit einem Operator nicht als Infix[fn::Der Operator steht zwischen seinen Argumenten], sondern in Prefixschreibweise notieren:
+Operatoren (~A+B~) haben alles, was andere Funktionen auch haben:
+Parameter (~A~, ~B~), einen Funktionsnamen ~+~ und wenn man sie ausführt, haben sie einen Rückgabewert.
+Klarer wir das ganze, wenn wir einen Ausdruck mit einem Operator nicht als Infix[fn::Der Operator steht zwischen seinen Argumenten], sondern in Präfixschreibweise notieren:
 ~+(A, B)~.
-Plötzlich sieht so eine Operatoranwendung auch aus wie ein Funktionsaufruf bei dem das Lexer-Token des Operators (~+~) zum Funktionsnamen wird.
+Plötzlich sieht so eine Operatoranwendung auch aus wie ein Funktionsaufruf, bei dem das Lexer-Token des Operators (~+~) zum Funktionsnamen wird.
 
 Weil wir Operatoren als Funktionen sehen, können wir sie prinzipiell auch überladen.
 Tatsächlich sind in vielen Sprachen die *Standardoperatoren* bereits für die eingebauten Datentypen überladen.
-So haben die Überladungen des Plus-Operator in Python nicht nur unterschiedliche Datentypen (~float~ vs.
-~int~), sondern es steht manchmal sogar eine ganz andere Semantik dahiner, wie dies bei ~+(string, string)~ der Fall ist.
-Wenn wir dann die Namensauflösung für die Operatoren machen, wird das Overload Set mit diesen vordefinierten Überladungen vom Übersetzer gefüllt[fn::Tatsächlich sind die Implementierungen dieser Standardoperatoren ein Beispiel für echtes Compile-Time Binding.].
+So haben die Überladungen des Plus-Operators in Python nicht nur unterschiedliche Datentypen (~float~ vs.
+~int~), sondern es steht manchmal sogar eine ganz andere Semantik dahinter, wie dies bei ~+(string, string)~ der Fall ist.
+Wenn wir dann die Namensauflösung für die Operatoren machen, wird das Overload-Set mit diesen vordefinierten Überladungen vom Übersetzer gefüllt[fn::Tatsächlich sind die Implementierungen dieser Standardoperatoren ein Beispiel für echtes Compile-Time Binding.].
 
 Manche Sprachen erlauben es darüber hinaus, eigene Überladungen für bereits existierende Operatoren zu definieren.
-Dazu muss die Sprache allerdings festlegen wie sie normale Funktionsnamen von den "komischen Namen" der Operatoren unterscheiden kann.
-In C++ wird dazu das Prefix ~operator~ vor den Operator geschrieben.
+Dazu muss die Sprache allerdings festlegen, wie sie normale Funktionsnamen von den "komischen Namen" der Operatoren unterscheiden kann.
+In C++ wird dazu das Präfix ~operator~ vor den Operator geschrieben.
 Im Beispiel ist daher der gesamte hervorgehobene Text (~operator+~) der Name der definierten Funktion.
-Die selbst-definierten Überladungen werden dem Overloading Set hinzugefügt und der Mechanismus der Namensauflösung geht seinen gewohnten Gang.
+Die selbst-definierten Überladungen werden dem Overloading-Set hinzugefügt und der Mechanismus der Namensauflösung geht seinen gewohnten Gang.
 
 Es gibt sogar Sprachen, wie Haskell, die es einem erlauben ganz eigene neue Operatoren zu definieren.
-Dazu muss allerdings Lexer und Parser, während diese gerade laufen, über die neu definierten Operatoren informiert werden.
-Lexer, Parser und Semantische Analyse müssen also noch enger verzahnt werden, als dies sonst der Fall ist.
+Dazu müssen allerdings Lexer und Parser, während diese gerade laufen, über die neu definierten Operatoren informiert werden.
+Lexer, Parser und semantische Analyse müssen also noch enger verzahnt werden, als dies sonst der Fall ist.
 
 ** Überladung und Polymorphismus
 :PROPERTIES:
@@ -1487,10 +1489,10 @@ Lexer, Parser und Semantische Analyse müssen also noch enger verzahnt werden, a
 \end{frame}
 
   \begin{frame}[fragile]{Interaktion zwischen Überladung und Subtypen}
-    \textbf{Erinnerung}: Subtyping ist eine Form des universellen Polymorphismus. Bei Vererbung ist die Kindsklasse ein Subtyp  der Elternklasse.
+    \textbf{Erinnerung}: Subtyping ist eine Form des universellen Polymorphismus. Bei Vererbung ist die Kindklasse ein Subtyp  der Elternklasse.
 
     \begin{btBlock}{}
-      Ein polymorphes Typssystem führt Typkomptaibilität ein und erzeugt damit \structure{Uneindeutigkeit}. Diese muss die Sprache eindeutig auflösen.
+      Ein polymorphes Typsystem führt Typkompatibilität ein und erzeugt damit \structure{Uneindeutigkeit}. Diese muss die Sprache eindeutig auflösen.
     \end{btBlock}\medskip
 
     \begin{columns}[t]
@@ -1556,25 +1558,25 @@ Lexer, Parser und Semantische Analyse müssen also noch enger verzahnt werden, a
   \end{frame}
 #+end_src
 
-Im letzten Unterkapitel haben wir die (vorläufige) Annahme getroffen eine Sprache mit monomorphem Typsystem zu haben. Allerdings haben wir in der letzten Vorlesung schon gesagt, dass solche Typssystem wenig flexibel sind. Daher wollen wir uns nun ansehen, wie Überladung mit einem Inklusionspolymorphismus interagiert und welche Folgen sich daraus ergeben. Wir picken uns für diese Diskussionganz bewusst den *Subtyp*-Polymorpismus heraus, weil dieser allgegenwärtig ist (Vererbung).
+Im letzten Unterkapitel haben wir die (vorläufige) Annahme getroffen, eine Sprache mit monomorphem Typsystem zu haben. Allerdings haben wir in der letzten Vorlesung schon gesagt, dass solche Typsysteme wenig flexibel sind. Daher wollen wir uns nun ansehen, wie Überladung mit einem Inklusionspolymorphismus interagiert und welche Folgen sich daraus ergeben. Wir picken uns für diese Diskussion ganz bewusst den *Subtyp*-Polymorphismus heraus, weil dieser allgegenwärtig ist (Vererbung).
 
-Durch die Einführung von Subtyping erzeugen wir eine gewisse Uneindeutigkeit mit denen die Sprache umgehen muss um weiterhin die Regel "Ein Name, ein Objekt" aufrecht zu erhalten. Dabei bekommen wir an zwei Stellen Uneindeutigkeit: An der Deklarationsstelle und an der Aufrufstelle.
+Durch die Einführung von Subtyping erzeugen wir eine gewisse Uneindeutigkeit, mit denen die Sprache umgehen muss, um weiterhin die Regel "Ein Name, ein Objekt" aufrechtzuerhalten. Dabei bekommen wir an zwei Stellen Uneindeutigkeit: An der Deklarationsstelle und an der Aufrufstelle.
 
-An der *Deklarationsstelle* können wir Überladungen erzeugen bei denen die Parametertypen in einer Typ--Subtyp Relation stehen. Da der Untertyp ~S~ typkompatibel mit dem Obertyp ~B~ ist, könnte ein Aufruf ~f(S)~ von beiden Deklarationen behandelt werden. Welche sollen wir also wählen?
+An der *Deklarationsstelle* können wir Überladungen erzeugen, bei denen die Parametertypen in einer Typ--Subtyp-Relation stehen. Da der Untertyp ~S~ typkompatibel mit dem Obertyp ~B~ ist, könnte ein Aufruf ~f(S)~ von beiden Deklarationen behandelt werden. Welche sollen wir also wählen?
 
-Die andere Uneindeutigkeit tritt an der *Aufrufstelle* auf, weil wir in einer Variable vom Obertypen ohne Probleme ein Objekt vom Untertyp speichern können. Dies führt dazu, dass der dynamische Typ und der statische Typ einer Variable (siehe Typkapitel) sich unterscheiden. Welchen Typen sollen wir beachten, wenn wir den Referenznamen erzeugen? Ist der Aufruf im Beispiel ~f(B, int)~ oder ist er ~f(S, int)~. Dazu kommt, dass wir den dynamischen Typen (normalerweise) erst zur Laufzeit wissen können, während der statische Typ bereits bei der Übersetzung bekannt ist.
+Die andere Uneindeutigkeit tritt an der *Aufrufstelle* auf, weil wir in einer Variable vom Obertypen ohne Probleme ein Objekt vom Untertyp speichern können. Dies führt dazu, dass der dynamische Typ und der statische Typ einer Variable (siehe Typkapitel) sich unterscheiden. Welchen Typen sollen wir beachten, wenn wir den Referenznamen erzeugen? Ist der Aufruf im Beispiel ~f(B, int)~ oder ist er ~f(S, int)~? Dazu kommt, dass wir den dynamischen Typen (normalerweise) erst zur Laufzeit wissen können, während der statische Typ bereits bei der Übersetzung bekannt ist.
 
-Weil es erstmal einfacher ist, wollen wir als Erstes das Problem an der Deklarationsstelle angehen.
-Dazu rechnen wir für eine bestimme Aufrufstelle die *Spezifität* für jede Deklaration des Overload Sets.
+Weil es erstmal einfacher ist, wollen wir als erstes das Problem an der Deklarationsstelle angehen.
+Dazu berechnen wir für eine bestimme Aufrufstelle die *Spezifität* für jede Deklaration des Overload-Sets.
 Die Idee dabei ist, dass manche Deklarationen "besser" auf die Aufrufstelle passen als andere.
 Im Prinzip kann jede Sprache diese Spezifität anders ausrechnen, aber die grundlegende Idee ist dabei meist ähnlich.
 
-Für jedes Argument--Parameter Paar berechnen wir wie weit die Typen in der Vererbungshierarchie voneinander entfernt sind.
-Umso weiter die Distanz ist, also umso mehr Casts man bräuchte, umso schlechter kann die Deklaration mit diesem Argument umgehen. Im Beispiel ist bei der ersten Funktion das Argument ~S11~ zwei Kanten in der Vererbungshierarchie von dem Parametertypen ~B~ entfernt; Sie gibt also 2 *Maluspunkte*.
+Für jedes Argument--Parameter-Paar berechnen wir, wie weit die Typen in der Vererbungshierarchie voneinander entfernt sind.
+Umso weiter die Distanz ist, also umso mehr Casts man bräuchte, umso schlechter kann die Deklaration mit diesem Argument umgehen. Im Beispiel ist bei der ersten Funktion das Argument ~S11~ zwei Kanten in der Vererbungshierarchie von dem Parametertypen ~B~ entfernt; sie gibt also 2 *Maluspunkte*.
 Am Ende rechnen wir, zum Beispiel durch addieren, alle Maluspunkte zusammen und nehmen die Deklaration mit den wenigsten Maluspunkten als Ergebnis der Namensauflösung.
 
 Dabei gibt es zwei Randfälle:
-Wenn Parametertyp und Argumenttyp inkompatibel zueinander sind, so vergeben wir einen unendlich großen Malus um die Funktion aus dem Overload Set zu kegeln.
+Wenn Parametertyp und Argumenttyp inkompatibel zueinander sind, so vergeben wir einen unendlich großen Malus, um die Funktion aus dem Overload-Set zu kegeln.
 Zum anderen könnten zwei Deklarationen genau den gleichen Maluswert haben, was zu einem Übersetzungsfehler führt, dass die Überladung in diesem Fall uneindeutig ist[fn::Ambigous Overload].
 
 #+begin_src latex
@@ -1606,14 +1608,14 @@ Zum anderen könnten zwei Deklarationen genau den gleichen Maluswert haben, was 
       \end{column}
     \end{columns}
 
-    \textbf{Bisher} haben wir nur den statischen Typen der Argumente betrachtet.
+    \textbf{Bisher} haben wir nur die statischen Typen der Argumente betrachtet.
     \medskip
 
     \bi
     \ii<2-> \structure{Dynamic Dispatch}: Überladungsauswahl anhand des dynamischen Typs{
       \be
-      \ii Vorberechnung eines eingeschränkten Overload Sets
-      \ii Zur Laufzeit: Extraxtion des dynamischen Typs \alert{aller} Argumente
+      \ii Vorberechnung eines eingeschränkten Overload-Sets
+      \ii Zur Laufzeit: Extraktion des dynamischen Typs \alert{aller} Argumente
       \ii Berechnung und Aufruf der spezifischsten Überladung
       \ee
     }\smallskip
@@ -1663,12 +1665,12 @@ Zum anderen könnten zwei Deklarationen genau den gleichen Maluswert haben, was 
     \bi
     \ii \structure{Methoden} werden im Kontext einer Klasse deklariert.{
       \bi
-      \ii Methoden werden \enquote{auf einem Objekt} aufgerufen: \codebox{obj.foo(1,1)}
+      \ii Methoden werden \enquote{auf einem Objekt} aufgerufen: \codebox{obj.foo(1, 1)}
       \ii Das Objekt wird zu einem impliziten Argument (\texttt{this := obj})
       \ii Bei \structure{statischen Methoden} wird nur der statische Typ beachtet.
       \ei
     }\medskip
-    \ii<2-> \structure{Virtuelle Methoden}: dynamischer Dispatch auf dem \texttt{this} Argument{
+    \ii<2-> \structure{Virtuelle Methoden}: dynamischer Dispatch auf dem \texttt{this}-Argument{
       \bi
       \ii Die passende Überladung hängt am Objekt, nicht an der Variable.
       \ii Effizient implementierbar mit virtuellen Funktionstabellen (vtable).
@@ -1683,22 +1685,22 @@ Zum anderen könnten zwei Deklarationen genau den gleichen Maluswert haben, was 
 
 Der andere Aspekt bei der Verbindung von Polymorphismus und Überladung ist der Einfluss des *dynamischen Datentyps*.
 Prinzipiell ist die Geschichte ganz einfach:
-In dem Moment, wo wir das Typssystem nach der Signatur der Aufrufstelle beten, fragen wir nicht nach der Signatur der statischen Typen, sondern nach der Signatur der dynamischen Typen.
-Es werden also nicht die Typen der Variablen verwendet, sondern der Typ des übergebenen Objekts zählt. Eigentlich ganz einfach, könnte man Browser und Laptop zuklappen und endlich schlafen gehen. Leider ist es nicht ganz so leicht.
+In dem Moment, wo wir das Typsystem nach der Signatur der Aufrufstelle bitten, fragen wir nicht nach der Signatur der statischen Typen, sondern nach der Signatur der dynamischen Typen.
+Es werden also nicht die Typen der Variablen verwendet, sondern der Typ des übergebenen Objekts zählt. Ganz einfach, eigentlich könnte man Browser und Laptop zuklappen und endlich schlafen gehen. Leider ist es nicht ganz so einfach.
 
 Das Problem mit dynamischen Typen ist, dass sie an den Objekten hängen.
 Und Objekte werden ganz häufig ja erst zur Laufzeit an Namen gebunden (run-time binding).
-Wir müssten also ganz oft mit der Auflösung der Überladung bis zum letzten Moment, bis zur Nanosekunde des Aufrufstelle warten, die dynamischen Typen extrahieren und die ganze Berechnung der Spezifität durchführen.
+Wir müssten also ganz oft mit der Auflösung der Überladung bis zum letzten Moment, bis zur Nanosekunde des Aufrufs warten, die dynamischen Typen extrahieren und die ganze Berechnung der Spezifität durchführen.
 Das Folienbeispiel in Python tut das, indem es mittels ~isinstance()~ den dynamischen Typen prüft.
 Allerdings kostet das, und zwar so richtig.
 Deswegen bietet kaum eine Sprache direkt Mittel an diese Art der dynamischen Überladungsauflösung, die auch *multiple dynamic dispatch* heißt, auszudrücken.
-Das ist schade, weil es uns solch schreckliche ~isinstance()~-Kasakaden wie im Beispiel ersparen würde.
+Das ist schade, weil es uns solch schreckliche ~isinstance()~-Kaskaden wie im Beispiel ersparen würde.
 
-Was in vielen Sprachen allerdings angeboten wird ist eine eingeschränkte Form des dynamischen Dispatch, in Form von *virtuellen Methoden*: der *single dynamic dispatch*.
+Was in vielen Sprachen allerdings angeboten wird, ist eine eingeschränkte Form des dynamischen Dispatch, in Form von *virtuellen Methoden*: der *single dynamic dispatch*.
 
 Dazu müssen wir zunächst einmal verstehen, was *Methoden* eigentlich sind und was sie von Funktionen unterscheidet bzw.
 was sie zu besonderen Funktionen macht.
-Methoden werden im Kontext eines dynamisch instantiierbaren Namensraums (zum Beispiel einer Klasse) deklariert.
+Methoden werden im Kontext eines dynamisch instanziierbaren Namensraums (zum Beispiel einer Klasse) deklariert.
 Ruft man eine Methode auf, so wird der Zeiger auf die Namensrauminstanz als erstes *implizites Argument* an die Funktion übergeben.
 Ob man an der Deklarationsstelle diesen impliziten Parameter aufschreiben muss, wie in Python, oder weglassen kann, wie in C++ oder Java, das ist wiederum sprachspezifisch.
 Wichtig ist nur:
@@ -1707,11 +1709,11 @@ Das erste Argument ist implizit und zeigt auf das Instanzobjekt und hat die umge
 Bei Methoden gibt es dann die Unterscheidung zwischen statischen und virtuellen Methoden: Beim Aufruf einer statischen Methoden wird an der Aufrufstelle die statische Signatur berechnet und die Überladungsauflösung durchgeführt. Da dabei alles statisch ist, kann dies bereits zur Übersetzungszeit erfolgen. Eine Zero-Cost Abstraktion!
 
 Bei virtuellen Methoden berechnen wir an der Aufrufstelle eine Signatur, bei der für dieses erste implizite Argument der dynamischen Typen anstatt der statische Typ beachtet wird.
-Wir machen einen dynamischen Dispatch auf dem ~this~ Zeiger.
+Wir machen einen dynamischen Dispatch auf dem ~this~-Zeiger.
 
 In Java haben die Sprachdesigner entschieden, dass jede Methode per default virtuell ist und man explizit mit dem Schlüsselwort ~static~ auf statischen Dispatch umstellen muss. Bei C++ ist die Entscheidung genau gegenteilig ausgefallen, dort muss man explizit ~virtual~ sagen.
 
-Virtuelle Methoden lassen sich relativ effizient implementieren, indem man eine virtuelle Funktionstablle (vtable) in jedes Objekt schreibt. Die Idee dabei ist die Folgende:
+Virtuelle Methoden lassen sich relativ effizient implementieren, indem man eine virtuelle Funktionstabelle (vtable) in jedes Objekt schreibt. Die Idee dabei ist die Folgende:
 
 | Methode     | Signatur              | statischer Teil | Slot |
 |-------------+-----------------------+-----------------+------|
@@ -1722,7 +1724,7 @@ Virtuelle Methoden lassen sich relativ effizient implementieren, indem man eine 
 2. Wir berechnen für jede Methode den statischen Anteil der Signatur (alle Parametertypen bis auf das erste)
 3. Wir gruppieren die Methoden nach dem statischen Teil und geben jeder Gruppe einen Slot.
 4. Wir erzeugen für jede Klasse eine virtuelle Funktionstabelle mit so vielen Einträgen wie es Slots gibt.
-5. Wir schreiben einen auf die passende Implementierung in die passende Funktionstabelle.
+5. Wir schreiben einen Zeiger auf die passende Implementierung in die passende Funktionstabelle.
 6. Zum Erzeugungszeitpunkt bekommt jedes Element einen Zeiger auf die Funktionstabelle.
 
 Wir emulieren dies mal in C:
@@ -1763,8 +1765,7 @@ Wir emulieren dies mal in C:
 #+end_src
 
 
-An der Aufrufstelle erstellen wir dann nur noch den statischen Anteil der Signatur, führen die Überladungsauflösung durch um auf die Slotnummer zu kommen.
-Und erzeugen eine Call Instruktion, die dynamisch, über den ~this~- und den ~vtable~-Zeiger auf die richtige Implementierung kommt.
+An der Aufrufstelle erstellen wir dann nur noch den statischen Anteil der Signatur, führen die Überladungsauflösung durch, um auf die Slotnummer zu kommen, und erzeugen eine Call-Instruktion, die dynamisch über den ~this~- und den ~vtable~-Zeiger auf die richtige Implementierung kommt.
 Diese zusätzliche Indirektion über diese beiden Zeiger ist es auch, was virtuelle Methodenaufrufe teurer macht als statische Methodenaufrufe.
 
 
@@ -1772,9 +1773,9 @@ Diese zusätzliche Indirektion über diese beiden Zeiger ist es auch, was virtue
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
-    \ii \structure{Namen} sind symbolische und statische Objektreferenzen {
+    \ii \structure{Namen} sind symbolische und statische Objektreferenzen.{
       \bi
-      \ii Bei der \structure{Deklaration} können Namen mit (Typ)information versehen werden
+      \ii Bei der \structure{Deklaration} können Namen mit (Typ-)informationen versehen werden.
       \ii Deklarationen werden in hierarchischen \structure{Namensräumen} strukturiert.
       \ii Eingeschränkte Sichtbarkeit und Import von Namen möglich
       \ei
@@ -1785,16 +1786,16 @@ Diese zusätzliche Indirektion über diese beiden Zeiger ist es auch, was virtue
       \ii \structure{Partielle Auflösung} kann bereits vorgezogen werden (Variablendeklaration)
       \ei
     }\medskip
-    \ii \structure{Instantiierbare Namensräume} führen zu dynamischer Namensauflösung {
+    \ii \structure{Instanziierbare Namensräume} führen zu dynamischer Namensauflösung {
       \bi
-      \ii Eine Deklaration beschreibt viele Laufzeitobjekte (\texttt{struct}, \texttt{class})
-      \ii Laufzeitwissen wird zur vollständigen Namensauflösung benötigt (\texttt{this})
+      \ii Eine Deklaration beschreibt viele Laufzeitobjekte (\texttt{struct}, \texttt{class}).
+      \ii Laufzeitwissen wird zur vollständigen Namensauflösung benötigt (\texttt{this}).
       \ei
     }\medskip
     \ii \structure{Überladene Funktionen} werden mit Typinformationen aufgelöst {
       \bi
       \ii Neben dem Funktionsnamen wird auch die \structure{Typsignatur} einbezogen.
-      \ii Bei Subtyping: Auswahl zwischen statischem und \structure{dynamischem Dispatch}.
+      \ii Bei Subtyping: Auswahl zwischen statischem und \structure{dynamischem Dispatch}
       \ei
     }
 
@@ -1809,13 +1810,13 @@ Diese zusätzliche Indirektion über diese beiden Zeiger ist es auch, was virtue
 :CUSTOM_ID: 04-namespace-language
 :END:
 
-- ~{...}~: Ein Namensraum der Namensräume und Deklarationen enthalten kann. Der Namensraum hat die Standardattribute ~[E,S]~.
-- ~{[<ATTR>] ...}~: Ein Namensraum mit Standardattribute, die er an seine enthaltenen Deklarationen vererbt, die dort aber überschrieben werden können.
+- ~{...}~: Ein Namensraum, der Namensräume und Deklarationen enthalten kann. Der Namensraum hat die Standardattribute ~[E,S]~.
+- ~{[<ATTR>] ...}~: Ein Namensraum mit Standardattributen, die er an seine enthaltenen Deklarationen vererbt, die dort aber überschrieben werden können.
 - ~let <NAME>~: Deklariert NAME als neuen Namen an dieser Stelle.
 - ~let[<ATTR>] <NAME>~: Deklariert NAME mit den gegebenen Attributen ATTR an dieser Stelle.
 - ~[I]~: Deklarationsattribut für interne (oder private) Sichtbarkeit. Der Name ist nur noch von innerhalb des umgebenden Namensraums sichtbar. Er wird bei Importen übersprungen.
-- ~[E]~: Externe Sichtbarkeit. Das Gegeteil von ~[I]~.
-- ~[D]~: Der so deklarierte Name benötigt Laufzeitwissen um aufgelöst zu werden.
-- ~[S]~: Alles Laufzeitwissen wird bei der Auflösung dieses Namens ignoriert bzw. ist nicht nötig. Gegeteil von ~[D]~.
+- ~[E]~: Externe Sichtbarkeit. Das Gegenteil von ~[I]~.
+- ~[D]~: Der so deklarierte Name benötigt Laufzeitwissen, um aufgelöst zu werden.
+- ~[S]~: Alles Laufzeitwissen wird bei der Auflösung dieses Namens ignoriert bzw. ist nicht nötig. Gegenteil von ~[D]~.
 - ~import <PFAD>~: Importiert die referenzierte Deklaration in den aktuellen Namensraum.
 - ~NS()~: Legt einen Klon des Namensraums NS an.
