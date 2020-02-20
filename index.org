@@ -11,29 +11,16 @@
 {{{topic(./05-semantische-analyse.org,fig/05-stamp.png)}}}
 {{{topic(./06-objekte.org,fig/06-stamp.png)}}}
 {{{topic(./07-operationen.org,fig/07-stamp.png)}}}
+* COMMENT Not yet written
 {{{topic(./08-codegen.org,fig/08-stamp.png)}}}
 {{{topic(./09-optimierung.org,fig/09-stamp.png)}}}
 {{{topic(./10-maschinencode.org,fig/10-stamp.png)}}}
 
 * COMMENT TODO 6 Vorlesungen
-
-     - Übersetzer: Intermediate Code Generierung
-       - 3-Address Code, Basic Blocks, Control-Fluss Graph, R-Values, L-Values
-
-     - Übersetzer: Optimierung
-       - Fixpunkt Analyse
-       - Konstantenfortschreibung, Konstantenfolding
-       - Dead Code Elimination
-       - Tail-Call Optimization
-     - Übersetzer: Machienencodegenerierung
-       - Registerallokation, Funktionsaufrufe, ABI, Peephole Optimizer
-     - Übersetzer: Das Run-Time Environment
-       - ELF und Dynamische Libraries, Garbage Colletion, Just-in-Time Compilation
-
      - Sprachen: Das Objektorientierte Paradigma
        - SOLID
        - https://de.wikipedia.org/wiki/Prinzipien_objektorientierten_Designs
-
+         
      - Sprachen: Das Funktionale Paradigma
        - Freiheit von Seiteneffekten
        - Parametrische Datentypen

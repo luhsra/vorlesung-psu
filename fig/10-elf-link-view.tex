@@ -1,0 +1,178 @@
+\documentclass{lecturefig}
+\usepackage{lecturesourcecode}
+\usepackage{calc}
+\begin{document}
+
+\long\def\mainObject#1{
+     \node[anchor=north,at=(listing.north),
+          section,
+          label={[name=section-text-label,rotate=90,anchor=south]west:\scriptsize .text},
+          label={[anchor=north east,inner sep=1pt,xshift=-3pt,fill=srared!40]north east:\scriptsize AX},
+          ] (section-text) {
+      \tikznode[name=#1-main]{55 89 e5 6a 06}\\
+      e8 \tikznode[text width=1.4cm,draw,fill=srared!20,name=#1-fib]{00 00 00 00}\\
+      83 c4 04 c9 c3
+    };
+
+    \node[below=0.2 of section-text,
+          section,fill=amber!40,
+          label={[anchor=north east,inner sep=1pt,xshift=-3pt,fill=srared!40]north east:\scriptsize WA},
+          label={[name=section-data-label,rotate=90,anchor=south]west:\scriptsize .data}] (section-data) {
+            \tikznode[name=#1-var]{17 00 00 00}
+    };
+
+    \node[below=0.2 of section-data,section,fill=safegreen!20,
+       label={[name=symbols-label,rotate=90,anchor=south]west:\scriptsize Symbols}
+    ] (symbols) {
+      \tikznode[name=#1-sym-var]{d global\_var}\\
+      \tikznode[name=#1-sym-main]{T main}\\
+      \tikznode[name=#1-sym-fib]{U fib}
+    };
+
+    \draw[->] (#1-sym-main.west) -- ++(west:1.7ex) |- (#1-main.west);
+    \draw[->] (#1-sym-var.west) -- ++(west:1.2ex) |- (#1-var.west);
+
+    
+    \node[below=0.2 of symbols,section,fill=luhblue!30,
+       label={[name=relocs-label]below:\scriptsize Relocations}
+    ] (relocs) {
+      \tikznode[name=#1-reloc]{R\_386\_PC32 fib}
+    };
+
+    \draw[->] (#1-reloc.west) -- ++(west:1.2ex) |- (#1-sym-fib.west);
+    \draw[->] (#1-reloc.east) -- ++(east:1ex) |- (#1-fib.east);
+
+
+    
+    \node[rotate=90,anchor=south,yshift=1ex] at ($(section-data-label)!0.5!(section-text-label)$) (section-label)
+    {\scriptsize Sections};
+
+
+    \node[draw,fit=(section-label) (section-text) (relocs-label),
+         label={[anchor=south west]south west:main.o}
+         ](object-main) {};
+
+}
+
+\tikzset{
+  section/.style={
+    font=\scriptsize\ttfamily,fill=amber!60,align=left,
+    text width=2cm,inner xsep=1em,
+    every node/.style={inner sep=2pt},
+  }
+}
+
+\bgroup
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture]
+    \node[align=left,draw,visible on=<1>] (listing) {
+      \lstinputlisting[mathescape=false]{lst/10-elf-assembler.S}
+    };
+
+    \begin{visible}<2->
+      \mainObject{first}
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\egroup
+
+\bgroup
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture]
+    \node (listing){};
+    \mainObject{second}
+    
+    \node[anchor=north,below=1 of relocs,
+          section,
+          label={[name=section-text-label,rotate=90,anchor=south]west:\scriptsize .text},
+          label={[anchor=north east,inner sep=1pt,xshift=-3pt,fill=srared!40]north east:\scriptsize AX},
+          ] (section2-text) {
+      \tikzmark{fib-def}55 89 e5 .. ..\\
+      e8 \tikznode[text width=1.4cm,draw,fill=srared!20,name=fib-call]{00 00 00 00}\\
+      .. .. .. .. c3
+    };
+
+    \node[below=0.2 of section2-text,section,fill=safegreen!20,
+    ] (symbols2) {
+      \tikznode[name=sym2-fib]{T fib}
+    };
+
+    \node[below=0.2 of symbols2,section,fill=luhblue!30,
+    ] (relocs2) {
+      \tikznode[name=reloc2]{R\_386\_PC32 fib}
+    };
+    
+    \draw[->] (reloc2.west) -- ++(west:1.2ex) |- (sym2-fib.west);
+    \draw[->] (reloc2.east) -- ++(east:1ex) |- (fib-call.east);
+
+    \node[rotate=90,anchor=south,yshift=1ex] at (section-text-label) (section2-label)
+      {\scriptsize Sections};
+    
+    \node[draw,fit=(section2-label) (section2-text) (relocs2),
+         label={[anchor=south west]south west:foo.o}
+         ](object-foo) {};
+
+
+    \begin{visible}<2->
+       \node[right=6 of section-text.north,anchor=north,
+          section,
+          label={[name=section3-text-label,rotate=-90,anchor=south]east:\scriptsize .text},
+          label={[anchor=north east,inner sep=1pt,xshift=-3pt,fill=srared!40]north east:\scriptsize AX},
+          ] (section3-text) {
+      \tikzmark{main-def3}55 89 e5 6a 06\\
+      e8 \tikznode[text width=1.4cm,fill=safegreen!40,name=fib]{05 00 00 00}\\
+      83 c4 04 c9 c3\\
+      \tikzmark{fib-def3}55 89 e5 .. ..\\
+      e8 \tikznode[text width=1.4cm,fill=safegreen!40,name=fib-call]{c3 ff ff ff}\\
+      .. .. .. .. c3
+    };
+
+    \node[below=0.2 of section3-text,
+          section,fill=amber!40,
+          label={[anchor=north east,inner sep=1pt,xshift=-3pt,fill=srared!40]north east:\scriptsize WA},
+          label={[name=section-data-label,rotate=-90,anchor=south]east:\scriptsize .data}] (section3-data) {
+            \tikzmark{var-def3}17 00 00 00
+    };
+
+    \node[below=0.2 of section3-data,section,fill=safegreen!20,
+       label={[name=symbols-label,rotate=-90,anchor=south]east:\scriptsize Symbols}
+    ] (symbols3) {
+      \tikznode[name=sym3-var]{d global\_var}\\
+      \tikznode[name=sym3-fib]{T fib}\\
+      \tikznode[name=sym3-main]{T main}
+    };
+
+    \draw[->] (sym3-main.west) -- ++(west:1.7ex) |- ($(pic cs:main-def3)+(-1pt,2pt)$);
+    \draw[->] (sym3-fib.west) -- ++(west:1.5ex) |- ($(pic cs:fib-def3)+(-1pt,2pt)$);
+    \draw[->] (sym3-var.west) -- ++(west:1.2ex) |- ($(pic cs:var-def3)+(-1pt,2pt)$);
+
+    \draw[->,ultra thick,luhblue] (section-text) --node[above,pos=0.35,yshift=1ex]{\structure{Linker}} (section3-text.west);
+    \draw[->,ultra thick,luhblue] (section2-text) -- ($(section3-text.west)+(down:2ex)$);
+    \draw[->,ultra thick,luhblue] (section-data) -- (section3-data.west);
+
+    \node[below=0.3 of symbols3,font=\scriptsize,align=left,xshift=-1em] (metadata){
+      ELF Header:\\
+      \ \ Class:                             ELF32\\
+      \ \ OS/ABI:                            UNIX - System V\\
+      \ \ Machine:                           Intel 80386\\
+      \ \ Entry point address:               0x1050
+    };
+
+    \node[fit=(metadata) (section3-text) (section3-text-label),draw](main){};
+
+    \node[below=0.2 of main.south west,align=left,anchor=north west,xshift=-2.8cm]{
+      \begin{minipage}{7.2cm}
+        \bii
+        \ii[--] Sektionen einsammeln und kombiniern
+        \ii[--] Relokationen (wenn möglich) auflößen
+        \ii[--] Startadresse wird festgelegt
+        \eii
+      \end{minipage}
+    };
+
+
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\egroup
+\end{document}

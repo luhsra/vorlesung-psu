@@ -795,11 +795,99 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
     \ii<2-> Aber da ist noch mehr\ldots {
       \bi
       \ii \structure{Seperate Übersetzung} ermöglicht inkrementelles neuübersetzen
-      \ii<3-> Der \structure{Loader} bringt die Binärdatei in den Speicher
+      \ii<3-> Der \structure{Loader} bringt die Binärdatei in den Prozessspeicher
       \ii<4-> \structure{Dynamische Bibliotheken} erlauben es Binärcode zu sharen
       \ei
     }
     \ei
+  \end{frame}
+
+
+  \begin{frame}{Das Executable and Linkable Format (ELF)}
+    \bi
+    \ii ELF ist \textbf{das} \structure{Datiformat} für übersetzten Programmcode unter Linux{
+      \bi
+      \ii Objektdateien, Bibliotheken  und Binärprogramme werden als ELF gespeichert
+      \ii Andere Plattformen haben ähnliche Formate: Mach-O (Mac), PE (Windows)
+      \ii Es gibt viele \advantage{Tools} um ELF-Dateien zu inspizieren und zu verarbeiten
+      \ei
+    }\medskip
+    \ii ELFs speichern Code/Daten zusammen mit anderen Meta-Daten{
+      \bi
+      \ii \texttt{readelf -a ELF} liefert eine Übersicht über die Metadaten.
+      \ii Meta-Daten werden im Link-Prozess ergänzt und festgelegt.
+      \ei
+    }
+    \ii Ein ELF beinhaltet zwei Sichten auf Programmdaten {
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \columntitle{Link View}
+        \bii
+        \ii Informationen für den Linker
+        \ii Welche Funktionen werden definiert?
+        \ii Welche Funktionen werden aufgerufen?
+        \ii Nebenbedingungen für das Arrangieren von Code/Daten
+        \eii
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \columntitle{Load View}
+        \bii
+        \ii Informationen für den Loader
+        \ii Welcher Dateiabschnitt gehört an welche virtuelle Speicheradresse?
+        \ii Was wird ausführbar/schreibbar/lesbar?
+        \ii Müssen Bibliotheken  geladen werden?
+        \eii
+      \end{column}
+    \end{columns}
+    }\ei
+  
+  \end{frame}
+
+  \begin{frame}{ELF: Link View}
+    \vspace{-1em}
+    \begin{columns}
+      \begin{column}{0.35\textwidth}
+        \btAnimation[width=\textwidth]{1:<1>,2:<2->}{fig/10-elf-link-view}
+      \end{column}\hfill
+      \begin{column}{0.65\textwidth}
+        \bii
+        \ii Assembler erzeugt Objektdatei im ELF Format{
+          \bi
+          \ii Assembler-Befehle werden zu Maschinencode 
+          \ii Pseudo-Instruktionen steuern die Codeerzeugung
+          \ii Definition und Verwendung symbolischer Namen 
+          \ei
+        }\medskip
+        \ii<2-> \structure{Sektionen} enthalten Daten, Code und Metadaten{%
+          \bi
+          \ii Flags: Allokiert(A), Ausführbar(X), Schreibbar(W)
+          \ii Relative Sprünge (\ircmd{Goto}) bereits aufgelößt
+          \ii Lücken für noch unbekannte Werte
+          \ii Tool: \fbox{\texttt{objdump -D ELF}}
+          \ei
+        }\medskip
+        \ii<2-> \structure{Symbole} geben einzelnen Bytes einen Namen{
+          \bi
+          \ii Symbole in diesem ELF definiert sein (z.B. \texttt{main})
+          \ii Undefinierte Symbole werden noch aufgelößt
+          \ii Tool: \fbox{\texttt{nm ELF}}
+          \ei
+        }\medskip
+        \ii<2-> \structure{Relokationen} sind Modifikationsregeln {
+          \bi
+          \ii Wo muss der Linker den Code modifizeren
+          \ii Bsp.: \texttt{\&fib} wird als PC-relative Adresse eingefügt
+          \ii Tool: \fbox{\texttt{objdump -r ELF}}
+          \ei
+        }
+        \eii
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}{ELF: Was geschieht beim Linken?}
+    \btAnimation[height=0.86\textheight]{center,3:<1>,4:<2->}{fig/10-elf-link-view}
+
   \end{frame}
 #+end_src
 
