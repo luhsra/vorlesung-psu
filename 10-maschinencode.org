@@ -779,7 +779,6 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
 #+end_src
 * Programme und Prozesse
 #+begin_src latex
-  %%ONLY%%
   \dividerframe{Programme und Prozesse}
 
   \begin{frame}{Übersicht des restlichen Übersetzungsvorgang}
@@ -891,3 +890,53 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
   \end{frame}
 #+end_src
 
+https://upload.wikimedia.org/wikipedia/commons/e/e4/ELF_Executable_and_Linkable_Format_diagram_by_Ange_Albertini.png
+
+#+begin_src latex
+  %%ONLY%%
+  \begin{frame}{ELF: Load View}
+    \bi
+    \ii Linker  und Loader haben unterschiedliche Sichten auf die Binärdatei{
+      \bi
+      \ii Der Loader arbeitet mit Segmenten und Bibliotheksreferenzen
+      \ii Der Lade-Prozess soll möglichst schnell und einfach sein
+      \ii Sektionen (und Symbole) werden für den Load View nicht benötigt \hfill \texttt{strip}
+      \ei
+    }\medskip
+    \ii Das Laden geschieht auf Granularität von \structure{Segmenten}{
+      \bi
+      \ii Im ELF:\hspace{1cm}\btSetTab Dateioffset und Länge des Segments
+      \ii Im Prozess: \btUseTab Ziel-Addresse, Länge der Allokation und Zugriffsrechte
+      \ei
+    }\medskip
+    \ii \structure{Shared Libraries} sind ebenfalls ELF Dateien {
+      \bi
+      \ii Symbole können für andere ELF-Dateien exportiert werden
+      \ii ELF Dateien können Bibliotheken und exportiere Symbole anfordern
+      \ii Angeforderte Bibliotheken werden mitgeladen und die Importe aufgelößt
+      \ei
+    }
+    \ei
+
+  
+  \end{frame}
+
+  \begin{frame}[fragile,t]{Was geschieht beim Laden?}
+    \btAnimation[width=\textwidth]{range=1-7:<1->}{fig/10-elf-load-view}
+
+    \begin{code}[tag=Pseudo Code]
+      \begin{py}[style=highlighting]
+        @2elf = ELF("main")@
+        @3AS  = AddressSpace()@
+        for seg in elf.program_headers:
+           va_start = seg.VirtAddr or 0xf0000
+           @4AS[va_start...seg.MemSize ]  = 0@
+           @5AS[va_start...seg.FileSize] = ELF[seg.Offset...seg.FileSize]@
+           @6AS[va_start...seg.MemSize ].setFlags(seg.Flg)@
+        @7os.StartProzess(eip = ELF.EntryPoint, esp=0xf0fff, as=AS)@
+      \end{py}
+    \end{code}
+  
+
+  \end{frame}
+#+end_src

@@ -1,0 +1,162 @@
+\documentclass{lecturefig}
+\begin{document}
+\tikzset{
+  section/.style={
+    font=\scriptsize\ttfamily,fill=amber!40,align=left,
+    text width=2cm,inner xsep=1em,
+    every node/.style={inner sep=2pt},
+  }
+}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \colorlet{colorcode}{srared!50}
+    \colorlet{colorrodata}{luhblue!60}
+    \colorlet{colordata}{safegreen!60}
+    \colorlet{colorstack}{badbee!60}
+    
+    \begin{visible}<-5>
+    \node[section,draw] (section-init) {.init};
+    \node[section,draw,above=-\pgflinewidth of section-init,fill=luhgray!40] (metadata) {ELF Headers};
+    \node[section,draw,below=-\pgflinewidth of section-init] (section-fini)   {.fini};
+    \node[section,draw,below=-\pgflinewidth of section-fini] (section-text)   {.text};
+    \node[section,draw,below=-\pgflinewidth of section-text] (section-rodata) {.rodata};
+    \node[section,draw,below=-\pgflinewidth of section-rodata] (section-data) {.data};
+    \node[section,draw,below=-\pgflinewidth of section-data] (section-bss)    {.bss};
+    \node[section,draw,below=-\pgflinewidth of section-bss] (section-symtab)    {.symtab};
+    \node[section,draw,below=-\pgflinewidth of section-symtab] (section-strtab)    {.strtab};
+    \node[section,draw,below=-\pgflinewidth of section-strtab] (section-reltext)    {.rel.text};
+  \end{visible}
+
+
+
+    \begin{visible}<1>
+      \draw[decorate,decoration={brace,amplitude=5pt}] 
+      (section-reltext.south west)
+      -- node[above,yshift=5pt,sloped] {Sections}
+      (section-init.north west);
+    \end{visible}
+
+    \begin{visible}<2-5>
+      \draw[<-] (section-init.north west) -- ++(west:1em) node[name=first,left]   {\tiny 0x1000};
+      \draw[<-] (section-fini.north west) -- ++(west:1em) node[left]   {\tiny 0x1040};
+      \draw[<-] (section-text.north west) -- ++(west:1em) node[left]   {\tiny 0x1140};
+      \draw[<-] (section-rodata.north west) -- ++(west:1em) node[left] {\tiny 0x2000};
+      \draw[<-] (section-data.north west) -- ++(west:1em) node[left]   {\tiny 0x2150};
+      \draw[<-] (section-bss.north west) -- ++(west:1em)    node[name=A,left]   {\tiny 0x2250};
+      \draw[<-] (section-symtab.north west) -- ++(west:1em) node[name=B,left]   {\tiny 0x2250};
+
+      \node[fit=(A) (B), thick,srared,draw,inner sep=2pt,visible on=<2>] {};
+
+      \node[above=0 of first]{\structure{Offset}};
+
+    \end{visible}
+
+    
+  
+
+
+ 
+
+
+
+   \begin{visible}<2-6>
+    \matrix[matrix of nodes,right=of section-bss.north east,anchor=north west,
+            every node/.style={font=\scriptsize,inner sep=2pt},
+           ] (segments){
+      Type                    & Offset  & VirtAddr & FileSiz & MemSiz & Flg            \\
+      |[ onslide=<4->{fill=colorcode}]|LOAD   & 0x1000 & 0x20000   & 0x300   & 0x300  & R\hphantom{E}E \\
+      |[onslide=<4->{fill=colorrodata}]|LOAD & 0x2000 & 0x21000   & 0x150   & 0x150  & R\hphantom{WE} \\
+      |[onslide=<4->{fill=colordata}]|LOAD   & 0x2150 & 0x40150   & |[name=A]|0x100   & |[name=B]|0x200  & RW\hphantom{E} \\
+      |[onslide=<4->{fill=colorstack}]|STACK & 0x0000 & 0x00000   & 0x000   & 0xfff  & RW            \\
+    };
+    \node[fit=(A) (B), thick,srared,draw,inner sep=2pt,visible on=<2>] {};
+    \node[fit=(segments-1-3) (segments-5-3), thick,srared,draw,inner sep=2pt,visible on=<4>] {};
+    \node[fit=(segments-1-5) (segments-5-5), thick,srared,draw,inner sep=2pt,visible on=<4>] {};
+    \node[fit=(segments-1-2) (segments-5-2), thick,srared,draw,inner sep=2pt,visible on=<5>] {};
+    \node[fit=(segments-1-4) (segments-5-4), thick,srared,draw,inner sep=2pt,visible on=<5>] {};
+    \node[fit=(segments-1-6) (segments-5-6), thick,srared,draw,inner sep=2pt,visible on=<6>] {};
+  \end{visible}
+  \begin{visible}<2-3>
+      \draw[decorate,decoration={brace,amplitude=5pt}] 
+       (segments.north west)
+          -- node[above,yshift=5pt,sloped] {Segmente}
+          (segments.north east);
+  \end{visible}
+
+  \begin{visible}<4-5>
+    \draw[fill=colorcode] (section-init.north east)++(down:0.5\pgflinewidth)    rectangle ($(section-text.south east)+(west:1ex)$);
+    \draw[fill=colorrodata] (section-rodata.north east) rectangle ($(section-rodata.south east)+(west:1ex)$);
+    \draw[fill=colordata] (section-data.north east) rectangle ($(section-bss.south east)+(west:1ex)$);
+  \end{visible}
+
+
+
+  \begin{visible}<4->
+
+  \begin{scope}[every node/.style={minimum width=3em, minimum height=2em}]
+    \node[fill=colorcode!50,   minimum width=3em,right=of section-fini]  (mem-code) {};
+    \node[fill=colorrodata!50,   minimum width=3em,right=0 of mem-code]     (mem-rodata) {};
+    \node[fill=colordata!50, minimum width=3em,right=1 of mem-rodata] (mem-data) {};
+    \node[fill=colorstack, minimum width=3em,right=1 of mem-data] (mem-stack) {};
+  \end{scope}
+
+  \begin{visible}<4-5>
+    \draw[<-] (mem-code.north west) --++(up:1em)   node[above]{\tiny 0x20000};
+    \draw[<-] (mem-rodata.north west) --++(up:1em) node[above]{\tiny 0x21000};
+    \draw[<-] (mem-data.north west) --++(up:1em)   node[above]{\tiny 0x40000};
+    \draw[<-] (mem-stack.north west) --++(up:1em)  node[above]{\tiny 0xf0000};
+  \end{visible}
+
+    
+  \end{visible}
+
+
+  \begin{scope}[every node/.style={height as=mem-code},visible on=<5->]
+    \node[fill=colorcode,    minimum width=3ex,  right=0 of mem-code.west]       (load-code) {};
+    \node[fill=colorrodata,  minimum width=1.5ex,right=0 of mem-rodata.west]   (load-rodata) {};
+    \node[fill=colordata,    minimum width=2ex,  right=1.5ex of mem-data.west] (load-data) {};
+
+  \end{scope}
+
+  \begin{visible}<5>
+      \draw[<-] (load-code.south) -- ++(down:1ex) coordinate(@) -- (@-|section-text.east);
+    \draw[<-] (load-rodata.south) -- ++(down:2.5ex) coordinate(@) -- (@-|section-text.east);
+    \draw[<-] (load-data.south) -- ++(down:5ex) coordinate(@) -- (@-|section-text.east);
+  \end{visible}
+
+  \begin{visible}<3->
+    \node[draw,inner sep=0pt, inner xsep=1em, fit=(mem-code) (mem-stack)](mem){};
+  \end{visible}
+  \begin{visible}<3>
+    \draw[decorate,decoration={brace,amplitude=5pt}] 
+    (mem.north west)
+    -- node[above,yshift=5pt,sloped] {Adressraum des Prozesses}
+    (mem.north east);
+  \end{visible}
+
+
+
+  \begin{visible}<6>
+    \def\Flag#1#2{
+    \draw[decorate,decoration={brace,amplitude=5pt}] 
+    (#1.north west)
+    -- node[above,yshift=5pt,sloped] {\tiny #2}
+    (#1.north east);
+  }
+  \Flag{mem-code}{RE}
+  \Flag{mem-rodata}{R}
+  \Flag{mem-data}{RW}
+  \Flag{mem-stack}{RW}
+  \end{visible}
+
+  
+  \begin{visible}<7>
+    \draw[<-] (mem-code.south west)++(east:1ex)  --++(down:1em)   node[below,anchor=north east,xshift=2ex]{\scriptsize Entry Point $\rightarrow$ \%eip};
+    \draw[<-] (mem-stack.south east) --++(down:2ex)   node[below]{\scriptsize \%esp};
+  \end{visible}
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
