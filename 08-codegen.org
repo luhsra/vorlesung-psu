@@ -55,7 +55,7 @@
     \ei
   \end{frame}
 
-  \begin{frame}{Einordnung in den Übersetzerbau}
+  \begin{frame}<handout:3>{Einordnung in den Übersetzerbau}
     \btAnimation[width=\textwidth]{1:<-2>,2:<3>}{fig/08-retargable-compiler}%
     \footnote{Zahlen für Clang (C/C++ Frontend, 700k) und LLVM 9.0 (18 Backends, 1.4M)}
 
@@ -77,11 +77,95 @@
   \end{frame}
 #+end_src
 
+Nachdem wir uns in den letzten zwei Vorlesungen wieder mit Elementen von Programmiersprachen beschäftigt haben, wollen wir uns in dieser, und den nächsten beiden, Vorlesungen anschauenen, wie wir Objekte und Operationen auf die reale Maschine abbilden.
+Letztendlich werden wir durch diese Abbildung die verbleibende *Semantische Lücke* zum Maschinencode hin schließen.
+Ausgangspunkt dieser Abbildung ist der abstrakte Syntaxbaum, Endpunkt ist eine Programmdatei welche wir zur Ausführung bringen.
+Wir befinden uns in den nächsten drei Vorlesungen wieder im Übersetzer, wo wir "von unten" auf die Sprachsemantik blicken und diese "nach unten" auf die Hardware abbilden.
+Dazu werden wir einige Konzepte und Techniken kennen lernen, die es uns erlauben einen übersichtlichen Übersetzer zu konstruieren, sowie effiziente Programme zu erzeugen.
+Wollen wir also Beginnen.
+
+
+Der abstrakte Syntaxbaum ist eine hierarchische Darstellung des Programms, welche wir im Parser erzeugt und in der semantischen Analyse auf Validität hin geprüft haben.
+Allerdings kennt keine unserer echten Maschinen hierarchische Befehle, sondern am Ende sind alle real-existierenden CPUs sequentielle Maschinen, die einen Befehl nach dem anderen (entlang des Kontrollflusses) ausführen.
+Wir müssen die hierarchische Struktur des ASTs *linearisieren*, um sie die sequentielle Semantik der Maschinen abzubilden.
+
+Während Übersetzer in der Frühzeit der Informatik aus dem AST direkt Maschinencode erzeugt haben, hat sich gezeigt, dass ein zusätzlicher Zwischenschritt, in Form von *Zwischencode*, fruchtbar ist.
+Er erlaubt es Übersetzer einfacher zu strukturieren, Optimierungen leichter durchzuführen und Komponenten des Übersetzers für verschiedene Programmiersprachen und Zielplattformen wieder zu verwenden.
+Dieser Zwischencode, in den wir das Programm übersetzen, ist der Maschinencode einer virtuellen Maschine, die wir einzig und allein zu diesem Zecke definieren.
+
+Den Aspekt der Wiederverwendbarkeit von Übersetzerkomponenten möchte ich an dieser Stelle besonders herausstellen:
+Zwar ist es möglich für jede neue Programmiersprache, die man sich erdenkt, auf der grünen Wiese einen neuen Übersetzer anzufangen, jedoch würde ich es Ihnen nicht raten. 
+Denn, Übersetzer sind komplexe Programme und die Anwender möchten beständig neue Sprach-Features, effizientere Programme und Support für ihren Lieblingsprozessor.
+Ganz selbstverständlich, quasi nebenbei, soll Ihr Übersetzer natürlich auch immer korrekt funktionieren und die versprochene Sprachsemantik eins zu eins einhalten.
+Und wehe, wenn ein Anwender eine Besonderheit in ihrer Implementierung (=Bug) gefunden hat und sich, für sein Mission-Critical Programm, darauf verlässt.
+Kurzum, eigentlich wollen Sie keinen ganzen Übersetzer schreiben, sondern nur an den Teilen arbeiten für die Sie sich begeistern, den ihre Kunden ihnen bezahlen; der Rest darf von der Stange kommen.
+
+Um nicht für jede Kombination auf Frontend-Sprache und Backend-Platform einen ganzen Übersetzer konstruieren zu müssen, hat der Zwischencode eine zentrale *Scharnierfunktion*.
+Jedes Sprach-Frontend hat seinen eigenen Parser und prüft die Sprachregeln ganz nach der intendierten Facón, generiert aber am Ende Zwischenrepresentation des Programms als Zwischencode.
+Hierbei ist zu betonen, dass die ASTs der einzelnen Frontends auch schon Zwischenrepresentationen sind, die Semantik des Programms einfangen, aber diese sind nicht kompatibel zueinander.
+Erst mit der *Zwischencode-Erzeugung* kommen wir zu einer Zwischenrepresentation (oder "Immediate Representation"), die einer einheitlichen Sprache entspricht.
+
+Auf diesem IR-Code, der Befehle für eine wohldefinierte virtuelle Maschine enthält, können wir Semantik-erhaltende Optimierungen durchführen, bevor wir das Programm an die Plattformabhängigen Backends geben. Dort werden die Befehle der IR-Maschine auf Befehle des jeweiligen Backends abgebildet.
+
+Ein Übersetzer, der diesem Prinzip als Kerngedanke mit sich trägt, ist die Kombination aus *Clang und LLVM*.
+Clang ist das Sprachfrontend für C und C++.
+Es generiert LLVM IR-Code generiert und hat insgesamt einen Umfang von ungefähr 700.000 Zeilen C++ Code.
+Jedoch gibt es noch andere Frontends, die ebenfalls LLVM IR erzeugen:
+Das Frontend für Go hat 91k Codezeilen und für Rust sind es 382k Codezeilen.
+Hätten wir für jede dieser Sprachen die 1.4M Codezeilen neu entwickelt, so würden wir jetzt auf einem Berg von 5.4M Codezeilen sitzen anstatt jetzt 2.6M.
+Natürlich hätten wir, auf dem Weg, im selben Maße mehr Bugs erzeugt und Entwicklerstunden verbraten.
+Zwischencode spart also nicht nur Geld, sondern auch Nerven, und ermöglicht schnelle Fortschritte bei der Entwicklung neuer Programmiersprachen zu machen.
+
+Um ihnen einen Eindruck über den LLVM  IR-Code zu geben, zeige ich ihnen kurz den IR-Code für einen rekursiven Fibonacci:
+
+#+begin_example
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @fib(i32) #0 {
+  %2 = alloca i32, align 4
+  %3 = alloca i32, align 4
+  store i32 %0, i32* %3, align 4
+  %4 = load i32, i32* %3, align 4
+  %5 = icmp sle i32 %4, 1
+  br i1 %5, label %6, label %7
+
+; <label>:6:                                      ; preds = %1
+  store i32 1, i32* %2, align 4
+  br label %15
+
+; <label>:7:                                      ; preds = %1
+  %8 = load i32, i32* %3, align 4
+  %9 = sub nsw i32 %8, 1
+  %10 = call i32 @fib(i32 %9)
+  %11 = load i32, i32* %3, align 4
+  %12 = sub nsw i32 %11, 2
+  %13 = call i32 @fib(i32 %12)
+  %14 = add nsw i32 %10, %13
+  store i32 %14, i32* %2, align 4
+  br label %15
+
+; <label>:15:                                     ; preds = %7, %6
+  %16 = load i32, i32* %2, align 4
+  ret i32 %16
+}
+#+end_example
+
 * Virtuelle Maschinen für Zwischencode
+:PROPERTIES:
+:CUSTOM_ID: 08-ir-code-definition
+:END:
+
+Um die Übersetzung vom AST in IR-Code vorzunehmen, müssen wir zunächst die virtuelle Maschine definieren, für die wir die Codeerzeugung durchführen wollen.
+Eine solche IR-Maschine zu definieren ist mehr eine Kunst als eine exakte Wissenschaft.
+Unterschiedliche Maschinenen-Typen und -Ausprägungen eigenen sich für manche Arten der Optimierungen besser als andere (und umgekehrt).
+Auch ist das Abstraktions-Niveau, welches man der IR-Code noch bietet eine Design-Entscheidung, die Einfluss auf die Komplexität des Übersetzers hat.
+Daher bedienen sich manche Übersetzer nicht nur einer IR-Maschine, sondern sie haben mehrerere virtuelle Maschinen, die sukkzessive weniger Abstraktionen bieten.
+So hat der Rust Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch eine [[https://blog.rust-lang.org/2016/04/19/MIR.html][High-Level IR (HIR) und eine Mid-Level IR]].
+
 #+begin_src latex
   \dividerframe{Virtuelle Maschinen\\für die\\Zwischencodeereugung}
 
   \begin{frame}[fragile,t]{Virtuelle Stack- und Register-Maschinen}
+    \vspace{-1em}
     \begin{center}
       \begin{tikzpicture}
         \node[operation,rectangle] {+}
@@ -101,14 +185,14 @@
         \eii
 
         \begin{code}
-          \begin{onlyenv}<1>
+          \begin{onlyenv}<handout:1|1>
           \begin{codetext}
             push 3
             push 4
             add     // = push(pop() + pop())
           \end{codetext}
           \end{onlyenv}
-          \begin{onlyenv}<2->
+          \begin{onlyenv}<handout:2-|2->
           \begin{codetext}
             // code(Op1) ->  1 Element am Stack
             // code(Op2) ->  1 Element am Stack
@@ -126,14 +210,14 @@
         \ii Beliebig viele Register
         \eii
         \begin{code}[]
-          \begin{onlyenv}<1>
+          \begin{onlyenv}<handout:1|1>
           \begin{codetext}
             r0 = 3
             r1 = 4
             r2 = add r1, r2
           \end{codetext}
           \end{onlyenv}
-          \begin{onlyenv}<2->
+          \begin{onlyenv}<handout:2-|2->
           \begin{codetext}
             // r1 = code(Op1)
             // r2 = code(Op2)
@@ -145,7 +229,7 @@
     \end{columns}
 
     \bigskip
-    \uncover<3->{$\Rightarrow$ Codeerzeugung für Stack- und Register-Maschinen sieht ähnlich aus.}
+    \uncover<handout:2-|3->{$\Rightarrow$ Codeerzeugung für Stack- und Register-Maschinen sieht ähnlich aus.}
   \end{frame}
 
   \begin{frame}{Design-Kriterien für Virtuelle Maschinen}
@@ -177,6 +261,27 @@
 
 
 #+end_src
+
+Grundlegend gibt es zwei Arten von Maschinene-Typen, die für IR-Maschinenen heran gezogen werden: Stack-Maschinen und Register-Maschinen. Beide Typen von Maschinen sind (natürlich) gleich mächtig, haben jedoch ein grundlegend andere virtuelle Architektur. 
+
+Bei der *Stack-Maschine* ist der zentrale Ort der Berechnung ein Operandenstack.
+Jeder Befehl verwendet diesen Operandenstack als impliziten Parameter. So legt ~push~ den angegebenen Wert auf den Stack; ~add~ nimmt die obersten beiden Elemente vom Stack, addiert sie, und legt das Ergebnis auf den Stack. Eine Stack-Maschine ist daher ähnlich zur umgekehrten Polnischen Notation (~3 4 +~), bei der die selbe Auswertungsmethode angewendet wird.
+Durch den Operandenstack ist der Datenfluss, inbesondere langen Operationssequenzen, nicht mehr offensichtlich, da wir im Programmtext keinen Hinweis darauf finden wo ein Operand herkommt. Wir müssten, beim Betrachten solcher IR-Programme, immer den Operandenstack im Kopf mitdenken. Dazu habe ich keine Lust und ich lehne Stack-Maschinen daher ab[fn::Zur Ehrenrettung von Stack-Maschinen ist aber zu sagen, dass sie für den Übersetzerbau eine wundervolle Eigenschaft haben: Reine Stack-Maschinen-Programme sind automatisch in SSA Form.].
+
+Das prominenteste Beispiel für eine Stack-Maschine als Zwischenrepresentation ist die Java Virtual Maschine, deren IR-Code (der Java-Byte-Code) genau nach diesem Muster funktioniert. Die Zwischenrepresentation von .NET verwendet, mit der Common Interpreter Language (CIL), ebenfalls eine Stack-basierte Zwischensprache.
+In beiden Fällen wir der IR-Code allerdings nicht hauptsächlich als Eingabe für ein Übersetzerbackend verwendet, sondern als Eingabeformat für eine interpretierte und Just-in-Time übersetzte Ausführung.
+
+Der andere Typus von IR-Maschinen sind die *Register-Maschinen*.
+Dort sind alle Operanden, sowohl Quell- als auch Zieloperanden, explizit an den Operationen vermerkt und sichtbar.
+Im Unterschied zu den real-existierenden Register-Maschinen nehmen wir allerdings an, dass es nicht nur eine begrenzte Anzahl von Registern gibt, sondern unendlich viele.
+Mit dieser Annahme von unendlich vielen Register verhindern wir, dass wir uns zu früh auf eine konkrete Zielplattform fest legen. Stellen Sie sich vor, wir hätten gesagt, unsere Maschine hat genau 16 Register und am Ende hat die Zielplattform dann 32 oder 8 Register; in beiden Fällen müssten wir das Programm umstrukturieren um eine Abbildung vorzunehmen.
+
+Da die Register nur virtuell sind, können wir ihnen auch symbolische Namen geben (~arg0_a~), anstatt Nummern (~r23~) zu verwenden.
+Auf diese Weise wird der IR-Code für uns lesbarer, während es für den Übersetzer (beinahe) keinen Unterschied machen.
+Die virtuellen Register sind also sehr ähnlich zu Variablen, weswegen ich auch, im Folgenden, IR-Register und IR-Variablen als austauschbare Begriffe verwende.
+
+Die Codeerzegugung für beide Maschinen-Typen sieht sehr ähnlich aus.
+Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebnis auf dem Stack liegen, bei Register-Maschinen wird das Ergebnis in ein explizit benanntes Register geschrieben.
 
 #+begin_src latex
 \begin{frame}{3-Address Code (Quadrupel-Notation) }

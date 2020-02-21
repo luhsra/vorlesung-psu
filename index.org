@@ -11,7 +11,6 @@
 {{{topic(./05-semantische-analyse.org,fig/05-stamp.png)}}}
 {{{topic(./06-objekte.org,fig/06-stamp.png)}}}
 {{{topic(./07-operationen.org,fig/07-stamp.png)}}}
-* COMMENT Not yet written
 {{{topic(./08-codegen.org,fig/08-stamp.png)}}}
 {{{topic(./09-optimierung.org,fig/09-stamp.png)}}}
 {{{topic(./10-maschinencode.org,fig/10-stamp.png)}}}

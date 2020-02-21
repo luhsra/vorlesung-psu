@@ -79,7 +79,7 @@ $(1).handout.html.view:  build/html/$(2).handout.html
 $(1).all:             $(1).html $(1).handout $(1).handout.html
 
 $(1).wc:
-	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_src/ {p=0}; {if(p) print};  /#\+end_src/ {p=1}' < $(2).org | wc -w
+	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_(example|src)/ {p=0}; {if(p) print};  /#\+end_(example|src)/ {p=1}' < $(2).org | wc -w
 $(1).publish:   build/html/index.html $(1).all
 	cd build/html; rsync -aLv  ./index.html ./img ./css ./js ./lst ./fig ./$(2)* ${REMOTE}
 fig/$(1)-stamp.png: ${$(1)_stamp}
@@ -89,7 +89,7 @@ endef
 
 # Wordcount
 wc:
-	@make -s 01.wc 02.wc 03.wc 04.wc 05.wc 06.wc 07.wc | tr "\n" " " | dc -f - -e '[+z1<r]srz1<rp'
+	@make -s 01.wc 02.wc 03.wc 04.wc 05.wc 06.wc 07.wc 08.wc 09.wc 10.wc| tr "\n" " " | dc -f - -e '[+z1<r]srz1<rp'
 
 %.view:
 	xdg-open $< &
