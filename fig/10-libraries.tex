@@ -1,0 +1,54 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[library/.style={
+      rectangle split,rectangle split parts=4,text width=3cm,draw,
+      font=\scriptsize
+    }]
+    \node[library] (main){
+      main
+      \nodepart{two}
+      \structure{Needed Libraries}\\
+      liblockfile.so.1
+      \nodepart{three}
+      \structure{Exports}:\\
+      --
+      \nodepart{four}
+      \structure{Imports}:\\
+      lockfile\_create\\
+      lockfile\_remove
+    };
+
+    \node[library,right=of main.north east,anchor=north west] (lockfile){
+      liblockfile.so.1
+      \nodepart{two}
+      \structure{Needed Libraries}\\
+      libc.so.6
+      \nodepart{three}
+      \structure{Exports}:\\
+      lockfile\_create\\
+      lockfile\_check\\
+      lockfile\_remove
+      \nodepart{four}
+      \structure{Imports}:\\
+      open\\
+      unlink
+    };
+
+    \node[library,right=of lockfile.north east,anchor=north west] (libc){
+      libc.so.6
+      \nodepart{two}
+      \structure{Needed Libraries}\\
+      --
+      \nodepart{three}
+      \structure{Exports}:\\
+      open\\
+      unlink\\
+      printf
+      \nodepart{four}
+      \structure{Imports}:\\
+      --
+      };
+  \end{tikzpicture}
+\end{frame}
+\end{document}
