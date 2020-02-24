@@ -281,7 +281,8 @@ Auf diese Weise wird der IR-Code für uns lesbarer, während es für den Überse
 Die virtuellen Register sind also sehr ähnlich zu Variablen, weswegen ich auch, im Folgenden, IR-Register und IR-Variablen als austauschbare Begriffe verwende.
 
 Die Codeerzegugung für beide Maschinen-Typen sieht sehr ähnlich aus.
-Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebnis auf dem Stack liegen, bei Register-Maschinen wird das Ergebnis in ein explizit benanntes Register geschrieben.
+Führen wir bei der Stack-Maschine einen AST-Unterbäumen aus, so beläßt die Berechung ihr Ergebnis auf dem Stack liegen.
+Bei Register-Maschinen wird das Ergebnis in ein explizit benanntes Register geschrieben und von anderen Befehlen weiter verarbeitet.
 
 #+begin_src latex
 \begin{frame}{3-Address Code (Quadrupel-Notation) }
@@ -300,7 +301,7 @@ Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebni
         \bi
         \ii \structure{Variablen/temporäre Register} halten ein Maschinenwort
         \ii \structure{Literale} als konstante Operanden
-        \ii \structure{Label} dressieren andere Operationen
+        \ii \structure{Sprungmarke} adressieren andere Operationen
         \ei
       }
       \ei
@@ -313,13 +314,22 @@ Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebni
     }
     \ei
     \begin{btBlock}[type=example]{Beispiel: \texttt{if ((*a) <= (4 + b)) ...}}\ttfamily
-      t1 := \ircmd{Load} a\\
+      t1 := \ircmd{Load} *a\\
       t2 := \ircmd{Add} 4, b\\
       t3 := \ircmd{LessEqual} t1, t2\\
       \ircmd{IfGoto} t3, .BB1, .BB2
     \end{btBlock}
   \end{frame}
 #+end_src
+
+Für unsere Register-Maschine wählen wir eine *3-Adress-Maschine*, deren Programme wir in *Quadrupel-Notation* aufschreiben.
+Dies bedeutet, dass jeder Befehl einen Operations-Code und maximal drei Operanden adressieren kann.
+Dadurch, dass wir 3 Operanden benennen können, kann eine solche Maschine eine zwei-stellige Operation (wie ~Add~) auszuführen ohne einen ihrerer Quelloperanden als impliziten Zieloperanden zu verwenden.
+
+Die Operanden können dabei virtuelle Register (== Variablen), literale Konstanten oder Sprungmarken (Labels) sein. Hervorzuheben ist, dass alle Werte eine feste Maschinenwort-Breite haben; ein weiterer Schritt bei der Annäherung an die Funktionalität einer echten Maschine.
+
+Weiterhin beherrscht eine solche 3-Adress Maschine keine Schleifen oder Bedingungen, sondern ausschließlich *bedingte und unbedingte Sprünge*. Diese Beschränkung auf 2 Kontrollfluss-Operationen passt hervorragend auf die Struktur eines Kontrollflussgraph.
+Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC Prozessoren funktionieren, die für einfache Operationen ebenfalls 3 Register als Operanden haben.
 
 #+begin_src latex
   \begin{frame}{Für PSÜ: Ein beispielhafter Zwischencode}
@@ -354,7 +364,7 @@ Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebni
     \bi
     \ii Einfache \structure{Operationen} (6 Befehle) {
       \bi
-      \ii \ircmd{Assign}: Einer Variable einen Wert zuweisen \hfill\texttt{V := \ircmd{Assign} b}
+      \ii \ircmd{Assign}: Einer Variable einen Wert zuweisen \hfill\texttt{V := \ircmd{Assign} CV}
       \ii 4 arithmetrische Operationen: \ircmd{Add}, \ircmd{Sub}, \ircmd{Mul}, \ircmd{Div}  \hfill\texttt{V := \ircmd{Add} CV, CV}
       \ii 1 logische Operation: \ircmd{LessEqual} \hfill\texttt{V := \ircmd{LessEqual} CV, CV}\\
           Falsch: \enquote{0}, Wahr: \enquote{!= 0}
@@ -367,8 +377,8 @@ Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebni
     \bi
     \ii \structure{Speichermanipulationen} (3 Befehle) {
       \bi
-      \ii \ircmd{Ref}: \hspace{1.2em}\btSetTab Erzeugen einer Referenz          \hfill\texttt{V := \ircmd{Ref} LV}
-      \ii \ircmd{Load}: \btUseTab Lesen des addressierten Speicherwortes        \hfill\texttt{V := \ircmd{Load} V}
+      \ii \ircmd{Ref}: \hspace{1.2em}\btSetTab Erzeugen einer Referenz          \hfill\texttt{V := \ircmd{Ref} V}
+      \ii \ircmd{Load}: \btUseTab Lesen des addressierten Speicherwortes        \hfill\texttt{V := \ircmd{Load} *V}
       \ii \ircmd{Store}: \btUseTab Schreiben eines Wertes an ein Speicherstelle \hfill\texttt{*V := Store CV}
       \ei
     }\medskip
@@ -387,20 +397,89 @@ Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebni
     }\medskip
     \ii \structure{Interprozedurale Kontrollflüsse} (2 Befehle) {
       \bi
-      \ii \ircmd{Call}: Funktionsaufruf mit beliebig vielen Argumenten \hfill\texttt{\ircmd{Call} LV, [CV]*}
+      \ii \ircmd{Call}: Funktionsaufruf mit beliebig vielen Argumenten \hfill\texttt{\ircmd{Call} L, [CV]*}
       \ii \ircmd{Return}: Rückkehr aus einer Funktionsinstanz \hfill\texttt{\ircmd{Return} CV}
       \ei
     }
     \ei
   \end{frame}
+#+end_src
 
+Um uns die Codeerzeugung im Detail anschauen zu können, wollen wir nun eine *beispielhafte* 3-Address-Maschine mit zugehörigem Zwischencode definieren.
+Dabei der Funktionsumfang dieser Maschine nicht vollumfänglich, sodass jede beliebige Programmiersprache darauf abgebildet werden kann.
+Insbesondere ist der Umfang der arithmetrischen, logischen und  bit-weisen Operationen sehr eingeschränkt.
+
+Zweck dieser IR-Code-Beschreibung ist es eine Grundlage für die darauf folgende IR-Code-Erzeugung zu legen.
+Weiterhin werden wir genau diesen in der Übung verwenden um ein vollständiges Backend, inklusive einem einfachen Optimierer, zu konstruieren.
+
+Grundlegend ist, wie gesagt, unsere IR-Code-Maschine eine Register-Maschine mit unendlich vielen Registern, die wir im folgenden auch Variablen nennen.
+Alle Variablen, sowie angegebene Konstanten, sind 32 Bit breit und die Maschine kennt keinerlei Art von Typisierung.
+Es wird Sie also niemand davon abhalten das Ergebnis von ~100 * 200~ im Speicher zu dereferenzieren oder dort eine ~23~ hin zu schreiben.
+Auf Ebene des IR-Codes gibt es kein Safety-Netz und wir können uns beliebig in den Fuß schießen.
+Genau wie auf einer echten Maschine.
+
+
+Bei den Operanden-Typen haben wir die bereits genannten:
+Konstanten (C), Variablen (V) und Label (L).
+Auf den Folien sehen Sie bei jeder Operation von welchem Typ die Operanden sein dürfen.
+So darf bei der Zuweisungs-Operation (~Assign~) auf der rechten Seite entweder eine Konstante *oder* eine Variable, auf der linken Seite aber nur eine Variable, stehen.
+Der Zuweisungs-Operator verändert ausschließlich die explizit angegebene Variable und es wird keine weitere Adressberechnung durchgeführt.
+
+Bei den Variablen ist ebenfalls wichtig, dass unsere Maschine nur funktion-lokale Variablen kennt.
+Aus dem vorangegangenen Satz lernen wir 2 Dinge:
+
+1. Es gibt keine globalen Variablen![fn::Diese Einschränkung macht unseren IR-Code ungeeignet als Zielplattform für C zu dienen. Jedoch macht es Optimierung und Backend deutlich einfacher, da nicht an jeder Stelle unterschieden werden muss, ob wir gerade eine lokale oder eine globale Variable vor uns haben.]
+2. Es gibt Funktionen!
+
+
+Insbesondere der zweite Punkt ist bemerkenswert, da Funktionen ja eigentlich ein starke Abstraktion ist, die normale Prozessoren so nicht kennen.
+Die Entscheidung diesen Teil des IR-Codes auf einer höheren Abstraktionsstufe zu belassen, ist eine sehr bewusste:
+Wir müssen uns an dieser Stelle noch keine Gedanken darum machen, wo unsere lokalen Variablen gespeichert werden, wie wir an unsere Parameter kommen oder wie genau man eine Funktion am Ende aufruft.
+Außerdem können wir jede Funktion für sich übersetzen, optimieren und zu Maschinencode überführen.
+Sie können sich die IR-Funktionen und ihre Funktionsaufrufe wie ein Hochsprachen-Gerüst vorstellen, welches wir mit Befehlen von deutlich niedrigerem Abstraktionsgrad füllen.
+
+Bei den *einfachen Befehlen* beschränken wir uns auf die 4 Grundrechenarten und lassen alle Bit-Weisen Operationen aus. Zwar könnten wir all diese ebenfalls in den Funktionsumfang aufnehmen, würden dadurch jedoch nur wenig Erkenntnis gewinnen, außer dass man an allen Stellen nicht nur zwischen 4 Operationen, sonder zwischen 45 Operationen unterscheiden muss. Zu gunsten der Übersichtlichkeit bleiben wir hier, absichtlich, unvollständig.
+
+Bei den *logischen Operationen* beschränken wir uns auf das Kleiner-Gleich (~<=~).
+Dies ist tatsächlich keine Einschränkung, da alle anderen Vergleichsoperationen daraus abgeleitet werden können.
+So kann man ein ~a == b~ zu einem ~(a <= b) * (b <= a)~ umformen.
+Die Multiplikation übernimmt an dieser Stelle die Aufgabe des logischen UNDs.
+Auf unserer Maschine sind Wahrheitswerte ~0~ (falsch) oder ~!=0~ (wahr).
+
+Neben der Möglichkeit Werte in Variablen zu schreiben, hat unsere Maschine Befehle zur *Speichermanipulation*:K
+Sie kann Zeiger auf Variablen mit dem ~Ref~-Befehl erzeugen und in einer Ziel-Variable ablegen.
+Der Zeiger-indirekter Zugriff erfolgt dann über den ~Load~ und den ~Store~-Befehl, welche jeweils das adressierte Wort lesen bzw. schreiben.
+Die Sternchen an beiden Operationen sind reine Notation und Zierde und sollen uns nur anzeigen, welche der beiden Variablen der Zeiger und welche Ziel- bzw. Quellvariable sind.
+
+Bezüglich der Speichermodells definieren wir, dass unsere Maschine einen Wort-Adressierten Speicher hat.
+Es ist einem IR-Programm auch erlaubt einen Zeiger mittels Zeigerarithmetik zu manipulieren, jedoch muss der Zeiger immer innerhalb der Grenzen des gleichen Objekts bleiben.
+Dies bedeutet auch, dass eine Referenz auf eine Variable niemals verändert werden kann, da die Variable ja nur ein Wort breit ist.
+Ausschließlich Zeiger auf dynamisch angeforderten Speicher können wohldefiniert verändert werden.
+
+Für das *Speichermanagement* stellen wir drei Befehle zur Verfügung um Objekte dynamisch anzulegen:
+Mit dem ~StackAlloc~ Befehl kann ein Funktions-lokales Objekt mit der angegebenen Größe (in Worten) im Call-Frame allokiert werden.
+Der Rückgabewert von ~StackAlloc~ ist ein Zeiger auf das erste Wort des neuen Objekts.
+Funktions-lokale Objekte werden automatisch mit dem Verlassen der aktuellen Funktionsinstanz verworfen.
+Anders sieht es mit Heap-allokierten Objekten aus, die mittels ~HeapAlloc~ erstellt und explizit mit ~HeapFree~ wieder frei gegeben werden müssen.
+Zu beachten ist hier auch, dass die Größen der allokierten Objekte als Konstanten angegeben werden müssen.
+
+Für die Funktions-lokalen Kontrollflüsse haben wir ~Goto~ (mit einem Label) und ~IfGoto~ (mit einer Bedingung und zwei Labeln).
+Beide Befehle leiten den eingehenden Kontrollfluss sicher an eines der angegeben Ziele um und es gibt kein implizites Durchfallen zum nächsten Befehl.
+Die Bedingung von ~IfGoto~ wird als Wahrheitswert (~0~ oder ~!= 0~) ausgewertet und bei wahr wird das erste Label, bei falsch das zweite Label angesprungen.
+
+Für den interprozeduralen Kontrollfluss gibt es ~Call~ und ~Return~. Wie bereits gesagt, bleiben beide Befehle auf einem hohen Abstraktionsniveau und ~Call~ bricht sogar das 3-Adress-Modell, da es beliebig viele Argumente transportieren kann.
+
+
+Insgesamt hat unsere IR-Maschine 16 Befehle. Also eher übersichtlich. 
+
+#+begin_src latex
   \begin{frame}[fragile]{Für PSÜ: Ein Beispielhafter Zwischencode (3)}
     \bi
     \ii \structure{Basisblöcke} {
       \bi
       \ii Geordnete Liste von Operationen
       \ii Jeder Basisblock hat ein (funktions-lokal) eindeutiges Label  \hfill{\texttt{.BB0}},\ldots
-      \ii Der letzte Befehl eines Basisblocks muss ein \ircmd{Goto} oder \ircmd{IfGoto} sein.
+      \ii Der letzte Befehl muss ein \ircmd{Goto}, \ircmd{IfGoto}, oder \ircmd{Return} sein.
       \ii[$\Rightarrow$] Maximale Basisblöcke
       \ei
 
@@ -425,7 +504,6 @@ Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebni
               def __init__(self, label):
                   self.label = label
                   self.instructions = []
-                  self.successors = []
         \end{py}
         \end{code}
       \end{column}\hfill
@@ -484,7 +562,22 @@ Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebni
   \end{frame}
 #+end_src
 
-* Codeerzeugung für Zwischencode
+Unser Programm strukturieren wir in Funktionen, die aus mehreren Basisblöcken bestehen.
+Dabei hat jeder Basisblock ein eindeutiges Label und besteht aus einer Sequenz von IR-Befehlen, wobei der letzte Befehl eines jeden Blocks ein ~Goto~, ein ~IfGoto~ oder ein ~Return~ sein muss.
+Durch diese Verpflichtung jeden Block mit einem Sprung zu beenden befreit uns auf Ebene einer Funktion von der Last über implizites Durchfallen und die Reihenfolge der Basisblöcke nachzudenken.
+
+Daher bestehen Funktionen aus einer ungeordneten Menge von Basisblöcken, von denen einer allerdings der Eingangsblock ist.
+An diesem Eingangsblock beginnt die Ausführung beim Funktionsaufruf.
+Weiterhin haben Funktionen eine geordnete Liste an Parameter-Variablen und an sonstigen lokalen Variablen.
+
+Auf den Folien finden Sie noch einen iterativen Fibonacci als Beispiel für eine IR-Funktion.
+
+
+* Vom CFG zum Zwischencode
+:PROPERTIES:
+:CUSTOM_ID: 08-codegen
+:END:
+
 ** CFG als Datenstruktur
 #+begin_src latex
   \dividerframe{Codeerzeugung}
@@ -932,7 +1025,7 @@ Bei der Stack-Maschine lassen die Ausführungen von AST-Unterbäumen ihr Ergebni
         \begin{code}[]
           \begin{codetext}[style=smaller]
             t0 := Add obj, 16
-            t1 := Load t0
+            t1 := Load *t0
             y  := Assign t1
           \end{codetext}
         \end{code}
