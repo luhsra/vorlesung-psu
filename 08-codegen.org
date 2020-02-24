@@ -573,11 +573,10 @@ Weiterhin haben Funktionen eine geordnete Liste an Parameter-Variablen und an so
 Auf den Folien finden Sie noch einen iterativen Fibonacci als Beispiel für eine IR-Funktion.
 
 
-* Vom CFG zum Zwischencode
+* Vom AST zum Zwischencode
 :PROPERTIES:
 :CUSTOM_ID: 08-codegen
 :END:
-
 ** CFG als Datenstruktur
 #+begin_src latex
   \dividerframe{Codeerzeugung}
@@ -614,6 +613,18 @@ Auf den Folien finden Sie noch einen iterativen Fibonacci als Beispiel für eine
 
   \end{frame}
 #+end_src
+
+Nach der Beschreibung des IR-Codes wollen wir unser eigentliches Ziel definieren:
+Wir möchten aus dem abstrakten Syntaxbaum ein IR-Programm ableiten, welches ein Funktions-Objekt mit Basisblöcken voller Befehle für jede Funktion auf AST-Ebene enthält.
+Dazu werden wir den AST traversieren und sukkzessive IR-Objekte erzeugen und hierarchisch ineinander Schachteln:
+Das Programm enthält mehrere Funktionen; Jede Funktion enthält einen oder mehrere Basisisblöcke; Jeder Basisblock ist eine Sequenz von Befehlen die mit einem Sprungbefehl abgeschlossen wird.
+
+Um diese IR-Objekte zu erzeugen verwenden wir das auf den Folien notierte Programmierschnittstelle.
+So hängt die ~create_block()~-Methode einen Basisblock an die aktuelle Funktion an und gibt uns eine Referenz auf den Block zurück[fn::Erinnern Sie sich daran das Python, welches wir im Folgenden verwenden ein Referenzmodell für Variablen hat.
+Alle Variablen referenzieren also nur Objekte, sie enthalten niemals ein Objekt und es gibt keine expliziten Zeiger.
+Sehr zu meinem Leidwesen....].
+Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können Sie im Übungsübersetzer nachschlagen.
+
 ** Codeerzeugung für Ausdrücke
 #+begin_src latex
   \begin{frame}[fragile]{Codeerzeugung für Ausdrücke}
