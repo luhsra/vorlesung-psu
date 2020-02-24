@@ -618,6 +618,7 @@ Nach der Beschreibung des IR-Codes wollen wir unser eigentliches Ziel definieren
 Wir möchten aus dem abstrakten Syntaxbaum ein IR-Programm ableiten, welches ein Funktions-Objekt mit Basisblöcken voller Befehle für jede Funktion auf AST-Ebene enthält.
 Dazu werden wir den AST traversieren und sukkzessive IR-Objekte erzeugen und hierarchisch ineinander Schachteln:
 Das Programm enthält mehrere Funktionen; Jede Funktion enthält einen oder mehrere Basisisblöcke; Jeder Basisblock ist eine Sequenz von Befehlen die mit einem Sprungbefehl abgeschlossen wird.
+Wichtig dabei ist sich immer vor Augen zu halten, dass es Funktionen auf Ebene des ASTs gibt und Funktionen auf Ebene des IRs. Die einen werden zwar auf die anderen abgebildet, jedoch sind es gänzlich unterschiedliche Klassen, die sich keinen Code teilen.
 
 Um diese IR-Objekte zu erzeugen verwenden wir das auf den Folien notierte Programmierschnittstelle.
 So hängt die ~create_block()~-Methode einen Basisblock an die aktuelle Funktion an und gibt uns eine Referenz auf den Block zurück[fn::Erinnern Sie sich daran das Python, welches wir im Folgenden verwenden ein Referenzmodell für Variablen hat.
@@ -625,7 +626,11 @@ Alle Variablen referenzieren also nur Objekte, sie enthalten niemals ein Objekt 
 Sehr zu meinem Leidwesen....].
 Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können Sie im Übungsübersetzer nachschlagen.
 
+
 ** Codeerzeugung für Ausdrücke
+:PROPERTIES:
+:CUSTOM_ID: 08-codegen-expression
+:END:
 #+begin_src latex
   \begin{frame}[fragile]{Codeerzeugung für Ausdrücke}
     \textbf{Erinnerung}: Ausdrücke sind AST-Unterbäume die Werte berechnen.
@@ -681,11 +686,76 @@ Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können S
       \end{column}
     \end{columns}\medskip
 
-    \bi \ii Codegenerierung delegiert das Berechnen der Unterbäume { \bi \ii Alle Visit-Funktionen für Ausdrücke liefern Ergebnis als Rückgabewert \ii Nur Berechnung des R-Werts.
-  L-Wert wird Sonderfall in \ircmd{Assign} \ei }\medskip \ii Explizite Traversierung bei der Code Erzeugung{ \bi \ii Wir verwenden absichtlich keine automatische Traversierung des Baums \ii Generierungs-Funktionn verwenden Referenz auf aktuelle Funktion/Block \ii Sie haben als \textbf{Seiteneffekt} das \structure{emittieren} einzelner Instruktionen \ei } \ei
+    \bi \ii Codegenerierung delegiert das Berechnen der Unterbäume {
+      \bi
+      \ii Alle Visit-Funktionen für Ausdrücke liefern Ergebnis als Rückgabewert
+      \ii Getrennte Visitor-Methoden für R- und L-Werte
+      \ei
+    }\medskip
+    \ii Explizite Traversierung bei der Codeerzeugung{
+      \bi
+      \ii Wir verwenden absichtlich keine automatische Traversierung des Baums
+      \ii Generierungs-Funktionn verwenden Referenz auf aktuelle Funktion/Block
+      \ii Sie haben als \textbf{Seiteneffekt} das \structure{emittieren} einzelner Instruktionen
+      \ei
+    }
+    \ei
   \end{frame}
+#+end_src
 
-  \begin{frame}[fragile]{Code-Erzeugung für Funktionsaufruf und Zuweisung}
+
+Wollen wir nun mit der Codeerzeugung beginnen.
+Und wir beginnen dort, wo es spannend ist:
+Mittendrin bei der Codeerzeugung für Ausdrücke (Expressions).
+Wir nehmen also an, dass wir bereits eine Funktion und einen Basisblock erzeugt haben[fn::Wie wir das konkret tun sehen wir gleich.].
+Unsere Aufgabe ist es IR-Code für einen AST-Unterbaum der einen Wert berechnet zu erzeugen und an den aktuellen Basisblock anzuhängen.
+Allgemein werden wir bei der Codeerzeugung an Basisblöcke immer nur Instruktionen anhängen, niemals irgendwas vorne oder mittendrin einfügen.
+
+Um die Codeerzeugung zu formulieren machen wir, wie bei der semantischen Analyse, wieder Gebrauch vom *Visitor-Pattern* um jeden AST-Typen passend zu behandeln.
+Wir bündeln alle Generierungsfunktionen in einer ~CodeGeneration~-Klasse (siehe Übung) und verwenden doppelten-dynamischen Dispatch um die passende Methode aufzurufen.
+Allerdings verwenden wir nicht nur ein Set an ~visit_*()~-Methoden, sondern gleich drei Verschiedene, je nachdem ob der Unterbaum zu Code für einen L-Wert (~lvalue_*()~), für einen R-Wert (~rvalue_()~), oder ganz ohne Rückggabewert (~visit_*()~) erzeugt werden soll.
+Auf diese Weise können wir im Code leicht erkennen mit welchem Ziel hier Code generiert wird.
+
+Diesmal verwenden wir das Visitor-Pattern allerdings ohne automatische Traversierung.
+Es gibt also keine Maschinerie (~traversal()~-Funktion), die unsere Visitor-Methoden aufruft, sondern jeder Abstieg zu einem Unterbaum ist explizit im Code vermerkt.
+Dies erlaubt es die Umstände der Unterbaum-Codeerzeugung genau zu kontrollieren (z.B. in welchen Basisblock soll der Code hinein erzeugt werden). Außerdem können wir den Rückgabewert der Visitor-Methoden als Rückkanal zwischen Unterbaum und aktuellem Knoten verwenden.
+
+Wie bereits bei der Diskussion um Stack-Maschinen vs.
+Register-Maschnen angedeutet, berechnet der Code für einen Ausdruck einen Wert und speichert ihn in einer Variable.
+Wer erstellt aber die Variable in der das Ergebnis gespeichert wird?
+Erstellt der Aufrufende eine Variable und stellt den Auftrag /"Erzeuge Code für diesen Unterbaum, sodass das Ergebnis in dieser Variable gespeichert ist!"/ (Top-Down) oder erstellt die Generierungsfunktion die Variable selbst und propagiert diese dem Aufrufer zurück (Bottom-Up).
+Es stellt sich heraus, dass beides valide Strategien sind um die Codeerzeugung in einem Übersetzer zu strukturieren.
+Es sind sogar Mischungen beider Formen möglich:
+
+#+begin_src python
+  class CodeGen:
+      ...
+      def rvalue_Literal(self, node, dst_var=None):
+          if dst_var is None:
+              dst_var = self.current_function.create_variable()
+          self.current_block.append(Assign, dst_var, node.value)
+          return dst_var
+#+end_src
+
+In diesem winzigen Ausschnitt, der R-Wert Code für ein konstantes Literal erzeugt[fn::~lvalue_Literal()~ kann es nicht geben. Überlegen Sie sich warum!], wird eine Variable optional Top-Down übergeben. Hat der Aufrufende keine Variable mitgegeben, so erzeugen eine an dieser Stelle. In allen Fällen propagieren wir die Zielvariable als Rückgabewert.
+
+Bereits am Beispiel des Literals sehen wir, dass die aktuelle Funktion und der aktuelle Basisblock als implizite Parameter in der Codeerzeugung verwendet werden.
+Beide Werte speichern wir als Felder in der Codeerzeugungs-Klasse.
+Durch Umsetzen des ~current_block~-Feldes können wir kontrollieren in welchen Basisblock Code für einen Unterbaum erzeugt wird. Davon werden wir bei den Kontrollstrukturen Gebrauch machen.
+
+Bemerkenswert ist auch, dass die Codeerzeugungs-Methoden nicht nur implizite Parameter bekommen, sondern das IR-Programm als Seiteneffekt erzeugen. Der Aufruf einer ~rvalue_*()~-Methode liefert eine Variable mit dem Ergebnis *und* erzeugt im aktuellen Basisblock IR-Befehle um diese Variable zu befüllen.
+
+Auf den Folien sehen wir auch noch die R-Wert Codeerzeugung für den ~Add~-AST Knotentypen:
+Diese Methode generiert Code für die Unterbäume auf der linken (~LHS~) und auf der rechten (~RHS~) Seite der Addition, erzeugt eine Zielvariable (Bottom-Up), und hängt eine IR-Add-Instruktion an den aktuellen Basisblock an.
+Durch das Visitor-Pattern kann diese Methode beliebige Unterbäume verarbeiten. Sollten wir vergessen haben eine ~rvalue_*()~-Methode zu implementieren, würde es hier einen Laufzeitfehler geben.
+
+So unscheinbar die Codeerzeugung für die Addition auch aussieht, so trifft sie jedoch eine weitgehende Entscheidung, die nicht unerwähnt bleiben darf:
+Wir legen uns hier auf eine Ausführungsreihenfolge fest bei der zuerst die linke und dann die rechte Seite ausgewertet wird.
+Zuerst werden sich die Instruktionen des linken Unterbaums im Basisblock, danach die des rechten Basisblocks, wiederfinden.
+Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge der Kindsknoten festlegen, sind es die die *Linearsierung des ASTs* durchführen.
+
+#+begin_src latex
+\begin{frame}[fragile]{Code-Erzeugung für Funktionsaufruf und Zuweisung}
     \bi
     \ii \structure{Funktionsaufrufe}{\\[1ex]
     \begin{code}[]
@@ -732,6 +802,9 @@ Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können S
   \ei
   \end{frame}
 #+end_src
+
+
+
 ** Codeerzeugung für Kontrollflusskonstrukte
 #+begin_src latex
   \begin{frame}[fragile]{Kontrollfluss: Sequenzierung}
