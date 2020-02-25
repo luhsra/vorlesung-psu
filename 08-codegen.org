@@ -966,7 +966,46 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
   \end{frame}
 #+end_src
 
+Wie bereits bei der Selektion, bei der wir leere Basisblöcke für nicht vorhandene Else-Zweige erzeugen, ist die hier präsentierte Codeerzeugung nicht optimal und der generierte IR-Code geht öfters mal einen Umweg.
+Wenn wir mit bloßem Augen auf solchen IR-Code schauen, könnten wir auf die Idee kommen zu sagen, dass wir doch direkt besseren IR-Code erzeugen könnten. Jedoch spricht ein wichtiges Argument gegen eine bessere Coderzeugung: Komplexität.
+
+Die Aufgabe der Codeerzeugung ist es den AST für eine lineare Maschine zu sequenzieren.
+Alles was wir an zusätzlicher Logik in diesem Übersetzer-Schritt einbauen um besseren IR-Code zu generieren wird die Codeerzeugung verkomplizieren.
+Das eigentliche Ziel der Codeerzeugung wird verwässert und weniger offensichtlich.
+Und wenn eines an einem Übersetzer, bei dem wir erhöhte Ansprüche an die Korrektheit stellen, von Übel ist, so ist es wenig intuitiver Code der mehrerer Zielsetzungen gleichzeitig verfolgt.
+
+Im Fall des Übersetzers lösen wir das Dilemma, zwischen klarerer Codeerzeugung und einem effizienten Kompilat, dadurch auf, dass wir den informatischen Zaubertrick *Trennung der Belange* anwenden und die Optimierung als weiteren Schritt bei der Übersetzung einführen.
+So können wir zuerst ineffizienten Code in sehr klarer Weise generieren, und dennoch ein möglichst effizientes Übersetzungsergebnis bekommen.
+
+Außerdem haben wir einen weiteren Vorteil, der auf den Folien sehr lapidar dargestellt wird:
+Optimierungen werden auch auf den Benutzercode angewendet.
+Dies ist viel wichtiger als es zunächst erscheint.
+Stellen Sie sich vor, wir bauen eine Codeerzeugung, die einigermaßen effizienten Code aus dem AST erzeugt.
+Wenn aber das Programm an sich ineffizient programmiert wurde und Redundanzen enthält, so würden wir diese (sehr effizient) auf IR-Code abbilden.
+Trennen wir allerdings Codeerzeugung und Optimierung, so werden die Optimierungen nicht nur auf die generierten Ineffizienten, sondern auch auf die ineffizient programmierten Programmstücke angewendet:
+
+#+begin_src C
+int foo() {
+   int bar = 2 + 3;
+   int x = bar * 2;
+   if (x < 0) { x = x * x; }
+   int y = x - 9;
+   return y;
+}
+#+end_src
+
+In diesem Stück Beispielcode ist, bei nähererer Betrachtung, ganz klar, dass ~foo()~ immer das Ergebnis 3 liefern wird.
+Eine Codeerzeugung zu erstellen, die dies nebenbei heraus findet ist um Größenordnungen schwieriger, als was ich Ihnen in dieser Vorlesung gezeigt habe.
+In der nächsten Vorlesung werde ich mehrere, relativ einfache, Optimierungsroutinen diskutieren, die IR-Code so optimieren, dass am Ende tatsächlich nur ~Return 3~ übrig bleibt.
+
+Anders sieht die Geschichte bei Interpretern aus:
+Dort können wir, um den Start der Ausführung nicht übermäßig zu verzögern, nicht zuerst aufwändige Optimierung vorschalten.
+Daher treffen Codeerzeugungs-Routinen, die eine interpretierte Ausführung zum Ziele haben, andere Abwägungen und führen Coderzeugung und Optimierung deutlich vermischter aus.
+
 ** Fallstudie für komplexe Objekte: Records
+:PROPERTIES:
+:CUSTOM_ID: 08-codegen-records
+:END:
 #+begin_src latex
 \dividerframe{Komplexere Objekte\\und\\Operationen}
   \begin{frame}{Komplexere Objekte: Records}
@@ -991,6 +1030,28 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
     \ei
   \end{frame}
 
+
+#+end_src
+
+Mit den bisher gesehenen Übersetzungsregeln können wir bereits einfache Programme in IR-Code überführen, sofern sie keine komplexen Datenstrukturen beinhalten.
+Nun könnten wir an dieser Stelle für alle möglichen Konstrukte, die in Programmiersprachen vorkommen, und die wir teilweise schon in der Vorlesung behandelt haben, die Übersetzungsregeln im Detail besprechen.
+Aber das würde, so dicht aneinander gereiht eher ermüdend, denn erleuchtend für Sie sein.
+Daher habe ich mich entschieden ein einzelnes Thema heraus zu greifen und an diesem beispielhaft zu demonstrieren, wie wir bei der Codeerzeugung vorgehen.
+Das Thema dem wir uns zuwenden wollen sind *Records*{{{see(03-composite-types,Zusammengesetzte Typen)}}}, da wir an ihnen einer Vielzahl der Abbildungsproblemen begegnen, die auch bei anderen Sprachkonstrukten auftreten.
+
+Di *semantische Lücke* der wir bei Record-Datentypen begegnen, lässt sich wie folgt beschreiben:
+Ein Record Typ ist eine geordnete Sequenz von Typ--Name-Paaren, die im Verbund auftreten.
+Wir können auf einzelne Felder eines Record-Objekts lesend bzw. schreibend zugreifen und das gesamte Record-Objekt per Zuweisung oder Funktionsaufruf durch die Gegend schieben.
+Dadurch das Records Verbünde aus mehreren Feldern sind, können Record-Objekte mehr als ein Maschinenwort umfassen.
+
+Das Problem ist, das bei unserer IR-Maschine alle Variablen genau ein Maschinenwort (32-Bit) breit sind.
+Ein Variable kann also nicht jedes beliebige Record-Objekt beinhalten.
+Natürlich könnten wir hergehen und unseren IR-Code erweitern um eine möglichst einfache Codeerzeugung zu bekommen, jedoch würde wir damit die Übersetzungsleistung einfach weiter nach hinten ins Backend schieben.
+Außerdem können wir ja nicht für jedes neu erdachte Sprachkonstrukt den IR-Code erweitern, was wiederum eine Anpassung des gesamten Middle- und Backends erforderlich machen würde.
+Anstatt dessen werden wir das Sprachkonstrukt "Record" auf den vorgestellten IR-Code abbilden.
+Dazu greifen wir vier Teilbereiche an: Abbildung auf das IR-Speichermodell, Zuweisungen von Record-Objekten, Feldzugriffe und Funktionsaufrufe. 
+
+#+begin_src latex
   \begin{frame}[t]{Record-Typen: Datenlayout}
     \bi
     \ii \textbf{Erinnerung (Record)}: Geordnete Sequenz von Paaren (Name, Typ)\\\medskip
@@ -1004,30 +1065,30 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
         \texttt{layout(struct bar) = }\\[1ex]
         {\small
         \begin{tabular}{lrrr}\toprule
-          Name & \uncover<4->{Offset} & Typ    & \uncover<3->{Länge} \\\midrule
-          \only<7->{*TAG* & 0 & type\_t  & 4\\}
-          a    & \only<4-6>{0} \only<7->{4}    & int    & \uncover<3->{4}     \\
-          b    & \only<4-6>{4} \only<7->{8}    & foo\_t & \uncover<3->{5}     \\
-  \only<5->{-- & \only<4-6>{9} \only<7->{13}    &        & 3\\}
-          c    & \only<5-6>{12}\only<7->{16}    & int    & \uncover<3->{4}  \\\bottomrule
+          Name & \uncover<handout:3-|4->{Offset} & Typ    & \uncover<handout:2-:3->{Länge} \\\midrule
+          \only<handout:6-|7->{*TAG* & 0 & type\_t  & 4\\}%
+          a    & \only<handout:3-5|4-6>{0} \only<handout:6-|7->{4}    & int    & \uncover<handout:2-|3->{4}     \\
+          b    & \only<handout:3-5|4-6>{4} \only<handout:6-|7->{8}    & foo\_t & \uncover<handout:2-|3->{5}     \\
+  \only<handout:4-|5->{-- & \only<handout:3-5|4-6>{9} \only<handout:6-|7->{13}    &        & 3\\}
+          c    & \only<handout:4-5|5-6>{12}\only<handout:6-|7->{16}    & int    & \uncover<handout:2-|3->{4}  \\\bottomrule
         \end{tabular}
         }
       
-        \only<6->{\mbox{}\\[2ex]\texttt{sizeof(struct bar) = } \alt<6>{16}{20}}
+        \only<handout:5-|6->{\mbox{}\\[2ex]\texttt{sizeof(struct bar) = } \alt<handout:5|6>{16}{20}}
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \vspace{-1em}
         \bi
         \ii Übersetzer leitet das Layout ab {
           \bi
-          \ii<3-> Jeder enthaltende Typ belegt eine gewisse \alert{Anzahl an Bytes} im Speicher.
-          \ii<4-> Berechnung eines \structure{Feld-Offsets}.
-          \ii<5-> Zusätzliche \structure{Alignment}-Bedingungen durch das Einfügen von Lücken.
-          \ii<6-> Es ergibt sich die Größe \textbf{dieses Typs}.
-          \ii<7-> Mit dynamische Typen: Tag-Feld
+          \ii<handout:2-|3-> Jeder enthaltende Typ belegt eine gewisse \alert{Anzahl an Bytes} im Speicher.
+          \ii<handout:3-|4-> Berechnung eines \structure{Feld-Offsets}.
+          \ii<handout:4-|5-> Zusätzliche \structure{Alignment}-Bedingungen durch das Einfügen von Lücken.
+          \ii<handout:5-|6-> Es ergibt sich die Größe \textbf{dieses Typs}.
+          \ii<handout:6-|7-> Mit dynamische Typen: Tag-Feld
           \ei
         }\smallskip
-        \ii<8-> Verwendung des Layout-Deskriptors {
+        \ii<handout:7-|8-> Verwendung des Layout-Deskriptors{%
           \bi
           \ii Codeerzeugung
           \ii Debug-Informationen
@@ -1040,7 +1101,7 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
   }\ei
   \end{frame}
 
-  \begin{frame}[fragile]{Records: Codeerzeugung}
+  \begin{frame}[fragile]{Records: Variablen-Definitionen}
     \bi
     \ii Codeerzeugung muss an mehreren Stellen angepasst werden {
       \bi
@@ -1049,7 +1110,7 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
       \ii Wir streben (beispielhaft) ein Wertemodell für Variablen an
       \ei
     }\medskip
-    \ii<2-> \structure{Deklaration einer lokalen Variable} mit Record-Typ{
+    \ii<2-> \structure{Definition einer lokalen Variable} mit Record-Typ{
       \bi
       \ii Unsere IR-Maschine kann nur 32-Bit Variablen $\Rightarrow$ IR-Variable hält Pointer
       \ii Allokation am Stack mittels \ircmd{StackAlloc} und \texttt{sizeof(Type)}
@@ -1068,7 +1129,7 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
 
                 # ggf. Objekt am Stack anlegen
                 if decl.Type.sizeof > 4:
-                  bb.append(StackAlloc(var, sizeof))
+                  bb.append(StackAlloc, var, sizeof)
                     if self.dynamic_types:
                        bb.append(Store, var,
                                  decl.Type.tag)
@@ -1098,7 +1159,52 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
     }
     \ei
   \end{frame}
+
+
   #+end_src
+
+Als erstes nehmen wir die Abbildung der Record-Objekte auf das Speichermodell der IR-Maschine vor.
+Dazu bilden wir den strukturierte Record-Typen ab, indem wir festlegen wie die Felder des Records auf den linearen Speicher abgebildet werden. Diese Abbildungsvorschrift, von abstrakten Record-Objekte, auf nebeneinander liegende Speicherzellen, heißt *Datenlayout*.
+
+Das Datenlayout ist abhängig von Record-Typen und kann von sprachspezifischen und architektonischen Besonderheiten beeinflusst. So gibt der C-Sprachstandard vor, dass Felder beim Datenlayout nicht umgeordnet werden dürfen.
+
+Als erstes berechnet der Übersetzer wie viel Speicher jedes einzelne Feld des Records benötigen würde, wenn es alleine alloziert wird.
+Enthält unser aktueller Record-Typ wiederum Record-Typen so wird die Berechnung des Datenlayouts rekursiv für den enthaltenen Typen ausgeführt.
+Beim Beispiel auf den Folien arbeiten wir auf Byte-Granularität, was also nicht 1:1 auf unsere IR-Maschine übertragbar wäre.
+
+Im zweiten Schritt berechnen wir für jedes Feld einen *konstanten Feld-Offset* vom Beginn des Objekts im Speicher.
+Da das Feld ~b~ an zweiter Stelle ist, startet sein Inhalt bei einem Offset von ~4~, was genau der Länge des Feldes ~a~ entspricht.
+
+Vor dem Feld ~c~ fügen wir eine künstliche Lücke ein, da ~b~ mit 5 Bytes irregulär lang ist und ~c~, bei einem kompakten Datenlayout keine durch 4 teilbare Adresse hätte.
+Solches zusätzliche Alignment, meist auf Maschinenwortbreite, führt zwar, durch die entstandenen Lücken, zu einem erhöhten Speicherverbrauch, kann aber den erzeugten Maschinencode oft deutlich beschleunigen. Hintergrund hier ist, dass Speicherzugriffe, die nicht Wort-weise ausgerichtet sind auf vielen Prozessoren langsamer sind[fn::Besonders ekelhaft ist es, wenn ein Zugriff die Grenze zwischen zwei Cachezeilen oder zwei Speicherseiten überschreitet.].
+
+Haben wir jedem Feld einen Offset gegeben, so können wir die Größe für ein Record-Objekt angeben (in diesem Fall 16 Byte).
+Jedes Objekt vom Typen ~struct bar~ wird später nach genau diesem Layout strukturiert sein, sodass jeder Zugriff auf die Felder eines ~struct bar~-Objekts von diesem Layout ausgehen kann.
+Außerdem werden die Informationen über das Datenlayout auch in den Informationen für den Debugger vermerkt, sodass dieser ein solches Objekt aus dem Speicher dekodieren kann und die semantische Zuordnung zwischen Feld und Speicherzelle rückgängig machen.
+
+Wollen wir dynamische Typ-Informationen für unserer Objekte haben, so müssen wir ein zusätzliches Typ-Tag Feld im Datenlayout vorsehen.
+Da diesen Typ-Feld bei allen Objekten am gleichen konstanten Offset zu finden sein muss, gibt es nur die Möglichkeit das Tag-Feld vor dem ersten benutzerdefinierten Feld einzufügen. Alle anderen Felder rücken somit eine Position nach hinten und die Größe unseres Objekts wächst auf 20 Byte an.
+
+Bewaffnet mit dem Datenlayout und der Größe des Typen, können wir nun zur Tat schreiten und IR-Code erzeugen.
+Für unsere Beispiel werden wir ein *Wertemodell für Variablen* anstreben, da wir die Records in eine Sprache mit Referenzen einbauen wollen.
+Zur Erinnerung:
+Wertemodell bedeutet, dass eine Variable vom Typ ~struct bar~ ein entsprechendes Objekt enthält und nicht nur eine Referenz darauf (das wäre Referenzmodell).
+Bei Zuweisungen und Funktionsaufrufen wird das Objekt kopiert, und mit dem Ende der Variablen-Lebenszeit endet auch die Lebenszeit des Objekts.
+In unserem Beispiel gibt es nur lokale Variablen und keine dynamische Speicherallokation auf Sprachebene.
+
+Treffen wir bei der Codeerzeugung auf eine Variablendeklaration/definition, so müssen wir, da wir dem Wertemodell folgen, auch ein Objekt vom entsprechenden Typen anlegen.
+Auf den Folien sehen wir, dass dies für kleine Objekte, die in eine IR-Variable passen sehr einfach ist, und wir dort einfach die Variable bei der aktuellen Funktion (~self.current_function~) anlegen.
+
+Anders sieht das bei Objekten aus, die größer sind als ein Maschinenwort (4 Byte), worunter auch die Record-Objekte Fallen.
+Um diese Fälle abzudecken verwenden wir den IR-Befehl ~StackAlloc~ um das Objekt im aktuellen Call-Frame anzulegen.
+In der angelegten IR-Variable speichern wir nur die Referenz auf das neu-angelegte Objekt.
+Gewissermaßen bilden wir das Wertemodell auf der Sprachebene auf ein Referenzmodell in der IR-Ebene ab. Was dies bedeutet werden wir im folgenden noch sehen.
+Wichtig ist aber: eine IR-Variable für ein Record-Objekt enthält nur einen Zeiger!
+
+Wollen wir dynamische Typen haben, ist das Anlegen des Objekts *der* Zeitpunkt um den korrekten dynamischen Typen zu setzen.
+Dies führen wir, wenn gewollt, mit einem einzelnen ~Store~ Befehl durch, der ein konstant gewähltes Typ-Tag in das erste Feld des Objekts schreibt.
+Da wir keine benutzerdefinierten Konstruktoren{{{see(06-init, Geburt von Objekten)}}} anbieten wollen, sind wir an dieser Stelle mit der Codeerzeugung für eine Variablendefinition fertig.
+
 #+begin_src latex
   \begin{frame}[fragile]{Records: Zuweisungen}
     \bi
@@ -1113,7 +1219,7 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
         \begin{column}{0.49\textwidth}
           \begin{code}[]
             \begin{py}[style=smaller]
-              def rvalue_Identifier(self, expr):
+              def lvalue_Identifier(self, expr):
                 ...
                 if isinstance(expr.Type, RecordType):
                    return expr.decl.ir_obj
@@ -1157,7 +1263,7 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
           \begin{codetext}
             x  := StackAlloc 16
             y  := StackAlloc 16
-            t1 := Call memcpy, y, x, 20
+            t1 := Call memcpy, x, y, 16
           \end{codetext}
         \end{code}
       \end{column}
@@ -1168,6 +1274,146 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
   
   \end{frame}
 
+  \begin{frame}[fragile]{Records: Funktionsaufrufe}
+    \begin{btBlock}{}
+      \textbf{Erinnerung}: Wir wollen Wertemodell für Variablen in der Sprache.
+    \end{btBlock}
+
+    \bi
+    \ii Wir müssen Record-Objekte in Funktionen und wieder heraus bekommen{%
+      \bi
+      \ii \textbf{Problem}: Wir können nur 32-Bit Wörter übergeben
+      \ii \structure{Call-by-Value}: Der Aufgerufene soll eine Kopie des Objekts bekommen{
+        \begin{columns}
+          \hfill\begin{column}{0.70\textwidth}
+            \begin{code}[]
+              \begin{lzero}
+                func f(obj : struct foo) : struct foo {
+                  obj.c := 33;
+                  return obj.c;
+                }
+              \end{lzero}
+            \end{code}
+          \end{column}\hfill
+        \end{columns}
+      }
+      \ei
+    }\medskip
+    \ii<2-> \textbf{Lösung}: Wir führen ein \structure{Aufrufkonvention} für größere Objekte ein{
+      \bi
+      \ii Für \structure{Parameter}: \btSetTab Der Aufrufende gibt Zeiger auf Orginalobjekt mit.\\
+      \btUseTab Der Aufgerufene legt sich eine Kopie als lokales Objekt an\\[2ex]
+      \ii Für \structure{Rückgabe}: \btUseTab Aufrufer gibt Zieladdresse als zusätzlichen Parameter mit\\
+      \btUseTab Ausschleusen des Rückggabewerts durch \texttt{memcpy()}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+
+  \begin{frame}[fragile]{Records: Beispiel für Funktionsaufruf}
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \columntitle{Aufrufstelle}
+        \begin{code}[]
+          \begin{lzero}
+            var src : struct foo;
+            var dst : struct foo;
+            dst := f(src);
+          \end{lzero}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \columntitle{Funktion}
+        \begin{code}[]
+          \begin{lzero}[style=smaller]
+            func f(obj :struct foo) : struct foo {
+              return obj;
+            }
+          \end{lzero}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \begin{center}
+          $\Downarrow$
+          \begin{code}[]
+            \begin{codetext}
+              src := StackAlloc 16
+              dst := StackAlloc 16
+              t0  := Call f, dst, src
+            \end{codetext}
+          \end{code}
+        \end{center}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \begin{center}
+          $\Downarrow$
+          \begin{code}[]
+            \begin{codetext}[style=smaller]
+              <Function: f> {
+                parameters = [__ret, obj]
+                variables = [__obj]
+                <BB: BB0> {
+                  // Prologue
+                  __obj := StackAlloc 16
+                  t0  := Call memcpy, __obj, obj
+                  // Function Return
+                  t1  := Call memcpy, __ret, __obj
+                  Return __ret
+                }
+              }
+            \end{codetext}
+          \end{code}
+        \end{center}
+      \end{column}
+    \end{columns}
+  \end{frame}
+#+end_src
+
+Als erstes, denn wir sind jetzt stolze Besitzer eines Record-Objekts, wollen wir diese herumreichen und umher werfen.
+Dies geschieht an mehreren Stellen:
+Bei einer Zuweisung zu einer Variablen mit einem Record-Typ[fn::Seien Sie sich gewahr, dass eine Variable vom Typ ~struct foo*~ keinen Record-Typ hat, sondern ein Zeiger ist, der auf einen Record verweist.], bei Übergabe eines Record-Objekts an eine Unterfunktion und bei Verwendung eines Records als Rückgabewert.
+Diese drei Stellen werden wir uns im Detail ansehen ansehen.
+
+Gemeinsam ist diesen Stellen, dass es zur Kopie von Objekten kommt, da wir einer Wertesemantik folgen.
+Es stellt sich also die Frage: *Von Wo* wird *nach Wo* mit *welchem Mechanismus* kopiert? 
+
+Die Frage nach Quelle und Ziel ist die Frage nach dem R-Wert und dem L-Wert einer Variable mit Record-Typ.
+Da wir diese Variablen auf IR-Ebene als Zeiger auf Stackobjekte abbilden und dort, gewissermaßen eine Referenzsemantik verwenden, fallen R- und L-Wert von Record-Objekten zusammen.
+In allen Fällen reichen wir einfach den Zeiger auf das Objekt herum.
+Erst der Verwender des R-/L-Wertes entscheidet dann ob er aus dem Speicherbereich ließt oder schreibt.
+
+Um dies in der Codeerzeugung zu implementieren, fügen wir sowohl in der R-Wert- als auch in der L-Wert-Berechnung für Bezeichner den Sonderfall ein, dass wir ein Variable mit Record-Typen vor uns haben. Wie beim Funktionsaufruf verwenden wir die semantischen Querverweise um zur Stelle der Variablendefinition zu kommen (~expr.decl~) und die IR-Variable mit dem Zeiger zu erhalten (~ir_obj~).
+
+Mit dem Wissen, dass bei Objekten, die größer sind als eine einzelnes Maschinenwort, der L- und der R-Wert zusammenfallen, können wir nun auch in der Zuweisungsoperation einen weiteren Sonderfall (neben dem für Zuweisung zu Variablen) einbauen.
+Um vom Quellobjekt zum Zielobjekt zu kopieren, rufen wir die Laufzeitfunktion ~void *memcpy(void *dest, const void *src, size_t n)~ auf. 
+Die Anzahl der Bytes, die kopiert werden muss ergibt sich aus der Berechnung des Datenlayouts.
+
+An dieser Stelle sehen wir eine weitere Designentscheidung, die wir für unseren IR-Befehlssatz getroffen haben.
+Anstatt einen eigenen IR-Kopier-Befehl einzuführen, der mehr als 4 Byte kopieren kann, bedienen wir uns einer Laufzeitfunktion.
+Dies ist wiederum eine Entscheidung, die dazu führt, dass wir unseren IR-Code so einfach wie möglich halten können.
+
+
+Bei *Funktionsaufrufen* müssen wir sehr ähnliche Probleme lösen, wie bei der Zuweisung.
+Da der ~Call~-Befehl nur Maschinenwörter zwischen Aufrufendem (caller) und Aufgerufenem (callee) transportieren kann, bleibt uns nichts anderes übrig, als eine Referenz auf das übergebene Objekt als Parameter zu verwenden.
+Da wir allerdings dem Wertemodell folgen wollen, müssen wir, mittels der IR-Befehle, die *Call-by-Value*[fn::Der Aufgerufen bekommt eine Kopie des Objekts und keine Referenz (was Call-by-Reference wäre).]-Semantik der Sprachebene abbilden. 
+Dazu legen wir eine Aufrufkonvention fest: Zwar bekommt der Aufgerufene einen Zeiger, legt sich aber eine selbständig eine Kopie in seinem Call-Frame an, dann im folgendem anstatt des Parameters verwendet wird.
+
+Im Beispiel übergeben wir ~src~ an die Funktion f als Parameter ~obj~. Diese Funktion legt, in ihrem *Funktionsprolog*, bevor eine Instruktion für den Entwickler ausgeführt wird, ein lokales Objekt an, dessen Zeiger in ~__obj~ gespeichert wird. Ein Aufruf zu ~memcpy()~ erledigt das kopieren der Daten, und fortan wird nur noch ~__obj~ verwendet, wo ~obj~ im AST steht.
+
+Ein ähnliches Problem haben wir bei der Rückgabe des Objekts. Wiederum wollen wir, auf Sprachebene, das Objekt "by-Value" zurückgeben, können aber nur Zeiger zwischen Caller und Callee austaschen. Da die Lebenszeit des Rückgabewerts länger sein muss als die Laufzeit der Callee-Funktionsinstanz, müssen wir auch Speicher aus dem Call-Frame des Aufrufendem verwenden um das Objekt zu transportieren.
+
+Wir erweitern unsere Aufrufkonvention dahingehend, dass eine Funktion die ein Record-Objekt als Rückgabewert hat, einen zusätzlichen (unsichtbaren) Parameter bekommt, mit dem der Aufrufer eine Zieladresse für die Rückgabe kommuniziert.
+Bei einem Return-Statement kopiert der Callee seinen Rückgabewert an diese Stelle und führt das eigentliche ~Return~ mit dem Zeiger durch.
+
+Zusammengefasst:
+Unsere Record-Objekte sind zu groß für das IR-Maschinenmodell, weswegen wir diese Objekte auf IR-Ebene immer per Referenz herumreichen und an neuralgischen Stellen Kopien erstellen.
+Genau an dieser Stelle sehen wir, dass das Wertemodell für Variablen zu vielen Kopien von Objekten führt, denn reale Maschinen haben ebenfalls Register von fixer und begrenzter Größe; auch dort muss ständig ~memcpy()~ ausgeführt werden.
+
+#+begin_src latex
   \begin{frame}[fragile]{Records: Feldzugriffe}
     \begin{columns}
       \begin{column}[t]{0.49\textwidth}
@@ -1253,111 +1499,20 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
 }
 
     \ei
-
-
-  \end{frame}
+\end{frame}
 #+end_src
 
+Der letzte Teil der Codeerzeugung für Records ist der, für den wir den ganzen Tanz mit den Records überhaupt erst angefangen haben:
+Wir wollen auf einzelne Felder in einem Record-Objekt zugreifen. Und zwar sowohl lesend, als auch schreibend.
 
-#+begin_src latex
-  \begin{frame}[fragile]{Records: Funktionsaufrufe}
-    \begin{btBlock}{}
-      \textbf{Erinnerung}: Wir wollen Wertemodell für Variablen in der Sprache.
-    \end{btBlock}
+Um ein Feld beschreiben zu können verwendet der Entwickler auf Sprachebene eine Zuweisung. 
+Wir haben gesehen, dass die Codeerzeugung der Zuweisung für die linke Seite einen Zeiger als L-Wert berechnet und den zugewiesenen Wert als R-Wert. Also können wir die Frage nach dem Feldzugriff umformulieren und Fragen: Was ist der L-Wert eines Feldzugriffes und was ist sein R-Wert?
 
-    \bi
-    \ii Wir müssen Record-Objekte in Funktionen und wieder heraus bekommen{%
-      \bi
-      \ii \textbf{Problem}: Wir können nur 32-Bit Wörter übergeben
-      \ii \structure{Call-by-Value}: Der Aufgerufene soll eine Kopie des Objekts bekommen{
-        \begin{columns}
-          \hfill\begin{column}{0.70\textwidth}
-            \begin{code}[]
-              \begin{lzero}
-                func f(obj : struct foo) : struct foo {
-                  obj.c := 33;
-                  return obj.c;
-                }
-              \end{lzero}
-            \end{code}
-          \end{column}\hfill
-        \end{columns}
-      }
-      \ei
-    }\medskip
-    \ii<2-> \textbf{Lösung}: Wir führen ein \structure{Aufrufkonvention} für größere Objekte ein{
-      \bi
-      \ii Für \structure{Parameter}: \btSetTab Der Aufrufende gibt Zeiger auf Orginalobjekt mit.\\
-      \btUseTab Der Aufgerufene legt sich eine Kopie als lokales Objekt an\\[2ex]
-      \ii Für \structure{Rückgabe}: \btUseTab Aufrufer gibt Zieladdresse als zusätzlichen Parameter mit\\
-      \btUseTab Ausschleusen des Rückggabewerts durch \texttt{memcpy()}
-      \ei
-    }
-    \ei
-  \end{frame}
+Für den L-Wert müssen wir die Adresse des Feldes berechnen. Diese ergibt sich daraus, dass wir auf die Basisadresse des Objekts den Offset des (statisch benannten) Feldes aus dem Datenlayout addieren. Auf den Folien sehen wir wie dies alles ineinander bei ~lvalue_FieldAccess()~[fn::FieldAccess ist der AST Knotentyp für den Punkt-Operator: "lhs.name"] ineinander greift: 
+Um die Basisaddresse der ~lhs~ zu berechnen brauchen wir den L-Wert des Objekts (also die Adresse des Objekts). Aus dem Feldnamen ~name~ leiten wir, zusammen mit dem Datenlayout das konstante Offset ab und addieren Basisaddresse und konstantem Offset zum L-Wert des Feldes.
 
-
-  \begin{frame}[fragile]{Records: Beispiel für Funktionsaufruf}
-    \begin{columns}[t]
-      \begin{column}{0.49\textwidth}
-        \columntitle{Aufrufstelle}
-        \begin{code}[]
-          \begin{lzero}
-            var src : struct foo;
-            var dst : struct foo;
-            dst := f(src);
-          \end{lzero}
-        \end{code}
-      \end{column}\hfill
-      \begin{column}{0.49\textwidth}
-        \columntitle{Funktion}
-        \begin{code}[]
-          \begin{lzero}[style=smaller]
-            func f(obj :struct foo) : struct foo {
-              return obj;
-            }
-          \end{lzero}
-        \end{code}
-      \end{column}
-    \end{columns}
-
-    \begin{columns}[t]
-      \begin{column}{0.49\textwidth}
-        \begin{center}
-          $\Downarrow$
-          \begin{code}[]
-            \begin{codetext}
-              src := StackAlloc 16
-              dst := StackAlloc 16
-              t0  := Call f, dst, src
-            \end{codetext}
-          \end{code}
-        \end{center}
-      \end{column}\hfill
-      \begin{column}{0.49\textwidth}
-        \begin{center}
-          $\Downarrow$
-          \begin{code}[]
-            \begin{codetext}[style=smaller]
-              <Function: f> {
-                parameters = [__ret, src]
-                variables = [__src]
-                <BB: BB0> {
-                  // Prologue
-                  __src := StackAlloc 16
-                  t0  := Call memcpy, __src, src
-                  // Function Return
-                  t1  := Call memcpy, __ret, __src
-                  Return __ret
-                }
-              }
-            \end{codetext}
-          \end{code}
-        \end{center}
-      \end{column}
-    \end{columns}
-  \end{frame}
-#+end_src
+Wollen wir den R-Wert des Feldes, also seinen Inhalt haben, so ist das relativ einfach:
+Dort rufen wir ~lvalue_FieldAccess()~ auf um die Feld-Adresse zu berechnen und schieben einen ~Load~ Befehl hinterher um das Feld auszulesen.
 
 #+begin_src latex
   \begin{frame}{Records: Fazit}
@@ -1377,7 +1532,7 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
     }\bigskip
     \ii Notwendigkeit einer Bibliothek mit Laufzeitfunktionen {
       \bi
-      \ii Übersetzer verlässt sich auf die Existenz von Bibliotheksfunktionen (\texttt{memcpy()}
+      \ii Übersetzer verlässt sich auf die Existenz von Bibliotheksfunktionen (\texttt{memcpy()})
       \ii Erweiterung des IR-Codes durch Funktionen (\ircmd{Call}: Komplexbefehl)
       \ei
     }
@@ -1385,7 +1540,33 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
   
   \end{frame}
 #+end_src
+
+Am Ende möchte ich zu unserem Record-Fallbeispiel für die Codeerzeugung noch einige Bemerkungen machen:
+Eigentlich haben Records nicht besonders gut in unser IR-Modell gepasst.
+Aber zu geschickte Erzeugung von IR-Code und durch Einführung von Konventionen war es uns möglich die zuerst diskutierte Codeerzeugung um ein weiteres Sprachfeature zu erweitern ohne die virtuelle Maschine zu verändern. In einem richtigen Übersetzer hätten wir es uns also gespart sowohl Middle- als auch Backend anzupassen nur weil wir ein neues Feature in der Sprache anbieten wollen.
+
+Ausschließlich die Verwendung von Laufzeitfunktionen zieht ein gewisses Maß an Fallout hinter sich her.
+Denn, wo kommt den das ~memcpy()~ her?
+Wer fügt die Implementierung in das fertige Programm ein?
+Zu diesem Zwecke kommt ein Übersetzer nicht nur als ein Binärprogramm, welches aus dem Quellcode ein Assemblerprogramm macht, sondern es gibt sogenannte *Run-Time Support Libraries*.
+In diese Bibliotheken platzieren wir jene Funktionalitäten, die wir bei der Abbildung von komplexeren Sprachkonstrukten auf die einfachen IR-Befehle benötigen.
+
+Bei GCC heißt diese Bibliothek ~libgcc.a~. Ein kurzen Überblick über ihren Inhalt kann man mit dem Tool ~nm~ bekommen[fn::Der Pfad zur libgcc.a kann auf ihrem System anders sein], welches wir in der Vorlesung über Maschinencode noch genauer diskutieren werden:
+
+#+begin_example
+$ nm /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a  | grep bswap
+_bswapsi2.o:
+0000000000000000 T __bswapsi2
+_bswapdi2.o:
+0000000000000000 T __bswapdi2
+#+end_example
+
+In dieser Auflistung sehen wir zwei Funktionen, die GCC verwendet um die Byte-Order innerhalb eines Wortes vertauschen. Eine genaue Auflistung solcher Funktionen findet sich in der [[https://gcc.gnu.org/onlinedocs/gccint/Standard-Names.html][GCC Dokumentation]]. Die äquivalente Implementierung für LLVM wird in der compiler-rt Bibliothek implementiert. Dort finden wir auch die Implementierung für [[https://github.com/llvm-mirror/compiler-rt/blob/master/lib/builtins/bswapsi2.c][~bswapsi2()~]].
+
 * Zusammenfassung
+:PROPERTIES:
+:CUSTOM_ID: 08-conclusion
+:END:
 
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
