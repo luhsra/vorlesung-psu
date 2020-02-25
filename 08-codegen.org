@@ -397,7 +397,7 @@ Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC Prozessoren
     }\medskip
     \ii \structure{Interprozedurale Kontrollflüsse} (2 Befehle) {
       \bi
-      \ii \ircmd{Call}: Funktionsaufruf mit beliebig vielen Argumenten \hfill\texttt{\ircmd{Call} L, [CV]*}
+      \ii \ircmd{Call}: Funktionsaufruf mit beliebig vielen Argumenten \hfill\texttt{\ircmd{Call} F, [CV]*}
       \ii \ircmd{Return}: Rückkehr aus einer Funktionsinstanz \hfill\texttt{\ircmd{Return} CV}
       \ei
     }
@@ -468,9 +468,10 @@ Beide Befehle leiten den eingehenden Kontrollfluss sicher an eines der angegeben
 Die Bedingung von ~IfGoto~ wird als Wahrheitswert (~0~ oder ~!= 0~) ausgewertet und bei wahr wird das erste Label, bei falsch das zweite Label angesprungen.
 
 Für den interprozeduralen Kontrollfluss gibt es ~Call~ und ~Return~. Wie bereits gesagt, bleiben beide Befehle auf einem hohen Abstraktionsniveau und ~Call~ bricht sogar das 3-Adress-Modell, da es beliebig viele Argumente transportieren kann.
+Außerdem ist das erste Argument von ~Call~ die aufgerufene IR-Funktion (Typ F).
 
 
-Insgesamt hat unsere IR-Maschine 16 Befehle. Also eher übersichtlich. 
+Insgesamt hat unsere IR-Maschine 16 Befehle und ist damit sehr übersichtlich. 
 
 #+begin_src latex
   \begin{frame}[fragile]{Für PSÜ: Ein Beispielhafter Zwischencode (3)}
@@ -759,10 +760,10 @@ Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge d
     \bi
     \ii \structure{Funktionsaufrufe}{\\[1ex]
     \begin{code}[]
-      \begin{py}
+      \begin{py}[style=highlighting]
         def rvalue_CallExpr(self, call_expr):
           args   = [self.rvalue(arg) for arg in call_expr.arguments]
-          callee = self.lvalue(call_expr.callee)
+          @1callee = call_expr.callee.decl.ir_obj@
           ret    = self.current_function.create_variable()
           self.current_block.append(Call, ret, callee, *args)
           return ret
@@ -770,7 +771,7 @@ Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge d
     \end{code}
     \bi
     \ii Wir entscheiden über eine Auswertungsreihenfolge der Argumente
-    \ii Auswertung des Callee könnte Label oder Referenz liefern
+    \ii Auffinden der IR-Funktion über Querverbindung zur AST-Deklaration 
     \ei
   }\bigskip
   \ii<2-> \structure{Zuweisung} braucht den L-Wert der linken Seite{
@@ -803,6 +804,34 @@ Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge d
   \end{frame}
 #+end_src
 
+Im Prinzip sieht die Codeerzeugung für die Berechnung von Ausdrücken gleich aus.
+Zuerst erzeugen wir den R-Wert Code für jeden Unterbaum und speichern das Ergebnis in jeweils einer Variable, bevor wir diese im Knoten-spezifischen Code verarbeiten, der wiederum eine Ergebnisvariable beschreibt.
+Zur Laufzeit führt dies dazu, dass die Unterbäume vor dem Elternknoten ausgewertet werden.
+
+Beim *Funktionsaufruf* sehen wir, wie die Querverbindungen, die die semantische Analyse eingefügt hat, bei der Codeerzeugung verwendet wird: Wir sind angehalten Code für den Funktionsaufruf ~call_expr~ zu generieren. An diesem AST-Knoten hängt das Attribut ~callee~, welches im Normalfall nur der Bezeichner der aufgerufenen Funktion ist. In der semantischen Analyse (Namensauflösung) haben wir an diesen Bezeichner eine Querverbindung zur Funktionsdeklaration (~call_expr.callee.decl~) eingefügt.
+Um nun bei der Codeerzeugung von der AST-Funktionsdeklaration zur IR-Funktion zu kommen, hängen wir, während der Codeerzeugung, bevor wir den Funktionskörper besuchen, ein Attribut an die AST-Deklaration:
+
+#+begin_src python
+class CodeGen:
+    ...
+    def visit_FuncDecl(self, decl):
+        func = Function(decl.name)
+        decl.ir_obj = func
+        ...
+#+end_src
+
+Auf diese Weise verwenden wir die Querverbindungen im AST um Informationen während der Codeerzeugung zwischen Deklarations- und Referenzierungsstelle zu transportieren.
+In der selben Weise werden wir bei Parameter- und Variablendeklarationen vorgehen.
+
+Eine andere Besonderheit sehen wir beim *Zuweisungsausdruck*.
+Dort verwenden wir den R-Wert-Visitor um die *rechte* Seite auszuwerten und den L-Wert-Visitor um einen Zeiger auf die *linke Seite* zu generieren.
+Die Zuweisung selbst besteht dann aus einer einzelnen ~Store~-Operation, die den Wert der rechten Seite an die adressierte Speicherstelle der linken Seite schreibt.
+
+Dieses allgemeine Vorgehen (Wert von rechts, Zeiger von links, Store) funktioniert in jeder Situation, egal wie komplex der Ausdruck wir auf der linken Seite ist (z.B.
+~*(foo.bar()) := ...~).
+Allerdings erzeugt dieses allgemeine Muster für den Standardfall, bei dem eine lokale Variable auf der linken Seite steht, wenig lesbaren (und vor allem analysierbaren Code).
+Deswegen bauen wir an dieser Stelle einen *Sonderfall* dafür ein, dass eine Variable auf der linken Seite steht und sodann nur ein ~Assign~ emittiert wird.
+Schauen Sie sich ruhig an dieser Stelle den Übungsübersetzer an (~CodeGen.rvalue_Assign()~).
 
 
 ** Codeerzeugung für Kontrollflusskonstrukte
@@ -970,7 +999,7 @@ Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge d
 
                 # IR-Variable 
                 var = cf.create_variable(decl.name)
-                decl.IR_var = var
+                decl.ir_obj = var
 
                 # ggf. Objekt am Stack anlegen
                 if decl.Type.sizeof > 4:
@@ -1022,7 +1051,7 @@ Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge d
               def rvalue_Identifier(self, expr):
                 ...
                 if isinstance(expr.Type, RecordType):
-                   return expr.decl.IR_var
+                   return expr.decl.ir_obj
             \end{py}
           \end{code}
         \end{column}\hfill
@@ -1032,7 +1061,7 @@ Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge d
               def rvalue_Identifier(self, expr):
                 ...
                 if isinstance(expr.Type, RecordType):
-                   return expr.decl.IR_var
+                   return expr.decl.ir_obj
             \end{py}
           \end{code}
         \end{column}
