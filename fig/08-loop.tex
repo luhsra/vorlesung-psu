@@ -21,7 +21,7 @@
       \node[anchor=north west,xshift=2em,align=left] at (beforeLoop.north east){
         
         \begin{minipage}{7cm}
-        \structure{Ablauf der Codeerzeugung}:
+        \structure{Codeerzeugung (while-Schleife)}:
         \begin{itemize}
         \item<2-> Blöcke erstellen {
             \begin{itemize}
@@ -31,7 +31,7 @@
             \end{itemize}
           }
         \item<3-> Eintritt in die Schleife
-        \item<4-> Bedingung generiern\\\texttt{self.visit(whileStmt.cond)}
+        \item<4-> Bedingung generiern\\\texttt{self.rvalue(whileStmt.cond)}
         \item<5-> Bedingte Kontrollflussverzeigung
         \item<6-> Loop-Body generieren\\\texttt{self.visit(whileStmt.body)}
         \item<7-> Rücksprungkante
@@ -45,13 +45,13 @@
     \begin{visible}<2->
       \node[basic block=BB1,current=<4-5>,below=0.4 of beforeLoop] (loopHeader) {
         \only<4->{cond := \ircmd{Assign} \ldots}\strut\\
-        \only<5->{\ircmd{IfGoto} cond, .BB1, .BB2}\strut\\
+        \only<5->{\ircmd{IfGoto} cond, .BB2, .BB3}\strut\\
       };
 
       \node[basic block=BB2,current=<6>,below=0.4 of loopHeader] (loopBody) {
         \only<6->{Stmt1}\strut\\
         \only<6->{Stmt2}\strut\\
-        \only<7->{\ircmd{Goto} .BB3}\strut\\
+        \only<7->{\ircmd{Goto} .BB1}\strut\\
       };
 
       \node[basic block=BB3,current=<8>,below=0.4 of loopBody] (afterBlock) {

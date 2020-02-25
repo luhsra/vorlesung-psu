@@ -26,7 +26,7 @@
         \begin{minipage}{7cm}
         \structure{Ablauf der Codeerzeugung}:
         \begin{itemize}
-        \item Bedingung generieren\\ \texttt{self.visit(ifStmt.cond)}
+        \item Bedingung generieren\\ \texttt{self.rvalue(ifStmt.cond)}
         \item<3-> Blöcke für Then-/Else-Teil, sowie den Sequenzierungsblock erstellen
         \item<4-> Bedingte Kontrollflussverzeigung
         \item<5-> Then-Block generieren\\\texttt{self.visit(ifStmt.then\_block)}

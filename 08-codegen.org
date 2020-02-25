@@ -744,7 +744,7 @@ Bereits am Beispiel des Literals sehen wir, dass die aktuelle Funktion und der a
 Beide Werte speichern wir als Felder in der Codeerzeugungs-Klasse.
 Durch Umsetzen des ~current_block~-Feldes können wir kontrollieren in welchen Basisblock Code für einen Unterbaum erzeugt wird. Davon werden wir bei den Kontrollstrukturen Gebrauch machen.
 
-Bemerkenswert ist auch, dass die Codeerzeugungs-Methoden nicht nur implizite Parameter bekommen, sondern das IR-Programm als Seiteneffekt erzeugen. Der Aufruf einer ~rvalue_*()~-Methode liefert eine Variable mit dem Ergebnis *und* erzeugt im aktuellen Basisblock IR-Befehle um diese Variable zu befüllen.
+Bemerkenswert ist auch, dass die Codeerzeugungsmethoden nicht nur implizite Parameter bekommen, sondern das IR-Programm als Seiteneffekt erzeugen. Der Aufruf einer ~rvalue_*()~-Methode liefert eine Variable mit dem Ergebnis *und* erzeugt im aktuellen Basisblock IR-Befehle um diese Variable zu befüllen.
 
 Auf den Folien sehen wir auch noch die R-Wert Codeerzeugung für den ~Add~-AST Knotentypen:
 Diese Methode generiert Code für die Unterbäume auf der linken (~LHS~) und auf der rechten (~RHS~) Seite der Addition, erzeugt eine Zielvariable (Bottom-Up), und hängt eine IR-Add-Instruktion an den aktuellen Basisblock an.
@@ -835,6 +835,9 @@ Schauen Sie sich ruhig an dieser Stelle den Übungsübersetzer an (~CodeGen.rval
 
 
 ** Codeerzeugung für Kontrollflusskonstrukte
+:PROPERTIES:
+:CUSTOM_ID: 08-codegen-control-flow
+:END:
 #+begin_src latex
   \begin{frame}[fragile]{Kontrollfluss: Sequenzierung}
     \bi
@@ -853,10 +856,10 @@ Schauen Sie sich ruhig an dieser Stelle den Übungsübersetzer an (~CodeGen.rval
       \bi
       \ii Unterfunktionen hängen Operationen \textit{implizit} an den \codebox{\scriptsize current\_block}\\[0.5ex]
       \ii Invariante: Nach jedem Statement kommt der Kontrollfluss wieder zusammen\\[2ex]
-      \uncover<2->{\btAnimation[width=0.7\textwidth]{center,1:<-2>,2:<3>,3:<4>,4:<5->}{fig/08-sequencing}}
+      \uncover<handout:2-|2->{\btAnimation[width=0.7\textwidth]{center,1:<-2>,2:<3>,3:<4>,4:<5->}{fig/08-sequencing}}
       \ei
     }
-    \ii<5-> Die Statements etablieren die komplexeren Kontrollflüsse {
+    \ii<handout:5-|5-> Die Statements etablieren die komplexeren Kontrollflüsse {
       \bi
       \ii Anlegen neuer Basisblöcke und Verbindung über \ircmd{Goto} und \ircmd{IfGoto}
       \ii \textbf{Wichtig}: Ein \texttt{visit()}-Aufruf kann den \texttt{current\_block}-Zeiger umbiegen
@@ -864,15 +867,76 @@ Schauen Sie sich ruhig an dieser Stelle den Übungsübersetzer an (~CodeGen.rval
     }
     \ei
   \end{frame}
+#+end_src
 
-  \begin{frame}{Kontrollfluss: Selektion}
-    \btAnimation[width=\textwidth]{center,range=1-8:<1->}{fig/08-condition}
-  \end{frame}
+Nachdem wir Code für alle Ausdrücke abgehandelt haben, gehen wir mit der Codeerzeugung eine Stufe weiter nach Oben und emittieren die Befehle um die Kontrollflussstruktur der Funktion auf IR-Ebene abzubilden.
+Dazu behandeln wir die AST-Konstrukte zur Sequenzierung, Selektion und Iteration so, dass in der aktuellen IR-Funktion direkt der korrekte Kontrollflussgraph entsteht.
 
+Als erstes betrachten wir die *Sequenzierung* und dort insbesondere die Codeblöcke:
+Aus der vagen Erinnerung an die Vorlesung zu Operationen {{{see(07-sequencing,Sequenzierung)}}}, wissen wir, dass der Sequenzoperator verwendet wird um mehrere Statements in einer festen Reihenfolge auszuführen.
+Eine solche Statement-Reihung ist im AST in einem Codeblock-Knoten zusammengefasst.
+
+Geht es nun daran Code für diesen Block-Knoten zu generieren, sieht die Erzeugungsmethode denkbar einfach aus, denn sie besucht, in der gegebenen Reihenfolge, alle Statements des Blocks mit der ~visit()~-Funktion (unsere Statements haben keinen Rückggabewert).
+Allerdings steckt der Teufeln im Detail und dieses Vorgehen funktioniert nur wenn wir eine Invariante über die ~visit_*()~ annehmen:
+Wir haben bereits diskutiert, dass die Erzeugungsmethoden als Seiteneffekt IR-Befehle an den aktuellen Block (~current_block~) anhängen.
+Bestehen die besuchten Statements nur aus Ausdrücken so ist auch alles fein, da diese keine neuen Basisblöcke erzeugen wollen.
+Was machen wir aber mit Statements, die wiederum Kontrollflusskonstrukte, wie eine Selektion, beinhalten?
+Um weiterhin korrekten Code für die Sequenzierung zu generieren, muss jede ~visit_*()~-Methode, die den potentiellen Kontrollfluss aufspaltet (eine Verzweigung im CFG einbaut), diesen an ihrem Ende wieder zusammenführen.
+Technisch gesehen darf der ~current_block~ am Ende zwar auf einen anderen Basisblock zeigen, dieser muss jedoch in Reihe mit dem ersten Block der Sequenzierung ausgeführt werden.
+
+Diese etwas schwammige Bedingung lässt sich noch etwas genauer formulieren: Auf der Folie ist jeder schwarze Punkt eine Stelle im CFG und steht für den Beginn einer Statement-Ausführung. Zwischen jedem dieser Sequenzierungspunkte kann ein beliebig komplexer Kontrollfluss entstehen. Jedoch muss jeder Pfad durch den CFG, der einen Sequenzierungspunkt geht, vorher alle anderen Sequenzierungspunkte besucht haben. Diese Pfad-Eigenschaft heißt *Dominanz-Relation*: Ein Punkt A im CFG dominiert einen anderen B, wenn alle Kontrollflüsse durch B vorher A besucht haben müssen.
+Wir werden die Dominanz-Relation in dieser Vorlesung nicht weiter diskutieren, jedoch sei ihnen gesagt, dass sie eine signifikante Rolle bei fortgeschritteneren Programm-Optimierungen spielt. Die entsprechenden Stichwort hierzu, wenn Sie sich weiter darüber informieren wollen, sind Dominanz-Grenze und Single-Static-Assignment-Form (SSA).
+
+#+begin_src latex
+\begin{frame}{Kontrollfluss: Selektion}
+  \btAnimation[width=\textwidth]{center,range=1-8:<1->}{fig/08-condition}
+\end{frame}
+#+end_src  
+
+Bei den Selektionen schauen wir uns nur die einfachste Form der bedingten Ausführung an:
+if-else-Konstrukte mit Boolescher Bedingung.
+Am Anfang unserer Erzeugungsmethode für diesen AST-Knotentypen (Übung:
+~visit_IfStmt()~) gilt die Invariante, dass der ~current_block~ eindeutig auf einen Basisblock zeigt.
+In diesen Basisblock können bereits andere Befehle hinein generiert worden sein, aber jetzt sind wir an der Reihe.
+Zunächst müssen wir den R-Wert der Bedingung ausrechnen, falls dies ein komplexerer *Ausdruck* ist und, beispielsweise, logische oder arithmetische Operationen beinhaltet.
+Nun erzeugen wir drei neue Basisblöcke:
+
+- BB1 für den Then-Zweig
+- BB2 für den Else-Zweig
+- BB3 zum Zusammenführen des gespaltenen Kontrollflusses
+
+Den Kontrollfluss spalten wir in BB0 auf, indem wir dort, mit dem Ergebnis der Bedingung einen ~IfGoto~-Befehl anhängen, der entweder zu BB1 oder zu BB2 verzweigt.
+
+Für den *Then-Zweig*, setzen wir den ~current_block~-Zeiger auf BB1 und besuchen den entsprechenden Unterbaum im AST um BB1 mit Befehlen zu füllen.
+Am Ende dieses Besuchs kann es allerdings sein, dass ~current_block~ nicht mehr auf BB1 zeigt, sondern auf einen Block BBn, der allerdings von BB1 dominiert wird.
+Das Bild auf den Folien zeigt also nicht die ganze Wahrheit, sondern nur den vereinfachten Fall, wenn innerhalb von ~ifStmt.then_block~ der Kontrollfluss nicht weiter aufgespalten wird.
+Egal wie, nach dem Besuchen des Then-Zweiges, fügen wir ein ~Goto .BB3~ ein um den Kontrollfluss wieder zusammen zu führen.
+
+In gleicher Weise gehen wir auch beim Else-Zweig vor. Allerdings kann es sein, dass es im AST keinen Else-Unterbaum gibt, wenn der Entwickler keinen angegeben hat. In diesem Fall generieren wir den Else-Zweig dennoch und kümmern uns in der Optimierung darum, diesen überflüssigen Block wieder zu entfernen.
+
+Am Ende der Selektion stellen wir die Sequenzierungs-Invariante wieder her, indem wir den ~current_block~ auf BB3 setzen, welcher im CFG von BB1 dominiert wird.
+Alle Pfade die BB3 erreichen, haben vorher BB1 besucht.
+
+#+begin_src latex
   \begin{frame}{Kontrollfluss: Iteration}
     \btAnimation[width=\textwidth]{center,range=1-8:<1->}{fig/08-loop}
   \end{frame}
+#+end_src
 
+Ziemlich ähnlich sieht es bei Iterationen aus.
+Wir schauen uns an dieser Stelle nur ganz normale ~while~-Schleifen an.
+Zu Beginn erzeugen wir ebenfalls mehrere Basisblöcke um den Kontrollfluss der Schleife abzubilden. 
+
+Anderes als bei der Selektion spalten wir allerdings die Auswertung der Bedingung in einen eigenen Basisblock (BB1) ab, da dieser nicht nur einmal beim Betreten der Schleife ausgeführt werden soll, sondern vor jedem Schleifendurchgang.
+
+Da wir Code für eine ~while~-Schleife, und keine ~do-while~-Schleife, betreten wir zuerst den Schleifenkopf BB1, in den wir den Code für die Auswertung der Bedingung hinein generieren. Am Ende des Schleifenkopfes prüfen wir, ob eine weitere Iteration durchgeführt werden soll, oder ob wir hinter die Schleife zu BB3 springen.
+
+Zu Generierung des Schleifenkörpers setzen wir ~current_block~ auf BB2 und besuchen den entsprechenden Unterbaum im AST (~whileStmt.body~).
+Wiederum könnte der Kontrollfluss innerhalb des Schleifenkörpers gespalten werden, jedoch ist dieser am Ende wieder eindeutig und wir können einen *Rücksprung zum Schleifenkopf* einfügen um die nächste Runde der Iteration ein zu läuten.
+
+Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wieder her.
+
+#+begin_src latex
   \begin{frame}{Diskussion: Optimierte Codegenerierung}
     \bi
     \ii Die gezeigte Codeerzeugung generiert \alert{ineffizienten Code} {
@@ -901,6 +965,7 @@ Schauen Sie sich ruhig an dieser Stelle den Übungsübersetzer an (~CodeGen.rval
     \OrangeBox<4->{Eine valide Entscheidung für Übersetzer, aber nicht für Interpreter.}
   \end{frame}
 #+end_src
+
 ** Fallstudie für komplexe Objekte: Records
 #+begin_src latex
 \dividerframe{Komplexere Objekte\\und\\Operationen}
