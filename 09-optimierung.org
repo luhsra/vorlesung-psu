@@ -58,7 +58,7 @@
     \begin{columns}[t]
 
     
-      \begin{onlyenv}<1-2>
+      \begin{onlyenv}<handout:1-2|1-2>
         \begin{column}{0.49\textwidth}
           \begin{code}[tag=L0]
           \lstinputlisting[style=lzero]{lst/09-example.l0}
@@ -67,11 +67,11 @@
         Bei genauer Betrachtung, sehen wir, dass dieses Programm \ALERT{immer 0} zurück geben wird.
 
         \bigskip
-        \uncover<2>{Dafür wird echt viel gerechnet!}
+        \uncover<handout:2|2>{Dafür wird echt viel gerechnet!}
       \end{column}
 
     \end{onlyenv}
-    \begin{onlyenv}<3->
+    \begin{onlyenv}<handout:3-|3->
       \begin{column}{0.49\textwidth}
         \mbox{}\par\bigskip
         \enquote{Der Übersetzer schaut genau hin}
@@ -80,33 +80,63 @@
         \ii {Konstante Auswertung} {
           \\[0.5ex]\enquote{Bekanntes Vorrausberechnen}\\[0.5ex]
           \bi
-          \ii<4-> Arithmetische Berechnungen
-          \ii<5-> Konstante Sprungbedingungen
+          \ii<handout:4-|4-> Arithmetische Berechnungen
+          \ii<handout:5-|5-> Konstante Sprungbedingungen
           \ei
         }
-        \ii<6-> {Konstanten- und Kopiepropagation}
-        \ii<7-> Goto-auf-Goto  eliminieren
-        \ii<8-> {Dead-Code Elimination}
-        \ii<9-> {Basic-Block Merge}\\[2ex]
-        \ii<10-> \ldots repeat, until no change.
+        \ii<handout:6-|6-> {Konstanten- und Kopiepropagation}
+        \ii<handout:7-|7-> Goto-auf-Goto  eliminieren
+        \ii<handout:8-|8-> {Dead-Code Elimination}
+        \ii<handout:9-|9-> {Basic-Block Merge}\\[2ex]
+        \ii<handout:10-|10-> \ldots repeat, until no change.
         \ee
       \end{column}
     \end{onlyenv}
-    \begin{column}<2->{0.49\textwidth}\centering
-      \only<1-3>{\btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<1->}{fig/09-example-unoptimized}}%
-        \only<4>{\btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<1->}{fig/09-example-cf1}}%
-        \only<5>{\btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<1->}{fig/09-example-cf2}}%
-        \only<6>{\btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<1->}{fig/09-example-cvp}}%
-        \only<7>{\btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<1->}{fig/09-example-jumps}}%
-        \only<8>{\btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<1->}{fig/09-example-dce}}%
-        \only<9>{\btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<1->}{fig/09-example-merge}}%
-        \only<10>{\btAnimation[width=0.5\textwidth]   {raisebox,1:<1->}{fig/09-example-repeat}}
+    \begin{column}<handout:2-|2->{0.49\textwidth}\centering
+      \only<handout:1-3|1-3>{\btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<1->}{fig/09-example-unoptimized}}%
+        \btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<4>}{fig/09-example-cf1}%
+        \btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<5>}{fig/09-example-cf2}%
+        \btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<6>}{fig/09-example-cvp}%
+        \btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<7>}{fig/09-example-jumps}%
+        \btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<8>}{fig/09-example-dce}%
+        \btAnimation[height=0.9\textheight,width=\textwidth,keepaspectratio]{raisebox,1:<9>}{fig/09-example-merge}%
+        \btAnimation[width=0.5\textwidth]                                  {raisebox, 1:<10>}{fig/09-example-repeat}
       \end{column}
     \end{columns}
   \end{frame}
 #+end_src
 
-* Vorraussetzungen und Ziele
+In der letzten Vorlesung haben wir den abstrakten Sytntaxbaum zu einem IR-Programm übersetzt.
+Dabei haben wir den AST linearisiert und uns auf eine Ausführungsreihenfolge von Befehlen fest gelegt.
+Bei diesem Prozess der Codeerzeugung haben wir darauf verzichtet super performanten und effizienten Zwischencode zu erzeugen, der, beispielweise, minimal viele virtuelle Register verwendet.
+Ich habe ganz absichtlich eine Trennung der Belange von Codeerzeugung und Optimierung vorgenommen um die Prinzipien des einen Bereichs nicht mit Prinzipien des anderen Bereichs zu vermengen.
+In dieser Vorlesung wollen wir einen kurzen Blick auf den Bereich der Optimierung werfen.
+
+Dazu will ich als erstes den Umfang den wir hier, aufgrund der Kürze der Zeit, gleich einmal einschränken:
+Ganz generell ist die Optimierung von Programmen ein breites und altes Feld.
+Optimierungen können im Übersetzer in jedem Zwischenschritt durchgeführt werden.
+Der Übersetzer kann bereits beim Parsen Ausdrücke die ein konstantes Ergebnis liefern (~2+3~) durch das Ergebnis (~5~) ersetzen[fn::GCC tut dies, Clang nicht. Daher ist Clang leichter für Source-to-Source Transformationen anwendbar.]. Aber auch der Zwischencode oder der bereits erstelle Assembler können optimiert werden. 
+So breit können wir dieses Thema einfach nicht besprechen und ich werde mich daher auf einige relativ einfache Optimierungen auf der IR-Ebene konzentrieren. 
+Jedoch werden Sie dennoch einen Eindruck und, hoffentlich, eine gewisse Intuition bekommen, welche Fähigkeiten ein Übersetzer haben *kann* und wie Sie, als Entwickler, diesen Mechanismen möglichst wenig im Weg stehen.
+
+Als einleitendes Beispiel sehen Sie auf den Folien eine Funktion, die auf sehr komplizierte Art und Weise die Zahl 0 berechnet.
+Immer.
+Die gezeigte ~main()~-Funktion wird immer damit Enden, dass die Variable ~a~ den Wert 0 hat.
+Prüfen Sie es nach, verfolgen Sie den Kontrollfluss, es wird immer 0 dabei heraus kommen.
+Wenn wir uns aber den Kontrollflussgraphen anschauen, den die Codeerzeugung produziert hat, so spiegelt sich darin genau die Struktur wieder, die der Entwickler notiert hat.
+
+Geben wir dieses IR-Programm an den Optimierer, so wendet dieser eine Reihe von Optimierungsroutinen an, die zum Ziel haben die Anzahl der ausgeführten IR-Befehle zu verringern.
+Jede der im Beispiel aufgeführten Routinen, werden wir in dieser Vorlesung besprechen und Sie finden im Übersetzer der Übung eine beispielhafte Implementierung.
+Daher können Sie sich an dieser Stelle zurück lehnen und das Schauspiel genießen, wie Instruktionen sich verändern und verschwinden, und wie Blöcke und Kanten verschoben, verschmolzen und weggeräumt werden.
+Wie wunderschön:
+Eine Programm, das ein Programm verkürzt, ganz ohne menschliches Zutun und ohne dabei seine Semantik zu verändern.
+Die Kontrollflussgraphen auf den Folien sind im übrigen Echt und stammen aus dem Übungsübersetzer.
+
+* Voraussetzungen und Ziele
+:PROPERTIES:
+:CUSTOM_ID: 09-goals-and-means
+:END:
+
 #+begin_src latex
   \dividerframe{Ziele und Vorraussetzungen\\der Optimierung}
 
@@ -134,8 +164,43 @@
     \ei
   
   \end{frame}
+#+end_src
 
-  \begin{frame}{Wiederholung (1. Vorlesung): Korrekte Übersetzung}
+Bevor wir zu einzelnen Optimierungsroutinen kommen, müssen wir genauer definieren, was die Ziele und Mittel sind, die ein Optimierer hat und die er einsetzen darf.
+Das Ziel muss klar sein, genauso wie die Werkzeuge die angewendet und die nicht angewendet werden dürfen.
+
+Unser Startpunkt bei dieser Überlegung ist, wie immer im Übersetzerbau, der Entwickler und seine *Intention*. Verändern wir das Programm so, dass es nicht mehr dieser Intention entspricht, werden wir kein großes Glück in die Welt bringen. Die Art und Weise, wie diese Intention notiert wurde, ist der Programmtext der nach den semantischen Regeln der Sprache zu Papier (oder eher zu Datei) gebracht wurde. Der Entwickler bedient der Regeln der Sprache und formuliert sein Programm entlang der Garantien, welche die Sprache bietet. 
+
+Eine Verletzung einer solche Regel würde Sie wirklich unglücklich machen. Ein Beispiel hierzu: Jede Programmiersprache verspricht, dass Sie jenen Wert aus einer Variable wieder auslesen können, den Sie bei der letzten Zuweisung hinein geschrieben haben. Würde beim wieder auslesen ein anderer Wert herauskommen, wären Sie *maximal überrascht*[fn::Das Prinzip der *minimalen Überraschung* ist ein wichtiges Prinzip in der Informatik. Da in den abstrakt konstruierten Gedankengebäuden alles möglich ist, jedes Verhalten codierbar ist, ist es wichtig sich diesem Prinzip unterzuordnen. Überraschen Sie weder ihr zukünftiges Ich noch andere!]. Etwas formaler ausgedrückt würden wir sagen, dass ein Optimierer das Programm nur so verändern darf, dass seine erwartete Funktionalität, die von den Sprachregeln, hoch und heilig, versprochen wurden, unberührt bleiben. 
+
+Aber wozu das alles?
+Was bedeutet es ein Programm "besser" zu machen?
+Um dies zu verstehen müssen wir uns die *nicht-funktionalen Eigenschaften* des Programms anschauen.
+Nicht-funktional bedeutet, dass diese Eigenschaften nicht Teil des Zweckes des Programm sind.
+Selbst wenn die nicht-funktionalen Eigenschaften sehr sehr schlecht sind, könnten wir es benutzen um einen gewissen Zweck zu verfolgen.
+Jedoch würde es vielleicht sehr lange dauern[fn::Hundertausend Jahre], viel Energie benötigen[fn::Mehrere Sonnen], oder viel Speicherplatz belegen[fn::Aller jemals hergestellte RAM].
+
+Da ein Programm eine Vielzahl an nicht-funktionalen Eigenschaften hat, gibt es auch eine Vielzahl an unterschiedlichen *Optimierierungszielen*.
+Sie könnten sich vom Übersetzer wünschen, dass er das Programm dahingehend transformiert, dass es möglichst schnell ist (Ausführungszeit).
+Sie könnten aber auch ein möglichst kleines Programm haben wollen, was gerade noch in ihren Mikrocontroller passt (Programmgröße).
+Manche dieser Optimierungziele gehen Hand in Hand und weisen eine Korrelation auf.
+So ist Energieverbrauch und Ausführungszeit häufig (aber nicht immer!) stark miteinander korreliert. Manchmal ist diese Korrelation aber auch invers, wie dies bei Programmgröße und Ausführungszeit der Fall sein kann.
+Daher ist es wichtig sich *vorher* zu überlegen, was die Eigenschaft ist die man optimieren will.
+
+Um bei dieser Verbesserung wirklich eine Verbesserung und keine Verschlimmbesserung durchzuführen benötigt man eine Idee davon welche statische Änderung am Programmtext welche dynamische Änderungen zur Laufzeit bewirkt:
+"Sollte ich jene Instruktion durch diese andere Instruktion ersetzen um das Programm schneller zu machen, oder benötigt die neue Instruktion mehr Takte?"
+Um solche Fragen beantworten zu können braucht man eigentlich ein detailiertes *Kostenmodell* für die konkrete Zielplattform.
+Allerdings gibt es häufig ein solches Modell für den einen Prozessor, der in einer gewissen Generation aus einer bestimmten Herstellungscharge kommt, nicht.
+Daher greifen Übersetzer normalerweise auf gröbere Heuristiken zurück um Optimierungsentscheidungen zu treffen.
+Beispielsweise sind solche Heursitiken, dass Speicherzugriffe zu vermeiden sind und das Sprünge negative Auswirkungen auf das Pipelining haben.
+
+Für unser Vorhaben, das Optimieren auf IR-Ebene, gibt es noch ein weiteres Problem.
+Denn wir wissen bei IR-Optimierungen ja garnicht für welche Prozessorarchitektur das Progamm am Ende zu Assembler übersetzt wird.
+Wir müssen also noch allgemeiner das Programm "besser" machen.
+Daher werden wir versuchen ganz generell das Programm kleiner zu machen (weniger Instruktionen, weniger Basisblöcke) und Instruktionen zu vermeiden die in jedem Fall teurer in der Ausführung sind (weniger Sprünge).
+
+#+begin_src latex
+\begin{frame}{Wiederholung (1. Vorlesung): Korrekte Übersetzung}
     \bi
     \ii Die Programmiersprache definiert die \alert{beobachtbaren} Zustände. {
       \bi
@@ -158,7 +223,21 @@
     }
     \ei
   \end{frame}
+#+end_src  
 
+In der erstem Vorlesung habe ich bereits darüber gesprochen, das eine korrekte Übersetzung die *beobachtbaren Zustände* eines Programms nicht verändern darf. Diese beobachtbaren Zustände sind genau jenes, vom Entwickler, erwartete Verhalten. Wie das Programm diese beobachtbaren Zustände generiert ist aber im Grunde egal.
+
+Für unser Vorhaben, die Optimierung auf IR-Ebene, gibt es erstmal nur zwei Dinge die für ein Programm beobachtbar sind, weil sie Daten aus dem Programm an die Außenwelt transportieren können: Der Rückgabewert der ~main()~-Funktion und schreibende Speicherzugriffe.
+Lassen wir es zusätzlich zu, dass unser Programm Ausgabe machen kann (indem es einen Systemaufruf absetzt), so wären auch diese beobachtbar.
+
+Diese minimale Definition von beobachtbar (Rückgabewert, Schreibzugriffe, Systemaufrufe) ist allerdings nur dann von nutzen, wenn wir das gesamte Programm (== alle Funktionen) auf einmal optimieren.
+Allerdings ist eine so weitreichende Optimierung meist viel zu umfassend um handhabbar zu sein, weswegen wir die Optimierung einzelner Funktionen in Isolation anstreben.
+In diesem Fall müssen wir die beobachtbaren Zustände strenger definieren:
+Betrachten wir das Verhalten einer einzelnen Funktion, so können wir (von Außen), den Rückgabewert der Funktion (~Return~), die getätigten Schreibzugriffe (~Store~), und der Aufruf weiterer Funktionen (~Call~) beobachten.
+
+Würden wir zwei Kontrollflüsse, einmal vom optimierten Programm und einmal vom Unoptimierten, aufzeichnen und nach diesen drei IR-Befehlen filtern, so müssten beide Sequenzen exakt gleich sein. Es dürften keine Umsortierungen stattgefunden haben und die  Operanden müssten genau übereinstimmen.
+
+#+begin_src latex
   \begin{frame}{Phasen und Umfang der Optimierung}
     \begin{center}
       \includegraphics{fig/09-analyse}
@@ -179,6 +258,21 @@
     \ei
   \end{frame}
 #+end_src
+
+Im Allgemeinen zerfallen alle Optimierungenroutinen in zwei Schritte:
+Bei der *Analyse* finden der Übersetzer berechnet der Übersetzer alle, für diese Optimierung relevanten, Informationen aus dem Programm.
+Aufgrund dieser Wissensbasis wird dann entschieden ob die intendierte Optimierung auf den vorliegende Programmabschnitt überhaupt anwendbar ist, oder ob eine Optimierung das beobachtbare Verhalten verändern würde.
+Ist die Entscheidung getroffen, dass optimiert werden soll, geht es zur *Transformation* des Programms. Dabei wird das IR-Programm, unter zur Hilfenahme der extrahierten Informationen, modifiziert.
+
+Auf den Folien kann man beide Phasen deutlich getrennt voneinander sehen:
+Wir schieben zwei einzelne Instruktionen in die Analyse, in der wir sehen, dass das ~IfGoto~ immer dasselbe tut und zu L0 springen wird (die Bedingung ist immer wahr).
+Für das ~Add~ können keinen solchen Fakt generieren.
+Aufgrund dieses Wissens tauscht die Transformation das ~IfGoto~ durch ein entsprechendes ~Goto~ aus, lässt aber das ~Add~ völlig unverändert.
+Von den beobachtbaren Zuständen kann sich das Programm nicht geändert haben.
+
+Wie groß die Abschnitte sind die wir analysieren bzw. transformieren hängt von der Optimierung ab.
+Für manche Optimierungen genügt es auf eine einzelne Instruktion zu blicken und genau diese Instruktion zu modifizieren.
+Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszufinden, dass wir einzelne Instruktionen verändern dürfen. Aber Transformationen können auch Basisblöcke und Kontrollflusskanten verändern.
 
 * Optimierungen
 ** Instruktions- und Block-lokale Optimierungen
@@ -486,7 +580,7 @@
   \end{frame}
 #+end_src
 
-**  Optimierung des Kontrollflusses
+** Optimierung des Kontrollflusses
 #+begin_src latex
 
   \dividerframe{Optimierung des Kontrollflusses}

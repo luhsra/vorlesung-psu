@@ -1564,9 +1564,6 @@ _bswapdi2.o:
 In dieser Auflistung sehen wir zwei Funktionen, die GCC verwendet um die Byte-Order innerhalb eines Wortes vertauschen. Eine genaue Auflistung solcher Funktionen findet sich in der [[https://gcc.gnu.org/onlinedocs/gccint/Standard-Names.html][GCC Dokumentation]]. Die äquivalente Implementierung für LLVM wird in der compiler-rt Bibliothek implementiert. Dort finden wir auch die Implementierung für [[https://github.com/llvm-mirror/compiler-rt/blob/master/lib/builtins/bswapsi2.c][~bswapsi2()~]].
 
 * Zusammenfassung
-:PROPERTIES:
-:CUSTOM_ID: 08-conclusion
-:END:
 
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
