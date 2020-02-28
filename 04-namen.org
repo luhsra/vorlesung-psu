@@ -168,7 +168,7 @@ Hier helfen die Sprachkonstrukte der Namensdeklaration dabei, Komponenten entlan
       \bi
       \ii Wird vom Übersetzer teilweise vorbereitet oder schon ganz durchgeführt
       \ii Essenzieller Teil der semantischen Analyse (\texttt{name 'x' is not defined})
-      \ii Sowohl statischen (Bezeichner) als auch dynamische (Pointer), Informationen
+      \ii Verwendung statischer (Bezeichner) wie dynamischer (Pointer) Informationen
       \ei
     }
     \ei
@@ -205,6 +205,8 @@ Hier helfen die Sprachkonstrukte der Namensdeklaration dabei, Komponenten entlan
     \ei
   \end{frame}
 #+end_src
+
+TODO: Add AST in 04-scopes, 1. Bild, Rechte Seite
 
 Nach diesem sehr groben Überblick über den ganzen Bereich der Namen, möchte ich einige Grundbegriffe genauer definieren, damit ich für den Rest dieses Skripts auf eine möglichst wohldefinierte Nomenklatur zurückgreifen kann.
 Der erste Begriff ist der des *Namens*:
@@ -478,7 +480,7 @@ So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in de
 
 #+begin_src latex
   \begin{frame}{Einschränkung der Sichtbarkeit}
-    \begin{btBlock}[type=alert]{\ALERT{Ziel:} Wir wollen Interna der Implementierung verstecken}
+    \begin{btBlock}{\textbf{Ziel:} Wir wollen Interna der Implementierung verstecken}
       Zum Zwecke des \textbf{Information Hidings} wollen wir manche Namen nur \alert{innerhalb} eines Namensraumes sichtbar machen.
     \end{btBlock}
     \smallskip
@@ -682,9 +684,8 @@ Also direkt vor der Laufzeit des eigentlichen Programms.
 Manche Adressen werden erst beim Laden des Programms bekannt, da erst dann entschieden wird, an welcher Stelle im Speicher das Programm oder die Bibliothek geladen wird.
 Daher müssen die Adressen in der geladenen Binärdatei nochmal angepasst werden.
 Dies funktioniert technisch, indem der Linker sogenannte Relocation-Informationen mit in die Binärdatei packt.
-Diese Relocations haben in etwa die Form:
-"Wenn diese Bibliothek an Stelle X geladen wird, dann addiere X auf die Binärcodestelle X[1000] hinzu".
 Hierdurch kann der Übersetzer Code erzeugen, der abhängig davon ist, wo eine Bibliothek hin geladen wird.
+
 
 Noch später findet das *run-time binding* statt, beim dem die Adresse eines Objekts erst zur Laufzeit bekannt wird.
 Dies kann zum Beispiel der Fall sein, weil das Objekt auf dem Heap mittels ~malloc()~ erzeugt wurde.
