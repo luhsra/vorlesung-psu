@@ -275,7 +275,16 @@ Für manche Optimierungen genügt es auf eine einzelne Instruktion zu blicken un
 Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszufinden, dass wir einzelne Instruktionen verändern dürfen. Aber Transformationen können auch Basisblöcke und Kontrollflusskanten verändern.
 
 * Optimierungen
+In diesem Unterkapitel werden wir uns sechs verschiedene Optimierungsroutinen für den Zwischencode ansehen, den wir in der letzten Vorlesung definiert haben.
+Dabei werden wir Techniken kennen lernen, deren grundlegenden Arbeitsweisen auch bei anderen  Optimierungen zum Einsatz kommen.
+Die besprochenen Themen sind so sortiert, dass wir bei der Optimierung kleiner Einheiten (Instruktionen) zu den größeren Strukturen (Funktionen) im IR-Programm kommen.
+Jedoch bleiben wir in dieser Vorlesung immer auf der Funktions-lokalen Ebene und betrachten keine Optimierungen, die über Funktionsgrenzen hinweg operieren.
+
 ** Instruktions- und Block-lokale Optimierungen
+:PROPERTIES:
+:CUSTOM_ID: 09-opts-instruction-local
+:END:
+
 #+begin_src latex
 \dividerframe{Lokale Optimierungen}
 
@@ -307,7 +316,7 @@ Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszu
     \ei
   \end{frame}
 
-  \begin{frame}[fragile]{Algebraische Identitäten: Beispielhafte Ersetzugsmustern}
+  \begin{frame}[fragile]{Algebraische Identitäten: Einige Ersetzugsmuster}
     \def\Var#1{\colorbox{safegreen!40}{#1}}
     \def\Const#1{\colorbox{badbee!40}{#1}}
     \def\Label#1{\colorbox{luhblue!40}{#1}}
@@ -335,6 +344,46 @@ Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszu
   \end{frame}
 #+end_src
 
+Die erste Optimierungsroutine analysiert einen IR-Befehl nach dem anderen und ersetzt diesen, falls es möglich ist, durch einen Befehl, der später effizienter ausgeführt werden kann.
+Zwar haben wir auf der Ebene des IR-Codes kein Wissen darüber wie lange die einzelnen Befehle schlussendlich tatsächlich brauchen werden, aber wir stützen uns auf Heuristiken und grobe Verhältnisse, die für die viele Prozessorarchitekturen stimmen.
+Zusätzlich ermöglichen diese Instruktions-lokalen Optimierungen weitere, nachgelagerte, Optimierungsschritte; dazu aber erst später mehr.
+
+Die Kernidee dieser Familie von Optimierungen ist Instruktionen zu ersetzen durch Instruktionen die *algebraisch Äquivalent* sind.
+Dies bedeutet, dass die Ausführung der ursprünglichen Instruktion und die Ausführung der Ersetzung genau den gleichen nummerische Wert liefern.
+Dazu betrachten wir nicht nur die Art der Instruktion, sondern auch die Werte der Operanden, insbesondere wenn diese *Konstanten* sind.
+
+Bei der *Konstantenfaltung* sucht die Analyse nach Instruktionen die ausschließlich konstante Quelloperanden haben und die keine Seiteneffekte, neben dem beschreiben ihres Zieloperanden, haben.
+Insbesondere umfasst dies arithmetische, logische und bit-weise Befehle, sowie bedingte Sprünge mit konstanter Sprungbedingung.
+Da wir die Semantik eines jeden IR-Befehls genau definiert haben und die Quelloperanden konstant sind, können wir den Befehl bereits im Übersetzer ausführen.
+Dieses Vorziehen der Ausführung ist deshalb möglich, weil der Befehl zur Laufzeit immer das gleiche, konstante, Ergebnis liefern wird.
+Unsere Analyse liefert uns also eine statische Voraussage über das dynamische Verhalten des Programms.
+Die Transformation bei der Konstantenfaltung besteht dann darin, den Befehl durch eine einfache Zuweisung mit einem konstanten Operanden zu ersetzen.
+Wichtig bei der Berechnung des Ergebnisses ist, dass wir darauf achten die selbe Rechnung im Übersetzer zu durchzuführen, wie diese später, insbesondere an den Rändern des Wertebereichs, auch geschehen würde.
+
+Möglich ist diese Ersetzung, weil wir eine algebraische Identität ausnützen: Der Ausdruck ~1+2~ und ~3~ sind algebraisch äquivalent, obwohl er strukturell unterschiedlich ist.
+Diese Idee lässt sich teilweise auch dann anwenden, wenn nicht alle Argumente konstant sind.
+
+Bei der *Strength-Reduction* ist das Ziel Operationen, die komplexitäts-theoretisch aufwändiger sind durch weniger komplexe Befehle zu ersetzen.
+Informationstheoretisch ist, beispielsweise, eine Multiplikation teurer als eine Addition, die wiederum teurer ist als ein Bit-Shift.
+Diese Hierarchie der arithmetischen Operationen können wir mit der Komplexitätstheorie begründen:
+Bei der Addition wissen wir, dass eine Addition einer N-stelligen Binärzahl in N sequentiellen Bitmanipulationen (Volladdierer) durchgeführt werden kann; addieren also in O(N) geht.
+Die Multiplikation dagegen ist deutlich aufwändiger und die effizienteren Multiplikationsalgorithmen{{{wikipedia_en(Schönhage–Strassen_algorithm)}}} haben eine höhere Schranke.
+Dieser Unterschied in der Komplexität findet sich ebenfalls in der Hardware wieder; ein Addierwerk braucht deutlich weniger Gatter als eine Multiplikationsschaltung.
+Daher lohnt es sich Multiplikationen durch Additionen, und Additionen durch Bit-Shifts zu ersetzen, wo auch immer dies möglich ist.
+
+Konkret sucht die *Strength-Reduction* nach Operationen bei denen einige der Quelloperanden konstant sind.
+So ist die Multiplikation einer Variable mit der Zahl 2 äquivalent zur Addition mit Variable mit sich selbst. Noch einfacher wäre hier ein Links-Shift um eine Stelle, aber unser IR weißt leider kein ~LShift~ Kommando auf.
+Häufig haben Strength-Reduction Optimierungen die Nebenbedingung dass die Konstante eine Zweierpotenz ist oder ein andere Zusätzliche Bedingung erfüllt.
+
+Sehr ähnlich zur Strength-Reduction ist die Erkennung von *Null-Operationen*, bei denen die Quelloperanden unverändert durchgeschleift werden, oder sich vollständig auslöschen. So ist die Addition mit der Zahl 0 oder die Multiplikation mit der Zahl 1 eine Null-Operationen. Aber auch die Subtraktion einer Zahl mit sich selbst führt dazu, dass das Ergebnis im Vorhinein bekannt ist.
+
+Technisch funktionieren diese Optimierungen mit algebraischen Identitäten so, dass die Analyse nach gewissen Mustern sucht (Farbige Kästen auf der Folie), weitere Bedingungen prüft, und dann die Ersetzung durchführt. 
+
+Besonders hervorzuheben bei der Tabelle mit den Ersetzungsmustern ist das Muster für ~IfGoto~:
+Wenn die Sprungbedingung eine Konstante ist, so können wir das ~IfGoto~ durch ein entsprechendes ~Goto~ ersetzen.
+Spannend ist diese Ersetzung deshalb, weil diese Ersetzung als Seiteneffekt hat, dass sich der Kontrollflussgraph ändert, weil eine der ausgehenden Kanten des Basisblocks nicht mehr möglich ist.
+Speichert die CFG-Datenstruktur die Nachfolger eines Blockes, und berechnet diese nicht jedes mal aus den Sprungbefehlen neu, so muss bei dieser Optimierung die Graphstruktur aktualisiert werden.
+
 #+begin_src latex
   \begin{frame}{Konstanten- und Kopiepropagation}
     \begin{columns}
@@ -350,14 +399,14 @@ Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszu
     \medskip
 
     \bi
-    \ii<3-> Propagation bekannter Werte durch einen Basisblock {
+    \ii<handout:3-|3-> Propagation bekannter Werte durch einen Basisblock {
       \bi
       \ii Zum Zeitpunkt einer Zuweisung werden rechte und linke Seite äquivalent.
       \ii Operanden-Ersetzung in den folgenden Instruktionen
       \ii \ALERT{Aber}: Wir dürfen nur solange ersetzen, wie die Äquivalenz sicher ist.
       \ei
     }\medskip
-    \ii<4-> \structure{Intuition} für die Propagation von Konstanten und Werten {
+    \ii<handout:4-|4-> \structure{Intuition} für die Propagation von Konstanten und Werten {
       \bi
       \ii Iteration über die Instruktionen eines BBs, Mitführen von Äquivalenzmengen
       \ii Zuweisungen etablieren eine neue Äquivalenz zwischen LHS und RHS
@@ -383,10 +432,68 @@ Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszu
     }
     \ei
 
-    \OrangeBox<8>{Kann die Funktion f, die Variable x, y, oder t0 verändern?}
+    \OrangeBox<handout:8|8>{Kann die Funktion f, die Variable x, y, oder t0 verändern?}
   \end{frame}
+ #+end_src
 
-  \begin{frame}{Alias-Problematik bei der Datenflussanalyse}
+Durch die Ersetzung der Null-Operationen, und insbesondere durch die Konstantenfaltung, kommt es dazu, dass im Zwischencode viele Zuweisungen geschenen, die eine konstante rechte Seite haben.
+Direkt nach der Zuweisung ist der Wert der Zielvariable also statisch bekannt.
+Daher liegt der Gedanke nahe, die zukünftigen Verwendungen dieser Variable direkt durch die Konstante zu ersetzen.
+So kann im Beispiel die Verwendung von ~t1~ durch die Konstante ~2~ ersetzt werden.
+
+
+Genau das ist die Zielsetzung der *Konstantenpropagation*:
+Wir möchten statisch bekannte Werte, über Instruktionsgrenzen hinweg, durch das IR-Programm durch propagieren.
+Dabei müssen wir uns aber nicht nur konstante Werte beschränken, sondern wir können auch sogenannte "Kopien" mit der *Kopiepropagation* (Copy-Propagation) durchschleifen.
+Zusammengefasst nennt man diese Art der Optimierung im Englischen daher Copy-Value-Propagation (CVP).
+
+Bei der CVP gehen wir, in Richtung des Kontrollflusses, durch das Programm und ersetzen *Quelloperanden durch Konstanten oder Werte*, die an dieser Stelle garantiert den gleichen Wert haben.
+Dabei müssen wir aber vorsichtig vorgehen, um nur Ersetzungen vorzunehmen, die immer und garantiert immer äquivalent sind.
+Dazu führen wir, während der Optimierung, darüber Buch welche Variablen und Konstanten vor jeder einzelnen Instruktion äquivalent sind.
+Mit jeder Instruktion aktualisieren wir unsere Äquivalenzmengen und fahren mit der nachfolgenden Instruktion fort.
+Bei dieser Optimierung kann Analyse (Aktualisierung der Äquivalenzmengen) und Transformation (Ersetzung der Quelloperanden) verschränkt durchgeführt werden.
+
+Zunächst schauen wir uns aber die CVP für einen einzelnen Basisblock an.
+Später weiten wir diese Optimierung auf eine ganze Funktion aus, indem wir Äquivalenzmengen über Basisblöcke hinweg propagieren.
+Aber zuerst müssen wir definieren, was eine *Äquivalenzmenge* ist:
+Eine Äquivalenzmenge ist eine Menge von Variablen und Konstanten, die einen Gültigkeitszeitpunkt hat. Zu diesem Zeitpunkt haben alle Elemente den gleichen  R-Wert.
+Da wir die Mengen anhand der Äquivalenz-Relation[fn::Die Äquivalenz-Relation ist transitiv!] bilden gilt auch dass jede Variable und jeder Wert zu einem Zeitpunkt nur in einer einzigen Äquivalenzmenge sein kann.
+Anders ausgegdrückt: Die Menge der zeitgleich gültigen Äquivalenzmengen *partitioniert* die Menge aller Variablen und Werte, wobei ein-elementige Äquivalenzmengen auftreten können (und auch die Regel sind).
+
+Zu Zeitpunkt der Gültigkeit können wir einen Quelloperanden, wenn dieser in einer Äquivalenzmenge ist, durch jedes andere Element der Äquivalenzmenge ersetzen.
+Bevorzugt werden wir natürlich Variablen durch Konstanten ersetzen, aber auch die Ersetzung von temporären Variablen durch benutzerdefinierte Variablen ist sinnvoll.
+Es stellt sich nur noch die Frage:
+Welche Regeln verwenden wir um die Äquivalenzmengen zu erzeugen und zu aktualisieren?
+Betrachten Sie sich hierzu die Folie.
+
+Für einen einzelnen Basisblock starten wir ohne jegliches Wissen über irgendwelche Äquivalenzen.
+Wir nehmen an, dass alle Variablen unbekannte Werte haben und keine Variable äquivalent zu einer anderen ist.
+Durch diese konservative Annahme sind wir zum Beginn der Optimierung in einem sicheren Zustand.
+Beim fortschreiten der CVP, schieben wir die Menge der Äquivalenzmengen *vorwärts durch den Basisblock* und wenden verschiedene Aktualisierungsregeln abhängig von den IR-Befehlen an.
+
+
+Die wichtigste Aktualisierungsregel für die CVP ist die für den ~Assign~-Befehl.
+Denn mit einer Zuweisung entsteht, hinter der Zuweisung, eine Äquivalenz zwischen der rechten und der linken Seite.
+Ist die keine der beiden Seiten teil einer größeren Äquivalenzmenge, so sind wir damit fertig eine zwei-elementige Äquivalenzmenge aus linker und rechter Seite zu erzeugen.
+Ist die rechte Seite bereits Element einer Äquivalenzmenge, so wird die linke Seite der Zuweisung dieser größeren Äquivalenzmenge zugeschlagen.
+
+Besondere Vorsicht müssen wir nur walten lassen, wenn die linke Seite einer Zuweisung bereits Teil einer Äquivalenzmenge ist.
+Da die linke Seite mit der Zuweisung überschrieben wird, müssen wir diese vorher aus ihrer Äquivalenzmenge löschen, bevor die neue Äquivalenz postulieren.
+Dies gilt auch für alle anderen IR-Befehle, die eine Variable schreiben: Die Zielvariable muss aus allen Äquivalenzmengen entfernt werden (siehe ~x := Add x, y~), bevor neue Äquivalenzen etabliert werden.
+
+Im Beispiel sehen wir auch, dass Ersetzungen und Modifikation der Äquivalenzmengen verschränkt durchgeführt werden (~y := Assign x~).
+Für jeden einzelnen Befehl ist dabei die Reihenfolge:
+(1) Ersetzungen durchführen, (2) Zieloperanden aus Äquivalenzmenge entfernen und (3) neue Äquivalenzen etablieren.
+Dies entspricht der Reihenfolge in der Ausführung:
+Zuerst werden Quelloperanden gelesen, bevor die Zieloperanden mit den berechneten Werten überschrieben werden.
+
+Besonders spannend bei der Aktualisierung der Äquivalenzmengen, sind solche Instruktionen, die einen Seiteneffekt haben.
+Dazu zählt, insbesondere der ~Store~ und der ~Call~ Befehl.
+Beide könnten direkt, oder indirekt dazu führen, dass zwei Variablen nicht mehr äquivalent sind, obwohl sie nicht als Operand im IR-Programm vorkommen.
+Dies werden wir uns nun genauer anschauen.
+
+#+begin_src latex
+   \begin{frame}{Alias-Problematik bei der Datenflussanalyse}
 
     \begin{center}
       \includegraphics[page=12]{fig/09-cvp}
@@ -414,7 +521,7 @@ Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszu
       \ei
     }
     \ei
-    \begin{overlaybox}<4>[draw=srared,ultra thick,drop shadow,inner sep=1em]
+    \begin{overlaybox}<4|handout:2>[draw=srared,ultra thick,drop shadow,inner sep=1em]
       \columntitle{Take-Away für den effizienten Programmierer}\medskip
 
       \bii
@@ -425,6 +532,30 @@ Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszu
     \end{overlaybox}
   \end{frame}
 #+end_src
+
+Das *größte Problem* für die CVP-Optimierung sind *Zeiger*.
+Zeiger sind deswegen blöd, weil durch einen ~Store~-Befehl eine Zuweisung zu einer Variable erfolgen könnte, die im Befehl nicht als Operand vermerkt ist [fn::Was ja auch ziemlich genau der Zweck der Store-Instruktion ist, Variablen daten-abhängig zu modifizieren.].
+Da wir bei jeder Zuweisung und bei jedem Schreiben eines Zieloperanden die Äquivalenzmengen aktualisieren müssten, haben wir beim ~Store~ ein Problem.
+Indirekt bekommen wir bei ~Call~ das gleiche Problem, da die aufgerufene Funktion ein solche Speichermanipulation durchführen könnte.
+
+Nehmen wir mal an, dass der Zeiger ~ptr~ auf den Folien auf die Variable ~y~ zeigt.
+In dem Fall müssten wir ~y~ aus der ~{y, 2}~-Menge entfernen und könnten eine ~{y, 3}~-Menge etablieren.
+Allerdings müssten wir dazu *ganz sicher wissen*, dass ~ptr~ auf ~y~ zeigt.
+Sind wir uns dessen nicht ganz sicher, ist das Aktualisieren der Äquivalenzmengen deutlich komplizierter.
+
+Das Problem, was die CVP mit Zeigern hat, haben auch andere Optimierungsroutinen und wir nennen es das *Alias-Problem für Zeiger*.
+Da Zeiger Werte sind, die durch das Programm hindurch propagieren, ist es schwierig, bis unmöglich, festzustellen auf welche Objekte ein Zeiger an einer gewissen Stelle zeigt/zeigen kann.
+Im Allgemeinen ist das Alias-Problem sogar *unentscheidbar* und ein Übersetzer kann nur sichere Unterapproximation angeben, die durch aufwändige interprozedurale Analysen mühsam berechnet werden müssen.
+
+
+In dieser Vorlesung lassen wir die Alias-Analyse weg und bedienen uns für die zwei kritischen Befehle bei der CVP einer sehr konservativen Heuristik: Wir werfen bei jedem ~Store~ und bei jedem ~Call~ alle Äquivalenzmengen weg und starten wieder von vorne.
+
+Was wir aber aus der Kenntnis um das Alias-Problem lernen können, ohne eine Lösung dafür zu haben, ist, dass Zeiger für den Optimierer problematisch sind.
+Insbesondere, wenn Sie wild mit Zeigern herumrechnen und kuriose Zeiger-Magie machen wird der Optimierer aussteigen und ihre Funktion teilweise oder gänzlich unoptimiert zurück lassen.
+Wenn Sie also Gedacht haben "Ah, hier hab ich einen wirklich guten Trick mit Zeigern gefunden", so kann dies am Ende, für die Performance, gänzlich nach hinten losgehen.
+Daher, und auch aus einer Vielzahl an anderen Gründen:
+Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer, "optimierten Code" zu schreiben.
+
 
 ** Funktionsweite Optimierungen
 #+begin_src latex
