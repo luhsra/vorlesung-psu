@@ -548,7 +548,9 @@ Da Zeiger Werte sind, die durch das Programm hindurch propagieren, ist es schwie
 Im Allgemeinen ist das Alias-Problem sogar *unentscheidbar* und ein Übersetzer kann nur sichere Unterapproximation angeben, die durch aufwändige interprozedurale Analysen mühsam berechnet werden müssen.
 
 
-In dieser Vorlesung lassen wir die Alias-Analyse weg und bedienen uns für die zwei kritischen Befehle bei der CVP einer sehr konservativen Heuristik: Wir werfen bei jedem ~Store~ und bei jedem ~Call~ alle Äquivalenzmengen weg und starten wieder von vorne.
+In dieser Vorlesung lassen wir die Alias-Analyse weg und bedienen uns für die zwei kritischen Befehle bei der CVP einer sehr konservativen Heuristik:
+Wir werfen bei jedem ~Store~ und bei jedem ~Call~ alle Äquivalenzmengen weg und starten wieder von vorne.
+Die gesamte CVP-Analyse finden Sie im Übungsübersetzer.
 
 Was wir aber aus der Kenntnis um das Alias-Problem lernen können, ohne eine Lösung dafür zu haben, ist, dass Zeiger für den Optimierer problematisch sind.
 Insbesondere, wenn Sie wild mit Zeigern herumrechnen und kuriose Zeiger-Magie machen wird der Optimierer aussteigen und ihre Funktion teilweise oder gänzlich unoptimiert zurück lassen.
@@ -556,8 +558,10 @@ Wenn Sie also Gedacht haben "Ah, hier hab ich einen wirklich guten Trick mit Zei
 Daher, und auch aus einer Vielzahl an anderen Gründen:
 Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer, "optimierten Code" zu schreiben.
 
-
 ** Funktionsweite Optimierungen
+:PROPERTIES:
+:CUSTOM_ID: 09-opt-function-wide
+:END:
 #+begin_src latex
   \dividerframe{Funktionsweite Optimierungen}
 
@@ -565,7 +569,7 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
     \textbf{Bisher}: Wertepropagation (CVP) innerhalb eines Basisblocks.
 
     \begin{center}
-      \strut\alt<1>{
+      \strut\alt<handout:1|1>{
         \siginline{CVP}{BasicBlock}{()}
       }{
         \siginline{CVP}{BasicBlock, Equivalences}{Equivalences}
@@ -580,7 +584,7 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
       \ii Die CVP propagiert eine Äquivalenzmenge durch einen Block
       \ei
     }\medskip
-    \ii<2-> Wir wollen die CVP auf eine ganze Funktion anweden {
+    \ii<handout:2-|2-> Wir wollen die CVP auf eine ganze Funktion anweden {
       \bi
       \ii Blöcke werden zu Transformator-Funktionen für Äquivalenzmengen
       \ii Äquivalenzmengen \enquote{fließen} entlang der Kontrollflusskanten
@@ -589,8 +593,32 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
     }
     \ei
   \end{frame}
+#+end_src
 
-  \begin{frame}{Fixpunktiteration auf einem CFG}
+Bisher haben wir die CVP-Optimierung nur für einen einzelnen Basisblock durchgeführt.
+Wir haben jeden Basisblock einer Funktion genommen und der CVP diesen Block, in Isolation, mit der Bitte um Verbesserung, gegeben.
+Dieses Vorgehen ist deswegen der Startpunkt der CVP, weil der Kontrollfluss innerhalb eines Basisblocks sehr einfach und genau definiert ist:
+Von Oben, nach Unten.
+Für jeden Befehl ist klar, welcher Befehl vorher und welcher Befehl hinter her ausgeführt wird.
+Entlang dieses linearen Kontrollflusses ist ganz genau klar, wohin wir die Äquivalenzmengen propagieren müssen.
+Wollen wir die Konstanten- und Kopiepropagation auf die Ebene einer ganzen Funktion heben, müssen wir aber auch damit umgehen können wenn der CFG sich aufspaltet oder wieder zusammen kommt.
+
+Grundlegend für die funktions-weite CVP-Optimierung ist, dass die Berechnung der Äquivalenzmengen eine *Datenflussanalyse* ist.
+Der Datenfluss beschreibt wie Werte zwischen Variablen und Operationen durch das Programm "fließen" und welche Werte mit welchen anderen Werten verechnet werden.
+Gewissermaßen gibt es neben dem Kontrollflussgraphen, der die Befehle einer Funktion ordnet, auch noch einen Datenflussgraphen, der die Variablen einer Funktion miteinander verbindet.
+Datenfluss und Kontrollfluss sind eng aneinander gekoppelt und bedingen sich auch gegenseitig:
+Der Kontrollfluss gibt vor welche Instruktionen Operanden verrechnen und Bedingungen an Sprüngen bestimmen wohin der Kontrollfluss geht.
+Vereinigt sich der Kontrollflussgraph an einem Basisblock wieder, so fließen auch die Datenflüsse aus allen Vorgängerblöcken an dieser Stelle zusammen.
+
+Um die CVP auf ganze Funktionen anzuwenden, verwenden wir das bisher gezeigte Verfahren für einen einzelnen Basisblock (~CVP(BasicBlock)~) als eine Transformationsfunktion für Mengen von Äquivalenzmengen (~Equivalences~).
+Wir nehmen also eine Äquivalenzmengen-menge und einen Basisblock und fragen:
+Welche Äquivalenzen gelten nach diesem Basisblock, wenn dies die Äquivalenzen davor sind.
+Bewaffnet mit dieser ~CVP(BasicBlock, Equivalences) -> Equivalences~ Funktion können wir Äquivalenzmengen entlang der Kontrollflusskanten propagieren lassen.
+Wir führen die CVP für alle Blöcke dann solange aus, bis sich nichts mehr ändert und wir einen *Fixpunkt* erreicht haben.
+Die Basisblock-übergreifende CVP wird also zu einer *Fixpunkt-Iteration*, die wir uns nun im genaueren anschauen werden.
+
+#+begin_src latex
+\begin{frame}{Fixpunktiteration auf einem CFG}
 
     \begin{columns}
       \begin{column}{0.49\textwidth}
@@ -605,12 +633,12 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
 
         \columntitle{Elemente}
         \bii
-        \ii<2-> Transformation-Funktion: \texttt{T()}
-        \ii<3-> Propagierte Zustände: $d_n$
-        \ii<4-> Zustands-Merge-Funktion: \texttt{M()}
+        \ii<handout:2-|2-> Transformation-Funktion: \texttt{T()}
+        \ii<handout:3-|3-> Propagierte Zustände: $d_n$
+        \ii<handout:4-|4-> Zustands-Merge-Funktion: \texttt{M()}
         \eii
 
-        \uncover<5->{
+        \uncover<handout:5-|5->{
           \medskip
           \columntitle{Vorgehen}
           \bii
@@ -623,7 +651,38 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
       \end{column}
     \end{columns}
   \end{frame}
+#+end_src
 
+Um die CVP auf die Funktions-Ebene zu heben, schauen wir uns ganz generell an, wie Datenflussanalysen als Fixpunktiterationen auf dem Kontrollflussgraphen formuliert werden können.
+Also, einen Schritt zurück:
+Wir wollen eine Datenflussanalyse auf einer Funktion durchführen, die Wissen über den Zustand von Variablen berechnen soll.
+Dieser Zustand wird durch IR-Befehle manipuliert.
+Im Beispiel der CVP ist der Zustand für den wir uns interessieren die Menge der Äquivalenzmengen zu gewissen Zeitpunkten. 
+
+Für eine Fixpunktanalyse auf einem Kontrollflussgraphen brauchen wir 3 Funktionen und einen Datentypen.
+Der Datentyp ~d~ beschreibt den Zustand für den wir uns interessieren.
+Die erste Funktion initialisiert einen leeren Zustand, der minimal wenig Wissen beinhaltet.
+Im CVP-Beispiel ist der minimale Zustand die leere Äquivalenzmengen-Menge.
+
+Die erste "richtige" Funktion ist die Transformationsfunktion ~T()~, die einen Basisblock und einen Zustand als Parameter bekommt und einen neuen Zustand errechnet.
+Die Transformationsfunktion fängt ein, welche Auswirkung ein Basisblock auf einen gegebenen Zustand hat.
+Im CVP-Beispiel beginnt die Propagation der Mengen dann nicht mit der leeren Menge, sondern mit der gegebenen Menge.
+
+Die zweite Funktion, die wir wiederholt aufrufen werden, ist die Zustands-Merge-Funktion ~M()~.
+Diese Funktion hat mehrere Zustande als Parameter und berechnet die Verschmelzung dieser Eingangszustände.
+Da jeder Eingangs-Zustand eine gewisse Wissensbasis darstellt, verechnet ~M()~ seine Eingabeparameter dahingehend, dass der Ausgangszustand das kombinierte Wissen darstellt.
+Im CVP-Beispiel werden wir eine Äquivalenzmengen-Menge berechnen die nur solche Variablen (und Konstanten) als äquivalent postuliert, die in allen Eingabezuständen äquivalent waren.
+Keine Sorge, ich mache in einer Minute ein konkretes Beispiel hierzu.
+
+Das Vorgehen der Fixpunktiteration ist dann wie folgt:
+Wir legen auf jede Kante des Kontrollflussgraphen einen initialen leeren Zustand.
+Wir nehmen uns dann, wiederholt, einen Basisblock B heraus, kombinieren alle Zustände die auf eingehenden Kanten von B liegen mittels ~M()~.
+Den kombinierten Zustand schieben wir durch ~T()~ und legen das Ergebnis auf die Ausgangskanten von B.
+Verändert sich dadurch der Zustand auf einer Kante, so führen wir den Vorgang für diesen Nachfolgeblock noch einmal aus.
+Diese Iteration führen wir solange durch, bis sich kein Zustand auf einer Kante mehr ändert.
+Wir haben einen Fixpunkt erreicht.
+
+#+begin_src latex
   \begin{frame}{Fixpunktiteration als Worklist-Algorithmus}
     \begin{code}[tag=Python]
       \lstinputlisting[style=py,style=smaller,linerange=s0-e0]{lst/09-fixpoint.py}
@@ -634,8 +693,26 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
       \uncover<6->{\lstinputlisting[style=py,style=smaller,linerange=s5-e5]{lst/09-fixpoint.py}}
     \end{code}
   \end{frame}
+#+end_src
 
-  \begin{frame}[t]{Fixpunkiteration als Datenflussanalyse}
+Schauen wir uns den Code für einen solchen Fixpunktalgorithmus einmal genauer an.
+Was sie hier auf der Folie sehen ist ein *Worklist-Algorithmus*, der parametrisiert verschiedene Datenflussanalysen durchführen kann.
+Dieser Vorgehen heißt deswegen Worklist-Algorithmus, weil wir in einer Liste (~worklist~) speichern für welche Blöcke wir das Verfahren nocheinmal anwenden müssen.
+
+Parametrisiert ist die Funktion ~fixpoint()~ mit den 3 Funktionen (Initialisieren, Zustands-Merge und Transformation), sowie mit dem CFG auf dem gearbeitet werden soll.
+
+Als erstes legen wir uns ein Dictionary ~states~ an, um den Ausgangszustand für jeden Knoten des Graphen zu speichern.
+Dies ist der Zustand, den ein Knoten ~node~ an seine Nachfolger propagiert. Wir initialisieren dieses Dictionary mit leeren Zuständen.
+
+Der Algorithmus läuft dann solange, bis ~worklist~ leer gelaufen ist.
+In jedem Schleifendurchgang nehmen wir uns ein Element aus der Worklist und arbeiten dieses Ab.
+Zuerst werden alle Zustände der Vorgänger in ~d_ins~ gesammelt und mittels ~merge(d_ins)~ in ~d_in~ kombiniert.
+Diesen kombinierten Zustand schieben wir durch ~transform(node, d_in)~.
+Ist das Ergebnis der Transformation gleich dem bisherigen Ausgangszustand des Knotens, ist nichts zu tun.
+Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die Worklist, da deren Ausgangszustand sich ja da durch ändern könnte, dass einer ihrer Eingänge sich geändert hat.
+
+#+begin_src latex
+\begin{frame}[t]{Fixpunkiteration als Datenflussanalyse}
     \bi
     \ii \structure{Vorraussetzungen} für die Terminierung des Worklist-Algorithmus{
       \bi
@@ -643,9 +720,9 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
       \ii Beliebte Datenstrukturen für die Zustand: Bitvektoren, Mengen
       \ii Beispiel für eine strikt-monotone : {
         \bi
-        \ii \texttt{init()}: \hspace{2cm}\btSetTab Generiere eine leere Menge
-        \ii \texttt{merge()}: \btUseTab Vereinige alle Eingabemengen
-        \ii \texttt{transform()}: \btUseTab Füge der Menge nur Elemente hinzu
+        \ii \texttt{init()}: \hspace{2cm}\btSetTab Generiere eine leere Bitvektoren
+        \ii \texttt{merge()}: \btUseTab Bit-weises ODER
+        \ii \texttt{transform()}: \btUseTab Bits werden gesetzt
         \ei
       }
       \ei
@@ -665,7 +742,27 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
     }
     \ei
   \end{frame}
+#+end_src
 
+Wollen wir einen solchen Fixpunktalgorithmus als Datenflussanalyse verwenden, so müssen wir darauf achten, dass dieses Verfahren auch wirklich terminiert.
+Was würde passieren, wenn sich zwei Blöcke immer im Wechsel die Eingangszustände so manipulieren würden, dass der andere noch einmal in die Worklist kommt?
+Um dies zu vermeiden, muss die Kombination aus den Zustands-Initialisierung, Zustands-Merge und transformation *strikt monoton* sein.
+Dies bedeutet, dass jeder ausgeführte Schritt uns näher an den Fixpunkt bringt, niemals jedoch wieder weiter entfernt.
+Auf diese Weise können wir garantieren, dass wir in endlich vielen Schritten einen Fixpunkt erreichen werden.
+
+Ein Beispiel (nicht CVP) für eine solche strikt monotone Kombination wäre:
+Wir verwenden Bitvektoren als Zustände und starten mit gleich langen Bitvektoren die an jeder Stelle 0 sind.
+Jede Transformation kann einzelne Bits nur setzen, aber niemals löschen.
+Die Vereinigung zweier Zustände ist das bit-weise ODER (bei dem auch niemals eine 1 gelöscht wird).
+Eine solche Datenflussanalyse wird immer einen Fixpunkt in einem Worklist-Algorithmus finden.
+
+Wir haben bisher die Datenflussanalyse nur als Vorwärts-Analyse verwendet, da wir die Zustände nur entlang der Kontrollflusskanten propagiert haben.
+Aber es gibt auch eine Rückwärtsanalyse, bei der man genau umgekehrt vorgeht und Zustände entgegen der Kontrollflusskanten propagiert.
+Während man bei Vorwärtsanalyse gewissermaßen propagiert was Basisblock an Daten erzeugt, kann man bei der Rückwärtsanalyse zurück-propagieren, was ein Basisblock benötigt.
+Aber damit wollen wir uns hier nicht weiter beschäftigen.
+
+
+#+begin_src latex
   \begin{frame}[fragile,t]{Beispiel für Wertepropagation}
     \vspace{-2em}
     \begin{columns}[t]
@@ -676,18 +773,18 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
         \columntitle{Worklist}
         \centering
           \texttt{[%
-            \only<2>{BB0, BB1, BB3, BB2}%
-            \only<3>{BB1, BB3, BB2}%
-            \only<4>{BB3, BB2}%
-            \only<5>{BB2}%
-            \only<6>{BB3}%
-            \only<7>{BB0}%
+            \only<handout:2|2>{BB0, BB1, BB3, BB2}%
+            \only<handout:3|3>{BB1, BB3, BB2}%
+            \only<handout:4|4>{BB3, BB2}%
+            \only<handout:5|5>{BB2}%
+            \only<handout:6|6>{BB3}%
+            \only<handout:7|7>{BB0}%
             ]}\\[3ex]
 
-        \columntitle{Merge Logbuch}
+        \uncover<handout:5-|5->{\columntitle{Merge Logbuch}}
         \def\L{\texttt\small}\small
         \def\E{$\emptyset$}
-        \only<5->{\colorbox{badbee!20}{\medskip
+        \only<handout:5-|5->{\colorbox{badbee!20}{\medskip
         \begin{tabular}{lr}
           BB1 & \L{[\{a, c, 2\}, \{b, x, 3\}]}  \\
           BB2 & \L{\E}                          \\\midrule
@@ -695,7 +792,7 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
         \end{tabular}
       }}
       \mbox{}\bigskip\mbox{}
-      \only<7->{\colorbox{badbee!20}{\medskip
+      \only<handout:7-|7->{\colorbox{badbee!20}{\medskip
         \begin{tabular}{lr}
           BB1 & \L{[\{a, c, 2\}, \{b, x, 3\}]}  \\
           BB2 & \L{[\{a, 2\}, \{b, x, 4\}]}     \\\midrule
@@ -710,6 +807,40 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
 
   \end{frame}
 #+end_src
+
+Wenden wir das ganze doch, um es plastischer zu machen einmal auf die CVP-Analyse an.
+Auf der Folie sehen sie die Basisblöcke (Blau), sowie Eingangs- und Ausgangszustand.
+Ich zeige hier beide Zustände um zu verdeutlichen, welchen Einfluss die Transformationsfunktion hat.
+Im konkreten muss man bei der CVP, die eine Vorwärts-Analyse ist, nur den Ausgangszustand speichern[fn::Bei einer Rückwärtsanalyse muss man den Eingangszustand speichern.], wie wir das auch im Codebeispiel getan haben.
+Außerdem zeigt jede Folie den aktuellen Zustand der Worklist, alle noch zu abzuarbeitenden Knoten (rote Sternchen), sowie den aktuell bearbeiteten Knoten (roter Rahmen).
+
+Wir beginnen damit alles zu initialiserieren:
+Alle Zustände sind zunächst leere Äquivalenzmengen-Mengen und alle Basisblöcke sollen wenigstens einmal bearbeitet werden und kommen daher in die Worklist.
+Zuerst bearbeiten wir BB0, welcher zwei Äquivalenzen etabliert die an die Nachfolger BB1 und BB2 propagiert werden. Wir fügen beide Nachfolger nicht noch einmal in die Worklist, da sie dort schon vertreten sind und ganz sicher noch einmal bearbeitet werden.
+
+Der Knoten BB1 hat nur einen Vorgänger, was den Zustands-Merge trivial macht.
+Die beiden Instruktionen in BB1 werden beim transformieren modifiziert und der Ausgabezustand enthält mehr Äquivalenzen als der Eingabezustand. BB3 würde in die Liste kommen, ist dort aber bereits vorhanden.
+
+Als nächsten bearbeiten wir (aus didaktischen Gründen) BB3, da die Reihenfolge in der Worklist nicht festgelegt ist.
+BB3 hat jetzt zwei Vorgänger, sodass wir deren Zustände vereinigen müssen.
+Für BB1 ist der Zustand schon durch Transformation entstanden, bei BB2 ist es noch der initiale Zustand.
+Für die CVP, müssen wir beim Zustands-Merge wie folgt vorgehen:
+Im kombinierten Zustand dürfen zwei Werte (Variablen oder Konstanten) nur genau dann in einer Äquivalenzmenge sein, wenn diese in allen eingehenden Zuständen auch äquivalent sind.
+Etwas veranschaulicht gesprochen:
+Wenn die Variable A im einen Vorgänger den Wert 2 erhalten hat, im anderen Vorgänger aber den Wert 3, können wir nichts mehr über den Wert der Variable sagen.
+Im Falle von BB3, kombinieren wir etwas mit der leeren Äquivalenzmengen-Menge, was zwingend auch die leere Äquivalenzmengen-Menge sein muss.
+
+Jetzt führen wir endlich BB2 aus, was wiederum Äquivalenz erzeugt und BB3 wieder in die Worklist katapultiert. 
+
+Beim zweiten Besuch von BB3 sieht die Situation vom Mergen schon ganz anders aus:
+Die Äquivalenz ~{a, 2}~ hat sich über beide Pfade der Fallsunterscheidung hindurchpropagiert und bleibt für BB3 erhalten.
+Zusätzlich kommt hinzu, dass ~b~ und ~x~ in beiden Pfaden so gesetzt wird, dass sie den geleichen Wert haben:
+Links herum haben beide den Wert 3, recht herum haben beide den Wert 4.
+In jedem Fall haben beide Variablen aber den gleichen R-Wert.
+
+Jetzt wird BB0 noch einmal ausgeführt, aber da wir eine leere Menge in den Eingangsblock propagieren, ändert sich hier nichts mehr und wir sind fertig und haben einen Fixpunkt erreicht.
+
+Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen etwas fummelig ist, weswegen ich das Vorgehen hier nicht genauer darlegen möchte. Die Intuition ist, das man gemeinsamen Teilmengen für Äquivalenzmengen aus unterschiedlichen Vorgängern bildet, die sich teilweise überschneiden. Das ganze geht sogar ziemlich effizient, wenn man eine [[https://de.wikipedia.org/wiki/Union-Find-Struktur][Union-Find Datenstruktur]] verwendet. Und weil ich diese Union-Find Strukturen so schön finde, möchte ich hier auch eine Lanze dafür brechen: Schauen Sie sich diese Datenstruktur an, sie ist wirklich wundervoll elegant.
 
 ** Optimierung des Kontrollflusses
 #+begin_src latex
