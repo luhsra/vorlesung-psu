@@ -497,6 +497,9 @@ In diesen Fällen kann eine Variable an unterschiedlichen Punkten in einer Funkt
 Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durch weniger Druck auf den Cache, auch zu einer schnelleren Ausführung führt.
 
 * Befehlsauswahl und Registerallokation
+:PROPERTIES:
+:CUSTOM_ID: 10-instruction-selection-and-register-allocation
+:END:
 
 #+begin_src latex
   \dividerframe{Befehlsauswahl\\und\\Registerallokation}
@@ -568,7 +571,33 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
     }
   
   \end{frame}
+#+end_src
 
+Nachdem durch die Aufrufkonvention und die Abbildung von IR-Variablen auf Stack-Slots klar ist wie das Datenlayout für einen Call-Frame aussieht, geht es nun darum die IR-Befehl als Maschinenbefehle zu codieren.
+Dazu müssen zwei Entscheidungen getroffen werden: Bei der *Befehlsauswahl* wird für einen IR-Befehl ein einzelner oder eine Sequenz von Maschinenbefehlen ausgewählt. Bei der *Registerallokation* entscheiden wir zu welchem Zeitpunkt eine Variable in ihrem Slot lebt und wann sie in einem CPU Register zu finden ist. Haben wir beide Probleme gelößt können wir die Maschinenbefehle, zusammen mit den passenden Registeroperanden als Assembler raus schreiben und sind fertig mit der Übersetzung. Also eigentlich ganz einfach, wären da nicht zwei NP-Vollständige Probleme.
+
+Zum einen ist die Befehlsauswahl nicht so einfach:
+Viele Prozessoren, insbesondere CISC-Architekturen, haben viele Varianten eines einzelnen Befehls, die sich alle, mehr oder weniger stark, in ihrer Semantik und in ihren nicht-funktionalen Eigenschaften unterscheiden.
+So kennt die AMD64 Architektur 36 verschiedene Varianten von ~mov~, die im Assembler alle mit dem ~mov~-Opcode notiert werden.
+Außerdem ist nicht für jeden IR-Befehl 1:1 Abbildung möglich, sondern es wird eine 1:N Abbildung auf Maschinenebefehle benötigt um die geforderte Funktionalität umzusetzen.
+Das ganze wird noch schlimmer, weil die Betrachtung mehrerer IR-Befehle in einer M:N Weise zu besseren Übersetzungsergebnissen führt.
+Alles in allem hat sich herausgestellt, dass eine optimale Befehlsauswahl ein NP-vollständiges Problem ist.
+
+Zum anderen ist auch die Registerallokation ein Problem:
+Die Entscheidung welche Variable zu welchem Zeitpunkt in welchem Register lebt hat zum einen massive Auswirkungen auf die Performance des Programms.
+Dies rührt daher, dass Zugriffe auf den Speicher viel, viel langsamer sind als auf Register[fn::siehe: [[https://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.htmlttps://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.html][Your computer is already a distributed system. Why isn't your OS?]]][fn::Zugriffszeiten von [[https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-caches-and-main-memory#4087315][Stackoverflow]].]
+Daher kostet jeder Transfer zwischen Stack-Slot und Register richtig viel Zeit und wir möchten davon, während der Laufzeit, möglichst wenige Slot-Register-Transfers haben.
+Aber Registerallokation ist auch ein kompliziertes Problem, wenn man Variablen über Basisblockgrenzen hinweg im Register halten will.
+Erwartet der Code eines Basisblocks, zum Beispiel, eine Variable in einen bestimmtem Register, so müssen alle Vorgängerblöcke dafür sorgen, dass die Variable auch tatsächlich in diesem Register geladen ist.
+Da der CFG im Allgemeinen, aber weder linear noch azyklisch ist, haben wir es hier mit einer zyklischen Rückkopplung solcher Bedingungen zu tun.
+Alles in allem hat sich herausgestellt, dass eine optimale Registerallokation ein NP-vollständiges Problem ist.
+
+Aber das ganze wird noch schlimmer, da Befehlsauswahl und Registerallokation miteinander interagieren:
+Nicht jede Befehlssequenz, die die Befehlsauswahl in Betracht zieht braucht gleich Register.
+Und nicht jeder Maschinenbefehl kann mit jedem Register aufgerufen werden.
+Außerdem gibt es auch noch Befehle, die als Seiteneffekt den Inhalt von Registern verändern. Alles in allem: Die Kombination aus Registerallokation und Befehlsauswahl ist ein richtig richtig dickes Brett.
+
+#+begin_src latex
   \begin{frame}{Minimale Maschinencodeerzeugung}
     \vspace{-1em}
     \begin{btBlock}{}
@@ -579,20 +608,20 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
     \begin{columns}
       \begin{column}{0.6\textwidth}
     \bi
-    \ii \structure{Befehlsauswahl}: Macroexpansion {
+    \ii \structure{Befehlsauswahl}: Makroexpansion {
       \bi
-      \ii<2-> Jeder IR-Befehl wird zu einer festen Assembler-Sequenz
-      \ii<2-> Platzhalter für Registeroperanden
-      \ii<3-> Zusätzliche Anweisungen wo und wie die Operanden vorliegen müssen
-      \ii<4-> Muster für jede Instruktion instantiieren
+      \ii<handout:2-|2-> Jeder IR-Befehl wird zu einer festen Assembler-Sequenz
+      \ii<handout:2-|2-> Platzhalter für Registeroperanden
+      \ii<handout:3-|3-> Zusätzliche Anweisungen wo und wie die Operanden vorliegen müssen
+      \ii<handout:4-|4-> Muster für jede Instruktion instantiieren
       \ei
     }\medskip
-    \ii \structure{Registerallokation}: Eager Spilling {
+    \ii \structure{Registerallokation}: Spilling {
       \bi
-      \ii<5-> \structure{Spilling}: Variable-Wert aus einem Register in den Speicher schreiben.\\[1ex]
-      \ii<5-> Variablen immer neuladen
-      \ii<5-> Ergebnisse direkt spillen
-      \ii<6-> Jede Variable hat einen Speicher-Slot
+      \ii<handout:5-|5-> \structure{Spilling}: Variable-Wert aus einem Register in den Speicher schreiben.\\[1ex]
+      \ii<handout:5-|5-> Variablen immer neuladen
+      \ii<handout:5-|5-> Ergebnisse direkt spillen
+      \ii<handout:6-|6-> Jede Variable hat einen Speicher-Slot
       \ei
     }
     \ei
@@ -603,25 +632,18 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
           \medskip
         
         }
-        \uncover<2->{\btAnimation[width=0.8\textwidth]{center,padding,2:<1>,range=2-6:<2->}{fig/10-operation-selection}}
+        \uncover<handout:2-|2->{\btAnimation[width=0.8\textwidth]{center,padding,2:<1>,range=2-6:<2->}{fig/10-operation-selection}}
       \end{column}
     \end{columns}
   \end{frame}
 
-#+end_src
 
-https://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.html
-https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-caches-and-main-memory#4087315
-
-#+begin_src latex
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \tikzset{solution/.style={
       inner xsep=2em,fill=white,
       fill opacity=0.8,
       label={[draw=safegreen, thick, minimum width=8cm,fill=white]center:{\Large\advantage{\textbf{#1}}}}
     }
   }
-
 
   \begin{frame}[fragile]{Probleme der Minimallösung}
     \textbf{3 Probleme}: \ALERT{\uncover<2->{Ineffizient}\uncover<3->{, Ineffizient}\uncover<4->{, Ineffizient.}}
@@ -705,7 +727,7 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
   \end{minipage} \end{tikznodeenv}
 
           
-    \only<7->{\AtBeginShipoutNext{%
+    \only<|handout:2-|7->{\AtBeginShipoutNext{%
         \AtBeginShipoutUpperLeftForeground{%
           \begin{tikzpicture}[remember picture, overlay]
             %
@@ -718,6 +740,49 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
     }
   \end{frame}
 #+end_src
+Und immer wenn der Informatiker nicht weiter weiß, besinnt man sich auf die einfachste Methode das Problem zu lösen und überlegt sich danach an welchen Stellen man die Methode verbessern kann[fn::Wichtig bei einem solchen Vorgehen inkrementeller Verbesserungen, ist aber, dass man sich leicht in ein lokales Optimum manövrieren kann. Um dies zu vermeiden lohnt es sich eine optimale Lösung zu formulieren, egal wie aufwendig diese ist.]
+Dieser einfachste Basisfall für die Maschinencodeerzeugung wird uns dabei helfen das Problem genauer zu verstehen, bevor wir einen Vorschlag diskutieren, wie wir diese Minimallösung verbessern können. 
+Die Minimallösung besteht daraus, dass wir eine Makroexpansion für jeden IR-Befehl durchführen und alle Variablen vor der Sequenz aus dem Slot lesen und direkt danach wieder in zurückschreiben. 
+
+Für die *Makroexpansion* hinterlegen wir für jeden unserer 16 IR-Befehle ein festes Makro, welches wir expandieren, wenn ein solcher Befehl im IR-Programm vorkommt.
+Dieses Makro besteht aus einer Maschinenbefehlsequenz, die einen oder mehrere Instruktionen umfasst.
+An den Stellen an denen Register in die Operanden verwendet würden, enthält das Makro allerdings Platzhalter (R1, R2), die von der Registerallokation gefüllt werden.
+Zusätzlich gibt es noch eine Reihe von Anweisungen welcher IR-Operand in welchen Platzhalter geladen werden soll, und in welchem Platzhalter-Register das Ergebnis zu finden sein wird.
+
+Für jedes Auftreten des IR-Befehls im IR-Programm instantiieren wir das Makro und verbinden die Anweisungen an den Ein- und Ausgängen mit den konkreten Operanden.
+Die Instantiierung des Makros übergeben wir dann an die Registerallokation, die dafür sorgen muss, dass für jeden Platzhalter ein Register ausgewählt wird, die aktuellen Variablen-Werte in den Register landen, und das Ergebnis im Zieloperanden landet.
+
+Die einfachste Variante einer Registerallokation ist ein Spilling-Register-Allocator.
+Bei dieser Art der Registerallokation betrachten wir immer nur einen einzigen Befehl:
+Vor dem Befehl laden wir alle Variablen frisch aus ihrem fix-zugeordneten Stack-Slot in ein Register.
+Nachdem die Befehlssequenz abgearbeitet ist, wird das Ergebnis sofort wieder in einen Slot zurückgeschrieben.
+Dieses direkte Zurückschreiben führt dazu, dass eine Variable nur für die Dauer einer einzige Instruktion in einem Register lebt.
+Es gibt keinerlei Probleme, dass es über Kontrollflüsse hinweg zu irgendwelchen Inkonsistenzen kommen kann oder wir vergessen irgendeinen Wert zurückzuschreiben. Schick. Schick aber ineffzient.
+
+*Ineffizienz* ist genau das Problem dieser minimalen Maschinencodeerzeugung.
+An (mindestens) drei Stellen wird das Potential der Maschine nicht voll ausgenützt:
+Zum einen transferieren wir ständig Variablen-Werte zwischen Speicher und Register hin und her, egal ob diese vielleicht schon ein einem Register vorgeladen sind.
+Allein am Anteil bei dem ~Add~-Beispiel, bei dem 3 von 4 Befehlen nur Transfers waren, dass ein Hauptteil unseres Programms sich damit beschäftigt den Speicher zu beschäftigen.
+Viel klüger wäre es nur das aus dem Speicher zu laden, was nicht schon im Register ist und Werte, noch einmal verwendet werden, solange es irgendwie geht in Registern zu halten.
+
+Das zweite Problem ist, dass die starren Makros komplexere Fähigkeiten der CPU nicht ausnützen können.
+Insbesondere bei CISC Maschinen kann ein einzelner Befehl eine sehr komplexe Semantik haben.
+Auf den Folien sehen Sie eine Adressberechnung für ein Array, dass einmal naive aus drei Makros zusammegesetzt wurde, und einmal der passende IA-32 Befehl, der in einem Rutsch ~%eax+8*%ebx~ rechnet und dereferenziert.
+Die Besonderheiten der Prozessor-Architektur werden also nicht vollständig ausgenützt.
+
+In eine ähnliche Richtung, aber unterschiedlich davon, ist das dritte Problem der Minimallösung:
+Die Makroexpansion ignoriert, dass moderne CPUs Befehle nicht stumpf hintereinander ausführen, sondern dass diese mit einer Pipeline arbeiten, Instruktionen in unterschiedlicher Reihenfolge als angegeben ausführen können (Out-of-Order) und überdies noch mehrere funktionale Einheiten haben (Superskalar).
+Dies führt dazu, dass Befehle Quasi im Windschatten anderer Befehle "umsonst" ausgeführt werden können.
+So können in einer Out-of-Order CPU Befehle auf der ALU ausgeführt werden, während ein früherer Befehl noch auf den Speicher wartet.
+Dieses Problem kann man so zusammenfassen, dass die Besonderheiten der Prozessor-*Mikroarchitektur* nicht ausgenützt werden.
+
+Für all diese Teilaspekte gibt es Methoden die Maschinencodeerzeugung zu verbessern:
+Zum einen kann man bei der Registerallokation mehr als nur einen Befehl auf einmal betrachten und so eine *globalere Registerallokation* durchführen.
+Durch dieses größere Wissen wird die Allokation zwar aufwändiger, das Ergebnis aber um Größenordnungen besser.
+Um die Prozessorarchitektur auszunützen, haben moderne Übersetzer einen *Peephole-Optimizer*, der immer eine fixe Anzahl an Assemblerinstruktionen (z.B. 3 aufeinanderfolgende Befehle) gegen ein Muster-Datenbank vergleicht und durch effizentere Schnipsel ersetzt.
+Um die mikroarchitekturellen Besonderheiten auszunützen kann die *Instruktion-Selection* Assemblerbefehle so umordnen, dass immer noch die gleiche Berechnung durchgeführt wird, aber möglichst viele Instruktionen im Windschatten anderer verdeckt werden.
+
+Im Folgendenen greifen wir uns den Aspekt der Registervergabe heraus und diskutieren einen Registerallokator, der nicht so sehr unter Amnesie leidet und sich über den Verlauf eines einzelnen Basisblocks merkt, welche Werte bereits im Registersatz geladen sind.
 
 #+begin_src latex
   \begin{frame}[fragile]{Ein Registerallokator mit Gedächtnis}
@@ -947,6 +1012,9 @@ https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-c
   \end{frame}
 #+end_src
 * Programme und Prozesse
+:PROPERTIES:
+:CUSTOM_ID: 10-elf
+:END:
 #+begin_src latex
   \dividerframe{Programme und Prozesse}
 
