@@ -1075,13 +1075,21 @@ Die *Transformation* entfernt dann alle Instruktionen, die eine tote Variable al
 Ausgenommen hier von sind ~Call~-Instruktionen, da diese einen Seiteneffekt haben, den wir auf der Funktions-lokalen Ebene nicht überblicken können.
 Nachdem die toten Instruktionen entfernt wurden, können auch die toten Variablen aus der IR-Funktion gelöscht werden.
 
+Zusammen fallen die Entfernung toter Blöcke und die Entfernung toter Instruktionen in den Bereich der *Dead-Code-Elimination*.
+In dieser Klasse von Optimierungen werden Programmteile entfernt, die niemals ausgeführt werden oder deren Ergebnis eh ignoriert wird.
+In dieser Klasse gibt es noch präzisere Optimierungen, die ich hier aber, aufgrund der Kürze der Zeit nicht erklären kann.
+Jedoch können Sie einmal für sich überlegen wie eine Datenflussanalyse in Rückrichtung arbeiten würde, die Werte erkennt die nicht in den Return-Wert einfließen.
+
 * Optimierung im größeren Zusammenhang
+:PROPERTIES:
+:CUSTOM_ID: 09-opt-big-picture
+:END:
 
 #+begin_src latex
   \dividerframe{Optimierungen\\im\\Kontext}
   \begin{frame}[fragile]{Optimieren einer Funktion}
     \begin{columns}
-      \def\BOOL{\bgroup\uncover<2>{\color{luhblue}bool\space}\egroup}
+      \def\BOOL{\bgroup\uncover<handout:2|2>{\color{luhblue}bool\space}\egroup}
       \begin{column}{0.49\textwidth}
         \begin{code}\ttfamily\scriptsize
         \BOOL ConstantFolding(Function);\\
@@ -1107,7 +1115,7 @@ Nachdem die toten Instruktionen entfernt wurden, können auch die toten Variable
       \ii In welcher Reihenfolge sollen wir die Optimierungen anwenden?
       \ei
     }\medskip
-    \ii<2-> Optimierung als Fixpunktiteration {
+    \ii<handout:2-|2-> Optimierung als Fixpunktiteration {
       \bi
       \ii Jedes Verfahren gibt zurück, ob die Funktion \alert{verändert} wurde
       \ii Bei Veränderung führen wir alle anderen Optimierungen \textbf{nochmals aus}
@@ -1119,7 +1127,7 @@ Nachdem die toten Instruktionen entfernt wurden, können auch die toten Variable
       \begin{column}{0.49\textwidth}\centering
         \includegraphics[width=3.5cm] {fig/09-optimization-depends}
       \end{column}
-      \begin{column}<2->{0.49\textwidth}
+      \begin{column}<handout:2-|2->{0.49\textwidth}
         \begin{code}[]
           \begin{py}
             def optimize(func):
@@ -1153,6 +1161,28 @@ Nachdem die toten Instruktionen entfernt wurden, können auch die toten Variable
     \end{description}
   \end{frame}
 #+end_src
+
+In dieser Vorlesung haben wir sechs verschiedene Optimierungsroutinen kennen gelernt, die alle auf der Granularität von einzelnen Funktionen anwendbar sind.
+Allerdings haben wir noch nicht darüber gesprochen wie diese Optimierungsroutinen im Übersetzer angeordnet sind und ausgeführt werden.
+Eine Möglichkeit ist die Optimierungen zu sortieren und diese Sequenz einmal ab zu arbeiten.
+Allerdings würde sich bei diesem Vorgehen die Frage stellen, welche Reihenfolge das beste Optimierungsergebnis liefert.
+Außerdem haben wir gesehen, dass manche Optimierungen andere Optimierungen erst möglich macht.
+Zeichnet man ein Diagramm, bei dem man mit Pfeilen ausdrückt welche Optimierung welche andere Möglich machen könnte (siehe Folie), so kommt man schnell dahin zu Erkennen, dass es hier zyklische Abhängigkeiten zwischen den Optimierungen gibt.
+Dies bedeutet, dass keine lineare Optimierungssequenz jemals das bestmögliche Ergebnis liefern kann; Optimierungen sollten also mehrfach ausgeführt werden.
+
+Ein Möglichkeit die einzelnen Optimierungsroutinen zu komponieren ist es eine Fixpunkt-Iteration zu unternehmen.
+Dazu bekommt jede Routine einen Rückgabewert, der anzeigt ob Sie eine Änderung an der IR-Funktion vorgenommen hat.
+Nun führen wir alle Optimierungen solange aus, bis keine Routine eine Änderung mehr vorgenommen hat.
+Natürlich gibt es noch klügere Methoden diese Komposition vorzunehmen, zum Beispiel indem man den Abhängigkeitsgraphen beachtet, aber für einen möglichst einfachen Übersetzer ist die naive Fixpunktiteration eine gute Möglichkeit die Optimierungsroutinen wiederholt auf einer Funktion auszuführen.
+
+Damit endet unsere Betrachtung der Optimierungsphase in Übersetzern.
+Ich hoffe ihnen zumindest einen Einblick darin gegeben zu haben, welches Potential Optimierungen haben und wie stark sie die Effizient von Programmen steigern können.
+Haben Sie vertrauen darin, dass ihr Übersetzer Optimierungen durchführt und schreiben Sie lieber Code der verständlich ist und halten Sie Abstand von Code der "Optimierung" durch übermäßige Komplexität vortäuscht. Wildes rumfuchteln mit Zeigern mag beeindruckend aussehen, aber die dadurch entstehende Verschlimmerung des Alias-Problems kann in der Gesamtbilanz sogar negativ ausfallen.
+
+Auf der letzten Folie habe ich noch einige Meilensteine der optimierenden Übersetzer aufgelistet.
+Insbesondere sollte ihnen dabei auffallen, dass dieses Gebiet bereits sehr lange aktiv beforscht wird, aber auch dass die Forschung daran keineswegs schon abgeschlossen ist.
+So ist die hier länglich diskutierte Datenflussanalyse schon 1973 vorgestellt worden, jedoch habe ich mich beim Design des Zwischencode von LLVM inspirieren lassen.
+Aufwändigere Programmoptimierungen erfordern sowohl ein solides mathematisches Modell um korrekte Analysen durch zu führen, als auch ein gutes Verständnis von Hardware und Systemsoftware um Optimierungspotentiale richtig zu bewerten. 
 
 * Zusammenfassung
 #+begin_src latex
