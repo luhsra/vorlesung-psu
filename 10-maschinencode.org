@@ -194,10 +194,12 @@ IA-32 kennt aber Kontrollflussgraphen nicht als Dateiformat, sondern nur einen l
 Wir müssen unser übersetztes Programm so in eine Datei speichern, dass es vom Betriebssystem, als ein Prozess, in den Speicher geladen wird, wo es dann als Instruktionsstrom abgearbeitet werden kann.
 Wir schauen uns dazu an, wie das ELF-Binärformat für Linux aufgebaut ist und wie der erzeugte Assemblercode im Anschluss an die Übersetzung für die Ausführung vorbereitet wird.
 
-Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließen. Am Ende haben wir ein ausführbares Binärprogramm. 
+Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließen. Am Ende haben wir ein ausführbares Binärprogramm.
 
 * Speicherabstraktion: Call-Frames
-
+:PROPERTIES:
+:CUSTOM_ID: 10-call-frames
+:END:
 #+begin_src latex
   \dividerframe{Speicherabstraktion:\\Call-Frames}
   \begin{frame}{Funktionsaufrufe auf Maschinenebene}
@@ -251,9 +253,54 @@ Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließ
     \uncover<3->{Andere Konvention (auf IA-32): \btSetTab syscall, optlink, pascal, stdcall, fastcall,\\
                                                 \btUseTab vectorcall, safecall, thiscall, \ldots}
   \end{frame}
+#+end_src
 
+Der erste Schritt über den wir uns bei der Transformation von IR-Code zu Maschinencode Gedanken machen werden sind Funktionsaufrufe.
+Anhand dieser Funktionsaufrufe lernen wir nicht nur wie Argumente transportiert werden, sondern auch wie lokale Variablen im Call-Frame abgelegt werden.
+Dazu wollen wir uns aber zunächst in Erinnerung rufen, was der IR-Befehl ~Call~ genau getan hat.
+Der erste Operand von ~Call~ war der Name der Funktion, die der Aufrufer (Caller) aktivieren will (Callee).
+Die restlichen (beliebig viele) Operanden sind die Argumente, die vom Caller zum Callee übertragen werden (Datenfluss A).
+Für jeden Funktionsaufruf entsteht eine neue *Funktionsinstanz*, die wir mit eigenen lokalen Variablen ausstatten, die im Call-Frame gespeichert werden.
+Zusätzlich wird im Call-Frame auch noch eine Rücksprungadresse gespeichert, die Angibt an welche Codestelle im Caller wir beim ~Return~-Befehl zurückkehren.
+Mit der Rückkehr kann, über den Rückgabewert, ein zweiter Datenfluss (R) stattfinden.
 
-  \begin{frame}{Call-Frame auf IA-32/Linux}
+Zentral bei der Abbildung auf die Maschine ist der Call-Frame. Für diesen stellt sich die Frage nach dem Datenlayout. Ähnlich wie bei Record-Typen müssen wir uns auf ein konkretes Abbild im Speicher festlegen. Nur so können wir die Verwendung von symbolischen Namen effizient auf die Zeiger-basierte Adressierung der Maschine abbilden. Darüber hinaus müssen wir die Entscheidung über den Besitzer{{{see(06-ownership,Besitz von Objekten)}}} des Call-Frames treffen: Wer erzeugt den Call-Frame und wer löscht ihn wieder? Caller oder Callee? 
+Außerdem müssen wir uns darauf festlegen, was der Callee am Maschinenezustand überhaupt verändern darf. Darf der Callee den gesamten Speicher mit Nullen überschreiben (eher nicht nützlich), oder darf der Caller annehmen das einige Teile des Maschinenzustands unverändert bleiben.
+
+Wie sie bereits sehen, ich spreche hier häufig davon, dass wir uns festlegen müssen.
+Diese Entscheidungen, die wir bei der Abbildung von Funktionsaufrufen und dem Call-Frame machen, sind nicht zwingend, sondern es sind Designentscheidungen.
+Es sind Konventionen, an die sich sowohl Caller, als auch Callee, halten um miteinander arbeiten zu können.
+Daher heißen diese Designentscheidungen auch Aufrufkonventionen.
+
+Eine *Aufrufkonvention* regelt, im Kern, drei Dinge:
+Zum einen wird geregelt, wie Operanden von Caller zum Callee kommen.
+Dabei legt der Caller die Operanden an fest definierte Orte in der Maschine (z.B.
+auf den Stack oder ins Register) und der Callee verlässt sich darauf an genau diesen Stellen die Argumente zu finden.
+In der Rückrichtung verhält es sich mit dem Rückgabewert:
+Der Callee legt sein Berechnungsergebnis an eine vordefinierte Stelle in der Maschine, wo sie der Caller wieder auslesen kann.
+
+Das Dritte, was eine Aufrufkonvention regelt, ist der Maschinenzustand, der über einen einen Funktionsaufruf hinaus unberührt bleibt.
+Wir haben schon häufiger davon gesprochen, dass wir Funktionsaufrufe als Komplexoperationen ansehen können, mit denen der Befehlssatz erweitert wird.
+Die Aufrufkonvention beschreibt dann welche Seiteneffekte eine solche ~Call~-Komplexoperation auf den Maschinenzustand hat.
+Eine mögliche Regel könnte zum Beispiel sein: Der Callee darf nur das Register ~eax~, seinen eigenen Call-Frame, und alle über Zeiger erreichbare Speicherzellen verändern.
+
+Aufrufkonventionen dienen dazu Kompatibilität zu schaffen.
+Zum einen kann ein Übersetzer so Funktionen unabhängig voneinander zu Maschinencode übersetzen, da die Regel für Funktionsaufrufe überall gleich sind.
+Dies funktioniert sogar, wenn wir den Übersetzer auf mehreren Quelldateien ausführen um eine separate Übersetzung durch zu führen (dazu später mehr).
+Aber eine Aufrufkonvention fördert auch die Kompatibilität zwischen verschiedenen Übersetzern, und sogar zwischen unterschiedlichen Programmiersprachen.
+So ist die Aufrufkonvention für C Funktionen auf den meisten Plattformen die Lingua Franca um Funktionen aus anderen Programmiersprachen aufzurufen.
+
+Als Beispiel werden wir uns im Folgenden der System-V Aufrufkonvetion für C auf der IA-32 Plattform beschäftigen.
+Diese können Sie genauer im [[http://www.sco.com/developers/devspecs/abi386-4.pdf][Spezifikationsdokument]] ab Seite 35 ganz genau nachlesen.
+Keine Angst, die Spezifikation ist sehr klar und, wenn Sie mit dieser Vorlesungseinheit durch sind, gut zu verstehen.
+Bei dieser Konvention werden die Argumente von rechts nach links auf den Stack gelegt, was dazu führt dass das erste Argument zu oberst auf dem Stack liegt. Wir werden gleich sehen, welchen Vorteil diese Entscheidung bei Funktionen mit einer variablen Anzahl an Argumenten hat (z.B. ~printf()~). 
+Außerdem regelt die Aufrufkonvention das Rückgabewerte von Typ ~int~ in ~%eax~ und Fliesskommazahlen in ~%st0~ gespeichert werden.
+Bezüglich des unveränderten Maschinenzustands regelt die System-V Aufrufkonvention, dass fünf Register (~%esp, %ebp, %ebx, %esi, %edi~) nach einem Funktionsaufruf den gleichen Zustand haben müssen, wie vor dem Funktionsaufruf. Die *Callee-saved Register* werden vom Callee gespeichert und am Ende wieder hergestellt.
+
+Da Konventionen nur Konventionen sind, gibt es natürlich verschiedene Aufrufkonventionen [fn::siehe [[https://xkcd.com/927/][xkcd: Competing Standard]]]. So verwendet Windows, im gleichen Programm, für normale Funktionsaufrufe die fastcall-Konvention für normale Funktionsaufrufe und die Pascal-Konvention für Systemaufruf.
+
+#+begin_src latex
+\begin{frame}{Call-Frame auf IA-32/Linux}
 
     \begin{columns}
       \begin{column}{0.4\textwidth}
@@ -271,35 +318,84 @@ Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließ
         \columntitle{Aufrufsequenz}
 
         \bi\ii[]\be
-        \ii<2-> Argumente von \textbf{rechts nach links} ermöglicht Funktionen mit variabler Argumentenzahl {
+        \ii<handout:2-|2-> Argumente von \textbf{rechts nach links} ermöglicht Funktionen mit variabler Argumentenzahl {
           \bi
           \ii \texttt{\texttt{push arg2}; \only<3->{\texttt{push arg1}; }\only<4->{\texttt{push arg0};}}
           \ei
         }
-        \ii<5-> CPU legt Rücksprungaddresse auf den Stack{
+        \ii<handout:5-|5-> CPU legt Rücksprungaddresse auf den Stack{
           \bi
           \ii \texttt{call bar}
           \ei
         }
-        \ii<7-> Konstante Offsets durch Basiszeiger{
+        \ii<handout:7-|7-> Konstante Offsets durch Basiszeiger{
           \bi
           \ii \texttt{push \%ebp; mov \%esp, \%ebp;}
           \ei
         }
-        \ii<6-> Callee kann Raum für lokale Daten anlegen{
+        \ii<handout:6-|6-> Callee kann Raum für lokale Daten anlegen{
           \bi
           \ii sub x, \%esp
           \ei
         }
-        \ii<8-> Return: in umgekehrter Reihenfolge
+        \ii<handout:8-|8-> Return: in umgekehrter Reihenfolge
         \ee\ei
       \end{column}
     \end{columns}
-
-
   \end{frame}
+#+end_src  
 
-  \begin{frame}{Unterschiede der Aufrufkonventionen}
+Betrachten wir uns die Situation eines Funktionsaufrufs und die Erzeugung des Call-Frames auf IA-32 noch einmal genauer.
+Basis für diese Betrachtung ist, dass der Stack auf IA-32 von den hohen zu den niedrigen Adressen wächst, was sich in Maschinenbefehlen wie ~push~ und ~pop~ niederschlägt.
+Außerdem wird im Register ~%esp~ der Stackzeiger gespeichert, der als impliziter Quell- und Zieloperand für ~push/pop~ dient.
+Wir starten unsere Betrachtung im Caller, der eine Funktion mit 3 Parametern aufrufen wird.
+Um diesen Aufruf zu tätigen führt der Caller die sogenannte *Aufrufsequenz* durch.
+Die Aufrufsequenz sind jene Maschinenbefehle, die auf Seiten des Callers den Funktionsaufruf vorbereiten und durchführen. 
+
+Der erste Schritt der Aufrufsequenz ist speichern der Argumente auf den Stack.
+Dabei legen wir die Argumente von rechts nach links auf den Stack.
+Achten Sie bei der Animation auf den linken und den rechten Rand des Stacks.
+Auf der linken Seite sehen wir, wie der Stackzeiger mit jedem Argument nach unten wandert, da er immer auf das oberste Element des Stacks zeigt.
+Auf der rechten Seite habe ich notiert wie wir, zu jedem Zeitpunkt, auf das jeweilige Argument relativ zum Stackzeiger zugreifen könnten.
+Nachdem alle drei Argumente auf dem Stack liegen, können wir auf den Wert von ~arg2~ mit einem relativen Offset von 8 (~8(%esp)~ == ~%esp + 8~) zugreifen.
+
+Dieser relative Zugriff ist von großer Bedeutung, weil der Stackzeiger (und später der Basiszeiger) der Anker ist an dem wir den Call-Frame festhalten können.
+Über die relativen und konstanten (!)
+Offsets können wir dann auf die einzelnen Felder des Call-Frames zugreifen.
+Dieses Vorgehen ist dem Vorgehen für Records sehr ähnlich: Auch dort gab es einen Zeiger an dem wir das Objekt fest gehalten haben und relative Offsets, die wir mit dem Datenlayout fest gelegt haben. Genauso verhält es sich bei Call-Frames.
+
+In den relativen Offsets liegt auch der Grund, wieso die Argumente von rechts nach links auf den Stack gelegt werden:
+Stellen Sie sich vor, dass unsere Funktion nicht nur 3 Parameter hat, sondern noch viel mehr, im schlimmsten Fall sogar eine variable Anzahl.
+Diese würden unter ~arg2~ liegen und sie hätten keinen Einfluss auf die relativen Offsets für die ersten 3 Argumente.
+Der Callee kann also auf die ersten Argumente zugreifen, ohne zu wissen wie viele Argumente noch kommen.
+Überlegen Sie sich dazu, mit welchem Offset das erste Argument von ~printf()~[fn::int printf(const char *format, ...)]
+relativ zum Stackzeiger gespeichert ist.
+Da mit diesem ersten Argument ~format~ gespeichert ist, wie viele Argumente noch zu erwarten sind, kann die Implementierung die restlichen Offsets dynamisch berechnen.
+Wenn sie diesen Mechanismus noch genauer verstehen möchten, schauen Sie sich die Manpage [[https://linux.die.net/man/3/va_arg][va_arg(3)]] an.
+
+Nachdem die Argumente auf dem Stack liegen wird der Maschinenbefehl ~call~ ausgefürt, der die Rücksprungadresse auf den Stack legt und den Kontrollfluss zum Callee umleitet.
+Durch die Rücksprungadresse können wir später den Kontrollfluss des Callers wieder aufnehmen.
+
+Da die Kontrolle über die Maschine nun beim Callee liegt, kann dieser den Rest des Call-Frames anlegen indem der Stackpointer noch weiter nach unten verschoben wird.
+In diesem Zwischenbereich (gelb) werden dann die lokalen Variablen abgelegt.
+Wie Sie sehen habe ich in der Animation keine feste Größe für diesen Bereich angegeben sondern erstmal die Zahl ~x~.
+Solange eine Funktion nur lokale Variablen hat, aber niemals eine dynamische Stackallokation (~StackAlloc~) durchführt, ist der gelbe Bereich von bekannter Größe und die Zahl ~x~ eine Konstante. In diesem Fall können wir weiterhin über einen konstanten Stackzeiger-Offset auf die Argumente zugreifen. Hätte unsere Funktion beispielsweise 3 lokale Variablen a 4 Byte, würden wir mit ~24(%esp)~ an ~arg2~ kommen.
+
+Problematisch wird es, wenn der gelbe Bereich von unbekannter Größe ist.
+In diesem Fall brauchen wir einen zweiten Zeiger, der in die Mitte des Call-Frames zeigt, sodass die Parameter weiterhin über konstante Offsets erreicht werden kann.
+Dieser Zeiger heißt *Basiszeiger* und wird auf IA-32 in ~%ebp~ gespeichert.
+Es heißt deswegen Basiszeiger, weil er eigentlich an die Basis des Call-Frames zeigt, die viele Autoren am Beginn des gelben Bereichs verorten.
+Für diese Autoren beginnt der Call-Frame erst mit den lokalen Variablen und die Argumente gehören noch zum Call-Frame des Aufrufers.
+Da ich es aber unlogisch finde, dass Parameter und lokale Variablen einer Funktionsinstanz in unterschiedlichen Call-Frames liegen, definieren wir den Call-Frame in dieser Veranstaltung so, dass er sowohl Parameter und lokale Variablen überdeckt.
+
+Verwendet man einen Basiszeiger, so muss der ursprüngliche Wert dieses Registers gesichert (und am Ende wieder hergestellt) werden. Schließlich gehört ~%ebp~ zu den Callee-Save Registern.
+
+Am Ende der Funktion baut der Callee seinen Anteil des Call-Frames wieder ab und gibt die Kontrolle mit dem ~ret~-Maschinenbefehl an den Caller zurück.
+Dieser entfernt dann wieder die Parameter vom Stack und fährt mit seinem Kontrollfluss, nun um den Rückgabewert reicher, fort.
+
+
+#+begin_src latex
+\begin{frame}{Unterschiede der Aufrufkonventionen}
     \bi
     \ii Übergabe von \structure{Argumenten in Registern} {
       \bi
@@ -323,24 +419,25 @@ Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließ
   \end{frame}
 #+end_src
 
-http://www.sco.com/developers/devspecs/abi386-4.pdf ab Seite 35
+Ich möchte noch ganz kurz darauf eingehen, in welchen Aspekten sich Aufrufkonventionen unterscheiden können.
+Da auf aktuellen Plattformen Speicherzugriffe langsamer sind als Registerzugriffe, werden bei neueren Aufrufkonventionen die ersten Argumente nicht über den Speicher, sondern über die Register übergeben.
+Diese ist eine Optimierung, die insbesondere bei Funktionen mit weniger Argumenten, was die meisten Funktionen sind, erheblich die Anzahl der Speicheroperationen einschränkt.
 
+Eine andere Designentscheidung für Aufrufkonventionen ist die Anzahl der Callee-Save Register.
+Umso mehr Register als Callee-Save angenommen werden umso mehr Sicherungsoperationen können wir uns auf Seiten des Aufrufers sparen, da diese beim Callee gesichert werden.
+Andersherum, bei weniger Callee-save Registern, haben Funktionen, insbesondere Blattfunktionen, mehr Register zur Verfügung, die ohne Sicherung verwendet werden können.
+Das grundlegende Problem ist, dass der Caller nicht weiß welche Register der Callee tatsächlich verwenden wird, und der Callee nicht weiß welche Register sein Caller in der Zukunft noch verwenden will.
+Deshalb suchen Aufrufkonventionen nach einem Trade-Off zwischen keine Callee-save Register und ausschließlich Callee-save Registern, der diese gegenseitige Nicht-Kennen ausgleicht. Meist kümmert sich sowohl Caller als auch Callee um etwa die Sicherung des halben Registersatzes.
+
+Der dritte Aspekt der ebenfalls in Aufrufkonventionen geregelt ist, sind zusätzliche, nicht sichtbare Register.
+So wird beim thiscall (C++) der Zeiger auf das Objekt auf dem eine Methode ausgeführt werden soll im Register ~%ecx~ übergeben. Über solche zusätzlichen Argumente haben wir allerdings schon im Kapitel zur Coderzeugung ausführlich geredet{{{see(08-codegen-records, Coderzeugung für Records)}}}.
 
 #+begin_src latex
   \begin{frame}[fragile]{Lokale Variablen}
     \begin{btBlock}{Die Welt am Beginn einer Funktion\hfill Parameter: \checkmark}\small
       \begin{columns}
         \begin{column}{0.7\textwidth}
-          Nachdem Sicherung des \alert{alten Basiszeigers}, sind die Parameter mit einem \structure{konstanten, positiven Offset} zum \advantage{neuen Basiszeiger} adressierbar.       
-        \end{column}\hfill
-        \hspace{-3ex}\begin{column}{0.3\textwidth}\ttfamily
-          bar:\\
-          \ \alert{push \%ebp}\\
-          \ \advantage{mov \%esp, \%ebp}\\
-          \ mov \structure{8(\%ebp)}, \%eax
-        \end{column}
-      \end{columns}
-    \end{btBlock}
+          Nachdem Sicherung des \alert{alten Basiszeigers}, sind die Parameter mit einem \structure{konstanten, positiven Offset} zum \advantage{neuen Basiszeiger} adressierbar. \end{column}\hfill \hspace{-3ex}\begin{column}{0.3\textwidth}\ttfamily bar:\\ \ \alert{push \%ebp}\\ \ \advantage{mov \%esp, \%ebp}\\ \ mov \structure{8(\%ebp)}, \%eax \end{column} \end{columns} \end{btBlock}
 
     \bi
     \ii<2-> Unendlicher virtueller Registersatz (IR) vs. endlicher realer Registersatz{
@@ -368,6 +465,36 @@ http://www.sco.com/developers/devspecs/abi386-4.pdf ab Seite 35
 
 
 #+end_src
+
+Die Aufrufkonvention legt fest, welche Argumente über den Speicher im Call-Frame und welche in Registern übergeben werden.
+Daher wissen wir nun, wie der Maschinenzustand aussieht, bevor die erste Instruktion unserer Funktion ausgeführt wird.
+Nachdem wir dort den alten Basiszeiger gesichert und einen etabliert haben, können wir mit konstanten Offsets auf die Parameter zugreifen.
+Aber es fehlt noch etwas essentiellen:
+Wie bilden wir die lokalen Variablen auf den Speicher ab.
+Diesen (gelben) Teil habe ich bisher absichtlich ausgelassen um jetzt darauf genauer einzugehen.
+
+Das Problem ist, dass es (meist) mehr lokale Variablen in einer IR-Funktion gibt als der Registersatz der Maschine Plätze vorsieht.
+So bleiben bei IA-32 noch 6 "General-Purpose Register" über, nachdem wir Stackzeiger und Basiszeiger abgezogen haben, in denen wir Werte speichern können.
+Für alle Funktionen die nur 6 IR-Variablen haben können wir also eine 1:1 Abbildung vornehmen und brauchen keinen Stackspeicher vorsehen.
+Aber wie oft trifft das schon ein, nur 6 Variablen?
+
+Daher müssen wir den Call-Frame als zusätzlichen Zustandsspeicher für die Funktionsinstanz auffassen.
+Dazu legen wir am Beginn der Funktion eine gewissen Anzahl an *Speicherslots* an, in denen wir Variablenwerte zwischenspeichern können, wenn sie gerade nicht in Register liegen. Wir können dann Werte zwischen Registern und Speicherslots hin und her verschieben.
+
+Bei der einfachsten Variante diese Abbildung von IR-Variable durchzuführen, geben legen wir für jede Variable einen festen Slot an, der Fix mit dieser IR-Variable verbunden ist.
+Durch diese fixe Zuordnung zwischen IR-Variable und Stack-Slot, können wir für jede Variable einen konstanten Basiszeiger-Offset angeben mit dem wir den zugehörigen Slot adressieren können.
+
+Ich möchte hier noch einmal ganz deutlich machen, dass es einen kategorischen Unterschied zwischen Variable und Stack-Slot gibt:
+Variablen sind ein Konzept der IR-Ebene und so auf der Maschinenebene so nicht vorhanden.
+Slots dagegen sind auf der Maschinenebene vorhanden, da wir auf eine konkrete Speicherzelle zeigen können und sagen:
+"Das ist der Stack-Slot 3 im Call-Frame zu eine Funktionsinstanz von ~bar()~".
+Wie ist aber das Verhältnis von Variable zu Slot (in unserer fixen Zuordnung)?
+Man kann es sich bildlich so vorstellen, dass die Variable ein Geist ist, der entweder gerade in einem Register oder in einem Stack-Slot lebt.
+Zu jedem Zeitpunkt kann dieser Geist nur in einem dieser beiden Orte leben, denn entweder enthält ein Register den aktuellen Wert der Variable oder ein Stack-Slot.
+
+Im Fall eines etwas komplexeren Übersetzers ist die Zuordnung von Variable an Stack-Slots nicht so fix wie in unserer einfachen Variante.
+In diesen Fällen kann eine Variable an unterschiedlichen Punkten in einer Funktion in verschiedenen Slots leben und mehrere Variablen können sich einen Slot teilen.
+Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durch weniger Druck auf den Cache, auch zu einer schnelleren Ausführung führt.
 
 * Befehlsauswahl und Registerallokation
 
