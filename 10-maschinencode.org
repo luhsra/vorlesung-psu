@@ -1,3 +1,4 @@
+
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 10 - Maschinencode
 #+SETUPFILE: setup.org
@@ -141,7 +142,7 @@ Effiziente Programmierer:
     \end{column}
   \end{columns}
 
-  \only<2->{\AtBeginShipoutNext{%
+  \only<handout:2-|2->{\AtBeginShipoutNext{%
       \AtBeginShipoutUpperLeftForeground{%
         \begin{tikzpicture}[remember picture, overlay]%
           \draw[ultra thick,srared,->] ($(pic cs:left-befehle)+(up:3pt)$) -- ($(pic cs:right-befehle)+(-1pt,3pt)$);
@@ -153,6 +154,47 @@ Effiziente Programmierer:
   }
   \end{frame}
 #+end_src
+
+In dem Teil der Veranstaltung "Programmiersprachen und Übersetzer" der sich mit der technischen Seite, dem Übersetzerbau, beschäftigt haben wir zunehmend darauf hingearbeitet die semantische Lücke zwischen dem Text der Quellcodeebene und dem Programm der Maschinenebene zu schließen.
+Schrittweise haben wir uns von Zeichen zu Tokens (Scanner), von Tokens zu Bäumen (Parsing), von Bäumen zu semantisch korrekten Bäumen (Semantische Analyse), und von abstrakten Syntaxbäumen zum Zwischencode (Codeerzeugung) bewegt.
+Aber es fehlt noch ein letzter Schritt:
+Wir müssen von der Ebene des Zwischencodes zu Ebene der real existierenden Maschine kommen.
+Und da gibt es noch einige Unterschiede:
+Wo die IR-Maschine beliebig viele Register hat, hat der Prozessor nur eine endliche Anzahl derer.
+Wo die IR-Maschine Funktionsaufrufe mit Paramterübergabe beherscht, gibt es auf dem physikalische-existierenden Prozessor nur einen ~call~-Befehl, der mehr ein Sprung auf Steroiden ist.
+Wo die IR-Maschine unspezifiziert ist wie das Programm startet, müssen wir für die Ausführungsplattform ein passendes Binärformat erzeugen.
+All diese verbleibenden Aspekte werden wir in die Vorlesung thematisieren.
+Damit vollenden wir unsere Reise zur Schließung der semantischen Lücke, einer Reise man als 10.000 Abstraktionsebenen unter der der Entwicklungsumgebung bezeichen könnte.
+
+Als Zielplattform, anhand derer wir die Maschinencodeerzeugung diskutieren werden, habe ich die IA-32 (32-Bit Intel Architektur) gewählt.
+Nicht weil diese besonders hübsch oder zugänglich ist, sondern weil sie ein seit 40 Jahren stabiles Prozessorinterface bietet.
+Außerdem unterstützen alle Intel CPUs bis heute diesen 32-Bit Modus, auch wenn wir diese normalerweise im 64-Bit AMD64 Modus betreiben.
+Daher können Sie die Programme, die aus dem Übungsübersetzer fallen wirklich ausführen und schrittweise im Debugger durchgehen.
+Dabei ist die Konzentration auf IA-32 kein Hindernis für die Verallgemeinerbarkeit der vorgestellten Techniken. Jede Abbildung des Zwischencodes auf eine reale Prozessorarchitektur muss die selben Probleme lösen, wie wir dies für IA-32 tun müssen. Oft fallen dabei Designentscheidungen anders aus, aber die Probleme bleiben die gleichen.
+
+Das erste Problem, dessen wir uns annehmen müssen ist wie wir die *Speicherabstraktion* der IR-Maschine auf den Prozessor abbilden.
+Unsere IR-Maschine ist mit einer sehr mächtigen Speicherabstraktion ausgestattet, weil wir dort zum einen symbolisch benannte Variablen (Register) haben, von denen wir unendlich viele besitzen können.
+Außerdem gibt es die Befehle ~StackAlloc~ und ~HeapAlloc~, die es uns erlauben zusätzlichen Speicherplatz für Objekte anzufordern; es gibt also eine sehr rudimentäre Unterstützung für Objekte.
+Reale Prozessoren sind deutlich eingeschränkter: Kein realer Prozessor hat unendlich viele Registern, sondern ihre Anzahl ist beschränkt. Der Speicher ist auch nicht so hübsch in Variablen und allozierte Objekte strukturiert, sondern wir arbeiten nur mit einer endlichen Anzahl an Speicherzellen, die wir über einen numerischen Index (== Zeiger) ansprechen können.
+Zwischen beiden Welten bedarf es also einer Abbildungsfunktion.
+
+Das zweite Problem sind die *Befehle der IR-Maschine*:
+Wir haben uns den Zwischencode so definiert, dass die meisten Befehle 3 Operanden haben (Quadrupelschreibweise), wobei Quell- und Zieloperanden getrennt voneinander gewählt werden können.
+Auf IA-32 haben wir diesen Luxus nicht, dort haben Befehle in der Regel 2 Operanden, wovon ein Operand eine doppelte Rolle hat und sowohl Quell- als auch Zieloperand ist.
+Außerdem haben wir auf der IR-Ebene den ~Call~ Befehl, der nicht nur eine Funktion aufruft, sondern auch, nebenbei, eine beliebige Anzahl an Argumenten als Parameter an die neue Funktionsinstanz übergeben kann, wo sie dann wie lokale Variablen verwendet werden können.
+Das ist sehr schickt, aber es unterstützt keine reale Maschine.
+Das Attribut bei dem Sie stutzig werden müssen ist "beliebige Anzahl", denn nichts auf einer realen Maschine hat eine beliebige Anzahl; immer gibt es irgendeine Art von oberen Schranke[fn::Am Ende besteht die Maschine eben doch aus einer endlichen Anzahl von Atomen, die nur eine endliche Anzahl von Taktzyklen betriebn werden kann, bevor Elektromigration alle Gates und Leitungen aufgefressen hat.
+[[https://de.wikipedia.org/wiki/Memento_mori][Oh Memento Mori]]!].
+Auch hier brauchen wir für jeden IR-Befehl eine Abbildung auf einen IA-32-Befehl.
+
+Das dritte Problem ist die *Speicherung des Programms*.
+Darüber haben wir uns bei der IR-Maschine überhaupt keine Gedanken gemacht.
+Die Befehle kamen einfach irgendwo her und wurden entlang des Kontrollflussgraphen abgearbeitet.
+IA-32 kennt aber Kontrollflussgraphen nicht als Dateiformat, sondern nur einen linearen Instruktionsstrom.
+Wir müssen unser übersetztes Programm so in eine Datei speichern, dass es vom Betriebssystem, als ein Prozess, in den Speicher geladen wird, wo es dann als Instruktionsstrom abgearbeitet werden kann.
+Wir schauen uns dazu an, wie das ELF-Binärformat für Linux aufgebaut ist und wie der erzeugte Assemblercode im Anschluss an die Übersetzung für die Ausführung vorbereitet wird.
+
+Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließen. Am Ende haben wir ein ausführbares Binärprogramm. 
 
 * Speicherabstraktion: Call-Frames
 
