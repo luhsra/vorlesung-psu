@@ -41,7 +41,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \bi
     \ii Übersetzer prüft bei der semantische Analyse die letzten Sprachregeln.\\
     \alert{$\Rightarrow$ In der semantischen Analyse werden die letzten Fehler entdeckt.} \medskip
-    \ii Was sollte der \emph{effektive} und \emph{effiziente} Informatiker darüber Wissen? {
+    \ii Was sollte der \emph{effektive} und \emph{effiziente} Informatiker darüber wissen? {
       \bi
       \ii Datenfluss auf einem Baum geschieht entlang und quer zu den Kanten.
       \ii Übersetzertechniken sind auch in anderen Bereichen einsetzbar.
@@ -54,31 +54,31 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 
 In dieser Vorlesungseinheit werden wir uns mit der *semantischen Analyse* befassen.
-In den letzten beiden Kapiteln haben wir uns mit zwei essentiellen Bereichen des Sprachdesigns (Typen und Namen) befasst.
-Diese beiden Themenbereiche greifen wir bei der semantischen Analyse wieder auf, betrachten Sie diesmal allerdings aus Sicht des Übersetzers:
+In den letzten beiden Kapiteln haben wir uns mit zwei essentiellen Bereichen des Sprachdesigns (Typen und Namen) auseinandergesetzt.
+Diese beiden Themenbereiche greifen wir bei der semantischen Analyse wieder auf, betrachten sie diesmal allerdings aus Sicht des Übersetzers:
 "Wie *implementieren* wir Typprüfung und Namensauflösung in einem Übersetzer?"
-Dazu werden wir zum einen einen theoretischen Hintergrund kennen lernen, der uns erklärt was wir in der semantischen Analyse überhaupt ausrechnen (Knotenattribute) und welche Techniken dafür geeignet sind (Baumtraversierung, Symboltabelle, Unifikation).
-Die Vorlesung ist dabei stark von möglichen Implementierungen getrieben; Schnallen Sie sich also an, es wird Codebeispiele regnen!
+Dazu werden wir zum einen einen theoretischen Hintergrund kennenlernen, der uns erklärt, was wir in der semantischen Analyse überhaupt ausrechnen (Knotenattribute) und welche Techniken dafür geeignet sind (Baumtraversierung, Symboltabelle, Unifikation).
+Die Vorlesung ist dabei stark von möglichen Implementierungen getrieben; schnallen Sie sich also an, es wird Codebeispiele regnen!
 
 Zunächst wollen wir die semantische Analyse einmal in den Ablauf des Übersetzungsvorgangs einordnen.
-In der zweiten Vorlesung haben wir uns mit der syntaktischen Analyse befasst, die einen Zeichenstrom einließt und durch Anwendung eines kontextfreien Parsers einen abstrakten Syntaxbaum (AST) extrahiert.
+In der zweiten Vorlesung haben wir uns mit der syntaktischen Analyse befasst, die einen Zeichenstrom einliest und durch Anwendung eines kontextfreien Parsers einen abstrakten Syntaxbaum (AST) extrahiert.
 Ausgehend vom Syntaxbaum, welcher für jede Anwendung einer Grammatikregel einen Knoten enthält, berechnen wir den AST als eine kondensierte Form der Programmstruktur.
 Durch die Baumstruktur des AST können wir beliebig tiefe syntaktische Schachtelungen (z.B. geklammerte arithmetische Ausdrücke) darstellen.
 Der AST ist die *Eingabe der semantischen Analyse*.
 
-Während die syntaktische Analyse bereits sicher stellt, dass ein Programm korrekt notiert wurde und syntaktisch korrekt ist (z.B.
+Während die syntaktische Analyse bereits sicherstellt, dass ein Programm korrekt notiert wurde und syntaktisch korrekt ist (z.B.
 Klammerung ist balanciert), können sich immer noch inhaltliche (oder semantische) Fehler im AST verstecken.
-So könnte in einem Ausdruck eine Variable referenziert werden, die nirgends deklariert ist, oder wir könnten versuchen eine Ganzzahl auf zu rufen (~int x = 1; x();~).
+So könnte in einem Ausdruck eine Variable referenziert werden, die nirgends deklariert ist, oder wir könnten versuchen eine Ganzzahl aufzurufen (~int x = 1; x();~).
 Beide Fehler können, prinzipbedingt, nicht durch einen kontextfreien Parser erkannt werden, da sie erst in einer gewissen Umgebung, einem Kontext, erkennbar werden.
 Daher teilt man die Menge aller Sprachregeln in die syntaktischen Regeln und die semantischen Regeln ein.
 Im Prinzip prüft die semantische Analyse all übrigen Regeln ab, die nicht bereits im Parser geprüft werden konnten.
-Dies bedeutet aber auch, dass wir am Ende der semantischen Analyse sicher wissen, ob ein vorliegendes Programm wirklich ein Programm der Sprache ist oder nur ein Zeichenstrom der einem validen Programm zum verwechseln ähnlich sieht[fn::Wenn ihr "C Programm" nicht kompliert, ist es kein Programm der Sprache C].
+Dies bedeutet aber auch, dass wir am Ende der semantischen Analyse sicher wissen, ob ein vorliegendes Programm wirklich ein Programm der Sprache ist oder nur ein Zeichenstrom, der einem validen Programm zum verwechseln ähnlich sieht[fn::Wenn Ihr "C-Programm" nicht kompiliert, ist es kein Programm der Sprache C].
 
 Das Ergebnis der semantischen Analyse ist wieder der AST.
 Allerdings reichert die semantische Analyse die Knoten des AST um *semantische Attribute* an.
-Diese Attribute beinhalten Zeiger auf die Deklaration bei Namensreferenzen oder den berechneten Rückggabetyp eines komplexen Ausdrucks.
+Diese Attribute beinhalten Zeiger auf die Deklaration bei Namensreferenzen oder den berechneten Rückgabetyp eines komplexen Ausdrucks.
 Diese Attribute hängen dabei nicht nur von dem Knoten ab, an den wir sie anhängen, sondern auch von den Kindern, den Geschwistern oder dem Vorgänger des aktuellen Knotens.
-Die Techniken mit denen wir diese Attribute berechnen und auf Konsistenz prüfen, sind dabei nicht nur für den Übersetzerbau hilfreich, sondern auch für andere Bereiche der Informatik.
+Die Techniken, mit denen wir diese Attribute berechnen und auf Konsistenz prüfen, sind dabei nicht nur für den Übersetzerbau hilfreich, sondern auch für andere Bereiche der Informatik.
 
 TL;DR: Semantische Analyse(AST) -> AST mit semantischen Attributen an jedem Knoten
 
@@ -89,8 +89,8 @@ TL;DR: Semantische Analyse(AST) -> AST mit semantischen Attributen an jedem Knot
 \end{frame}
 
 \begin{frame}[t]{Ziele der Semantischen Analyse}
-    \begin{btBlock}{Syntaktische und Semantische Analyse prüfen alle Sprachregeln}\small
-      Die syntaktische Analyse prüft die kontextfreien Regeln einer Sprache. Alles was nicht kontextfrei geprüft werden kann, überprüft die semantische Analyse.
+    \begin{btBlock}{Syntaktische und semantische Analyse prüfen alle Sprachregeln}\small
+      Die syntaktische Analyse prüft die kontextfreien Regeln einer Sprache. Alles, was nicht kontextfrei geprüft werden kann, überprüft die semantische Analyse.
     \end{btBlock}
     \bi
     \ii Abschließende Prüfung der Sprachregeln und Informationsgewinnung{
@@ -102,7 +102,7 @@ TL;DR: Semantische Analyse(AST) -> AST mit semantischen Attributen an jedem Knot
     \ii \tikzmark{A}\structure{Deklariertheit}: Kann jede (statische) Namensreferenz aufgelöst werden?{
       \bi
       \ii Zu jedem Namen(spfad) muss eine Deklaration gefunden werden.
-      \ii Auffinden der passenden Überladung für eine Aufrufstelle.
+      \ii Auffinden der passenden Überladung für eine Aufrufstelle
       \ei
     }\medskip
     \ii \tikzmark{B}\structure{Typkonsistenz}: Werden die statischen Typen korrekt verwendet?{
@@ -119,28 +119,27 @@ TL;DR: Semantische Analyse(AST) -> AST mit semantischen Attributen an jedem Knot
 #+end_src
 
 Um die Schritte der semantischen Analyse deutlicher zu machen, wollen wir uns ein Beispiel ansehen.
-Beim AST, den wir aus dem Parser bekommen, sind alle Kinder eines AST Knotens erst einmal gleichberechtigt, haben aber eine Ordnung, die sich aus den Regeln der Grammatik ergeben; Wir können diese also in einem Knoten in einem Array speichern (im Beispiel ist der Rückgabetyp der Funktion in ~function.children[2]~ gespeichert.
-Da solche magischen Konstanten den Code unseres Übersetzers unübersichtlich macht, geben wir den Kindern der AST Knoten, wo dies Sinn macht, symbolische Namen (~function.rettype~).
+Beim AST, den wir aus dem Parser bekommen, sind alle Kinder eines AST Knotens erst einmal gleichberechtigt, haben aber eine Ordnung, die sich aus den Regeln der Grammatik ergeben; Wir können diese also in einem Knoten in einem Array speichern (im Beispiel ist der Rückgabetyp der Funktion in ~function.children[2]~ gespeichert).
+Da solche magischen Konstanten den Code unseres Übersetzers unübersichtlich machen, geben wir den Kindern der AST Knoten, wo dies Sinn macht, symbolische Namen (~function.rettype~).
 
-Bei der *Namensauflösung* prüfen wir zum einen ob es eine passende Deklaration (*Deklariertheitseigenschaft*) gibt und zum anderen speichern wir die gefundene Referenz als Attribut an der Verwendungsstelle.
-Bemerkenswert im Beispiel ist, dass wir bei der Referenz ~"a"~ nicht auf den deklarierenden Bezeichner ~"a"~ zeigen lassen, sondern auf den inneren Knoten der das semantische Element "Variablendeklaration" darstellt; Wir etablieren so eine *semantische Querverbindung* im AST.
-Querverbindung deshalb, weil sich die Kante nicht entlang der kanten des Baums hangelt, sondern direkt, quer zu jeder Eltern-Kind Beziehung, gezogen wird.
+Bei der *Namensauflösung* prüfen wir zum einen, ob es eine passende Deklaration (*Deklariertheitseigenschaft*) gibt und zum anderen speichern wir die gefundene Referenz als Attribut an der Verwendungsstelle.
+Bemerkenswert im Beispiel ist, dass wir bei der Referenz ~"a"~ nicht auf den deklarierenden Bezeichner ~"a"~ zeigen lassen, sondern auf den inneren Knoten der das semantische Element "Variablendeklaration" darstellt; wir etablieren so eine *semantische Querverbindung* im AST.
+Querverbindung deshalb, weil sich die Kante nicht entlang der Kanten des Baums hangelt, sondern direkt, quer zu jeder Eltern-Kind-Beziehung, gezogen wird.
 
-Das Ziel der *Typprüfung* ist es sicher zu stellen, dass jede angewandte Operation kompatibel zu den statischen Typen der Operanden ist; Operanden und Operationen müssen konsistent zueinander sein!
-So dürfen wir das Ergebnis einer Addition nicht als Funktion aufrufen:
-~(1+1)()~, weil man Ganzzahlen, immer noch nicht, aufrufen kann.
-Um diese Typprüfung durch zu führen, berechnen wir für die Knoten des ASTs einen Rückggabetyp:
-Beginnend bei den Blättern, die entweder konstante Laterale (~1~) oder Namensreferenzen sind (Typ der Deklaration), propagieren wir die Typinformationen im Baum von unten nach oben.
-Bei jedem inneren Knoten prüfen wir ob die Typen der direkten Kinder (= die Operanden) zum Knotentyp (= die Operation) passt.
+Das Ziel der *Typprüfung* ist es sicherzustellen, dass jede angewandte Operation kompatibel zu den statischen Typen der Operanden ist; Operanden und Operationen müssen konsistent zueinander sein!
+So dürfen wir das Ergebnis einer Addition nicht als Funktion aufrufen (~(1+1)()~), weil man Ganzzahlen immer noch nicht aufrufen kann.
+Um diese Typprüfung durchzuführen, berechnen wir für die Knoten des ASTs einen Rückgabetyp:
+Beginnend bei den Blättern, die entweder konstante Literale (~1~) oder Namensreferenzen sind (Typ der Deklaration), propagieren wir die Typinformationen im Baum von unten nach oben.
+Bei jedem inneren Knoten prüfen wir, ob die Typen der direkten Kinder (= die Operanden) zum Knotentyp (= die Operation) passt.
 So erwartet die ~+~ Operation im Beispiel, dass sowohl das linke (left-hand side, lhs) als auch das rechte (right-hand side, rhs) Kind ein ~int~ ist. Das Ergebnis dieser Addition ist wiederum selbst vom Typ ~int~.
-Außerdem wird sichergestellt, dass die zurückgegebenen Werte zum deklarierten Rückggabetyp der Funktion passen.
+Außerdem wird sichergestellt, dass die zurückgegebenen Werte zum deklarierten Rückgabetyp der Funktion passen.
 
-Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Namensauflösung, wie bereits erwähnt, miteinander interagieren. Hätte unsere Sprache die Möglichkeit diesen Operator zu überladen, so würden wir für den ~+~-Knoten zunächst die Typen der Kinder berechnen, eine Aufrufsignatur erstellen und per Namensauflösung eine Referenz auf die verwendete Überladung ziehen. Der Knotentyp unserer Addition wäre dann nicht immer ~+~, sondern der Rückgabetyp der gefundenen Überladung.
+Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Namensauflösung, wie bereits erwähnt, miteinander interagieren. Hätte unsere Sprache die Möglichkeit, diesen Operator zu überladen, so würden wir für den ~+~-Knoten zunächst die Typen der Kinder berechnen, eine Aufrufsignatur erstellen und per Namensauflösung eine Referenz auf die verwendete Überladung ziehen. Der Knotentyp unserer Addition wäre dann nicht immer ~+~, sondern der Rückgabetyp der gefundenen Überladung.
 
 
 Wir wollen uns im Folgenden den notwendigen Techniken für diese beiden Aspekte der semantischen Analyse widmen.
 Neben Typkonsistenz und Deklariertheit kann es allerdings noch andere Sprachregeln geben, die nicht kontextfrei prüfbar sind und daher in den Bereich der semantischen Analyse fallen.
-Diese lassen sich in aller Regeln mit den selben Techniken erledigen.
+Diese lassen sich in aller Regel mit den selben Techniken erledigen.
 
 * AST Struktur und Knotenattribute
 :PROPERTIES:
@@ -180,11 +179,11 @@ Diese lassen sich in aller Regeln mit den selben Techniken erledigen.
     \end{columns}
 
     \bi
-    \ii<2-> \textbf{In Realität}: Code des Übersetzers muss auf dem dem AST operieren {
+    \ii<2-> \textbf{In Realität}: Code des Übersetzers muss auf dem AST operieren {
       \bi
       \ii Struktur der Grammatik sollte sich in den Datenstrukturen widerspiegeln
       \ii Übersetzer sind komplexe Programme, Bugs sind besonders schwerwiegend
-      \ii Nutzung der verfügbaren Sprachfeatures um Übersetzer \structure{robust} zu machen
+      \ii Nutzung der verfügbaren Sprachfeatures, um Übersetzer \structure{robust} zu machen
       \ei
     }
     \ei
@@ -195,7 +194,7 @@ Diese lassen sich in aller Regeln mit den selben Techniken erledigen.
         class `\tikznode[name=classdef]{ClassDef}` extends Definition {
           public Name               name;
           public ClassDef           extending;
-          public `\tikznode[name=type]{List<InterfaceDef>}`    implementing;
+          public `\tikznode[name=type]{List<InterfaceDef>}` implementing;
           public List<Definition>   `\tikznode[name=member]{defs}`;
           ....
         }
@@ -217,16 +216,16 @@ Diese lassen sich in aller Regeln mit den selben Techniken erledigen.
 Bevor wir zu den Analysetechniken kommen, werfen wir einen genaueren Blick auf die Knoten des abstrakten Syntaxbaums.
 Für die semantische Analyse müssen wir viel Code schreiben, der auf den Knoten des ASTs operiert.
 Bauen wir dabei einen Fehler ein, so ist dieser um ein vielfaches schwerwiegender als ein Bug in einem anderen Programm, da ein Übersetzerbug beliebig viele Programme beeinflussen kann.
-Wir sollten daher bei der Konstruktion von Übersetzern besonders vorsichtig sein und so viele Sicherheits- und Verständlichkeits-Features unserer Host-Sprache (Programmiersprache in der der Übersetzer selbst verfasst ist) nutzen.
+Wir sollten daher bei der Konstruktion von Übersetzern besonders vorsichtig sein und so viele Sicherheits- und Verständlichkeits-Features unserer Host-Sprache (Programmiersprache, in der der Übersetzer selbst verfasst ist) nutzen.
 Der Code des Übersetzer muss also *robust* sein und wir sollten *defensiv programmieren*.
 
-Für den AST bedeutet dies, dass wir wegkommen müssen von der Vorstellung ein AST sei einfach eine Sammlung von Knoten und Kanten, welche zu der sehr minimalistischen, ersten Implementierung auf den Folien führt.
-Dort sind alle AST Knoten vom gleichen Datentyp (~node_t~), unterschieden durch eine magische Ganzzahlkonstante (~tag~), und versehen mit einer unstrukturierten Liste aller Kinder (~std::vector<node_t>~).
-Eine solche simplistische Darstellung ist zwar maximal flexibel ist, verhindert aber, dass wir die Host-Sprache voll ausnützen und führt außerdem zu wirklich unlesbarem Code.
+Für den AST bedeutet dies, dass wir wegkommen müssen von der Vorstellung, ein AST sei einfach eine Sammlung von Knoten und Kanten, welche zu der sehr minimalistischen, ersten Implementierung auf den Folien führt.
+Dort sind alle AST-Knoten vom selben Datentyp (~node_t~), unterschieden durch eine magische Ganzzahlkonstante (~type~), und versehen mit einer unstrukturierten Liste aller Kinder (~vector<node_t>~).
+Eine solch simplistische Darstellung ist zwar maximal flexibel, verhindert aber, dass wir die Host-Sprache voll ausnützen und führt außerdem zu wirklich unlesbarem Code.
 
-Besser ist es da jeden AST-Knotentyp auf einen Typen der Host-Sprache abzubilden und seine Kinder unter sprechenden Namen bekannt zu machen.
-Auf diese Weise können wir auch jedem Kind einen statischen Typen zuordnen und so verhindern, dass eine Typdeklaration als Operand einer Addition zuweisen.
-Wir bekommen so ein weiteres Sicherheitsnetz durch das Typssystem.
+Besser ist es da, jeden AST-Knotentyp auf einen Typen der Host-Sprache abzubilden und seine Kinder unter sprechenden Namen bekanntzumachen.
+Auf diese Weise können wir auch jedem Kind einen statischen Typen zuordnen und so verhindern, dass wir eine Typdeklaration als Operand einer Addition zuweisen.
+Wir bekommen so ein weiteres Sicherheitsnetz durch das Typsystem.
 
 #+begin_src latex
   \begin{frame}[fragile]{AST: Eine Hierarchie von Knotentypen}
@@ -234,20 +233,20 @@ Wir bekommen so ein weiteres Sicherheitsnetz durch das Typssystem.
     \ii<+-> Die Grammatik legt bereits eine Hierarchie von Knotentypen nahe\\{
       \btSetNamedTab[1cm]{\first}%
       \first Grammatik:      \grammarrule{\NT{smt}}{assign\_stmt \OR while\_stmt \OR if\_stmt \OR \ldots}\\
-      \first AST Definition: \codeinline[style=java]{class AssignStmt extends Stmt {...}}
+      \first AST-Definition: \codeinline[style=java]{class AssignStmt extends Stmt {...}}
     }
     \ii<+-> Zusammenfassung von Ähnlichkeiten verschiedener Knotentypen\\
         \textit{Beispiel}: Viele Deklarationen können einen Namen tragen. Lassen wir diese von \codebox{NamedDecl} erben, so können wir sie gleich behandeln.\medskip
 
     \ii<+-> Häufig verwendete Klassen von Knotentypen{
       \bi
-      \ii \structure{Expression}: Ausdrücke die man auswerten kann und die ein Ergebnis liefern.\\
+      \ii \structure{Expression}: Ausdrücke, die man auswerten kann und die ein Ergebnis liefern.\\
       \hspace{5mm}\textit{Beispiele:} Addition, Dereferenzierung, \codeinline{(<cond> ? <then> : <else>)}
-      \ii \structure{Statement}: Anweisungen die sequentiell bearbeitet werden.\\
+      \ii \structure{Statement}: Anweisungen, die sequentiell bearbeitet werden.\\
       \hspace{5mm}\textit{Beispiele:} if-else, Schleifen, Zuweisungen
-      \ii \structure{Typen}: Literal notierte Typausdrücke.\\
+      \ii \structure{Typen}: Literal notierte Typausdrücke\\
       \hspace{5mm}\textit{Beispiele:} Typname, Typausdruck innerhalb eines Casts
-      \ii \structure{Deklaration}: Jede statisch Bekanntmachung für den Compiler\\
+      \ii \structure{Deklaration}: Jede statische Bekanntmachung für den Compiler\\
       \hspace{5mm}\textit{Beispiele:} Variablendefinition, Klassendeklarationen, \codeinline[style=C]{typedef}
       \ei
     }
@@ -262,13 +261,13 @@ Wir bekommen so ein weiteres Sicherheitsnetz durch das Typssystem.
       \bi
       \ii \structure{Parseraktionen} machen dies nebenher, wenn eine Regel angewendet wird:\\
          \codeinline!while_stmt -> WHILE ( expr ) body         { new WhileStmt(cond=T3, body=T5) }!
-      \ii \codebox{expr} ist ein Expression Knoten und ist über T3 zugreifbar.
+      \ii \codebox{expr} ist ein Expression-Knoten und ist über T3 zugreifbar.
       \ei
     }
     \ii<2-> Semantische Analyse berechnet zusätzliche \structure{Attribute}{
       \bi
       \ii Datenhaltung während Analyse, Wissensbasis für den Rest des Übersetzers
-      \ii \textit{Beispiel}: Berechneten Typ einer Expression, Zeiger auf die Deklaration.
+      \ii \textit{Beispiel}: Berechneten Typ einer Expression, Zeiger auf die Deklaration
       \ei
     }
     \ei
@@ -289,7 +288,7 @@ Wir bekommen so ein weiteres Sicherheitsnetz durch das Typssystem.
 Wenn wir auf die Grammatik einer Sprache schauen, sehen wir oft auch eine Hierarchie der einzelnen Knotentypen.  
 So beinhaltet ein Codeblock mehrere Statements, aber jedes Statement kann entweder eine Zuweisung (~assign_stmt~), eine Schleife (~while_stmt~), eine Bedingung (~if_stmt~), usw. sein.
 Diese Flexibilität können wir auch im Code des Übersetzers gewinnbringend abbilden, indem wir eine Vererbungshierarchie von Knotentypen definieren.
-Dies ermöglicht es uns die statischen Typen für Kinder weiterhin möglichst strikt zu halten:
+Dies ermöglicht es uns, die statischen Typen für Kinder weiterhin möglichst strikt zu halten:
 
 #+begin_src java
 class CodeBlock extends Statement {
@@ -297,36 +296,36 @@ class CodeBlock extends Statement {
 }
 #+end_src
 
-Außerdem können wir Eigenschaften in mehrere Knotentypen vorkommen in eine Oberklasse heraus zu destillieren.
-In der Vorlesung zur Namensauflösung haben wir über benannte Deklarationen geredet, ein Aspekt der Sprache den man in einer Klasse ~NamedDecl~ (mit ~.name~ Attribut) abbilden kann.
-Auf diese Weise kann der Code zur Namensauflösung Variablen- als auch Funktionsdeklarationen gleich behandeln.
+Außerdem können wir Eigenschaften, die in mehreren Knotentypen vorkommen, in eine Oberklasse herausdestillieren.
+In der Vorlesung zur Namensauflösung haben wir über benannte Deklarationen geredet, ein Aspekt der Sprache, den man in einer Klasse ~NamedDecl~ (mit ~.name~ Attribut) abbilden kann.
+Auf diese Weise kann der Code zur Namensauflösung Variablen- sowie Funktionsdeklarationen gleich behandeln.
 
-Grundsätzlich hat man in übersetzten Sprachen vier Knotentypen, die üblicherweise als Wurzel der Vererbungshierarchie für AST Knoten dienen:
-Expressions (Ausdrücke), Statements (Anweidungen), Typen und Deklarationen.
-Diese vier Knotentypen sind auch Vokabel, die Sie als effektiver Lerner einer neuen Sprache brauchen um einen Text über die Sprache leicht verstehen zu können.
+Grundsätzlich hat man in übersetzten Sprachen vier Knotentypen, die üblicherweise als Wurzel der Vererbungshierarchie für AST-Knoten dienen:
+Expressions (Ausdrücke), Statements (Anweisungen), Typen und Deklarationen.
+Diese vier Knotentypen sind auch Vokabeln, die Sie als effektiver Lerner einer neuen Sprache brauchen, um einen Text über die Sprache einfach verstehen zu können.
 
 *Expressions* sind all jene Konstrukte, die bei ihrer Ausführung einen Ergebniswert liefern.
 So ist eine Addition ebenso eine Expression wie ein Literal eine Expression ist[fn::Der Ausdruck (1+2) besteht aus drei Expressions. Zählen Sie diese auf!].
 Bei Expressions gibt es auch weniger intuitive Überraschungen:
-So funktioniert der ternäre ~?:~-Operator zwar wie ein if-else, ist aber eine Expression das er einen Ergebniswert liefert.
-Auch Definition einer C-Funktion keine Expression, dafür aber ihr Aufruf (~CallExpr~).
+So funktioniert der ternäre ~?:~-Operator zwar wie ein if-else, ist aber eine Expression, da er einen Ergebniswert liefert.
+Auch ist die Definition einer C-Funktion keine Expression, dafür aber ihr Aufruf (~CallExpr~).
 
 *Statements* sind Anweisungen die von der virtuellen Maschine, welche diese definiert, sequentiell abgearbeitet werden.
 Zu den Statements gehören alle Zuweisungen und alle Kontrollflusskonstrukte (Bedingungen, Schleifen).
-Für C kann man, in etwa sagen, dass jede semantisch-zusammengehörige Programmzeile ein Statement ist.
+Für C kann man in etwa sagen, dass jede semantisch-zusammengehörige Programmzeile ein Statement ist.
 
 Die *Typ*-Knotentypen[fn::Jetzt nicht verwirren lassen!]
-sind jene syntaktischen Elemente mit denen wir Typausdrücke im Code notieren.
+sind jene syntaktischen Elemente, mit denen wir Typausdrücke im Code notieren.
 Diese brauchen wir zum Beispiel für ~typedef~, zur Notation von Parametertypen einer Funktion oder als Inhalt einer Cast-*Expression*[fn::Überlegen Sie sich für ~(void *) a~, was hier Expression und was ein Typknoten ist.].
 Die Typ-Knotentypen können wir direkt als Typausdrücke verwenden, was eine Dopplung von Klassen vermeidet (~ast.IntType~ vs. ~type_expr.IntType~).
 
 *Deklarationen* sind all jene Programmstrukturen, die dem Übersetzer etwas bekannt machen.
-Dies beinhaltet sowohl Variablendefinition als auch ~typedef~-Konstrukte.
+Dies beinhaltet sowohl Variablendefinitionen als auch ~typedef~-Konstrukte.
 Deklarationen sind das statische Rückgrat der Programmstruktur.
-Wir hängen Typen an die Deklaratione und füllen sie mit Statements, die wiederum Expressions beinhalten.
+Wir hängen Typen an die Deklarationen und füllen sie mit Statements, die wiederum Expressions beinhalten.
 
 #+begin_src latex
-  \begin{frame}{Clang: AST Knoten und ihre Attribute}
+  \begin{frame}{Clang: AST-Knoten und ihre Attribute}
     \begin{center}
       \btImage[text width=0.7\textwidth,draw,label=below:\scriptsize Ausschnitt aus der Klassenhierarchie]{fig/05-llvm-named-decl-tree}
       \medskip
@@ -344,8 +343,8 @@ Wir hängen Typen an die Deklaratione und füllen sie mit Statements, die wieder
       \end{column}\hfill
       \begin{column}{0.59\textwidth}
         \bii
-        \ii CLang: C/C++ Frontend für LLVM
-        \ii Source-to-Source Transformation
+        \ii Clang: C/C++-Frontend für LLVM
+        \ii Source-to-Source-Transformation
         \ii \texttt{clang::VarDecl} ist ein \texttt{clang::NamedDecl}
         \eii
       \end{column}
@@ -359,26 +358,26 @@ Wir hängen Typen an die Deklaratione und füllen sie mit Statements, die wieder
 
 #+end_src
 
-Die hier vorgeschlagene Klassenhierarchie, bestehend aus Deklarationen, Expressions, Statements und Typen, findet sich auch im LLVM C-Frontend CLang.
-Dort erben, beispielsweise, alle Deklarationen, die einen Namen einführen könnten, von ~NamedDecl~.
-Werfen Sie einen Blick auf die Vererbungsbeziehungen von [[https://clang.llvm.org/doxygen/classclang_1_1NamedDecl.html][NamedDecl]] in der automatisch generierten Dokumenation von CLang.
-Wenn Sie sich noch mehr für die Implementierung eines real existierenden Übersetzers interssieren bietet auch die [[https://clang.llvm.org/docs/IntroductionToTheClangAST.html]["Introduction to the CLang AST"]] einen guten Einstieg.
-Dort gibt es auch den Hinweis zum [[https://clang.llvm.org/docs/RAVFrontendAction.html][RecursiveASTVisitor]], der das später beschriebene Visitor-Pattern für den CLang AST implementiert.
-Mit seiner Hilfe ist es leicht möglich CLang Plugins zu bauen, welches Operationen auf C/C++ Code ausführt. Es ist diese einfache Zugänglichkeit, das relativ moderne Design, und eine existente Dokumentation, die CLang (und LLVM) zu einer guten Basis für Forschung im Bereich des Übersetzerbaus macht.
+Die hier vorgeschlagene Klassenhierarchie, bestehend aus Deklarationen, Expressions, Statements und Typen, findet sich auch im LLVM C-Frontend Clang.
+Dort erben beispielsweise alle Deklarationen, die einen Namen einführen könnten, von ~NamedDecl~.
+Werfen Sie einen Blick auf die Vererbungsbeziehungen von [[https://clang.llvm.org/doxygen/classclang_1_1NamedDecl.html][NamedDecl]] in der automatisch generierten Dokumentation von Clang.
+Wenn Sie sich noch mehr für die Implementierung eines real existierenden Übersetzers interessieren, bietet auch die [[https://clang.llvm.org/docs/IntroductionToTheClangAST.html]["Introduction to the Clang AST"]] einen guten Einstieg.
+Dort gibt es auch den Hinweis zum [[https://clang.llvm.org/docs/RAVFrontendAction.html][RecursiveASTVisitor]], der das später beschriebene Visitor-Pattern für den Clang-AST implementiert.
+Mit seiner Hilfe ist es einfach möglich Clang-Plugins zu bauen, die Operationen auf C/C++-Code ausführen. Es ist diese einfache Zugänglichkeit, das relativ moderne Design, und eine existente Dokumentation, die Clang (und LLVM) zu einer guten Basis für Forschung im Bereich des Übersetzerbaus macht.
 
-Auf den Folien ist auch eine textuelle Representation des CLang ASTs für ein kurzes Programm gezeigt.
+Auf den Folien ist auch eine textuelle Repräsentation des Clang-ASTs für ein kurzes Programm gezeigt.
 Dort können wir die einzelnen Aspekte eines gut handhabbaren ASTs direkt sehen.
-Alle Elemente einer Übesetzungseinheit[fn::Eine Übersetzungseinheit ist die (oder mehrere) C-Dateien, die zu einem Object-File (.o-Datei) übersetzt werden.]
+Alle Elemente einer Übersetzungseinheit[fn::Eine Übersetzungseinheit ist die (oder mehrere) C-Dateien, die zu einem Object-File (.o-Datei) übersetzt werden.]
 sind unter dem Wurzelknoten ~TranslationUnitDecl~ gespeichert; in unserem Beispiel ist dies genau die gezeigte Funktion.
-Innerhalb des ASTs finden wir Statements und Deklarationen, die sich ineinander schachteln. Jedem dieser Knotentypen entspricht eine C++ Klasse innerhalb CLang API.
+Innerhalb des ASTs finden wir Statements und Deklarationen, die sich ineinander schachteln. Jedem dieser Knotentypen entspricht eine C++-Klasse innerhalb Clang-API.
 
-An jedem Knoten wird seine Adresse im Speicher ausgegeben um Referenzierung innerhalb der Ausgabe zu erlauben. Diese Adressen sind nicht Teil der Programmstruktur und sie können sich mit jedem Aufruf des Übersetzers ändern. Die einzelnen Knoten sind zum einen entlang ihrer Baumkanten in einer Eltern-Kind-Beziehung verbunden, und zum anderen über die Querverbindungen welche die Namensauflösung eingeführt hat. So Referenziert die  ~DeclRefExpr~ in der letzten Zeile den ~VarDecl~ Knoten, welcher die lokale Variable ~result~ eingeführt hat.
+An jedem Knoten wird seine Adresse im Speicher ausgegeben, um Referenzierung innerhalb der Ausgabe zu erlauben. Diese Adressen sind nicht Teil der Programmstruktur und sie können sich mit jedem Aufruf des Übersetzers ändern. Die einzelnen Knoten sind zum einen entlang ihrer Baumkanten in einer Eltern-Kind-Beziehung verbunden, und zum anderen über die Querverbindungen, welche die Namensauflösung eingeführt hat. So referenziert die ~DeclRefExpr~ in der letzten Zeile den ~VarDecl~-Knoten, welcher die lokale Variable ~result~ eingeführt hat.
 
 Eigentlich sind auch die Typknoten Teil der Baumstruktur.
-In der hier gezeigten textuellen Darstelung werden sie allerdings, der Übersichtlichkeit halber, nicht als eigene Knoten dargestellt, sondern "nur" als Attribute von anderen Knoten.
+In der hier gezeigten textuellen Darstellung werden sie allerdings, der Übersichtlichkeit halber, nicht als eigene Knoten dargestellt, sondern "nur" als Attribute von anderen Knoten.
 So hat die ~FunctionDecl~ für unsere Funktion ~f~ den Typen ~"int (int)"~.
-Arbeitet man allerdings programmatisch mit dem CLang AST, so stellen sich diese Typen allerdings auch als Baum dar und entsprechen den von uns besprochenen Typausdrücken.
-In unserer Sprache könnte man auch sagen, dass die Typ-AST Knoten zu einem Typausdruck zusammengefaltet wurden und als Knotenattribut
+Arbeitet man allerdings programmatisch mit dem Clang-AST, so stellen sich diese Typen als Baum dar und entsprechen den von uns besprochenen Typausdrücken.
+In unserer Sprache könnte man auch sagen, dass die Typ-AST-Knoten zu einem Typausdruck zusammengefaltet wurden und als Knotenattribut
 an die Deklarationen/Statements geheftet wurden.
 
 * Informationsfluss auf Bäumen
@@ -391,9 +390,9 @@ an die Deklarationen/Statements geheftet wurden.
     \bi
     \ii Die sem. Analyse berechnet die Werte der Attribute für jeden Knoten{
       \bi
-      \ii Attribute hängen von anderen (benachbarten) AST Knotenattributen ab.
+      \ii Attribute hängen von anderen (benachbarten) AST-Knotenattributen ab.
       \ii Abstrakte Sicht: Gleichungssystem mit Gleichungen für jeden Knotentyp
-      \ii Reihenfolge der Auswertung ist nicht fest gelegt.
+      \ii Reihenfolge der Auswertung ist nicht festgelegt.
       \ei
     }
     \ei
@@ -411,43 +410,43 @@ an die Deklarationen/Statements geheftet wurden.
   \end{frame}
   #+end_src
 
-Wir wollen uns nun der semantischen Analyse etwas formaler nähern um auf einer abstrakteren Ebene zu verstehen, was da eigentlich gemacht wird.
-Ich habe bereits in der Einführung gesagt, dass wir für jeden AST Knoten *Attribute*, wie den Typ, ausrechnen werden.
-Diese Attribute hängen von der Nachbarschaft des Knotens ab und erlauben es kontext-sensitive Sprachregeln abzubilden.
-Eine solche kontext-sensitive Sprachregel wäre zum Beispiel, dass die Operanden einer Addition zwei Ganzzahlen sein müssen und das Ergebnis der Addition wiederum eine Ganzzahl ist.
+Wir wollen uns nun der semantischen Analyse etwas formaler nähern, um auf einer abstrakteren Ebene zu verstehen, was da eigentlich gemacht wird.
+Ich habe bereits in der Einführung gesagt, dass wir für jeden AST-Knoten *Attribute*, wie z.B. den Typ, ausrechnen werden.
+Diese Attribute hängen von der Nachbarschaft des Knotens ab und erlauben es Kontext-sensitive Sprachregeln abzubilden.
+Eine solche Kontext-sensitive Sprachregel wäre zum Beispiel, dass die Operanden einer Addition zwei Ganzzahlen sein müssen und das Ergebnis der Addition wiederum eine Ganzzahl ist.
 
 Abstrakt gesehen bilden die Knotenattribute untereinander ein *Gleichungssystem*[fn::Dies ist ein wichtiger Satz!].
 An jedem Knoten definieren wir die Attribute als Gleichungen, welche die Attribute anderer Knoten als Variablen verwenden.
-Die Form dieser Gleichungen ist in den semantischen Regeln der Sprache festgelegt und sind abhängig vom Knotentyp. Sie werden dann für jeden Knoten, anhand der Blaupause in den Sprachregeln, instanziiert.
-In Verlauf der semantischen Analyse lösen wir dieses Gleichungssystem auf indem wir konkrete Werte für die Attribute berechnen. Dabei ist die *Reihenfolge der Berechnenung nicht vorgegeben*!
+Die Form dieser Gleichungen ist in den semantischen Regeln der Sprache festgelegt und ist abhängig vom Knotentyp. Die Regeln werden dann für jeden Knoten anhand der Blaupause in den Sprachregeln instanziiert.
+In Verlauf der semantischen Analyse lösen wir dieses Gleichungssystem auf, indem wir konkrete Werte für die Attribute berechnen. Dabei ist die *Reihenfolge der Berechnung nicht vorgegeben*!
 
-Um dieses wichtige Prinzip zu veranschaulichen, zeigen die Folien einen sehr einfachen AST mit nur 2 Knotentypen (Literal, Addition), für den wir zwei Attribute (Höhe und Summe) ausrechnen wollen.
-Ich wähle hier absichtlich zwei Attribute, die nichts mit Übersetzern zu tun haben um klar zu machen, dass diese Gleichungssysteme aus Attributen ein allgemeines Prinzip sind und keine spezialisierte Übersetzertechnik ist.
-Die Herangehensweise Knotenattribute als symbolische Gleichungen zu beschreiben, ohne dass man darüber nachdenkt wie man diese Attribute ausrechnet, erlaubt es uns konzentrierter über die Beziehungen der Knoten nachzudenken und uns nicht in rekursiven Traversierungslogiken zu verirren.
+Um dieses wichtige Prinzip zu veranschaulichen, zeigen die Folien einen sehr einfachen AST mit nur zwei Knotentypen (Literal, Addition), für den wir zwei Attribute (Höhe und Summe) ausrechnen wollen.
+Ich wähle hier absichtlich zwei Attribute, die nichts mit Übersetzern zu tun haben, um klarzumachen, dass diese Gleichungssysteme aus Attributen ein allgemeines Prinzip und keine spezialisierte Übersetzertechnik sind.
+Die Herangehensweise Knotenattribute als symbolische Gleichungen zu beschreiben, ohne dass man darüber nachdenkt, wie man diese Attribute ausrechnet, erlaubt es uns, konzentrierter über die Beziehungen der Knoten nachzudenken und uns nicht in rekursiven Traversierungslogiken zu verirren.
 
 Die Analyse beginnt damit, dass wir die Gleichungen aus den semantischen Sprachregeln für jeden Knoten instantiieren und die konkrete Nachbarschaft einsetzen.
-Für die literalen Blätter ist die Baumhöhe immer 1 und die Summe der Ganzzahlwert des angehängten Tokens.
-Für ~plus~-Knoten, die nur als innere Knoten auftreten können, ist das Attribut ~v~, die Summe der ~v~-Attribute der Kinder; Für die Höhe ist es das Maximum der Höhe der beiden Unterbäume, plus eins.
-Um dieses Gleichungssystem zu verstehen, stelle ich mir immer vor ganz lokale auf einem der Knoten zu stehen:
-Dort sehe ich genau die ausgehenden Kanten zu den Kinds- und zum Elternknoten, und kann von den Gleichungen sagen, dass Sie im prinzip wahr sind.
+Für die literalen Blätter ist die Baumhöhe immer 1 und der Wert ist der Ganzzahlwert des angehängten Tokens.
+Für ~plus~-Knoten, die nur als innere Knoten auftreten können, ist das Attribut ~v~ die Summe der ~v~-Attribute der Kinder; für die Höhe ist es das Maximum der Höhe der beiden Unterbäume plus eins.
+Um dieses Gleichungssystem zu verstehen, stelle ich mir immer vor, ganz lokal auf einem der Knoten zu stehen:
+Dort sehe ich genau die ausgehenden Kanten zu den Kinds- und zum Elternknoten, und kann von den Gleichungen sagen, dass sie im Prinzip wahr sind.
 So kann ich mir auf einem ~plus~-Konten sagen:
 "Ich bin ~x~ und meine Wert ~x.v~ ist die Addition der Werte ~v~ meiner linken Seite (~x.lhs.v~) und meiner rechten Seite (~x.rhs.v~)!
 Das sollte mal jemand ausrechnen, und mir ist eigentlich auch egal wie!"
 
 Nachdem wir die Attributgleichungen aufgestellt haben, geht es daran diese Aufzulösen.
 Als Mensch können wir hergehen, auf den gesamten AST blicken und eine Attributgleichung auflösen, für die alle benötigten Werte bereits ausgerechnet sind.
-Das habe ich für das Folienbeispiel gemacht, was zu einer sehr eratischen Berechungsreihenfolge geführt hat.
-Das war pädagogische Absicht um ihnen nochmals zu sagen:
+Das habe ich für das Folienbeispiel gemacht, was zu einer sehr erratischen Berechnungsreihenfolge geführt hat.
+Das war pädagogische Absicht, um Ihnen nochmals zu sagen:
 Die Berechnungsreihenfolge ist in den Attributen nicht festgelegt!
 
-Diese Attribute-getriebene Herangehensweise an die semantische Analyse hat einen breiteren theoretischen Hintergrund, in Form von *Attributgrammatiken*, dessen Details ich ihnen hier ersparen möchte.
-Für unsere Zwecke reicht es aus, dass sie eine Intuition dafür entwickeln, was dabei ungefähr passiert.
+Diese Attribute-getriebene Herangehensweise an die semantische Analyse hat einen breiteren theoretischen Hintergrund, in Form von *Attributgrammatiken*, dessen Details ich Ihnen hier ersparen möchte.
+Für unsere Zwecke reicht es aus, dass Sie eine Intuition dafür entwickeln, was dabei ungefähr passiert.
 Bei einer Attributgrammatik legt man nicht für jeden AST Knotentyp eine semantische Regel fest, sondern für jede Produktion der Grammatik.
-Solange allerdings alle Grammatik-Regeln die eine bestimmte Knotenart erzeugen, die selbe Gleichung haben, ist unser vorgestelltes Modell von Attributgleichungen äquivalent zu Attributgrammatiken.
+Solange allerdings alle Grammatik-Regeln, die eine bestimmte Knotenart erzeugen, die selbe Gleichung haben, ist unser vorgestelltes Modell von Attributgleichungen äquivalent zu Attributgrammatiken.
 
 Ein Beispiel für solche Attributgrammatiken sind die *Parseraktionen*, die viele Parsergeneratoren erlauben.
-Dabei wird ein Stück Code an jede Regeln geheftet, welches der Parser ausgeführt wenn er die Grammatik-Regel anwendet.
-In der Übung werden wir solche Parseraktionen allerdings nur verwenden um den AST während des Parsevorgangs zu konstruieren ohne zuerst den vollständigen Syntaxbaum zu erzeugen.
+Dabei wird ein Stück Code an jede Regeln geheftet, welches der Parser ausführt, wenn er die Grammatik-Regel anwendet.
+In der Übung werden wir solche Parseraktionen allerdings nur verwenden, um den AST während des Parsevorgangs zu konstruieren ohne zuerst den vollständigen Syntaxbaum zu erzeugen.
 
 #+begin_src latex
   \begin{frame}{Abhängigkeitsgraphen und Attributtypen}
@@ -489,7 +488,7 @@ In der Übung werden wir solche Parseraktionen allerdings nur verwenden um den A
     \begin{column}<4->{0.33\textwidth}
       \begin{center}
         \includegraphics[height=2.5cm,page=3]{fig/05-dependency-tree}\\
-        \structure{Zyklen Abhängig.}
+        \structure{Zyklische Attribute}
         \scriptsize \enquote{all-over-the-place}
       \end{center}
       \bii
@@ -507,33 +506,33 @@ In der Übung werden wir solche Parseraktionen allerdings nur verwenden um den A
 
 #+end_src
 
-Nun wollen wir uns der maschinellen Berechnung der AST Attribute zuwenden. Dazu wollen wir uns zunächst die Struktur der aufgestellten Gleichungssysteme nähern, indem wir über die *Abhängigkeiten* zwischen den Knotenattributen nachdenken.
-Für jedes Attribut dass auf der rechten Seite einer Gleichung auftaucht gibt es eine Berechnungsabhängigkeit zwischen diesem Knoten und dem Attribut des referenzierten Knoten. Es ensteht ein *Abhängigkeitsgraph*, bei dem die Attribute die Knoten und die Abhängigkeiten die Kanten sind.
+Nun wollen wir uns der maschinellen Berechnung der AST-Attribute zuwenden. Dazu wollen wir uns zunächst der Struktur der aufgestellten Gleichungssysteme nähern, indem wir über die *Abhängigkeiten* zwischen den Knotenattributen nachdenken.
+Für jedes Attribut, das auf der rechten Seite einer Gleichung auftaucht, gibt es eine Berechnungsabhängigkeit zwischen diesem Knoten und dem Attribut des referenzierten Knoten. Es entsteht ein *Abhängigkeitsgraph*, bei dem die Attribute die Knoten und die Abhängigkeiten die Kanten sind.
 
-Im Beispiel mit der Baumhöhe erzeugt die Gleichung ~x.h = max(x.lhs.h, x.rhs.h) + 1~ zwei Kanten im Abhängigkeitsgraphen. Diese Kanten gehen vom Attribut ~x.h~ zu den Höhnenattributen der beiden Kinder von ~x~. Die Gleichungen für die Summe eines ~plus~-Knotens erzeugt ebenfalls zwei Abhängigkeiten, ebenfalls gerichtet auf direkte Kindsattribute.
+Im Beispiel mit der Baumhöhe erzeugt die Gleichung ~x.h = max(x.lhs.h, x.rhs.h) + 1~ zwei Kanten im Abhängigkeitsgraphen. Diese Kanten gehen vom Attribut ~x.h~ zu den Höhenattributen der beiden Kinder von ~x~. Die Gleichungen für die Summe eines ~plus~-Knotens erzeugt ebenfalls zwei Abhängigkeiten, ebenfalls gerichtet auf direkte Kindattribute.
 
-Würden wir ganz generell eine Berechnungsreihenfolge für diesen Abhängigkeitsgraphen angeben wollen, so würden wir die Attribute *toplogisch Sortieren*. Eine topologische Sortierung bedeutet, dass wir alle Attribute, aus dem gesamten AST, in eine Reihenfolge bringen, sodass alle Abhängigkeiten erfüllt sind, wenn ein Attribut an die Reihe kommt. Für die Höhe des Beispielbaums wäre die Reihenfolge ~[B.h, D.h, E.h, C.h, A.h]~ eine topologische Sortierung für den enstandenen Abhängigkeitsgraphen. *Aufgabe:* Vollziehen Sie diese Reihenfolge anhand des Baums nach!
+Würden wir ganz generell eine Berechnungsreihenfolge für diesen Abhängigkeitsgraphen angeben wollen, so würden wir die Attribute *topologisch Sortieren*. Eine topologische Sortierung bedeutet, dass wir alle Attribute, aus dem gesamten AST, in eine Reihenfolge bringen, sodass alle Abhängigkeiten erfüllt sind, wenn ein Attribut an die Reihe kommt. Für die Höhe des Beispielbaums wäre die Reihenfolge ~[B.h, D.h, E.h, C.h, A.h]~ eine topologische Sortierung für den entstandenen Abhängigkeitsgraphen. *Aufgabe:* Vollziehen Sie diese Reihenfolge anhand des Baums nach!
 
 Allerdings wäre es viel zu aufwendig, den Abhängigkeitsgraphen tatsächlich aufzustellen und dann topologisch zu sortieren.
-Er ist nur ein gedankliches Modell um auf eine praktikable Berechnungsvorschrifft zu kommen, die implizit die topologische Berechnungsreihenfolge erzeugt. Dazu teilen wir die Abhängigkeiten der Attribute in unterschiedliche Klassen ein.
+Er ist nur ein gedankliches Modell, um auf eine praktikable Berechnungsvorschrift zu kommen, die implizit die topologische Berechnungsreihenfolge erzeugt. Dazu teilen wir die Abhängigkeiten der Attribute in unterschiedliche Klassen ein.
 
 Bei *synthetischen Attributen* (S-Attribute) erzeugen die Sprachregeln nur Abhängigkeiten zu den Kindern, sodass der Wert eines Knotens genau dann ausgerechnet werden kann, wenn die Werte all seiner Kinder ausgerechnet sind.
 Die Abhängigkeiten eines S-Attributs sind also streng hierarchisch "von unten nach oben".
 Die Attribute Höhe und Summe aus unserem Beispiel sind ebensolche S-Attribute.
-Aber auch die Ergebnis-Typen von arithmetrischen Ausdrücken sind synthetisch[fn::Ich finde den Namen "synthetische Attribute" so überhaupt nicht sprechend, aber so heißen diese Attribute nunmal in der Literatur.]. 
-Die Technik für solche Attribute ist die Baumtraversierung, genauer gesagt die Baumtraversierung mit Post-Order Reihenfolge[fn::Wie bei der Titanic: Post-Order=Kinder zuerst!]. Wir werden uns diese im folgenden genauer ansehen.
+Aber auch die Ergebnis-Typen von arithmetischen Ausdrücken sind synthetisch[fn::Ich finde den Namen "synthetische Attribute" so überhaupt nicht sprechend, aber so heißen diese Attribute nunmal in der Literatur.].
+Die Technik für solche Attribute ist die Baumtraversierung, genauer gesagt die Baumtraversierung mit Post-Order Reihenfolge[fn::Wie bei der Titanic: Post-Order=Kinder zuerst!]. Wir werden uns diese im Folgenden genauer ansehen.
 
 Bei *geerbten Attributen* (L-Attribute) zeigen die Abhängigkeiten "nach links" in den Baum.
 Ein L-Attribut kann also von Attributen von "älteren" Geschwistern und den Eltern-Knoten abhängen.
 Bilden wir dies auf einen Programmcode ab, so hat ein L-Attribut nur Abhängigkeiten zu Elementen die weiter oben in der Datei stehen.
 Ein Beispiel für solche L-Attribute sind Namensreferenzen, die auf vorher deklarierte Namen zeigen müssen.
 Wir werden solche L-Attribute mittels der Symboltabelle und einer Baumtraversierung berechnen.
-Dabei ist die Symboltabelle eine Art "Datenrucksack" den wir während der Baumtraversierung mit uns herumtragen und mit Informationen füllen.
+Dabei ist die Symboltabelle eine Art "Datenrucksack", den wir während der Baumtraversierung mit uns herumtragen und mit Informationen füllen.
 
-Die dritte Art von Attributen sind die "zyklischen Attribute". Bei diesen sind beliebige Abhängkeiten zwischen den Knoten des ASTs möglich; eben auch zyklische Abhängigkeiten. Traditionell haben Sprachdesigner solche zyklischen Attribute eher vermieden, da sie relativ komplex auszurechnen sind und sie nicht mittels einer einfachen Baumtraversierung aufgelößt werden können. Allerdings kann man mittels zyklischer Attribute das Problem der Typinferenz formulieren. Deswegen werfen wir einen kurzen Blick auf die Technik der *Unifikation*, die es erlaubt solche zyklischen Attribute zu berechnen.
+Die dritte Art von Attributen sind die "zyklischen Attribute". Bei diesen sind beliebige Abhängigkeiten zwischen den Knoten des ASTs möglich; eben auch zyklische Abhängigkeiten. Traditionell haben Sprachdesigner solche zyklischen Attribute eher vermieden, da sie relativ komplex auszurechnen sind und sie nicht mittels einer einfachen Baumtraversierung aufgelöst werden können. Allerdings kann man mittels zyklischer Attribute das Problem der Typinferenz formulieren. Deswegen werfen wir einen kurzen Blick auf die Technik der *Unifikation*, die es erlaubt, solche zyklischen Attribute zu berechnen.
 
-Im Folgenden werde ich also drei Techniken vorstellen um unterschiedliche Typen von Attributen zu berechnen:
-Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zyklische Attribute).  Los gehts!
+Im Folgenden werde ich also drei Techniken vorstellen, um unterschiedliche Typen von Attributen zu berechnen:
+Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zyklische Attribute). Los geht's!
 
 ** Traversierung von Bäumen
 :PROPERTIES:
@@ -563,7 +562,7 @@ Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zy
         \bii
         \ii Bäume sind rekursiv.
         \ii Jeden Knoten besuchen auch!\\[5ex]
-        \ii<3-> Dynamischer Typ des Knoten
+        \ii<3-> Dynamischer Typ des Knotens
         \ii<3-> Zugriff auf Attribute der Kinder
         \ii<3-> Attributgleichung ausrechnen\\[6ex]
         \ii<4-> Setzen des Attributs
@@ -589,7 +588,7 @@ Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zy
         \bi
         \ii Duplikation der Traversierungslogik für jedes Attribut
         \ii Duplikation der \codebox{isinstance} Kaskade für jedes Attribut
-        \ii Ein neuer AST Knotentyp $\rightarrow$ N Traversierungsfunktionen anpassen.
+        \ii Ein neuer AST-Knotentyp $\rightarrow$ N Traversierungsfunktionen anpassen
         \ei
       }\medskip
       \ii<3-> Wende informatische Super-Power \alert{"Trennung der Belange"} an! {
@@ -602,26 +601,26 @@ Baumtraversierung (S-Attribute), Symboltabelle (L-Attribute) und Unifikation (zy
   \end{frame}
   #+end_src
   
-Als erstes wollen wir uns die *Baumtraversierung* anschauen und mit dem *Visitor*/*Besucher*-Pattern ein Entwurfsmuster diskutieren bei dem man die Attributegleichungen für S-Attribute übersichtlich formulieren kann.
-Generell fließen die Informationen bei S-Attributen von unten nach oben, wir müssen also zuerst alle Kinder eines Knotens besuchen, bevor wir daran gehen das eigene Attribut auszurechnen. Dieses Berechnungsmuster entspricht einer Tiefensuche mit Post-Order Besuchsreihenfolge.
+Als erstes wollen wir uns die *Baumtraversierung* anschauen und mit dem *Visitor/Besucher*-Pattern ein Entwurfsmuster diskutieren, bei dem man die Attributgleichungen für S-Attribute übersichtlich formulieren kann.
+Generell fließen die Informationen bei S-Attributen von unten nach oben, wir müssen also zuerst alle Kinder eines Knotens besuchen, bevor wir daran gehen, das eigene Attribut auszurechnen. Dieses Berechnungsmuster entspricht einer Tiefensuche mit Post-Order Besuchsreihenfolge.
 
 Das erste Codebeispiel zeigt eine rekursive Funktion, die diese Tiefensuche implementiert und das Höhenattribut ausrechnet.
-Im gesamten Verlauf, wird die Funktion ~height(N)~ für jeden Knoten ~N~ des Baums einmal aufgerufen und der untere Teil der Funktion rechnet die Höhe aus.
-Der rekursive Besuch aller Knoten geschiet dadurch, dass wir ~height()~ mit dem Wurzelknoten aufrufen und wir bei jedem Knoten zuerst ~height(child)~ für alle Kinder auswerten.
-Beachten Sie hier, dass jeder Knotentyp unter dem Feld ~N.children~ eine Liste aller seiner Kinder bereit stellt[fn::Für ~plus~: ~N.children = [N.lhs, N.rhs]~].
-Bei einem Auf einem Knoten stehend, besucht ~height()~ also zuerst die Kinder, rechnet dort das Attribut ~child.h~ aus und erst danach wird der Code für den aktuellen Knoten ausgewertet und das Attribut gesetzt.
+Im gesamten Verlauf wird die Funktion ~height(N)~ für jeden Knoten ~N~ des Baums einmal aufgerufen und der untere Teil der Funktion rechnet die Höhe aus.
+Der rekursive Besuch aller Knoten geschieht dadurch, dass wir ~height()~ mit dem Wurzelknoten aufrufen und wir bei jedem Knoten zuerst ~height(child)~ für alle Kinder auswerten.
+Beachten Sie hier, dass jeder Knotentyp unter dem Feld ~N.children~ eine Liste aller seiner Kinder bereitstellt[fn::Für ~plus~: ~N.children = [N.lhs, N.rhs]~].
+Auf einem Knoten stehend besucht ~height()~ also zuerst die Kinder, rechnet dort das Attribut ~child.h~ aus und erst danach wird der Code für den aktuellen Knoten ausgewertet und das Attribut gesetzt.
 
-Der mittlere Teil berechnet, abhängig von Typ des Knotens den Wert für das Attribut ~h~.
+Der mittlere Teil berechnet, abhängig vom Typ des Knotens, den Wert für das Attribut ~h~.
 Für ~literal~-Knoten ist die Höhe 1, für Blätter hängt sie von den beiden Kindern ab.
-An dieser Stelle verwenden wir den dynamischen Typ des Knotens um in Python eine Fallunterscheidung anhand der AST-Knotenklasse (~isinstance()~) zu machen.
+An dieser Stelle verwenden wir den dynamischen Typ des Knotens, um in Python eine Fallunterscheidung anhand der AST-Knotenklasse (~isinstance()~) zu machen.
 
 Mit diesem Muster können wir alle S-Attribute für unseren AST ausrechnen.
 Allerdings geht die Formulierung der Attributgleichungen im Code für die Traversierung und der Fallunterscheidung für den dynamischen Typen (=dynamic dispatch) unter.
-Um dieses Problem noch deutlicher zu machen, habe ich auf der zweiten Folie die Traversierung noch kompakter formuliert, und den Rückggabewert von ~height()~ für die Propagation der Höhe verwendet.
+Um dieses Problem noch deutlicher zu machen, habe ich auf der zweiten Folie die Traversierung noch kompakter formuliert, und den Rückgabewert von ~height()~ für die Propagation der Höhe verwendet.
 Der Besuch der Kinder ist jetzt spezifisch für den Knotentypen und seine Kinder geworden.
 
 Hierdurch entstehen mehrere Probleme:
-Zum einen schreiben wir den Code für Traversierung und dynamischen Dispatch für jedes Attribut immer wieder, was zu einer unsäglichen Menge an Boilerplate-Code führt, und zum anderen ist die Lösung sehr  fragil:
+Zum einen schreiben wir den Code für Traversierung und dynamischen Dispatch für jedes Attribut immer wieder, was zu einer unsäglichen Menge an Boilerplate-Code führt, und zum anderen ist die Lösung sehr fragil:
 Führen wir einen neuen Knotentypen ein, der Kinder besitzt, so müssen wir alle Baumtraversierungen unseres Übersetzer um diesen Knotentypen ergänzen.
 Vergessen wir dabei den rekursiven Abstieg für diesen Knotentypen richtig zu implementieren, so vergessen wir ganze Unterbäume bei der Baumtraversierung. 
 Um dieses Problem zu lösen und besseren Code zu schreiben, faktorisieren wir jene Teile der Implementierung, die für alle Baumtraversierungen gleich sind, in eine generische Funktion aus. Wir wenden also das informatische Grundprinzip *Trennung der Belange* an.
@@ -634,7 +633,7 @@ Um dieses Problem zu lösen und besseren Code zu schreiben, faktorisieren wir je
     \bi
     \ii Bündelung der Attributgleichungen in einem Visitor-Objekt {
       \bi
-      \ii Die \codebox{visit()} Funktion wird für jeden Knotentyp überladen
+      \ii Die \codebox{visit()}-Funktion wird für jeden Knotentyp überladen.
       \ii Visitor-Objekt kann zusätzlichen Zustand als Member speichern
       \ii Vererbungshierarchie kann beachtet werden (\codeinline[style=CPP]{void visit(NamedDecl D)})
       \ei
@@ -656,7 +655,7 @@ Um dieses Problem zu lösen und besseren Code zu schreiben, faktorisieren wir je
         \bii
         \ii Knoten haben Liste der Kinder
         \ii Definierte Besuchsreihenfolge
-        \ii Visitor wird auf jeden Knoten angewendet.
+        \ii Visitor wird auf jeden Knoten angewendet
         \eii
       \end{column}
     \end{columns}
@@ -671,7 +670,7 @@ Um dieses Problem zu lösen und besseren Code zu schreiben, faktorisieren wir je
 
   \begin{frame}[fragile]{Visitor-Pattern: Double Dynamic Dispatch}
     \begin{btBlock}[type=alert]{Statische Typen an der Aufrufstelle: \texttt{visit(Visitor, Tree)}}
-      Bei der Traversierung soll \texttt{visit(v, t)} für das konkrete Visitor-Objekt und spezifisch für den AST Knoten aufgerufen werden.\\
+      Bei der Traversierung soll \texttt{visit(v, t)} für das konkrete Visitor-Objekt und spezifisch für den AST-Knoten aufgerufen werden.\\
       \begin{columns}
         \begin{column}{0.49\textwidth}
           \begin{CPP}[style=smaller]
@@ -741,41 +740,41 @@ Um dieses Problem zu lösen und besseren Code zu schreiben, faktorisieren wir je
 
 Mit dem *Visitor*-Pattern bündeln wir nur den knotenspezifischen Code und geben für jeden Knotenart eine ~visit()~-Funktion an.
 Um dies generisch zu formulieren, können wir in C++ das Sprachfeature der überladenen Funktionen verwenden, welches wir in der letzten Vorlesung bereits diskutiert haben.
-Durch diese Überladung, wird die ~visit()~ Funktion zu einer Art komplexem Operator, der für jede Art von Knoten weiß welcher Code ausgeführt werden soll.
+Durch diese Überladung wird die ~visit()~-Funktion zu einer Art komplexem Operator, der für jede Art von Knoten weiß, welcher Code ausgeführt werden soll.
 Indem wir die ~visit()~-Methode virtuell machen, können wir von ~Visitor~ erben und Funktionen für einzelne Knotentypen überschreiben.
 
-Die ~traversal()~-Funktion bündelt nun generischen Teil der Baumtraversierung. Sie bekommt ein Visitor-Objekt  und einen Baumknoten als Argument und kümmert sich um die Besuchsreihenfolge und den korrekten Aufruf der ~visit()~-Funktionen.
+Die ~traversal()~-Funktion bündelt den nun generischen Teil der Baumtraversierung. Sie bekommt ein Visitor-Objekt und einen Baumknoten als Argument und kümmert sich um die Besuchsreihenfolge und den korrekten Aufruf der ~visit()~-Funktionen.
 Für den rekursiven Abstieg verlässt sich die Traversierungsfunktion darauf, dass jeder Knotentyp eine Liste seiner Kinder bereitstellt.
 Nachdem diese besucht wurden, rufen wir die ~visit()~-Funktion auf. 
 
 Leider ist das Codebeispiel, wie ich es auf der ersten Folie gezeugt habe, kaputt.
-Denn an der Aufrufstelle von ~visit()~ wird, bei der Auflösung der Überladung, nur der dynamische Typ von ~v~, nicht aber der von ~t~ beachtet.
+Denn an der Aufrufstelle von ~visit()~ wird bei der Auflösung der Überladung nur der dynamische Typ von ~v~, nicht aber der von ~t~ beachtet.
 Dieses Problem, dass virtuelle Methoden nur im ersten Argument dynamischen Dispatch anwenden, haben wir bereits im Kapitel über Namensauflösung diskutiert {{{see(04-dynamic-dispatch, Dynamischer Dispatch)}}}.
 Für das Visitor-Pattern brauchen wir allerdings nicht nur einen solchen single-dynamic dispatch, sondern einen double-dynamic dispatch.
-Wir wollen uns nun ansehen, wie wir diesen in einer statisch-getypten Sprache (C++) und einer dynamischen Skriptsprache (Python) emulieren können.
+Wir wollen uns nun ansehen, wie wir diesen in einer statisch typisierten Sprache (C++) und einer dynamischen Skriptsprache (Python) emulieren können.
 
-In der statischen C++ Variante erreichen wir den double-dynamic dispatch dadurch, dass wir zweimal hintereinander einen single-dynamic dispatch durchführen bzw.
+In der statischen C++-Variante erreichen wir den double-dynamic dispatch dadurch, dass wir zweimal hintereinander einen single-dynamic dispatch durchführen bzw.
 zwei virtuelle Methodenaufrufe hintereinander schalten.
 Der Startpunkt unseres Aufrufs ist die ~traversal()~-Funktion:
 Hier rufen wir auf einem ~Tree~-Objekt die *virtuelle* ~accept()~-Methode auf, die uns als Trampolin für den double-dynamic dispatch dient (1.
 dynamic dispatch).
-Weil ~accept()~ virtuell ist, wird der Aufruf anhand des dynamischen Typen aufgelößt und wir landen in Codestücken die spezifisch für den jeweiligen AST-Knotentyp sind; der statische Typ des ~this~-Zeigers ist gleich dem dynamischen Typen des Objekts.
+Weil ~accept()~ virtuell ist, wird der Aufruf anhand des dynamischen Typen aufgelöst und wir landen in Codestücken, die spezifisch für den jeweiligen AST-Knotentyp sind; der statische Typ des ~this~-Zeigers ist gleich dem dynamischen Typen des Objekts.
 Die ~accept()~-Methoden bekommt ein Visitorobjekt (statischer Typ: ~Visitor~, dynamischer Typ: divers) und ruft dort die *virtuelle* ~visit()~-Funktion mit sich selbst auf (2.
 dynamic dispatch).
-Somit kommen wir, mit dem zweiten virtuellen Methodenaufruf, zu einer ~visit()~-Funktion die dynamisch abhängig ist vom Knoten *und* vom Visitortypen!
+Somit kommen wir mit dem zweiten virtuellen Methodenaufruf zu einer ~visit()~-Funktion, die dynamisch abhängig ist vom Knoten *und* vom Visitortypen!
 
 Man kann diese Aufrufkette ~traversal()-accept()-visit()~ so beschreiben, dass wir den statischen Typen der Argumente schrittweise an ihre dynamischen Typen anpassen.
-Am Anfang haben wir ~(Visitor,Tree)~, dann ~(Visitor, literal)~ und letztendlich ~(HeightVisitor, literal)~.
+Am Anfang haben wir ~(Visitor, Tree)~, dann ~(Visitor, literal)~ und letztendlich ~(HeightVisitor, literal)~.
 
-Für die Python-Variante des Visitor Patterns wählen wir eine andere Technik, da wir in dieser Skriptsprache keine Überladung in den Parametertypen haben (keine Statischen Typen!).
-Anstatt dessen Verwenden wir Introspektion auf dem gegebenen Visitor-Objekt und dem AST-Knoten.
-In Python haben wir die Möglichkeit uns den dynamischen Typen eines Objekts als ein eigenes Objekt geben zu lassen (~type()~).
+Für die Python-Variante des Visitor-Patterns wählen wir eine andere Technik, da wir in dieser Skriptsprache keine Überladung in den Parametertypen haben (keine statischen Typen!).
+Stattdessen verwenden wir Introspektion auf dem gegebenen Visitor-Objekt und dem AST-Knoten.
+In Python haben wir die Möglichkeit, uns den dynamischen Typen eines Objekts als ein eigenes Objekt geben zu lassen (~type()~).
 Aus diesem Typ-Objekt können wir den Typnamen (~__qualname__~[fn::Dieses Attribut gibt es erst seit Python 3.
 Es ist der qualified-name des Typen, der bei Klassen gleich dem Klassennamen ist.])
-extrahieren und einen Methodennamen abzuleiten.
-Würden wir den gegebenen Code mit einem ~literal~ Knoten ausführen, so wäre ~M_name~ der String ~"visit_literal"~.
+extrahieren und einen Methodennamen ableiten.
+Würden wir den gegebenen Code mit einem ~literal~-Knoten ausführen, so wäre ~M_name~ der String ~"visit_literal"~.
 Mit Hilfe von Introspektion mittels ~getattr(obj, name)~ kommen wir an die virtuelle Methode (selbst auch wieder ein Objekt), die wir aufrufen können.
-Diese Art einen double-dynamic dispatch durch zu führen ist nur möglich, wenn eine Sprache mittel zur Introspektion der Laufzeitumgebung (dynamische Typinspektion, Finden von Methoden) zur Verfügung stellt. 
+Diese Art einen double-dynamic dispatch durchzuführen ist nur möglich, wenn eine Sprache mittel zur Introspektion der Laufzeitumgebung (dynamische Typinspektion, Finden von Methoden) zur Verfügung stellt.
 
 
 
@@ -831,17 +830,17 @@ Diese Art einen double-dynamic dispatch durch zu führen ist nur möglich, wenn 
   \end{frame}
 #+end_src
 
-Mit all unserem Vorwissen, und zwei Implementierungsvarianten für das Visitor-Pattern im Rücken, ist es nun relativ einfach eine simple Typberechung und -prüfung zu definieren.
-Dafür berechnen wir für jeden (relevanten) Knoten im AST einen statischen Rückggabetypen aus und prüfen an allen inneren Knoten ob die Typen der Kinder zueinander und zum Knotentypen kompatibel sind. Zum Beispiel sollten wir nur zwei Ganzzahlen miteinander addieren, wobei das Ergebnis der Addition wiederum eine Ganzzahl ist.
+Mit all unserem Vorwissen, und zwei Implementierungsvarianten für das Visitor-Pattern im Rücken, ist es nun relativ einfach eine simple Typberechnung und -prüfung zu definieren.
+Dafür berechnen wir für jeden (relevanten) Knoten im AST einen statischen Rückgabetypen und prüfen an allen inneren Knoten, ob die Typen der Kinder zueinander und zum Knotentypen kompatibel sind. Zum Beispiel sollten wir nur zwei Ganzzahlen miteinander addieren, wobei das Ergebnis der Addition wiederum eine Ganzzahl ist.
 
 Lassen wir alle Feinheiten, wie Namensauflösung und Polymorphie, außer Acht, so ist der Knotentyp ein S-Attribut, welches von unten nach oben propagiert wird.
 Wir müssen also für alle Blätter einen Typ angeben und für jeden inneren Knotentyp eine Berechnungsvorschrift für die Propagation von unten nach oben.
-Bei literalen Konstanten (z.B., ~23~, ~"foo"~) geben die Sprachregeln genau vor, welchen Typ diese Ausdrücke haben (z.B., int, string).
-Diese Sprachregeln lässt sich sehr klar in unserem ~TypeVisitor~ kodieren, indem wir das Typattribut in den Blättern entsprechend setzen.
-Bei manchen Knoten, wie dem address-of-Operator (~&FOO~), besteht die Typberechnung daraus einen Typkonstruktor (~pointer()~) auf dem Typen des einzigen Kindes anzuwenden.
-Informeller gesagt, ist der Ergebnistyp des address-of-Operators ein Pointertyp, als Pointee-Typ den Typ des Kindes hat; ~&"foobar"~ hat den Typ ~pointer(string)~, wenn ~"foobar"~ den Typ ~string~ hat.
+Bei literalen Konstanten (z.B., ~23~, ~"foo"~) geben die Sprachregeln genau vor, welchen Typ diese Ausdrücke haben (z.B. int, string).
+Diese Sprachregeln lassen sich sehr klar in unserem ~TypeVisitor~ kodieren, indem wir das Typattribut in den Blättern entsprechend setzen.
+Bei manchen Knoten, wie dem address-of-Operator (~&FOO~), besteht die Typberechnung daraus, einen Typkonstruktor (~pointer()~) auf dem Typen des einzigen Kindes anzuwenden.
+Informeller gesagt ist der Ergebnistyp des address-of-Operators ein Pointertyp, der als Pointee-Typ den Typ des Kindes hat; ~&"foobar"~ hat den Typ ~pointer(string)~, wenn ~"foobar"~ den Typ ~string~ hat.
 
-Bei komplexeren Knoten oder bei komplexeren Sprachregeln beinhaltet die entsprechende ~visit()~-Methode nicht nur Typberechnung, sondern sie prüft auch ob gewisse Sprachregeln eingehalten wurden. So müssen in einem strikt Monomorphen Typssystem die beiden Operandentypen bei einer Addition übereinstimmen (~L.equal(R)~). Weiterhin wird überprüft, ob die Addition für diese Typen überhaupt definiert ist. In unserem Beispiel ist nur eine Addition von Ganzzahlen erlaubt (~L.equal(int)~).
+Bei komplexeren Knoten oder bei komplexeren Sprachregeln beinhaltet die entsprechende ~visit()~-Methode nicht nur Typberechnung, sondern sie prüft auch, ob gewisse Sprachregeln eingehalten wurden. So müssen in einem strikt monomorphen Typsystem die beiden Operandentypen bei einer Addition übereinstimmen (~L.equal(R)~). Weiterhin wird überprüft, ob die Addition für diese Typen überhaupt definiert ist. In unserem Beispiel ist nur eine Addition von Ganzzahlen erlaubt (~L.equal(int)~).
 
 Wir übergeben der ~traversal()~-Funktion die Wurzel des ASTs und das Visitor-Objekt und die ~visit()~-Methoden werden, in der richtigen Reihenfolge, von unten nach oben, aufgerufen, sodass die Typinformationen von unten nach oben berechnet wird. Dabei prüfen wir nicht nur die konsistente Verwendung der Typen, sondern befüllen auch für jeden Knoten das Typ-Attribut, welches wir im weiteren Verlauf der Übersetzung verwenden werden.
 
@@ -851,9 +850,9 @@ Wir übergeben der ~traversal()~-Funktion die Wurzel des ASTs und das Visitor-Ob
 :END:
 #+begin_src latex
   \dividerframe{Coercion:\\Implizite Typumwandlung}
-  \begin{frame}{Automatisch-angewendete implizite Typumwandlung}
+  \begin{frame}{Automatisch angewendete implizite Typumwandlung}
     \begin{btBlock}{Was passiert bei inkompatiblen Typen?}\small
-      Passen gefordertert (z.B. Parameter) und vorhandener Typ (z.B.Argument) nicht zusammen, kann eine \textbf{implizite} Typumwandlung eingefügt werden.
+      Passen geforderter (z.B. Parameter) und vorhandener Typ (z.B. Argument) nicht zusammen, kann eine \textbf{implizite} Typumwandlung eingefügt werden.
     \end{btBlock}
 
     \medskip
@@ -891,7 +890,7 @@ Wir übergeben der ~traversal()~-Funktion die Wurzel des ASTs und das Visitor-Ob
       \ii Typumwandlung \btDefTab ist polymorph auf Seite des Produzenten\\Überladung\btUseTab ist polymorph auf Seite des Konsumenten
       \ei
     }\smallskip
-    \ii<2-> Manche Sprachen erlauben es nutzerdefinierte implizite Umwandlungen.{
+    \ii<2-> Manche Sprachen erlauben nutzerdefinierte implizite Umwandlungen.{
       \bi
       \ii \structure{Converting constructors} (C++): Konstruktoren mit genau einem Argument ergänzen die eingebauten Regeln zur Typumwandlung.
       \ei
@@ -904,21 +903,21 @@ Wir übergeben der ~traversal()~-Funktion die Wurzel des ASTs und das Visitor-Ob
 
 Aber nicht immer passen die an einem Knoten geforderten Typen zu den Typen der Operanden.
 Im Beispiel wollen wir eine Funktion, welche eine Fließkommazahl erwartet, mit einer Ganzzahl aufrufen.
-Wäre unsere Sprache ganz strikt, müssten wir an dieser Stelle die Übersetzung abbrechen und dem Programmierer die Aufgabe überlassen eine explizite Umwandlung von Ganzzahl zu Fließkommazahl einzufügen.
+Wäre unsere Sprache ganz strikt, müssten wir an dieser Stelle die Übersetzung abbrechen und dem Programmierer die Aufgabe überlassen, eine explizite Umwandlung von Ganzzahl zu Fließkommazahl einzufügen.
 Eine solche explizite Typumwandlung heißt auch Cast (~(char *) ....~) oder Coercion und hat zweierlei Aspekte:
-Zum einen wird der angegebene Typausdruck anstatt der des Kindes als Rückgabetyp verwendet, zum anderen muss, unter Umständen, Code eingefügt werden der das Objekt zur Laufzeit vom einen zum anderen Typen umwandelt.
-Allerdings prüft nicht jede Programmiersprache ob die angegebene Typumwandlung überhaupt Sinn ergibt oder ob der Programmierer das Typssystem absichtlich umgeht[fn::Bei C bieten Casts kaum bis keine Typsicherheit, was aber für systemnahe Programmierung mehr als Feature denn als Bug gesehen wird.]. 
+Zum einen wird der angegebene Typausdruck anstatt der des Kindes als Rückgabetyp verwendet, zum anderen muss, unter Umständen, Code eingefügt werden, der das Objekt zur Laufzeit vom einen zum anderen Typen umwandelt.
+Allerdings prüft nicht jede Programmiersprache, ob die angegebene Typumwandlung überhaupt Sinn ergibt oder ob der Programmierer das Typsystem absichtlich umgeht[fn::Bei C bieten Casts kaum bis keine Typsicherheit, was aber für systemnahe Programmierung mehr als Feature denn als Bug gesehen wird.].
 
-Da das manuelle einfügen von expliziten Typumwandlungen aufwendig ist und zu einer verschlechterten Lesbarkeit des Codes führt, haben viele Sprachen, zumindestens einige, Regeln zur *impliziten Typumwandlung*.
+Da das manuelle einfügen von expliziten Typumwandlungen aufwendig ist und zu einer verschlechterten Lesbarkeit des Codes führt, haben viele Sprachen, zumindest einige, Regeln zur *impliziten Typumwandlung*.
 So wandeln viele Sprachen eine Ganzzahl automatisch in eine Fließkommazahl um.
 Technisch geschieht die implizite Typumwandlung während der Berechnung des Typattributs:
-Passt an einem Knoten der vorgefundene Typ eines Kindes nicht zum erwarteten Typ, so prüft der Übersetzer ob die Sprachregeln es erlauben eine implizite Umwandlung vor zu nehmen. Ist dies möglich, so wird ein *neuer AST Knoten* eingefügt, der die Typumwandlung durchführt.
+Passt an einem Knoten der vorgefundene Typ eines Kindes nicht zum erwarteten Typ, so prüft der Übersetzer, ob die Sprachregeln es erlauben, eine implizite Umwandlung vorzunehmen. Ist dies möglich, so wird ein *neuer AST-Knoten* eingefügt, der die Typumwandlung durchführt.
 
-In einem Sprachstandard werden normalerweise nur solche impliziten Typumwandlungen definiert, welche keine Überraschende Semantik haben.
+In einem Sprachstandard werden normalerweise nur solche impliziten Typumwandlungen definiert, welche keine überraschende Semantik haben.
 So kennen viele Sprachen die *Ganzzahlweitung*, welche eine implizite Umwandlung von den kleinen (Bitbreite) zu den großen Ganzzahltypen erlaubt.
 Möglich ist dies, weil durch eine solche Weitung kein Informationsverlust entstehen kann; der größere Ganzzahltyp hat eine höhere Informationskapazität.
 
-Wenn wir, für einen kurzen Augenblick, unsere sprachphilosophische Brille aufsetzen, so ist die implizite Typumwandlung oder Coercion eine Spielart des *Polymorphismus*, denn sie erlaubt es dass ein Typ an Stelle eines anderen Typen treten kann; der implizit umwandelbare Typ hat eine weitere Gestalt.
+Wenn wir, für einen kurzen Augenblick, unsere sprachphilosophische Brille aufsetzen, so ist die implizite Typumwandlung oder Coercion eine Spielart des *Polymorphismus*, denn sie erlaubt es, dass ein Typ an Stelle eines anderen Typen treten kann; der implizit umwandelbare Typ hat eine weitere Gestalt.
 Dabei gehört die Coercion, ebenso wie die Überladung, zur Klasse der Ad-Hoc Polymorphie, da die konkrete Gestalt des Typens an der konkreten Stelle im Programm bzw. im AST festgestellt wird.
 
 Vergleichen wir Coercion mit Überladung, so stellen wir fest, dass beide Ad-Hoc Mechanismen in der gleichen Problemlage angewendet werden, sie aber auf unterschiedlichen Seiten wirken.
@@ -928,11 +927,11 @@ So kann es in C++ passieren, dass ein Funktionsargument zuerst implizit umgewand
 Solch eine Situation kann noch unübersichtlicher werden, da der Programmierer eigene Regeln zur impliziten Typumwandlung definieren kann.
 
 Generell lässt sich sagen, dass implizite Typumwandlungen ein mächtiges, aber auch ein gefährliches Sprachmittel sind.
-Zum einen führen gut gewählte Coercion-Regeln zu Code bei dem nicht beständig gegen das Typsystem gekämpft wird.
-Zum anderen können automatisch-angewendete Typumwandlungen zu Situationen führen, bei denen man sich fragt: "Wieso funktioniert das? Und was wird hier eigentlich aufgerufen?"
+Zum einen führen gut gewählte Coercion-Regeln zu Code, bei dem nicht beständig gegen das Typsystem gekämpft wird.
+Zum anderen können automatisch angewendete Typumwandlungen zu Situationen führen, bei denen man sich fragt: "Wieso funktioniert das? Und was wird hier eigentlich aufgerufen?"
 
 #+begin_src latex
-  \begin{frame}{Probleme der implizten Typumwandlung}
+  \begin{frame}{Probleme der impliziten Typumwandlung}
     \begin{center}
       \includegraphics[width=4cm]{fig/05-js-triangle}
     \end{center}
@@ -941,7 +940,7 @@ Zum anderen können automatisch-angewendete Typumwandlungen zu Situationen führ
         \bi
         \ii Javascript: Umwandlungen von Strings und leeren Arrays zur Zahl \texttt{0}\\
         \enquote{When using two equals signs [...] some funky conversions take place}
-        \ii Inkonsistente Gleicheit: \codebox{([]!="0")} vs. \codebox{(([]==0)\&\&(0=="0"))}
+        \ii Inkonsistente Gleichheit: \codebox{([]!="0")} vs. \codebox{(([]==0)\&\&(0=="0"))}
         \ei
         \medskip
     \ii[$\Rightarrow$] Die traurige Wahrheit: JavaScript hat zusätzlich einen \texttt{===}-Operator.
@@ -950,12 +949,12 @@ Zum anderen können automatisch-angewendete Typumwandlungen zu Situationen führ
 #+end_src
 
 Ein besonders schönes Beispiel für verwirrende Regeln zur impliziten Typumwandlung ist JavaScript.
-Dort gibt es viele Situationen bei denen Zeichenkennten automatisch zu einem "semantisch-äquivalenten Typen" umgeweandelt.
-Verwendet man, beispielsweise, die Zeichenkette ~"23"~ in einem Ganzzahl-Kontext, so wird diese Zeichenkette als eine Ganzzahl zur Basis 10 geparst.
+Dort gibt es viele Situationen, bei denen Zeichenketten automatisch zu einem "semantisch-äquivalenten Typen" umgewandelt werden.
+Verwendet man beispielsweise die Zeichenkette ~"23"~ in einem Ganzzahl-Kontext, so wird diese Zeichenkette als eine Ganzzahl zur Basis 10 geparst.
 Hier geschieht also nur auf Ebene der Typen eine Umwandlung, sondern es wird eine Interpretation der Zeichenkette, unter der Annahme des Zehnersystems, durchgeführt.
 
 So gut die Idee auf den ersten Blick erscheinen mag (sie spart eine Menge ~parseInt()~-Aufrufe), so schlecht ist sie in der Praxis. Denn diese, und ähnliche semantische Interpretationen von leeren Arrays, führen dazu, dass der ~==~-Operator und der ~!=~-Operator inkonsistent werden![fn::Lassen Sie sich das noch einmal auf der Zunge zergehen! Inkonsistenz bei der Gleichheitsrelation! Um George Orwell zu zitieren: "Schwarz ist weiß, Freiheit ist Sklaverei".]
-Nachdem diese Inkonsistenz aufgefiel, hat JavaScript einen ~===~-Operator bekommen, bei dem die impliziten Typumwandlungen ausgeschaltet werden um "echte Gleichheit" abprüfen zu können.
+Nachdem diese Inkonsistenz auffiel, hat JavaScript einen ~===~-Operator bekommen, bei dem die impliziten Typumwandlungen ausgeschaltet werden, um "echte Gleichheit" abprüfen zu können.
 
 ** Symboltabelle
 :PROPERTIES:
@@ -967,7 +966,7 @@ Nachdem diese Inkonsistenz aufgefiel, hat JavaScript einen ~===~-Operator bekomm
 
   \begin{frame}[fragile]{Statische Namensauflösung als L-Attribut}
     \bi
-    \ii Referenzen beziehen sich auf benannte, aber entfernte Deklarationen{%
+    \ii Referenzen beziehen sich auf benannte aber entfernte Deklarationen{%
       \bi
       \ii Deklaration muss vor der Benutzung stattfinden (im AST links)
       \ii Welche Deklaration gemeint ist, ist ein L-Attribut.
@@ -1007,7 +1006,7 @@ Nachdem diese Inkonsistenz aufgefiel, hat JavaScript einen ~===~-Operator bekomm
     \ei
   \end{frame}
 
-  \begin{frame}[fragile]{AST Traversierung mit Symboltabelle}
+  \begin{frame}[fragile]{AST-Traversierung mit Symboltabelle}
     \begin{columns}[t]
       \begin{column}{0.49\textwidth}
         \begin{code}
@@ -1030,8 +1029,8 @@ Nachdem diese Inkonsistenz aufgefiel, hat JavaScript einen ~===~-Operator bekomm
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \bii
-        \ii Visitor muss es erlauben Code vor (\codebox{pre\_}) und nach (\codebox{post\_}) Besuch der Kindsknoten auszuführen.
-        \ii \tikzmark{visitor} Einige AST Knoten öffen einen neuen Namensraum.
+        \ii Visitor muss es erlauben Code vor (\codebox{pre\_}) und nach (\codebox{post\_}) Besuch der Kindknoten auszuführen.
+        \ii \tikzmark{visitor} Einige AST-Knoten öffnen einen neuen Namensraum.
         \eii
       \end{column}
     \end{columns}
@@ -1044,7 +1043,7 @@ Nachdem diese Inkonsistenz aufgefiel, hat JavaScript einen ~===~-Operator bekomm
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \bii
-        \ii Deklarationen führen Namen (\codebox{N}) für AST Knoten (\codebox{fn}) ein.
+        \ii Deklarationen führen Namen (\codebox{N}) für AST-Knoten (\codebox{fn}) ein
         \eii
       \end{column}
     \end{columns}
@@ -1076,56 +1075,56 @@ Nachdem diese Inkonsistenz aufgefiel, hat JavaScript einen ~===~-Operator bekomm
 
     #+end_src
 
-Nachdem wir eine Idee davon bekommen haben, wie Typen in eine Übersetzer berechnet und geprüft werden, wollen wir uns der Namensauflösung zuwenden.
-Nachdem wir diesem Thema schon eine ganze Vorlesung gewidmet haben, wollen wir hier nur diskutieren wie sich diese in unserer Attribut-Sicht einordnet und jene Techniken kennen lernen mit denen die entsprechenden Sprachregeln implementiert werden.
+Nachdem wir eine Idee davon bekommen haben, wie Typen in einem Übersetzer berechnet und geprüft werden, wollen wir uns der Namensauflösung zuwenden.
+Da wir diesem Thema schon eine ganze Vorlesung gewidmet haben, wollen wir hier nur diskutieren, wie sich diese in unserer Attribut-Sicht einordnet und jene Techniken kennenlernen, mit denen die entsprechenden Sprachregeln implementiert werden.
 
 Namen verbinden Deklaration und Referenz quer zum AST.
-Daher ist es nicht möglich diese Verbindung als S-Attribut zu formulieren, sondern wir müssen eine mächtigere Klasse von Attributen verwenden.
+Daher ist es nicht möglich, diese Verbindung als S-Attribut zu formulieren, sondern wir müssen eine mächtigere Klasse von Attributen verwenden.
 Wenn eine Deklaration immer vor einer Verwendung stattfinden muss, so können wir die Namensauflösung als Berechnung eines *L-Attribut* auffassen ("die Deklaration steht im AST links").
 Der gesuchte Attributwert ist dabei ein Zeiger an der Namensreferenz, welche auf den deklarierenden AST-Knoten zeigt.
-Um ein solches L-Attribut zu berechnen erweitern wir den Visitor um eine Zustandsvariable, die es erlaubt Daten während der Traversierung von links nach rechts zu transportieren. Für die Namensauflösung ist die Symboltabelle die kanonische Datenstruktur um Informationen über die aktuell deklarierten Namen zu transportieren.
+Um ein solches L-Attribut zu berechnen, erweitern wir den Visitor um eine Zustandsvariable, die es erlaubt, Daten während der Traversierung von links nach rechts zu transportieren. Für die Namensauflösung ist die Symboltabelle die kanonische Datenstruktur, um Informationen über die aktuell deklarierten Namen zu transportieren.
 
-Die *Symboltabelle* ist eine Datenstruktur mit der wir einen hierarchischen Namensraum während der Baumtraversierung verwalten können.
-Im Minimum, erlaubt eine Symboltabelle einen neuen Namensraum zu öffen (~openNamespace()~), einen neuen Namen zu deklarieren (~createName()~), einen Namen aufzulösen (~findName()~) und den zuletzt geöffneten Namensraum wieder zu schließen (~closeNamespace()~).
+Die *Symboltabelle* ist eine Datenstruktur, mit der wir einen hierarchischen Namensraum während der Baumtraversierung verwalten können.
+Im Minimum erlaubt eine Symboltabelle, einen neuen Namensraum zu öffnen (~openNamespace()~), einen neuen Namen zu deklarieren (~createName()~), einen Namen aufzulösen (~findName()~) und den zuletzt geöffneten Namensraum wieder zu schließen (~closeNamespace()~).
 Dabei kann die Symboltabelle nicht nur die clostest-nested scope rule (CNSR), sondern auch komplexere Namensraumoperationen (wie Import von Namen), kapseln.
 
 Zuerst wollen wir uns ansehen, wie die Symboltabelle bei einer Baumtraversierung verwendet wird, bevor wir uns ihrer Implementierung zuwenden.
-Um eine mit Zustand behaftete Traversierung durchzuführen geben wir unserer Visitor-Klasse, welche bisher keinen eigenen Zustand hatte, ein Objekt-Attribut ~self.ST~, welches im Konstruktor mit einer leeren Symboltabelle initialisiert wird.
-Mit dieser einen Symboltabelle iterieren wir nun über alle Knoten des ASTs.
+Um eine mit Zustand behaftete Traversierung durchzuführen, geben wir unserer Visitor-Klasse, welche bisher keinen eigenen Zustand hatte, ein Objekt-Attribut ~self.ST~, welches im Konstruktor mit einer leeren Symboltabelle initialisiert wird.
+Mit dieser Symboltabelle iterieren wir nun über alle Knoten des ASTs.
 
-Um Namensräume korrekt zu öffnen und zu schließen zu können müssen wir unseren Visitor noch um eine weitere Funktionalität erweitern: Pre-Order Besuchsreihefolge. Bisher haben wir, an einm Knoten, die ~visit()~-Funktionen aufgerufen *nachdem* alle Kinder besucht worden sind (Post-Order). Nun wollen wir zusätzlich auch noch vor dem Besuch der Kinder eine Funktion aufrufen. Dazu führen wir in der ~traversal()~-Funktion vor und nach der Schleife über die Kinder einen double-dynamic dispatch mit Hilfe des Visitor-Objekts durch. Wir rufen die ~pre()~-Funktionen vor, und die ~post()~-Funktionen nach dem rekursivem Abstieg auf. Auf diese Weise, können wir einen Namensraum beim Besuch einer Namensraum-Deklaration öffnen, bevor wir alle enthaltenen Elemente abarbeiten. Nach der Abarbeitung wird der entsprechnende Namensraum wieder geschlossen.
+Um Namensräume korrekt öffnen und schließen zu können, müssen wir unseren Visitor noch um eine weitere Funktionalität erweitern: Pre-Order-Besuchsreihenfolge. Bisher haben wir, an einem Knoten, die ~visit()~-Funktionen aufgerufen, *nachdem* alle Kinder besucht worden sind (Post-Order). Nun wollen wir zusätzlich auch noch vor dem Besuch der Kinder eine Funktion aufrufen. Dazu führen wir in der ~traversal()~-Funktion vor und nach der Schleife über die Kinder einen double-dynamic dispatch mit Hilfe des Visitor-Objekts durch. Wir rufen die ~pre()~-Funktionen vor, und die ~post()~-Funktionen nach dem rekursivem Abstieg auf. Auf diese Weise, können wir einen Namensraum beim Besuch einer Namensraum-Deklaration öffnen, bevor wir alle enthaltenen Elemente abarbeiten. Nach der Abarbeitung wird der entsprechende Namensraum wieder geschlossen.
 
-Beim Besuch einer benannten Deklaration erzeugen wir einen neuen Namen (~self.ST.createName()~) und richten so eine Abbildung vom entsprechenen Namen auf den deklarierenden AST-Knoten ein. In einer Sprache mit statischen Typen hätten wir die Signatur ~createName(string, Decl)~.
+Beim Besuch einer benannten Deklaration erzeugen wir einen neuen Namen (~self.ST.createName()~) und richten so eine Abbildung vom entsprechenden Namen auf den deklarierenden AST-Knoten ein. In einer Sprache mit statischen Typen hätten wir die Signatur ~createName(string, Decl)~.
 
-An Stellen an denen wir eine Namensreferenz auflösen wollen, fragen wir die Symboltabelle nach dem referenzierten Namen und bekommen den vorher verknüpften AST-Knoten als Rückggabewert von ~findName(string)~.
-Diese Deklaration können wir nun (als Zeiger/Refenz) in einem AST-Attribut der ~DeclRefExpr~ speichern.
+An Stellen, an denen wir eine Namensreferenz auflösen wollen, fragen wir die Symboltabelle nach dem referenzierten Namen und bekommen den vorher verknüpften AST-Knoten als Rückgabewert von ~findName(string)~.
+Diese Deklaration können wir nun (als Zeiger/Referenz) in einem AST-Attribut der ~DeclRefExpr~ speichern.
 
 #+begin_src latex
-  \begin{frame}{Symboltablle als Stack von Namensräumen}
+  \begin{frame}{Symboltabelle als Stack von Namensräumen}
     \btAnimation[width=\textwidth]{range=1-12:<1->}{fig/05-symbol-table}
   \end{frame}
 #+end_src
 
 Wir wollen uns nun damit beschäftigen, wie die Symboltabelle implementiert ist und wie wir CNSR-Namensauflösung implementieren können.
-Dabei sei gesagt, dass die hier gezeigte Methode nicht unbedingt die effizienteste Variante ist, aber sie ist gut geeignet das Prinzip der Symboltabelle zu vermitteln.
+Dabei sei gesagt, dass die hier gezeigte Methode nicht unbedingt die effizienteste Variante ist, aber sie ist gut geeignet, das Prinzip der Symboltabelle zu vermitteln.
 
-Wir implementieren die Symboltabelle als einen Stack von Namensräumen. Am Beginn der Namensauflösung ist unsere Symboltabelle leer und es ist kein Namensraum auf dem Stack gespeichert. Bei Besuch der AST-Wurzel legen wir den *Wurzelnamensraum* an und speichern eine Referenz auf denjenigen AST-Knoten, der diesen Namensraum geöffnet hat (A).
-Auf den Folien ist der aktuell besuchte Knoten rot umrandet und ich habe für Sie annotiert, ob wir gerade in der Pre-Order oder in der Post-Order Visitor-Funktion sind.
+Wir implementieren die Symboltabelle als einen Stack von Namensräumen. Am Beginn der Namensauflösung ist unsere Symboltabelle leer, das heißt, es ist kein Namensraum auf dem Stack gespeichert. Bei Besuch der AST-Wurzel legen wir den *Wurzelnamensraum* an und speichern eine Referenz auf denjenigen AST-Knoten, der diesen Namensraum geöffnet hat (A).
+Auf den Folien ist der aktuell besuchte Knoten rot umrandet und ich habe für Sie annotiert, ob wir gerade in der Pre-Order- oder in der Post-Order-Visitor-Funktion sind.
 
-Beim Besuch einer Deklaration legen wir in dem Namensraum, der ganz oben auf dem Stack liegt ein entsprechendes Mapping an.
+Beim Besuch einer Deklaration legen wir in dem Namensraum, der ganz oben auf dem Stack liegt, ein entsprechendes Mapping an.
 Zum Beispiel:
 ~tmp -> B~ oder ~fib -> D~. 
 Wenn wir einen benannten Namensraum besuchen (~math~), legen wir zuerst ein Mapping im aktuellen Namensraum an (~math->C~) und legen erst danach einen neuen, leeren Namensraum auf den Stack.
 
 Treffen wir auf eine Namensreferenz, so führt die ~findName()~-Funktion die CSNR-Namensauflösung durch:
-Beginnend beim obersten Namensraum auf dem Stack, suchen wir nach dem referenzierten Namen.
+Beginnend beim obersten Namensraum auf dem Stack suchen wir nach dem referenzierten Namen.
 Finden wir den Namen nicht, so gehen wir immer eine Ebene in unserem Stack nach unten.
-Erst wenn wir auch im Wurzelnamensraum keine Deklaration finden, geben wir einen Übersetzungsfehler aus; Es wurde ein Name verwendet, der niemals deklariert wurde.
+Erst, wenn wir auch im Wurzelnamensraum keine Deklaration finden, geben wir einen Übersetzungsfehler aus; es wurde ein Name verwendet, der niemals deklariert wurde.
 Die gefundene Deklaration speichern wir als Referenz in einem Attribut (gestrichelte Linien).
 
 Beim Aufsteigen aus dem rekursiven Abstieg, bauen wir die aufgestapelten Namensräume wieder ab. Um sie im weiteren noch verfügbar zu haben, können wir die befüllten Namensräume aber auch als AST-Attribut an die Knoten hängen (nicht gezeigt).
 
-Im folgenden sehen sie eine minimale Implementierung einer Symboltabelle. Zum experimentieren, habe ich alle AST-Knoten durch entsprechende Strings ersetzt und die einzelnen API-Aufrufe selbst getätigt. Spielen Sie damit herum! Benennen sie, beispielsweise, die zweite Deklaration von ~tmp~ um und beobachten Sie, wie sich die Ausgabe ändert.
+Im Folgenden sehen Sie eine minimale Implementierung einer Symboltabelle. Zum Experimentieren habe ich alle AST-Knoten durch entsprechende Strings ersetzt und die einzelnen API-Aufrufe selbst getätigt. Spielen Sie damit herum! Benennen Sie, beispielsweise, die zweite Deklaration von ~tmp~ um und beobachten Sie, wie sich die Ausgabe ändert.
 
 #+INCLUDE: ../lst/05-symbols.py
 
@@ -1137,7 +1136,7 @@ Im folgenden sehen sie eine minimale Implementierung einer Symboltabelle. Zum ex
       \ii Java: Reihenfolge der Methodendefinition ist egal!
       \ii \textbf{Lösung:} Wir traversieren den AST \alert<1>{zweimal}.{
         \be
-        \ii Einsammeln aller Deklarationen.Speicherung an den Knoten (z.B. \codebox{ClassDecl})
+        \ii Einsammeln aller Deklarationen, Speicherung an den Knoten (z.B. \codebox{ClassDecl})
         \ii Auflösen der Referenzen beim zweiten Durchlauf
         \ee
       }
@@ -1148,12 +1147,12 @@ Im folgenden sehen sie eine minimale Implementierung einer Symboltabelle. Zum ex
     \bi
     \ii<2-|handout:2-> Überladung von Funktionen anhand der statischen Signaturen{
       \bi
-      \ii Typinformationen müssen bei der Namensauflösung bereit stehen
-      \ii \textbf{Lösung}: Typberechnung und Namensauflösung im \alert<2>{selben Visitor} durchführen.\\
+      \ii Typinformationen müssen bei der Namensauflösung bereitstehen
+      \ii \textbf{Lösung}: Typberechnung und Namensauflösung im \alert<2>{selben Visitor} durchführen\\
       \begin{code}[tag=Python]
         \begin{py}
           def post_CallExpr(self, call): # Post-Order: Bekannte Argumenttypen
-             # 1. Berechnung der Statischen Signatur
+             # 1. Berechnung der statischen Signatur
              N = signature(call.func_name)
              for A in call.arguments:
                N.addParam(A.Type)
@@ -1171,9 +1170,9 @@ Im folgenden sehen sie eine minimale Implementierung einer Symboltabelle. Zum ex
   \end{frame}
 #+end_src
 
-Das gezeigte Muster zur Namensauflösung funktioniert hervorragend, solange die Deklarationen in strikter Ordnung vor ihren Referenzen auftauchen müssen. Dies ist zum Beispiel bei C der Fall. Wollen wir diese Regel etwas aufweichen, indem wir erlauben, dass innerhalb eines Namensraums Referenzen vor ihren Deklarationen auftauchen können (wie dies bei Methoden in Java der Fall ist), so müssen wir zweimal über den AST traversieren: Beim ersten Mal sammeln wir alle Deklarationen ein und stecken sie in die Namensräume, welche wir an die AST-Knoten hängen. Beim zweiten Mal, lösen wir alle Namensräume wieder auf.
+Das gezeigte Muster zur Namensauflösung funktioniert hervorragend, solange die Deklarationen in strikter Ordnung vor ihren Referenzen auftauchen müssen. Dies ist zum Beispiel bei C der Fall. Wollen wir diese Regel etwas aufweichen, indem wir erlauben, dass innerhalb eines Namensraums Referenzen vor ihren Deklarationen auftauchen können (wie dies bei Methoden in Java der Fall ist), so müssen wir zweimal über den AST traversieren: Beim ersten Mal sammeln wir alle Deklarationen ein und stecken sie in die Namensräume, welche wir an die AST-Knoten hängen. Beim zweiten Mal lösen wir alle Namensräume wieder auf.
 
-Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besprochen haben, sind überladene Funktionen. An dieser Stelle schauen wir uns nur die Einbindung der dort besprochenen Strategie (die Parametertypen werden Teil des Namens) an. Hierfür erzeugt der Code ein ~signatur~-Objekt, welches als "Name" verwendet wird. Dort fügen wir, neben dem aufgerufenem Funktionsnamen auch noch die Parametertypen an und suchen nach der Deklaration. Haben wir diese gefunden, so speichern wir sie als Attribut (~call.decl~) und verwenden den Rückgabetyp als Typen des ~CallExpr~-Knoten (~call.Type = ...~).
+Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besprochen haben, sind überladene Funktionen. An dieser Stelle schauen wir uns nur die Einbindung der dort besprochenen Strategie (die Parametertypen werden Teil des Namens) an. Hierfür erzeugt der Code ein ~signatur~-Objekt, welches als "Name" verwendet wird. Dort fügen wir, neben dem aufgerufenen Funktionsnamen auch noch die Parametertypen an und suchen nach der Deklaration. Haben wir diese gefunden, so speichern wir sie als Attribut (~call.decl~) und verwenden den Rückgabetyp als Typen des ~CallExpr~-Knoten (~call.Type = ...~).
 
 ** Unifikation
 :PROPERTIES:
@@ -1191,7 +1190,7 @@ Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besproch
         \bii
         \ii Zyklische Attribute erfordern komplexen Datenfluss{
           \bi
-          \ii Knoten liefern Teilwissen um das Attribut
+          \ii Knoten liefern Teilwissen über das Attribut
           \ii Gleichungssystem für Attribute ist \alert<-2>{selbst-referenziell}
           \ii Einfaches zyklisches Beispiel: \only<2->{\texttt{x.h = 1, y.h = 2}}\\
               \hfill\colorbox{badbee!20}{\parbox[b]{0.8\textwidth}{
@@ -1214,23 +1213,23 @@ Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besproch
       \bi
       \ii Inferenz: Ableitung der statischen Typen aus der Verwendung der Variablen
       \ii \codeinline{fun(x) { return x + 2 }} $\rightarrow$ Der Parameter x muss vom Typ \codeinline[style=C]{int} sein
-      \ii \structure{Hindley-Milner Typinferenz} kombiniert zyklische Attribute mit\\ \textbf{parametrischem Polymorphismus}; Grundlage der \alert{funktionalen Programmierung}
+      \ii \structure{Hindley-Milner-Typinferenz} kombiniert zyklische Attribute mit\\ \textbf{parametrischem Polymorphismus}; Grundlage der \alert{funktionalen Programmierung}
       \ei
     }
     \ei
   \end{frame}
   #+end_src
 
-Mit der Baumtraversierung haben wir eine Technik bekommen um S-Attribute auszurechnen. Die Symboltabelle hat uns dazu befähigt Namensauflösung als ein L-Attribut zu berechnen. Aber was tun wir, wenn wir einen Zyklus in unseren Attributabhängigkeiten haben.
-Also wie berechnen wir eine Attributgleichung, bei der ein Attribut über Umwege von seinem eigenen Attributwert abhängt. Oder wenn die Abhängigkeiten komplexer sind als einfach von unten nach oben oder von links nach rechts.
+Mit der Baumtraversierung haben wir eine Technik bekommen um S-Attribute auszurechnen. Die Symboltabelle hat uns dazu befähigt, Namensauflösung als ein L-Attribut zu berechnen. Aber was tun wir, wenn wir einen Zyklus in unseren Attributabhängigkeiten haben.
+Also wie berechnen wir eine Attributgleichung, bei der ein Attribut über Umwege von seinem eigenen Attributwert abhängt. Oder, wenn die Abhängigkeiten komplexer sind als einfach von unten nach oben oder von links nach rechts.
 
-Im Beispiel habe ich eine solche Attributabhängigkeit mit zwei Knoten gezeigt. Zum sollen dort die beiden Attributwerte ~x.h~ und ~y.h~ aufeinander folgende Ganzzahlen sein, und zum anderen soll ~y.h~ genau doppelt so groß sein wie ~x.h~. Diese Bedingungen sind zyklisch und können nur von ~x.h=1~ und ~y.h=2~ erfüllt werden. Ich habe diese Beispiel absichtlich so gestaltet, dass es nichts mit Programmiersprachen zu tun hat, sondern es soll nur klar werden was es bedeutet, eine  zyklische Attributabhängigkeit in einem AST zu haben.
+Im Beispiel habe ich eine solche Attributabhängigkeit mit zwei Knoten gezeigt. Zum einen sollen dort die beiden Attributwerte ~x.h~ und ~y.h~ aufeinander folgende Ganzzahlen sein, und zum anderen soll ~y.h~ genau doppelt so groß sein wie ~x.h~. Diese Bedingungen sind zyklisch und können nur von ~x.h=1~ und ~y.h=2~ erfüllt werden. Ich habe diese Beispiel absichtlich so gestaltet, dass es nichts mit Programmiersprachen zu tun hat, sondern es soll nur klar werden, was es bedeutet, eine zyklische Attributabhängigkeit in einem AST zu haben.
 
-Ein solch komplexes, unter Umständen zyklisches, System von Attributabhängigkeiten kann aber auch bei Programmiersprachen nützlich sein: Lange Zeit haben Informatiker versucht Sprachregeln so zu gestalten, dass die semantische Analyse alleine mit S- und L-Attributen dargestellt werden kann. Dies führt aber dazu, dass häufig mehr Annotationen durch den Programmierer notwendig waren, da alles vor seiner Verwendung explizit angegeben werden musste (z.B. Namensdeklarationen oder Typannotationen). Häufig kommt man als Programmierer bei solch expliziten Sprachen auf den Gedanken: "Eigentlich müsste der Übersetzer das doch sehen. Das ist doch super offensichtlich!". 
+Ein solch komplexes, unter Umständen zyklisches, System von Attributabhängigkeiten kann aber auch bei Programmiersprachen nützlich sein: Lange Zeit haben Informatiker versucht, Sprachregeln so zu gestalten, dass die semantische Analyse alleine mit S- und L-Attributen dargestellt werden kann. Dies führt aber dazu, dass häufig mehr Annotationen durch den Programmierer notwendig waren, da alles vor seiner Verwendung explizit angegeben werden musste (z.B. Namensdeklarationen oder Typannotationen). Häufig kommt man als Programmierer bei solch expliziten Sprachen auf den Gedanken: "Eigentlich müsste der Übersetzer das doch sehen. Das ist doch super offensichtlich!".
 
-Dieses Gefühl entsteht beispielsweise häufig bei expliziten statischer Typisierung: Eigentlich verwenden wir eine Variable so, dass doch, aus dem Kontext(!), klar ist welcher Typ gemeint ist. Mit Hilfe der *Typinferenz* können wir den Übersetzer dazu befähigen den Typen in solchen Situationen zu berechnen. Dabei leitet der Übersetzer die statischen Variablentypen aus der konkreten Verwendung der Variablen automatisch ab. Der formale Hintergrund und die häufigst eingesetzte Variante ist die *Hindley-Milner Typinferenz*{{{wikipedia_de(Typinferenz_nach_Hindley-Milner)}}}.
+Dieses Gefühl entsteht beispielsweise häufig bei expliziter statischer Typisierung: Eigentlich verwenden wir eine Variable so, dass doch, aus dem Kontext(!), klar ist, welcher Typ gemeint ist. Mit Hilfe der *Typinferenz* können wir den Übersetzer dazu befähigen den Typen in solchen Situationen zu berechnen. Dabei leitet der Übersetzer die statischen Variablentypen aus der konkreten Verwendung der Variablen automatisch ab. Der formale Hintergrund und die häufigst eingesetzte Variante ist die *Hindley-Milner-Typinferenz*{{{wikipedia_de(Typinferenz_nach_Hindley-Milner)}}}.
 
-Nachteil an dieser komplexen Typinferenz ist, dass die Typattribute nun ein zyklisches Gleichungssystem bilden können, welches wir nicht mehr mit einfacher Baumtraversierung berechnen können. Wir brauchen eine mächtigere Technik, welche ich im Folgenden, überblickshalber, vorstellen werde: Die (synaktische) *Unifikation*.
+Nachteil an dieser komplexen Typinferenz ist, dass die Typattribute nun ein zyklisches Gleichungssystem bilden können, welches wir nicht mehr mit einfacher Baumtraversierung berechnen können. Wir brauchen eine mächtigere Technik, welche ich im Folgenden, überblickshalber, vorstellen werde: Die (syntaktische) *Unifikation*.
 
   #+begin_src latex
   \begin{frame}[fragile]{Typinferenz durch Ersetzung von Typvariablen}
@@ -1246,12 +1245,12 @@ Nachteil an dieser komplexen Typinferenz ist, dass die Typattribute nun ein zykl
           \bi
           \ii Die Variable p2 hat Typ \codebox{int}
           \ii \codebox{append()} ist generische Funktion und hängt ein Element an homogene Liste an
-          \ii Alles unbekannte wird durch eine \structure{freie Typvariable} ($\alpha, \beta, \gamma$) dargestellt.
+          \ii Alles Unbekannte wird durch eine \structure{freie Typvariable} ($\alpha, \beta, \gamma$) dargestellt.
           \ei
         }\medskip
         \ii<2-|handout:2-> Regeln als \structure{parametrische Bedingungen}{%
           \bi
-          \ii CallExpr: Die Signatur der aufgerufene Funktion muss zu den Argumenten passen.
+          \ii CallExpr: Die Signatur der aufgerufenen Funktion muss zu den Argumenten passen.
           \ii Rückggabetyp (E.T) soll ermittelt werden
           \ei
         }\medskip
@@ -1259,7 +1258,7 @@ Nachteil an dieser komplexen Typinferenz ist, dass die Typattribute nun ein zykl
           \bi
           \ii \textbf{Ziel:} \alert<-5|handout:-5>{Bedingungen müssen erfüllt} sein
           \ii Ersetztung: Variable $\rightarrow$ Typausdruck
-          \ii Finde Sequenz \only<6|handout:6>{\color{safegreen}\bfseries}{unifizierender Ersetztungen}
+          \ii Finde Sequenz \only<6|handout:6>{\color{safegreen}\bfseries}{unifizierender Ersetzungen}
           \ei
         }
         \eii
@@ -1269,22 +1268,22 @@ Nachteil an dieser komplexen Typinferenz ist, dass die Typattribute nun ein zykl
   \end{frame}
   #+end_src
   
-Typinferenz und Unifikation kommen insbesondere bei *funktionalen Programmiersprachen*, die generische Typen{{{see(03-polymorphism, Polymorphismus)}}} verwenden (z.B. Haskell) zum Einsatz.
+Typinferenz und Unifikation kommen insbesondere bei *funktionalen Programmiersprachen*, die generische Typen{{{see(03-polymorphism, Polymorphismus)}}} verwenden (z.B. Haskell), zum Einsatz.
 Wir wollen nun schrittweise durchgehen, wie die Typinferenz in diesen Sprachen funktioniert und wie wir Unifikation zur Auflösung zyklischer Attribute verwenden.
 
-Zunächst stellen wir, wie gewohnt, die Attributgleichungen auf. In unserem Beispiel betrachen wir einen Funktionsaufruf ~append(p1, p2)~, für den wir zwei Dinge wissen: Zum einen wissen wir, dass ~append()~ als erstes Argument eine Liste mit beliebigen Elementtypen bekommt und das zweite Argument an diese Liste anhängt, bevor sie zurückgegeben wird. Dabei muss der zweite Parameter den gleichen Typen haben wie die Listenelemente[fn::In Kurz: ~append()~ fügt ein Element, typsicher, an eine homogene Liste an.].
-Zum zweiten Wissen wir, dass ~p2~ vom Typ ~int~ ist. 
+Zunächst stellen wir, wie gewohnt, die Attributgleichungen auf. In unserem Beispiel betrachten wir einen Funktionsaufruf ~append(p1, p2)~, für den wir zwei Dinge wissen: Zum einen wissen wir, dass ~append()~ als erstes Argument eine Liste mit beliebigen Elementtypen bekommt und das zweite Argument an diese Liste anhängt, bevor sie zurückgegeben wird. Dabei muss der zweite Parameter den selben Typen haben wie die Listenelemente[fn::In kurz: ~append()~ fügt ein Element, typsicher, an eine homogene Liste an.].
+Zum zweiten wissen wir, dass ~p2~ vom Typ ~int~ ist.
 
-Allerdings wissen wir, zu diesem Zeitpunkt, einige Dinge noch nicht: Welchen Typ hat ~p1~? Welchen Rückggabetypen hat die gesamte ~CallExpr~? Was ist die konkrete Aufrufsignatur für ~append()~? Alle Typen, die wir noch nicht kennen, ersetzen wir in den Attributgleichungen durch *Typvariablen*. Konkrete Werte für diese Variablen zu finden ist nun unser Ziel für die Typinferenz.
+Allerdings wissen wir, zu diesem Zeitpunkt, einige Dinge noch nicht: Welchen Typ hat ~p1~? Welchen Rückgabetypen hat die gesamte ~CallExpr~? Was ist die konkrete Aufrufsignatur für ~append()~? Alle Typen, die wir noch nicht kennen, ersetzen wir in den Attributgleichungen durch *Typvariablen*. Konkrete Werte für diese Variablen zu finden, ist nun unser Ziel für die Typinferenz.
 
-Mit diesem Typvariablen können wir nun die semantischen Sprachregeln als Gleichheitsbedingung formulieren. Im Beispiel ist die relevante Sprachregel: *"Bei einem Funktionsaufruf müssen Parameterypen und Argumenttypen gleich sein. Der Rückggabetyp ergibt sich aus der Funktionssignatur"*. Ersetzen wir alle Attributreferenzen in dieser Bedingung durch die entsprechenden Gleichungen mit den freien Typvariablen, so erhalten wir die Bedingung: Der Term ~([Gamma], Gamma)->[Gamma]~ soll gleich sein mit dem Term ~(Beta, int)->Alpha~! Um diese Bedingung zu erfüllen, müssen wir die freien Typvariablen geschickt durch entsprechende Typausdrücke ersetzen. Der Prozess eine solche Ersetzung zu finden heißt *Unifikation*.
+Mit diesem Typvariablen können wir nun die semantischen Sprachregeln als Gleichheitsbedingung formulieren. Im Beispiel ist die relevante Sprachregel: *"Bei einem Funktionsaufruf müssen Parametertypen und Argumenttypen gleich sein. Der Rückgabetyp ergibt sich aus der Funktionssignatur"*. Ersetzen wir alle Attributreferenzen in dieser Bedingung durch die entsprechenden Gleichungen mit den freien Typvariablen, so erhalten wir die Bedingung: Der Term ~([Gamma], Gamma)->[Gamma]~ soll gleich sein mit dem Term ~(Beta, int)->Alpha~! Um diese Bedingung zu erfüllen, müssen wir die freien Typvariablen geschickt durch entsprechende Typausdrücke ersetzen. Der Prozess eine solche Ersetzung zu finden heißt *Unifikation*.
 
-Im Beispiel führe ich, nacheinander, drei Ersetzungen durch für die drei freien Typvariablen durch. Am Ende dieser *Sequenz von Ersetzungen* sind beide Terme an dem Funktionsaufruf gleich und wir haben erfolgreich eine Typinferenz durchgeführt. Hätten wir keine unifizierende Ersetzung gefunden, so hätten wir einen Übersetzungsfehler signalisieren müssen. Aber in unserem Fall hat alles geklappt: Wir wissen nun, dass ~p1~ eine Liste von Ganzzahlen ist, dass der Rückggabetyp des Funktionsaufrufs ebenfalls eine Ganzzahlenliste ist, und dass ~append()~ auf Ganzzahlenlisten operiert.
+Im Beispiel führe ich, nacheinander, drei Ersetzungen durch, für die drei freien Typvariablen durch. Am Ende dieser *Sequenz von Ersetzungen* sind beide Terme an dem Funktionsaufruf gleich und wir haben erfolgreich eine Typinferenz durchgeführt. Hätten wir keine unifizierende Ersetzung gefunden, so hätten wir einen Übersetzungsfehler signalisieren müssen. Aber in unserem Fall hat alles geklappt: Wir wissen nun, dass ~p1~ eine Liste von Ganzzahlen ist, dass der Rückgabetyp des Funktionsaufrufs ebenfalls eine Ganzzahlliste ist, und dass ~append()~ auf Ganzzahllisten operiert.
 
 #+begin_src latex
   \begin{frame}{Unifikation: Berechnung von passenden Ersetzungen}
     \begin{btBlock}{Unifikation}
-      Finden eine Sequenz von Variablen-Ersetzungen, die zwei Terme angleicht.
+      Finden einer Sequenz von Variablen-Ersetzungen, die zwei Terme angleicht.
     \end{btBlock}
     \medskip
     \begin{columns}
@@ -1301,7 +1300,7 @@ Im Beispiel führe ich, nacheinander, drei Ersetzungen durch für die drei freie
       \begin{column}{0.49\textwidth}
         \structure{Typausdrücke mit freien Variablen}
         \bii
-        \ii Typ(konstruktoren): int, func, List
+        \ii Typ(konstruktoren): int, func, list
         \ii Variablen: $\alpha, \beta, \gamma$
         \ii Variablen können in beiden Termen, auch mehrfach, vorkommen%
         \eii
@@ -1311,7 +1310,7 @@ Im Beispiel führe ich, nacheinander, drei Ersetzungen durch für die drei freie
         \bii
         \ii Ersetzungssequenz: $S_1\circ S_2 \circ S_3$
         \ii Reihenfolge ist relevant!
-        \ii \textbf{Allgemeinster Unifikator} nimmt nur notwendige Ersetzungen vor.
+        \ii \textbf{Allgemeinster Unifikator} nimmt nur notwendige Ersetzungen vor
         \eii
       \end{column}
     \end{columns}
@@ -1329,21 +1328,21 @@ Im Beispiel führe ich, nacheinander, drei Ersetzungen durch für die drei freie
 
 #+end_src
 
-Die zentrale Technik der Typinferenz ist die Unifikation. Wir wollen, ganz kurz, definieren, was die Unfikation im Rahmen der Typinferenz leistet. Die Unifikation arbeitet auf mehreren geschachtelten Termen die freie Variablen enthalten. In unserem Fall sind Typausdrücke mit freien Typvariablen die Terme welche verarbeitet werden sollen (T1, T2). Dabei können die Typvariablen mehrfach in einem Term oder in mehreren Termen vorkommen, müssen aber in jedem Fall durch den selben Typausdruck ersetzt werden. Dieses mehrfache Auftreten einer Variable erlaubt es uns die zyklischen Abhängigkeiten zu notieren. 
+Die zentrale Technik der Typinferenz ist die Unifikation. Wir wollen ganz kurz definieren, was die Unifikation im Rahmen der Typinferenz leistet. Die Unifikation arbeitet auf mehreren geschachtelten Termen, die freie Variablen enthalten. In unserem Fall sind Typausdrücke mit freien Typvariablen die Terme, welche verarbeitet werden sollen (T1, T2). Dabei können die Typvariablen mehrfach in einem Term oder in mehreren Termen vorkommen, müssen aber in jedem Fall durch den selben Typausdruck ersetzt werden. Dieses mehrfache Auftreten einer Variable erlaubt es uns, die zyklischen Abhängigkeiten zu notieren.
 
-Die Unifikation berechnet für die gegebenen Terme eine Sequenz von Ersetzungen, bei denen immer eine Typvariable durch einen konkreten Typausdruck ersetzt wird. Dabei ist die Reihenfolge der Ersetzungen relevant! Im Beispiel sehen wir, dass ich für die gleichen zu unifizierenden Typausdrücke eine andere unifizierende Ersetzungssequenz angegeben habe, die allerdings zum gleichen Ergebnis führt.
+Die Unifikation berechnet für die gegebenen Terme eine Sequenz von Ersetzungen, bei denen immer eine Typvariable durch einen konkreten Typausdruck ersetzt wird. Dabei ist die Reihenfolge der Ersetzungen relevant! Im Beispiel sehen wir, dass ich für die selben zu unifizierenden Typausdrücke eine andere unifizierende Ersetzungssequenz angegeben habe, die allerdings zum selben Ergebnis führt.
 
 Für zwei unifizierbare Terme gibt es immer unendlich viele unifizierende Ersetzungen, denn wir können immer noch eine weitere nutzlose Unifikation hinzufügen (z.B.
 ~Alpha->Beta, Beta->Alpha, Alpha->Beta, Beta->list(Gamma),....~).
-Daher suchen wir nicht nur irgendeine Unifikation, sondern den *allgemeinsten Unifikator*, welche beide Terme angleicht und nur die wirklich notwendigen Ersetzungen vornimmt. 
+Daher suchen wir nicht nur irgendeine Unifikation, sondern den *allgemeinsten Unifikator*, welcher beide Terme angleicht und nur die wirklich notwendigen Ersetzungen vornimmt.
 
-In der Literatur gibt es mehrere Verfahren um die Unifikation effizient durch zu führen. Dabei wurde der erste Algorithmus von Robinson, welcher im schlimmsten Fall noch exponentielle Laufzeit hat, verbessert, sodass heute Unifikation in linearer Laufzeit möglich ist. Wir wollen die konkreten Algorithmen an dieser Stelle nicht diskutieren. Sollten Sie sich für die algorithmischen Details dennoch interessieren, seien sie auf den Blogeintrag von [[https://eli.thegreenplace.net/2018/unification/][Eli Bendesky]] verwiesen. Dort finden Sie eine Implementierung des Robinon-Algorithmus in Python.
+In der Literatur gibt es mehrere Verfahren, um die Unifikation effizient durchzuführen. Dabei wurde der erste Algorithmus von Robinson, welcher im schlimmsten Fall noch exponentielle Laufzeit hat, verbessert, sodass heute Unifikation in linearer Laufzeit möglich ist. Wir wollen die konkreten Algorithmen an dieser Stelle nicht diskutieren. Sollten Sie sich für die algorithmischen Details dennoch interessieren, seien Sie auf den Blogeintrag von [[https://eli.thegreenplace.net/2018/unification/][Eli Bendesky]] verwiesen. Dort finden Sie eine Implementierung des Robinson-Algorithmus in Python.
 
 * Zusammenfassung
 #+begin_src latex
   \begin{frame}{Zusammenfassung: Semantische Analyse}
     \bi
-    \ii Semantische Analyse prüft die restlichen, kontextsensitiven Sprachregeln{
+    \ii Semantische Analyse prüft die restlichen kontextsensitiven Sprachregeln{
       \bi
       \ii \structure{Namensauflösung}: Gibt es zu jeder Referenz es eine Deklaration?
       \ii \structure{Typkonsistenz}:  Werden die statische Typen korrekt verwendet?\\[1ex]
@@ -1356,12 +1355,12 @@ In der Literatur gibt es mehrere Verfahren um die Unifikation effizient durch zu
           $\Rightarrow$ Gleichungssystem zwischen allen Knotenattributen\\[1ex]
       \ii \structure{S-Attribut}: Nur Abhängigkeiten zu den eigenen Kindern \hfill(\enquote{nach unten})
       \ii \structure{L-Attribut}: Abhängigkeiten von Geschwister und Vorgängern \hfill(\enquote{nach links})
-      \ii \structure{Zyklische Attribute}: Wechselseitig-abhängige Attributgleichungen
+      \ii \structure{Zyklische Attribute}: Wechselseitig abhängige Attributgleichungen
       \ei
     }\medskip
     \ii<3-> \structure{Übersetzertechniken} zur Attributberechnung und Regelprüfung{
       \bi
-      \ii \structure{Baumtraversierung}: Visitor bündelt Knotentyp-abhängige Operationen
+      \ii \structure{Baumtraversierung}: Visitor bündelt knotentypabhängige Operationen
       \ii \structure{Symboltabelle}: Speichert die aktuell deklarierten Namen beim Traversieren
       \ii \structure{Unifikation}: Angleichung von parametrischen Typausdrücken durch Ersetzung
       \ei
