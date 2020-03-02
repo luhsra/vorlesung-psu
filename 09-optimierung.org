@@ -843,6 +843,9 @@ Jetzt wird BB0 noch einmal ausgeführt, aber da wir eine leere Menge in den Eing
 Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen etwas fummelig ist, weswegen ich das Vorgehen hier nicht genauer darlegen möchte. Die Intuition ist, das man gemeinsamen Teilmengen für Äquivalenzmengen aus unterschiedlichen Vorgängern bildet, die sich teilweise überschneiden. Das ganze geht sogar ziemlich effizient, wenn man eine [[https://de.wikipedia.org/wiki/Union-Find-Struktur][Union-Find Datenstruktur]] verwendet. Und weil ich diese Union-Find Strukturen so schön finde, möchte ich hier auch eine Lanze dafür brechen: Schauen Sie sich diese Datenstruktur an, sie ist wirklich wundervoll elegant.
 
 ** Optimierung des Kontrollflusses
+:PROPERTIES:
+:CUSTOM_ID: 09-opt-cfg
+:END:
 #+begin_src latex
 
   \dividerframe{Optimierung des Kontrollflusses}
@@ -861,14 +864,14 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
           \ii[$\Rightarrow$] Verschmelze beide BB0 und BB1
           \ei
         }\medskip
-        \ii<2-> \textbf{Analyse}: Finde Block-Paar (x, y), sodass...{
+        \ii<handout:2-|2-> \textbf{Analyse}: Finde Block-Paar (x, y), sodass...{
           \bi
           \ii y ist Nachfolger von x
           \ii x hat genau einen Nachfolger
           \ii y hat genau einen Vorgänger
           \ei
         }
-        \ii<3-> \textbf{Transformation}: Verschmelze $x\rightarrow y${
+        \ii<handout:3-|3-> \textbf{Transformation}: Verschmelze $x\rightarrow y${
           \bi
           \ii Lösche \ircmd{Goto} aus x
           \ii Hänge Instruktionen von y an x
@@ -876,14 +879,27 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
           \ei
         }
         \eii
-        \begin{btBlock}<4->[type=info]{Trennung der Belange}\small
+        \begin{btBlock}<handout:4-|4->[type=info]{Trennung der Belange}\small
           Das Aufräumen des toten Blocks (BB1) übernimmt eine andere Optimierung.
         \end{btBlock}
       \end{column}
     \end{columns}
 
   \end{frame}
+#+end_src
 
+Nachdem wir uns mit der CVP-Optimierung ziemlich lange aufgehalten haben, kommen jetzt einige deutlich leichter zu verstehende Optimierungen.
+Diese Arbeiten auf der Ebene des Kontrollflussgraphen und haben zum Ziel unnötige Sprünge und Basisblöcke zu entfernen. Lehnen Sie sich also zurück und genießen Sie wie Kanten umgebogen werden und Blöcke verschwinden.
+
+Als erstes wollen wir Basisblöcke *verschmelzen*, die eh immer direkt hintereinander ausgeführt werden.
+Der Sprung vom ersten zum zweiten Block ist also absolut überflüssig. Als zusätzlich Bedingung machen wir aber, dass der zweite Block auch wirklich nur vom ersten Block aus angesprungen werden kann. Der erste Block soll also nur einen Nachfolger, der zweite nur einen Vorgänger haben.
+
+Als Transformation löschen wir das ~Goto~ aus dem ersten Block und kopieren alle Instruktionen in den ersten Block hinein. Dies hat zur Folge, dass der erste Block nicht mehr den zweiten Block als Nachfolger hat, sondern die Nachfolger seines Nachfolgers. 
+
+Der zweite Block kann nun auch niemals mehr angesprungen werden und ist daher *Tod*.
+Wir räumen diesen aber nicht an dieser Stelle weg, sonder überlassen das Wegräumen von toten Blöcken einer anderen Optimierung, die sich dann auch darum kümmert tote Basisblöcke zu entfernen, die durch Konstantenfaltung von ~IfGoto~ Befehlen enstehen können.
+
+#+begin_src latex
   \begin{frame}{Elimination von unbedingten Doppelsprüngen}
 
       \begin{columns}
@@ -899,19 +915,19 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
           \ii[$\Rightarrow$] \textbf{Ziel}: Vermeide reundante Sprünge
           \ei
         }\medskip
-        \ii<2-> \textbf{Hinweis}: Verschmelzen hier unmöglich {
+        \ii<handout:2-|2-> \textbf{Hinweis}: Verschmelzen hier unmöglich {
           \bi
           \ii BB3 hat mehrere Vorgänger
           \ii Verschmelzen würde BB Bedingung verletzen
           \ei
         }\medskip
-        \ii<3-> \textbf{Analyse}: Finde Block x sodass\ldots{
+        \ii<handout:3-|3-> \textbf{Analyse}: Finde Block x sodass\ldots{
           \bi
           \ii x nur ein \ircmd{Goto} enthält
           \ii x hat y als einzigen Nachfolger
           \ei
         }\medskip
-        \ii<4-> \textbf{Transformation}:{
+        \ii<handout:4-|4-> \textbf{Transformation}:{
           \bi
           \ii Besuche alle Vorgänger von x
           \ii Ersetze jedes x.label durch y.label
@@ -926,6 +942,27 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
   \end{frame}
 
 #+end_src
+
+Die zweite CFG-Optimierung soll Sprünge entfernen, die nur auf Sprünge springen; Doppelsprünge.
+Unsere Codeerzeugung{{{see(08-codegen-control-flow,Codeerzeugung für Kontrollflusskonstrukte)}}} provoziert solche Situationen, da sie für jede Bedingung einen Else-Block anlegt auch wenn es auf Quellcodeebene keinen Else-Zweig gab.
+Diese Sprünge sind offensichtlich unnötig, da sie immer das gleiche machen. In gewisser Weise sind diese Situationen auch konstante Operationen, allerdings auf der Ebene des Kontrollflusses und nicht, wie bei der Konstantenfaltung, auf der Ebene des Datenflusses.
+
+Bemerkenswert ist, das solche Doppelsprünge nicht in allen Fällen durch die, bereits diskutierte, Blockverschmelzung abgedeckt ist.
+Besehen sie sich das Beispiel und BB2:
+In Rückrichtung können wir BB2 nicht verschmelzen, da es mehrere Vorgänger hat.
+In Vorwärtsrichtung können wir BB2 nicht mit BB3 verschmelzen, da dieser selbst auch mehrere Vorgänger hat.
+Zwar würde das Verschmelzen in beiden Fällen kein Problem darstellen, da BB2 selbst keine Instruktionen hat, aber wir müssten dafür bei der Verschmelzungsoptimierung einen Sonderfall für leere Blöcke einbauen.
+Besser ist es eine separate Optimierungsroutine zu bauen, die spezifisch auf Doppesprünge abstellt.
+
+Die *Analyse* für diese Optimierung ist relativ einfach:
+Wir suchen alle Basisblöcke ~x~ die genau ein ~Goto~ enthalten.
+Damit ist bereits sichergestellt, dass der Block nur einen Nachfolger (~y~) hat.
+
+Die *Transformation* sieht dann so aus, dass wir in der ganzen Funktion nach Labeln suchen, die auf den Block ~x~ zeigen.
+Egal ob diese in einem ~Goto~ oder einem ~IfGoto~ vorkommen.
+Einschränken können wir diese Suche, indem wir dem Kontrollflussgraphen rückwärts zu den Vorgängern von ~x~ gehen.
+In den gefunden Sprüngen ersetzen wir das ~x~-Label durch das ~y~-Label.
+Wiederum überlassen wir das Aufräumen des toten Basisblocks der nun folgenden Dead-Block-Elimination.
 
 #+begin_src latex
   \dividerframe{Aufräumen}
@@ -944,13 +981,13 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
           \ii Blöcke die nie angesprungen werden
           \ei
         }\medskip
-        \ii<2-> \textbf{Analyse}: Finde tote Blöcke{
+        \ii<handout:2-|2-> \textbf{Analyse}: Finde tote Blöcke{
           \bi
           \ii Blöcke ohne Vorgänger
           \ii Keine Label-Adresse im Umlauf
           \ei
         }\medskip
-        \ii<2-> \textbf{Transformation}: Lösche Block {
+        \ii<handout:2-|2-> \textbf{Transformation}: Lösche Block {
           \bi
           \ii Entfernung aller ausgehenden Kanten
           \ii Block bei umgebender Funktion entfernen
@@ -963,7 +1000,35 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
   \end{frame}
   #+end_src
 
+Die restlichen beiden Optimierungen beschäftigen sich mit dem Aufräumen von überflüssigen Programmelementen.
+Zuerst wollen wir, mittels der *Dead-Block-Elimination*, tote Basisblöcke entfernen.
+
+Ein Basisblock ist tot, wenn es keine Möglichkeit mehr gibt ihn zu betreten, er also in keinem Kontrollfluss vorkommen kann.
+Ganz im Allgemeinen ist die Frage, ob ein Basisblock wirklich tot ist gleichbedeutend mit dem *Halteproblem*.
+Stellen Sie sich ein if-Statement mit sehr komplexer Bedingung vor, die von Nutzereingaben abhängig ist.
+Es ist für den Übersetzer schwierig, bis unmöglich, heraus zu finden, ob diese Bedingung jemals wahr wird und der bedingte Block jemals ausgeführt wird oder ob dieser tot ist.
+Wir begnügen uns bei der Dead-Code-Elimination daher mit einer *sicheren Unterapproximation*:
+Nur wenn wir garantieren können, dass der Block tot ist entfernen wir ihn.
+
+Unsere Unterapproximation ist denkbar einfach:
+Wird ein Block niemals angesprungen und ist er nicht der Eingangsblock der Funktion, so ist er sicher tot und kann entfernt werden.
+Wir suchen also in der *Analyse* nach Blöcken, die keinen Vorgänger im CFG haben und nicht der Eingangsblock sind.
+
+Zusätzlich müssen wir darauf achten, dass es keinen Zeiger gibt, der auf diesen Basisblock gibt.
+Zwar ist es in unserer IR-Maschine unmöglich Referenzen auf Label zu erzeugen, aber das gilt im Allgemeinen nicht für alle IR-Sprachen.
+Erlaubt eine IR-Maschine ~ptr := Reference ..BB3~ zu schreiben und Variablen anstatt von statischen Labeln zu verwenden (~Goto ptr~), so müssen wir noch vorsichtiger sein. In diesem Fall würden wir alle Blöcke für die eine Referenz erzeugt wurde auch als *nicht-tot* markieren.
+
+Die *Transformation* ist dann relativ einfach: Wir entfernen den toten Block und alle CFG-Kanten, die von ihm ausgehen, aus der Funktion. 
+
+Bemerkenswert ist, dass das entfernen eines toten Blockes dazu führen kann, dass andere Optimierungen wieder möglich werden.
+So verlangt Verschmelzung, dass der zweite Block nur einen Vorgänger hat.
+Hat der zweite Block allerdings tote Vorgänger, so kann deren Entfernung eine Verschmelzung ermöglichen.
+
+
 ** Elimination toter Instruktionen
+:PROPERTIES:
+:CUSTOM_ID: 09-opt-dead-instruction
+:END:
 #+begin_src latex
   \begin{frame}[t]{Elimination von toten Variablen}
     \begin{center}
@@ -978,13 +1043,13 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
       \ii Durch \structure{Wertepropagation} werden äquivalente Quelloperanden vereinigt
       \ei
     }
-    \ii<8-> \textbf{Analyse}: Finde alle lokalen Variablen, die \advantage{nie gelesen werden}{
+    \ii<handout:8-|8-> \textbf{Analyse}: Finde alle lokalen Variablen, die \advantage{nie gelesen werden}{
       \bi
       \ii \alert{Vorsicht}: Zeiger können Variablen indirekt lesen (Alias-Problem)
       \ii \advantage{Heuristik}: Markiere alle Variablen deren Addresse berechnet wird als \enquote{gelesen}
       \ei
     }
-    \ii<9-> \textbf{Transformation}: Entferne niemals gelesene lokale Variable x {
+    \ii<handout:9-|9-> \textbf{Transformation}: Entferne niemals gelesene lokale Variable x {
       \bi
       \ii Lösche Instruktionen, die x schreiben und kein \ircmd{Call} sind (Seiteneffekte!)
       \ii Lösche x aus der umgebenden Funktion
@@ -995,6 +1060,20 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
   \end{frame}
 
 #+end_src
+
+Neben den toten Blöcken hinterlassen manche Optimierungen auch *tote Instruktionen*.
+Eine Instruktion ist dann tot, wenn ihr Ergebnis oder ihre Seiteneffekte nicht benötigt werden.
+Insbesondere die CVP-Optimierung in Verbindung mit der Konstantenfaltung führt dazu, dass Ergebnisse vorberechnet und durch das Programm propagiert werden.
+Hierdurch verbleiben in den Basisblöcken viele IR-Befehle, die einer Variable einen Wert zuweisen, der niemals ausgelesen wird. Wir können uns diese Zuweisungen also auch getrost sparen.
+
+Wie bei der Suche nach toten Blöcken müssen wir uns einer Heuristik bedienen um tote Instruktionen zu finden.
+Wir ziehen das ganze daher von Seiten der Variablen auf und suchen nach zunächst nach toten Variablen, die niemals gelesen werden und niemals gelesen werden können.
+In der *Analyse* finden wir alle Variablen, die an keiner Stelle in der Funktion als Quelloperand auftreten und daher nie gelesen werden.
+Inbesondere ist darauf zu achten, dass ~Reference var~ eine Variable als gelesen markiert, da der erzeugte Zeiger dazu führen könnte dass eine Variable unbemerkt gelesen wird. Wieder kommt das Alias Problem zum Vorschein.
+
+Die *Transformation* entfernt dann alle Instruktionen, die eine tote Variable als Zieloperanden haben.
+Ausgenommen hier von sind ~Call~-Instruktionen, da diese einen Seiteneffekt haben, den wir auf der Funktions-lokalen Ebene nicht überblicken können.
+Nachdem die toten Instruktionen entfernt wurden, können auch die toten Variablen aus der IR-Funktion gelöscht werden.
 
 * Optimierung im größeren Zusammenhang
 
