@@ -38,6 +38,7 @@
 \newcommand{\psuSectionStop}[2]{% {topic}{lines}
   \setcounter{EndPage}{\theCurrentPage-1}
   \immediate\write\cutfile{\theFirstPage -\theEndPage:#2:#1}%
+  \typeout{Topic: \theFirstPage -\theEndPage:#2:#1}
   \setcounter{FirstPage}{\theCurrentPage}% set FirstPage to new first page
 }
 

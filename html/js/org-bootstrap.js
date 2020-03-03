@@ -157,7 +157,7 @@ $( document ).ready(function() {
         $('#footnotes').appendTo('.col-md-9');
 
         $("div.carousel").each(function (idx, carousel) {
-            $(carousel).click(function(e) {
+            $(carousel).find("div.carousel-inner").click(function(e) {
                 if(e.shiftKey || e.ctrlKey || e.altKey) {
                     $(carousel).carousel('prev');
                 } else {

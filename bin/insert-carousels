@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.8
 
 import sys
 import os
@@ -20,6 +20,7 @@ def make_carousel(label, title, files):
 
     ret += '#+BEGIN_EXPORT html\n'
     ret += '<div class="content">'
+    ret += '<p class="marginnote"><a class="graphic-button" href="'+base+'.sources.html#block-'+label+'">Graphiken und Animationen</a></p>'
     if title:
         ret += f'<span class="marginnote">Folien: {title}</span>\n'
     ret += '<div class="container">'
@@ -53,6 +54,43 @@ def make_carousel(label, title, files):
     ret += '#+END_EXPORT\n'
     return ret
 
+def make_sources_html(tex_log_fd, html_fd):
+    html_fd.write("<html><body>")
+    topic = None
+    block_number = 0
+    heading = False
+    files = []
+
+    def source_block():
+        html_fd.write(f"<div style='min-height: 100vh'> <h2 id='block-{block_number}'>Block {block_number}, {topic}</h2><ul>\n")
+        for fn, page in files:
+            html_fd.write(f"<li><a href='{fn}'>{fn}</a>, Page {page}\n")
+            html_fd.write("</li>\n")
+        html_fd.write("</ul>")
+        
+        html_fd.write("</div>")
+
+
+
+    for line in tex_log_fd.readlines():
+        if line.startswith("Topic:"):
+            topic = line[len("Topic:"):].strip()
+            block_number += 1
+            if files:
+                source_block()
+            files = []
+
+        if m := re.match("<use (.*?), page ([0-9]+)>$", line):
+            fn, page = m.groups()
+            if "fig/" not in fn:
+                fn = "fig/" + fn
+            if (fn, page) not in files:
+                files.append((fn, page))
+
+    if files:
+        source_block()
+
+
 def find_blocks(lines):
     start_line = None
     for idx, line in enumerate(lines):
@@ -72,6 +110,7 @@ if __name__ == "__main__":
 
     org, topics_fn = sys.argv[1:]
     basename = os.path.basename(topics_fn)
+    global base
     base,_ = os.path.splitext(basename)
     output_dir = f"build/html"
     with open(topics_fn, "rb") as fd:
@@ -86,6 +125,10 @@ if __name__ == "__main__":
                 topics[(topic, block)].append(fn)
             logging.info("Block %s slides: %s", block, len(topics[(topic, block)]))
             logging.debug(topic)
+
+    with open(topics_fn.replace(".topics", ".log")) as tex_log_fd:
+        with open(f"{output_dir}/{base}.sources.html", "w+") as html_fd:
+            make_sources_html(tex_log_fd, html_fd)
 
     with open(org) as fd:
         lines = list(fd.readlines())

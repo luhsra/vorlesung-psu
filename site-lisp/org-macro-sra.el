@@ -38,9 +38,8 @@
     (concat
      "#+begin_export html\n"
      (format "<h2><a href=\"%s\">%s</a></h2>" html (org-global-prop-value "subtitle"))
-     (format "<div class=\"media\"><div class=\"media-left\"><img class=\"img-index\" src=\"%s\"></div>" img)
-     "<div class=\"media-body\">\n"
-     
+     (format "<div class=\"row\"><div class=\"col-md-4\"><img class=\"img-index\" src=\"%s\"></div>" img)
+     "<div class=\"col-md-8\">\n"
      "<p> Abschnitte: "
      (message "%s" (org-macro-headlines file))
      "</p></div></div>\n"

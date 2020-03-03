@@ -50,6 +50,16 @@ a.headlineref:link {
     text-size: 80%;
 }
 
+a.graphic-button {
+    color:white;
+    text-decoration: none;
+    background: none;
+}
+
+a.graphic-button:hover {
+    color:black;
+}
+
 button.execute {
     display: inline;
     position: relative;
