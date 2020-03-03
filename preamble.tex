@@ -286,3 +286,22 @@
   \egroup%
   \global\setbox\@overlaybox=\copy\@overlaybox\relax%
 }
+
+\usepackage{default}
+\makeatletter
+\newif\ifOnBeamerModeTransition
+\newcommand{\slideselection}{1-}%
+\newenvironment{handoutframeselect}[1][1-]{%
+  \begingroup%
+  \mode<handout>{%
+    \gdef\beamer@currentmode{beamer}%
+    \OnBeamerModeTransitiontrue%
+    \renewcommand{\slideselection}{#1}}%
+}{%
+  \ifOnBeamerModeTransition%
+    \OnBeamerModeTransitionfalse%
+    \gdef\beamer@currentmode{handout}%
+  \fi%
+  \endgroup%
+}
+\makeatother
