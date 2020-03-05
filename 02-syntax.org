@@ -795,7 +795,7 @@ Innerhalb der Funktion wird für jede Regel ein bedingter Block emittiert, der m
 Die erzeugte Bedingung prüft, ob das nächste Zeichen in der PREDICT-Menge, die zur aktuellen Regel gehört, enthalten ist (~in~).
 Innerhalb des bedingten Blockes werden, nacheinander, alle Symbole der rechten Seite aus dem Tokenstrom gelesen.
 Ist ein Symbol ein Terminal, so lässt der Generator den Parser das Zeichen direkt in der Funktion aus dem Strom konsumieren.
-Hierbei bekommt die ~read()~ Funktion das optionale Argument ~expected=~, sodass sie prüft, ob das vorderste Token wirklich von der entsprechenden Klasse ist. Ist dies nicht der Fall, so wird ein Parserfehler geworfen.
+Hierbei bekommt die ~read()~-Funktion das optionale Argument ~expected=~, sodass sie prüft, ob das vorderste Token wirklich von der entsprechenden Klasse ist. Ist dies nicht der Fall, so wird ein Parserfehler geworfen.
 Ist das Symbol ein Nicht-Terminal, so delegieren wir das Parsen für diese Teil der rechten Seite an die entsprechende Funktion (rekursiver Abstieg).
 Weiterhin legt der Generator für jedes Symbol eine Variable an, um das Token (Terminale) bzw. den Unterbaum (Nicht-Terminale) aufzufangen und zur Konstruktion des zurückgegebenen Baumes zu verwenden.
 
@@ -1171,7 +1171,7 @@ Diese Klasse von Grammatiken hat weder das Problem der gemeinsamen Präfixe noch
 Allerdings ist die Analyse und die Konstruktion dieser Parser deutlich aufwendiger zu verstehen als bei LL(1)-Parsern.
 
 In a nutshell ist der Unterschied zwischen LL(k) und LR(k) in etwa folgender:
-Bei einem LL Parser muss immer anhand des Look-Aheads direkt entschieden werden, welche Regel nun im Folgenden angewendet werden muss.
+Bei einem LL-Parser muss immer anhand des Look-Aheads direkt entschieden werden, welche Regel nun im Folgenden angewendet werden muss.
 Dies bringt eben genau die Probleme, die wir bei einem gemeinsamen Präfix haben, mit sich:
 Dort können wir diese eindeutige Entscheidung nicht sofort treffen.
 LR(k)-Parser haben die Möglichkeit, beliebige Zeit in einem Zustand des "sich noch nicht entschieden habens" (tristate) zu bleiben.
