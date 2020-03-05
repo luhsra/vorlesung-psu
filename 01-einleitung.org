@@ -479,10 +479,10 @@ Jeder dieser Abschnitte wird in einer Vorlesung behandelt und soll einen Überbl
   \end{frame}
 #+END_SRC
 
-Während wir in der Vorlesung die theoretischen Grundlagen kennen lernen, soll Ihr Wissen in der Übung weiter vertieft werden.
+Während wir in der Vorlesung die theoretischen Grundlagen kennenlernen, soll Ihr Wissen in der Übung weiter vertieft werden.
 Dies wird zum einen dadurch geschehen, dass wir Ihnen passende theoretische Aufgaben zur Bearbeitung stellen.
 Zum anderen sollen Sie auch praktische Übungen an einem Beispielübersetzer, der von uns bereitgestellt wird, durchführen.
-Dieser Übersetzer verarbeitet bereits die rudimentäre L0 Sprache und wird von Ihnen um diverse Fähigkeiten erweitert werden.
+Dieser Übersetzer verarbeitet bereits die rudimentäre L0-Sprache und wird von Ihnen um diverse Fähigkeiten erweitert werden.
 Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eines solchen Softwareprojekts kennen und können die Arbeit eines Übersetzers "live und in Farbe" erleben.
 
 * Organisation der Veranstaltung
