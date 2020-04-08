@@ -129,10 +129,10 @@ build/tangle/%.tex: %.org
 	bin/delete-frames $@
 
 build/%.slides.tex: build/tangle/%.tex build
-	@echo "\\documentclass[beamer,xcolor={table,rgb,dvipsnames}]{beamer}\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
+	@echo "\\documentclass[beamer,xcolor={table,rgb,dvipsnames}]{beamer}\\input{preamble}\\begin{document}\\input{$<}\\end{document}" > $@
 
 build/%.handout.tex: build/tangle/%.tex build
-	@echo "\\documentclass[handout,xcolor={table,rgb,dvipsnames}]{beamer}\\input{preamble}\\\\begin{document}\\\\input{$<}\\\\end{document}" > $@
+	@echo "\\documentclass[handout,xcolor={table,rgb,dvipsnames}]{beamer}\\input{preamble}\\begin{document}\\input{$<}\\end{document}" > $@
 
 build/tangle/%.html: %.org
 	${EC} -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"
