@@ -1,4 +1,5 @@
-REMOTE=lab:/proj/www/sra.uni-hannover.de/Lehre/V_PSÜ/skript/.
+REMOTE_SEVER=lab
+REMOTE=${REMOTE_SERVER}:/proj/www/sra.uni-hannover.de/Lehre/V_PSÜ/skript/.
 
 ORG_PDF=$(shell echo 0*.org 1*.org)
 ORG=index.org $(ORG_PDF)
@@ -129,10 +130,10 @@ build/tangle/%.tex: %.org
 	bin/delete-frames $@
 
 build/%.slides.tex: build/tangle/%.tex build
-	@echo "\\documentclass[beamer,xcolor={table,rgb,dvipsnames}]{beamer}\\input{preamble}\\begin{document}\\input{$<}\\end{document}" > $@
+	@bin/gen-latex-root $< > $@
 
 build/%.handout.tex: build/tangle/%.tex build
-	@echo "\\documentclass[handout,xcolor={table,rgb,dvipsnames}]{beamer}\\input{preamble}\\begin{document}\\input{$<}\\end{document}" > $@
+	@bin/gen-latex-root $< > $@
 
 build/tangle/%.html: %.org
 	${EC} -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"
@@ -163,7 +164,7 @@ build/html/%.handout.html: %.org build/html/%.handout/.split-stamp bin/insert-ca
 	${EC} -e "(org-export-to-html-file \"$$PWD/$(patsubst %.org,build/%.handout.org,$<)\" \"$$PWD/$@\")"
 
 # Special cases for the index file
-build/tangle/index.html: $(shell echo *.org)
+build/tangle/index.html: $(shell echo *.org) COPYING.footer.html
 index index.view: build/html/index.html
 build/html/index.html: build/tangle/index.html
 	cp $< $@

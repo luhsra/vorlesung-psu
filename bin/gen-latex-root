@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+
+import sys
+
+print(r"""\documentclass[beamer,xcolor={table,rgb,dvipsnames}]{beamer}
+\input{preamble}
+\begin{document}
+\input{""" + sys.argv[1] + """}
+\end{document}""")
