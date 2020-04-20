@@ -50,6 +50,17 @@
 \end{frame}
 #+END_SRC
 
+#+begin_export html
+<div class="alert alert-danger">
+<strong>Tastenkombinationen im Skript:</strong><br/>
+<ul>
+<li>Mausklick: Im Folienstapel vorwärts gehen.</li>
+<li>Shift+Mausklick: Im Folienstapel rückwärts gehen.</li>
+</ul>
+</div>
+#+end_export
+
+
 * Gedanken zu dieser Vorlesung                                     :noexport:
 Mit der ersten Vorlesung, soll der Studierende für die Vorlesung
 motiviert werden. Es soll verstehen, welcher ganz konkreten
@@ -117,7 +128,7 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
     \bi
     \ii Welche Fragen muss ich an eine neue Programmiersprache stellen?
     \ii Welche Konstrukte müssen prinzipbedingt teuer sein?
-    \ii Demystifizierung der Compiler Black Box
+    \ii Demystifizierung der Black Box \enquote{Übersetzer}
     \ei
   }
   \ei
@@ -134,7 +145,7 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
     }
     \ii<+-> Beispiel: Über einen Zahlenvektor iterieren. {
 
-    \begin{code}<.>[tag=C]
+    \begin{code}<1|handout:1>[tag=C]
       \begin{C}[]
         int sum = 0;
         int *it;
@@ -145,7 +156,7 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
         }
       \end{C}
     \end{code}%
-    \begin{code}<+>[tag=C++03]
+    \begin{code}<2|handout:2>[tag=C++03]
       \begin{CPP}[]
         int sum = 0;
         std::vector<int>::iterator it;
@@ -156,14 +167,14 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
         }
       \end{CPP}
     \end{code}%
-    \begin{code}<+->[tag=Python]
+    \begin{code}<3|handout:3>[tag=Python]
       \begin{py}[]
         sum = 0
         for x in vec:
             sum += x
       \end{py}
     \end{code}%
-    \begin{code}<+>[tag=C++11]
+    \begin{code}<4-|handout:4->[tag=C++11]
       \begin{CPP}[]
         int sum = 0;
         for (int x : vec) { // foreach Schleife
@@ -172,11 +183,11 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
       \end{CPP}
     \end{code}
   }
-    \ii<+> Gemeinsame Konzepte von verschiedenen Programmiersprachen {
+    \ii<5-> Gemeinsame Konzepte von verschiedenen Programmiersprachen {
       \bi
       \ii Datentypen, Objekte, Benennung von Objekten, Operationen auf Objekten
       \ii Gemeinsamkeiten erleichtern erfahrenen Programmierern den Einstieg.
-      \ii Unendliche Mannigfaltigkeit in unendlicher Kombination!
+      \ii Unendliche Mannigfaltigkeit in unendlicher Kombination! (Spock)
       \ei
     }
     \ei
@@ -491,7 +502,6 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eine
 :END:
 
 #+BEGIN_SRC latex
-  %%ONLY%%
     \begin{frame}[t]{Organisatorisches: Vorlesung}
     \PutAt{(10.5cm,1cm)}{
       \includegraphics[width=2cm]{fig/01-dietrich}
@@ -524,25 +534,28 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eine
       \includegraphics[width=2cm]{fig/01-landsberg}\\
     }
     \bi
-    \ii Tafelübungen: 6 Termine {
+    \ii \structure{Tafelübungen}: 6 Termine {
       \bi
       \ii Verantwortlicher: \textbf{Tobias Landsberg}
-      \ii Freitag 10:30-12:00 Uhr, https://twitch.tv/luhsra
+      \ii Regulär: Freitag 10:30-12:00 Uhr, https://twitch.tv/luhsra
+      \ii \textbf{Sondertermin}: Donnerstag 30.04.2020, 10:30-12:00
       \ii Live-Stream mit Rückkanal, Vorlesungsaufzeichnung im Stud.IP
       \ii Vertiefung der Vorlesung, Erörterung der Übungsaufgaben
       \ei
     }\medskip
-    \ii Übungen: 6 Aufgaben mit theoretischem und praktischen Anteil {
+    \ii \structure{Übungen}: 6 Aufgaben mit theoretischem und praktischen Anteil {
       \bi
       \ii Betreuung in Kleingruppen durch studentische Tutoren
       \ii Treffen der Kleingruppen im Mumble, Beantwortung von Detailfragen
-      \ii Bearbeitung in \textbf{Zweierteams}, Abgabe mit Git und SRAbmit
+      \ii Bearbeitung in \textbf{Zweierteams}, Abgabe mit SRAbmit
       \ei
     }\medskip
-    \ii Bonuspunkte auf die Klausur {
+    \ii \structure{Bonuspunkte} auf die Klausur {
       \bi
-      \ii Bewertung der Übungsaufgaben, maximal +10\%  Klausurpunkte
-      \ii Bonuspunkte helfen \ALERT{nicht} über die Bestehensgrenze.
+      \ii Bewertung der Übungsaufgaben, maximal +10\%  Klausurpunkte.
+      \ii Bonuspunkte helfen \ALERT{nicht} über die Bestehensgrenze.\\[2ex]
+      \ii \textbf{Falls möglich}: Vor-Ort Testatklausur mit +10\% Klausurpunkte\\
+          Eher unwahrscheinlich, wir halten Sie auf dem Laufenden!
       \ei
     }
     \ei
@@ -551,9 +564,9 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eine
 
   \begin{frame}{Wo bekomme ich Hilfe?}
     \begin{enumerate}
-      \ii Übungspartner
-      \ii Kommilitoninnen\hfill\raisebox{0pt}[0pt]{\OrangeBox[align=left, scale content=0.85]{Reihenfolge beachten!}\vspace{2cm}}
-      \ii Stud.IP-Forum
+      \ii ÜbungspartnerInnen
+      \ii KommilitonInnen\hfill\raisebox{0pt}[0pt]{\OrangeBox[align=left, scale content=0.85]{Reihenfolge beachten!}\vspace{2cm}}
+      \ii \STRUCTURE{Stud.IP-Forum}
       \ii Übungstutoren
       \ii \textcolor{luhgray}{Mitarbeiter \tiny{\href{mailto:psu@sra.uni-hannover.de}{psu@sra.uni-hannover.de}}}
     \end{enumerate}
@@ -764,7 +777,7 @@ Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linke
       \bi
       \ii Variablen und Funktionen müssen deklariert sein, um sie zu nutzen.
       \ii Eine Ganzzahl ist kein valider Funktionsname.
-      \ii \enquote{\texttt{"12345(b, c)}} -- ist kein valides C-Programm.
+      \ii \enquote{\texttt{12345(b, c)}} -- ist kein valides C-Programm.
       \ei
     }
     \ei
@@ -991,21 +1004,21 @@ FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
     \begin{center}
       \Huge$\Downarrow$
     \end{center}
-    \begin{code}<1>[tag=C]
+    \begin{code}<1|handout:1>[tag=C]
       \begin{C}[]
         int foo() {
           return 3;
         }
       \end{C}
     \end{code}%
-    \begin{code}<2>[tag={RV32I}]
+    \begin{code}<2|handout:2>[tag={RV32I}]
       \begin{asm}[]
         foo:
           lui a0, 3
           ret
       \end{asm}
     \end{code}%
-    \begin{code}<3>[tag={Kobold}]
+    \begin{code}<3|handout:3>[tag={Kobold}]
       \begin{columns}
         \begin{column}{0.25\textwidth}
           \centering

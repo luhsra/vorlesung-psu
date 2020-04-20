@@ -62,12 +62,15 @@ def make_sources_html(tex_log_fd, html_fd):
     files = []
 
     def source_block():
-        html_fd.write(f"<div style='min-height: 100vh'> <h2 id='block-{block_number}'>Block {block_number}, {topic}</h2><ul>\n")
-        for fn, page in files:
-            html_fd.write(f"<li><a href='{fn}'>{fn}</a>, Page {page}\n")
-            html_fd.write("</li>\n")
-        html_fd.write("</ul>")
-        
+        html_fd.write(f"<div style='min-height: 100vh'> <h2 id='block-{block_number}'>Block {block_number}, {topic}</h2>\n")
+        if files:
+            html_fd.write("<ul>")
+            for fn, page in files:
+                html_fd.write(f"<li><a href='{fn}'>{fn}</a>, Page {page}\n")
+                html_fd.write("</li>\n")
+            html_fd.write("</ul>")
+        else:
+            html_fd.write(f"<p>In diesem Abschnitt gab es keine Graphiken</p>\n")
         html_fd.write("</div>")
 
 
@@ -76,8 +79,7 @@ def make_sources_html(tex_log_fd, html_fd):
         if line.startswith("Topic:"):
             topic = line[len("Topic:"):].strip()
             block_number += 1
-            if files:
-                source_block()
+            source_block()
             files = []
 
         if m := re.match("<use (.*?), page ([0-9]+)>$", line):
