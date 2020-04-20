@@ -153,6 +153,6 @@ pre span.org-rainbow-delimiters-depth-8  {color:#80a880;}
 pre span.org-rainbow-delimiters-depth-9  {color:#887070;}
 pre span.org-sh-quoted-exec              {color:#FF1493;}
 
-strong, b {
+strong, b, .structure {
     color: #00509b;
 } 

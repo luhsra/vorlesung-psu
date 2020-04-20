@@ -1,5 +1,6 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 01 - Einleitung
+#+DATE: [2020-04-21]
 #+SETUPFILE: ) setup.org
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
@@ -203,12 +204,12 @@ Dem ist nicht so und sowohl Programmiersprachen, als auch Übersetzer, sind ein 
 
 Diese beständige Entwicklung stellt allerdings auch eine Herausforderung für Sie, als Informatiker oder Informatik-geneigter Ingenieur, dar.
 Mit den Programmiersprachen, die Sie im Laufe Ihres Studiums konfrontiert sind, werden Sie nicht über die nächsten 40 Jahre kommen.
-Um zukunftssicher zu werden, brauchen Sie nicht nur rein technisches Wissen über eine oder zwei Sprachen, sondern systematisches und konzeptionelles Wissen, das nicht so schnell altert, wie der Hype-Train vom Java Bahnhof, über die C# Hochebene, zur **Rust**-Mine braucht.
+Um zukunftssicher zu werden, brauchen Sie nicht nur rein technisches Wissen über eine oder zwei Sprachen, sondern systematisches und konzeptionelles Wissen, das nicht so schnell altert, wie der Hype-Train vom **Java** Bahnhof, über die **C#** Hochebene, zur **Rust**-Mine braucht.
 
 Aber nicht nur die fortschreitende Entwicklung einzelner Programmiersprachen oder das Aufkommen von ganz neuen Sprachen bringt dauerhafte Relevanz für das Thema, sondern auch die schiere Prävalenz und die Vielfalt an Sprachen, die von Computern mechanisch verarbeitet werden.
 Sprachen werden nicht nur für die Kodifikation von ausführbaren Programmen verwendet, sondern, unter anderem, auch zur Aufbereitung von Informationen (z.B. [[https://www.w3.org/standards/webdesign/htmlcss][HTML5]] oder [[http://www.texample.net/tikz/][TiKZ]]) oder zur Beschreibung von Datenabfragen (z.B. SQL oder [[http://overpass-turbo.eu/s/M4M][Overpass]]).
 
-Im Laufe Ihres Lebens wird an Sie, nachdem entschieden wurde Programmiersprache R++ in Version 2034 zu verwenden, die Anforderung gestellt werden, möglichst schnell **effektiv** darin zu werden ein möglichst **effizientes** Programm zu schreiben.
+Im Laufe Ihres Lebens wird, nachdem in ihrem Projekt entschieden wurde die Programmiersprache R++ in Version 2034 zu verwenden, die Anforderung an Sie gestellt werden, möglichst schnell **effektiv** darin zu werden ein möglichst **effizientes** Programm zu schreiben.
 Die von Ihnen erwartete Effektivität besteht darin, dass Sie die Fähigkeit erarbeiten, überhaupt ein Programm zu schreiben.
 Die erwartete Effizienz besteht darin, dass das erstellte Programm nicht unrealistisch lange für eine einfache Aufgabe braucht.
 Aber auch, wenn Sie selbst in die Lage kommen, die Wahl der Programmiersprache für ein neues Projekt zu treffen, brauchen Sie das nötige Wissen, um eine informierte Entscheidung treffen zu können.
@@ -243,6 +244,7 @@ Um die Ladezeit der Seite zu verringern, haben wir darauf verzichtet diese Funkt
 Durch einen Klick auf den "Load Interpreter" Button, wird [[https://github.com/viebel/klipse][Klipse]] nachgeladen und die Beispiele erwachen zum Leben und können auch direkt im Browser editiert werden.
 Allerdings erfolgt das Nachladen von Klipse von Drittseiten, auf deren Einstellung zu Ihrer Privatsphäre wir keinen Einfluss haben.
 Falls Sie Browserplugins zur digitalen Selbstverteidigung, wie [[https://addons.mozilla.org/de/firefox/addon/umatrix/][uMatrix]], nutzen, müssen Sie Ihre Einstellungen entsprechend anpassen.
+Ansonsten können Sie den Codeschnipsel auch herauskopieren und als Python (leider nur Version 2) Programm ausführen
 
 * Inhalt der Veranstaltung
 :PROPERTIES:
@@ -432,7 +434,7 @@ Die einzelnen Schritte der Übersetzung können wir in mindestens vier Abschnitt
 Jeder dieser Abschnitte wird in einer Vorlesung behandelt und soll einen Überblick über das jeweilige Thema bieten.
 
 - Syntaktische Analyse :: Die Übersetzung startet in der syntaktischen Analyse mit dem Einlesen des Programms als Zeichenkette (z.B. von der Festplatte). Dabei haben die einzelnen Zeichen noch keinerlei *Bedeutung* (oder Semantik) für den Übersetzer, sondern es ist nur ein Array von Bytes. Zu diesem Zeitpunkt ist der Quellcode noch nach dem jeweiligen Gusto des Programmierers (z.B. überflüssige Leerzeichen) formatiert. Durch die syntaktische Analyse überführen wir diese Sequenz von Bytes in einen **abstrakten Syntaxbaum** (AST), der die hierarchische Programmstruktur widerspiegelt. In dem gezeigten Beispiel, ist die Bedingung ~a > b~ als erstes Kind der Bedingung im Baum eingeordnet. Um diesen Schritt der Strukturextraktion zu machen, werden wir uns die *Lexing* (Abtastung) und *Parsing* (Zerteilung) anschauen. Nachdem wir ein Programm syntaktisch analysiert haben, wissen wir, ob es einen Syntaxfehler enthält. Allerdings ist noch nicht klar, ob es wirklich ein valides Programm der gewünschten Sprache ist, denn es könnte zum Beispiel noch Typfehler enthalten.
-- Semantische Analyse :: Den zweiten notwendigen Schritt der Programmanalyse führen wir auf dem AST durch. Dabei analysieren wir den AST auf seine semantische Bedeutung. Zum einen bedeutet das den Schritt *vom Bezeichner zum Namen* (was ist die Bedeutung eines Variablennamens) zu machen und für jede Verwendung einer Variable die gültige Definition zu finden. Im Beispiel sieht man dem AST erst nach der semantischen Analyse an, dass ~a~ eine lokale und ~b~ eine globale Variable ist. Weiterhin wird das Programm auf Typkorrektheit hin untersucht: Passen die von den Blättern des Baumes (unten) zur Wurzel (oben) hin propagierten Datentypen zu den verwendeten Operationen? Würde man im Beispiel schreiben ~a > "hallo"~, wäre dies zwar syntaktisch Korrekt, jedoch nicht semantisch, da man Zahlen nicht mit Zeichenketten vergleichen darf. Nach der semantischen Analyse wissen wir endgültig, ob das Programm ein valides Programm ist. Tritt bis hier kein Fehler bei der Übersetzung auf, darf auch in den nachfolgenden Schritten kein Fehler mehr auftreten.
+- Semantische Analyse :: Den zweiten notwendigen Schritt der Programmanalyse führen wir auf dem AST durch. Dabei analysieren wir den AST auf seine semantische Bedeutung. Zum einen bedeutet das den Schritt *vom Bezeichner zum Namen* (was ist die Bedeutung eines Variablennamens) zu machen und für jede Verwendung einer Variable die gültige Definition zu finden. Im Beispiel sieht man dem AST erst nach der semantischen Analyse an, dass ~a~ eine lokale und ~b~ eine globale Variable ist. Weiterhin wird das Programm auf Typkorrektheit hin untersucht: Passen die von den Blättern des Baumes (unten) zur Wurzel (oben) hin propagierten Datentypen zu den verwendeten Operationen? Würde man im Beispiel schreiben ~23 > "hallo"~, wäre dies zwar syntaktisch Korrekt, jedoch nicht semantisch, da man Zahlen nicht mit Zeichenketten vergleichen darf. Nach der semantischen Analyse wissen wir endgültig, ob das Programm ein valides Programm ist. Tritt bis hier kein Fehler bei der Übersetzung auf, darf auch in den nachfolgenden Schritten kein Fehler mehr auftreten.
 - Erzeugung des Zwischencodes :: Mit dem Übergang vom AST zum Zwischencode (engl. intermediate representation, IR) klopfen wir die hierarchische Baumstruktur einzelner Operationen platt und machen einen großen Schritt hin zur realen Maschine. Der Zwischencode moderner Übersetzer ist an Assemblerbefehle angelehnt, enthält aber noch genug Informationen, um weitreichende Programmoptimierungen durchzuführen. Der Zwischencode enthält keine sprachspezifischen Konstrukte mehr und kann daher für Sprachfrontends verwendet werden. Zum Beispiel wird sowohl die Programmiersprache [[https://www.rust-lang.org/][Rust]] als auch C++ (bei Verwendung von clang) in LLVM-IR[fn::Einen kurzen Überblick über LLVM-IR bietet der folgende Blogeintrag: https://idea.popcount.org/2013-07-24-ir-is-better-than-assembly/]
  übersetzt, bevor es an die Optimierung und Erzeugung der Binärdatei geht.
    #+CAPTION: Mehrere Frontends übersetzen in die gleiche Zwischensprache und erlauben es daher den selben Optimierer und verschiedene Maschinenbackends zu verwenden. Die Abbildung stammt aus dem [[http://aosabook.org/en/llvm.html][AOSA Buch]], CC BY-SA 3.0, Chris Lattner.
@@ -698,7 +700,7 @@ Das in den Folien gezeigte Bild kennen Sie bereits aus der Veranstaltung "[[http
 Zur Erinnerung:
 Das Betriebssystem nimmt eine Teilinterpretation des Anwenderprogamms vor, indem es jeden Systemaufruf (~int 0x80~, ~sysenter~) aus dem Maschinenprogramm interpretiert; alle anderen Befehle (~mov~, ~add~) werden direkt auf der Befehlssatzebene ausgeführt.
 In PSÜ werden wir uns nicht mit (Teil)Interpretation auseinandersetzen, sondern mit der Übersetzung von Hochsprachenprogrammen in Assemblersprachenprogrammen.
-Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linkens (FIXME), der neben dem Assemblieren, die letzten Schritte zum ausführbaren Binärprogramm fehlt.
+Dabei werfen wir auch noch kurzen Blick auf den nachgelagerten Schritt der Linkens, der neben dem Assemblieren, die letzten Schritte zum ausführbaren Binärprogramm fehlt.
 
 #+begin_src latex
   \begin{frame}[t]{"Virtuelle Maschinen"}
@@ -808,7 +810,7 @@ Um dieses sehr abstrakte Konzept zu verdeutlichen, wollen wir einen *Prozessor* 
 
 #+begin_src python
   def prozessor(memory, program, maximal_steps=10):
-      """Prozessor fuer eine virtuelle Maschine mit 2 Befehlen: add und print"""
+      """Prozessor fuer eine virtuelle Maschine mit 2 Befehlen: inc und print"""
       # Der Programmzaehler zeigt den naechsten Befehl an
       pc = 0
       steps = 0
@@ -819,7 +821,7 @@ Um dieses sehr abstrakte Konzept zu verdeutlichen, wollen wir einen *Prozessor* 
           (operation, operand) = program[pc]
 
           # Das if: Dekodierung der Instruktion
-          if operation == "add":
+          if operation == "inc":
               # Das Ausführen der Operation
               memory[operand] += 1
           elif operation == 'print':
@@ -835,9 +837,9 @@ Um dieses sehr abstrakte Konzept zu verdeutlichen, wollen wir einen *Prozessor* 
 
   program = [
       # (Operation, Speicherzelle)
-      ("add",   0),
-      ("add",   0),
-      ("add",   1),
+      ("inc",   0),
+      ("inc",   0),
+      ("inc",   1),
       ("print", 0)
   ]
 
@@ -855,7 +857,7 @@ Beides übergeben wir dem Prozessor, der die Befehlsfolge sequentiell ausführt[
 
 Das einzige, was in dem Beispiel fehlt, ist die *Sprache der virtuellen Maschine*, denn diese ist nur im Skript, und hoffentlich jetzt auch in Ihren Köpfen, zu finden.
 Kurz könnte man sagen:
-Ein Programm unserer Beispielsprache ist eine Liste von Befehlen, die jeweils aus Operation und Operand bestehen; dabei muss die Operation eine der Zeichenketten ~"add"~ oder ~"print"~ sein.
+Ein Programm unserer Beispielsprache ist eine Liste von Befehlen, die jeweils aus Operation und Operand bestehen; dabei muss die Operation eine der Zeichenketten ~"inc"~ oder ~"print"~ sein.
 Der Operand ist die Adresse einer Speicherzelle, von denen wir 5 haben, kodiert als Ganzzahl.
 
 Mithilfe dieser Sprachdefinition können Sie nun noch einmal an die Aufgaben 3 und 4 herangehen und werden sehen, dass das Einfügen eines invaliden Befehls zwar Vordergründig zu einem ~RuntimeError~ geführt hat, aber der Prozessor eigentlich richtig gehandelt hat.
@@ -868,14 +870,14 @@ Um eine möglichst präzise Prüfung vornehmen zu können, ist es sinnvoll, dies
 #+begin_src python
   def sprache(program):
       for (operation, operand) in program:
-          if operation not in ("add", "print"):
+          if operation not in ("inc", "print"):
               raise RuntimeError("Invalide Operation: " + str(operation))
           if operand < 0 or operand > 5:
               raise RuntimeError("Invalider Operand: " + str(operand))
       print("Valides Programm")
 
   programm = [
-      ("add", 10),
+      ("inc", 10),
       ("prnt", 3)
   ]
   sprache(programm)
@@ -887,8 +889,6 @@ Die Funktion ~sprache()~ könnte so wie sie hier steht auch Teil eines Übersetz
 Dieser wird auch zuerst prüfen, ob das übergebene Programm von den Sprachregeln abgedeckt ist, bevor das Programm in die Sprache einer anderen virtuellen oder realen Maschine übersetzt wird.
 
 Auf den Folien finden Sie weitere Beispiele für reale bzw. virtuelle Maschinenmodelle (RISC-V und C).
-
-FIXME: Die Folien hier könnten auch in die Optimierungsvorlesung passen.
 
 #+begin_src latex
   \begin{frame}{Beobachtbare Zustände und Zustandsfolgen}
@@ -1041,7 +1041,7 @@ Genauso ist es möglich, dass ein Übersetzer von RISC-V-Assembler nach C (umgek
 
 Jedoch stellt sich die Frage, wann wir von einem *korrekten* Übersetzer bzw.
 einer korrekten Übersetzung eines Programms sprechen können.
-Es ist natürlich notwendig, dass ein Übersetzer für jedes valide Quellprogramm, was er durch seine Validierungsfunktion sicherstellt, ein valides Zielprogramm erzeugt.
+Es ist natürlich notwendig, dass ein Übersetzer für jedes valide Quellprogramm, die er durch seine Validierungsfunktion vorher überprüft, ein ebenfalls valides Zielprogramm erzeugt.
 Diese notwendige Bedingung ist allerdings ganz sicher nicht hinreichend, da ein Übersetzer, der immer dasselbe Programm ausgibt, egal mit was wir ihm füttern, ganz sicher nicht nützlich ist.
 
 Daher müssen wir noch einmal zu unserem Maschinenmodell zurückkehren und schauen, was wir vom Übersetzer erwarten.
@@ -1059,8 +1059,8 @@ Der Hintergrund dieser Entscheidung ist, dass andere Threads die geschriebenen W
 
 Eine andere wichtige Erkenntnis aus der Definition der korrekter Übersetzungen ist das *nur* der beobachtbare Zustand erhalten werden muss.
 Alles was die Sprache als nicht beobachtbar deklariert, kann vom Übersetzer beliebig verändert werden.
-Zum Beispiel, entfernen Übersetzer für C lokale Variablen aus Funktionen, die niemals verwendet werden.
-Dies ist laut C-Standard eine völlig valide Optimierung, da die Werte von lokalen Variablen nicht beobachtbar sind.
+Zum Beispiel entfernen C-Übersetzer lokale Variablen aus Funktionen, wenn diese niemals verwendet werden.
+Dies ist laut C-Standard eine legale Optimierung, da die Werte von lokalen Variablen nicht beobachtbar sind.
 Umso mehr ein Maschinenmodell als nicht beobachtbar deklariert, umso leichter fällt es einem optimierenden Übersetzer ein effizientes Zielprogramm zu erzeugen.
 Auf den Folien ist das Beispiel mit dem Kobold gezeigt, um genau dies zu verdeutlichen.
 Für die Funktion ~foo()~ ist es unerheblich, wie die Funktionalität implementiert ist, da nur ihre Ausgabe von uns beobachtbar ist.
@@ -1194,11 +1194,11 @@ Prinzipiell haben wir zwei Möglichkeiten, die beide ihre Vor- und Nachteile hab
 Zum einen können wir, neben dem Übersetzer für L, der in L geschrieben ist, auch einen Interpreter für L in M schreiben.
 Da ein Interpreter, zumindest wenn man erlaubt, dass er langsam sein darf, weniger Komplex ist als ein Übersetzer, spart man bei der Entwicklung und der Portierung auf neue Plattformen Zeit.
 Nachteil an dieser Variante ist, dass der Interpreter, wenn wir ihn nicht an anderer Stelle noch einmal verwenden können, Wegwerfware ist.
-Viel schwerwiegender ist allerdings das ein Konsistenzproblem.
+Viel schwerwiegender ist allerdings das Problem der Konsistenz.
 Denn woher wissen wir, dass Interpreter und Übersetzer wirklich die gleiche Sprache implementieren oder ob sich doch in einem von beiden ein Fehler eingeschlichen hat.
 
 Die andere Möglichkeit verwendet einen iterativen Prozess der Selbstübersetzung einer vereinfachten Variante des Übersetzers.
-Nachdem man den Übersetzer (L->M) in L geschrieben hat, definiert man die Untermengen L' und M', die gerade noch so mächtig sind, um einen vollständigen Übersetzer zu schreiben.
+Nachdem man den Übersetzer (~L->M~) in L geschrieben hat, definiert man die Untermengen L' und M', die gerade noch so mächtig sind, um einen vollständigen Übersetzer zu schreiben.
 Dies kann passieren, indem man exotische Sprachfeatures aus L weglässt bzw. die komplexeren Maschinenbefehle, die M eigentlich bietet, ignoriert.
 
 Mit diesen Untermengen leitet man aus dem eigentlichen Übersetzer einen vereinfachten Übersetzer her, der in L' implementiert ist und nur ineffizienten Code für M' erzeugt.

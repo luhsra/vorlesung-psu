@@ -34,10 +34,15 @@
 
 (defun org-macro-topic (file img)
  (with-file-from-disk file
-  (let ((html (s-replace ".org" ".html" file)))
+  (let* ((url (s-replace ".org" ".html" file))
+         (date (org-global-prop-value "date"))
+         (date-html (if date (format "<span class=\"structure\">%s</span> " date) ""))
+         )
     (concat
      "#+begin_export html\n"
-     (format "<h2><a href=\"%s\">%s</a></h2>" html (org-global-prop-value "subtitle"))
+     (format "<h2>%s<a href=\"%s\">%s</a></h2>"
+             date-html
+             url (org-global-prop-value "subtitle"))
      (format "<div class=\"row\"><div class=\"col-md-4\"><img class=\"img-index\" src=\"%s\"></div>" img)
      "<div class=\"col-md-8\">\n"
      "<p> Abschnitte: "
