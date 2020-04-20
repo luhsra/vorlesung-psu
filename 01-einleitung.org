@@ -491,37 +491,84 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eine
 :END:
 
 #+BEGIN_SRC latex
-  \begin{frame}[t]{Organisatorische Hinweise}
-  \PutAt{(10.5cm,1cm)}{
-    \includegraphics[width=2cm]{fig/01-dietrich}\\[2ex]
-    \includegraphics[width=2cm]{fig/01-landsberg}
-  }
-  \bi
-  \ii Vorlesung: 13 Termine {
+  %%ONLY%%
+    \begin{frame}[t]{Organisatorisches: Vorlesung}
+    \PutAt{(10.5cm,1cm)}{
+      \includegraphics[width=2cm]{fig/01-dietrich}
+    }
     \bi
-    \ii Dienstag 9:00-11:00 Uhr, 201, Conticampus
-    \ii Semesterplan und Vorlesungsskript auf der SRA Webseite
-    \ii \url{https://www.sra.uni-hannover.de/p/lehre-V\_PS\%C3\%9C}
+    \ii Vorlesung: 12 Termine {
+      \bi
+      \ii Dienstag 16:00-17:30 Uhr, \url{https://twitch.tv/luhsra}
+      \ii Live-Stream mit Rückkanal, Vorlesungsaufzeichnung im Stud.IP
+      \ii Semesterplan und Vorlesungsskript auf der SRA Webseite
+      \ii Sourcen sind auf Github (CC-BY 4.0), PR welcome.
+      \ei
+    }\medskip
+    \ii Besonderheiten in diesem Semester {
+      \bi
+      \ii Wir können \alert{noch nicht} sagen, wie es nach Pfingsten aussieht.
+      \ii Wir versuchen unser Möglichstes und halten Sie auf dem Laufenden.
+      \ii Ihre Mithilfe ist essentiell (Beteiligung, Rückmeldungen, Solidarität)
+      \ei
+    }
     \ei
-  }\medskip
-  \ii Wie funktioniert der Übungsbetrieb? {
+    \pause
+    \vspace{1em}
+    \Large
+     \STRUCTURE{Universität}:\\\hspace{1cm} Sprechen Sie \btSetTab mit den interessantesten Menschen\\\btUseTab über die abwegigsten Themen
+  \end{frame}
+
+  \begin{frame}[t]{Organisatorisches: Übungen}
+    \PutAt{(10.5cm,1cm)}{
+      \includegraphics[width=2cm]{fig/01-landsberg}\\
+    }
     \bi
-    \ii 2 Übungstracks (A, B), mit einer Woche Versatz (wie GBS)
-    \ii 6 Übungsaufgaben mit praktischem und theoretischem Inhalt\\[1ex]
-    \ii Pro Track: 6 Tafel- und 6 Kleingruppenübungen, alternierend
-    \ii Tafelübung: Dienstag 16:00-18:00 Uhr
-    \ii Kleingruppenübung: Betreuung durch studentische Hilfskräfte
+    \ii Tafelübungen: 6 Termine {
+      \bi
+      \ii Verantwortlicher: \textbf{Tobias Landsberg}
+      \ii Freitag 10:30-12:00 Uhr, https://twitch.tv/luhsra
+      \ii Live-Stream mit Rückkanal, Vorlesungsaufzeichnung im Stud.IP
+      \ii Vertiefung der Vorlesung, Erörterung der Übungsaufgaben
+      \ei
+    }\medskip
+    \ii Übungen: 6 Aufgaben mit theoretischem und praktischen Anteil {
+      \bi
+      \ii Betreuung in Kleingruppen durch studentische Tutoren
+      \ii Treffen der Kleingruppen im Mumble, Beantwortung von Detailfragen
+      \ii Bearbeitung in \textbf{Zweierteams}, Abgabe mit Git und SRAbmit
+      \ei
+    }\medskip
+    \ii Bonuspunkte auf die Klausur {
+      \bi
+      \ii Bewertung der Übungsaufgaben, maximal +10\%  Klausurpunkte
+      \ii Bonuspunkte helfen \ALERT{nicht} über die Bestehensgrenze.
+      \ei
+    }
     \ei
-  }\medskip
-  \ii Bonuspunkte auf die Klausur (wie bei GBS) {
-    \bi
-    \ii Abgabe der Übungsaufgaben, maximal +10\%  Klausurpunkte
-    \ii Testatklausur am \alert{23. Juni 2020}, maximal +10\% der Klausurpunkte
-    \ii Bonuspunkte werden auf \structure{bestandene} Klausuren angerechnet.
-    \ei
-  }\bigskip
-  \ii<2-> Was ist Klausurrelevant? \hfill\ALERT{\strut \only<3->{Vorlesung+Skript+Übung} }
-  \ei
+  \end{frame}
+  
+
+  \begin{frame}{Wo bekomme ich Hilfe?}
+    \begin{enumerate}
+      \ii Übungspartner
+      \ii Kommilitoninnen\hfill\raisebox{0pt}[0pt]{\OrangeBox[align=left, scale content=0.85]{Reihenfolge beachten!}\vspace{2cm}}
+      \ii Stud.IP-Forum
+      \ii Übungstutoren
+      \ii \textcolor{luhgray}{Mitarbeiter \tiny{\href{mailto:psu@sra.uni-hannover.de}{psu@sra.uni-hannover.de}}}
+    \end{enumerate}
+
+    \btUseExtraItemSep
+
+    \begin{itemize}
+      \ii Fragen zum Inhalt werden \textbf{nur im Forum} bentwortet
+      \begin{itemize}
+        \ii Studentische Antworten sind hier \STRUCTURE{sehr gerne gesehen}
+        \ii Es gibt keine falschen Fragen -- und keine Nachteile durch Antworten
+        \ii Trauen Sie sich auch zu antworten -- man lernt eine Menge dabei!
+      \end{itemize}
+      \ii Wir moderieren, korrigieren und ergänzen nach Bedarf. \textbf{Nur Mut!}
+    \end{itemize}
   \end{frame}
 #+END_SRC
 
