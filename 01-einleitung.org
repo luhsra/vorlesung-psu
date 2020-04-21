@@ -179,7 +179,7 @@ vorwärts, und bei gedrückter Shifttaste rückwärts, navigieren.
       \begin{CPP}[]
         int sum = 0;
         for (int x : vec) { // foreach Schleife
-          sum += x
+          sum += x;
         }
       \end{CPP}
     \end{code}
