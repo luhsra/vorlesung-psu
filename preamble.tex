@@ -16,8 +16,9 @@
 \usepackage{multirow}
 \usepackage{pgffor}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+%\usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
+
 \usepackage{lmodern}
 \usepackage[scaled=0.85]{beramono}
 
@@ -42,19 +43,27 @@
   \setcounter{FirstPage}{\theCurrentPage}% set FirstPage to new first page
 }
 
+% Parse Filename
+\def\retrieveFileName#1-#2.#3\next{%
+  \gdef\fileNumber{#1}%
+  \gdef\fileName{#2.#3}%
+  \gdef\fileTopic{#2}%
+  \gdef\fileMode{#3}%
+}%
+\expandafter\retrieveFileName\jobname\next\relax%
+
+\input{preamble.\fileMode.tex}
 
 \AtBeginDocument{
   \pagenumbering{arabic} % for pageslts
-  \SetPartNumToFileNum
+  \setcounter{part}{\fileNumber\relax}
 }
 
-
-
-  % Name, token and semester of the course
-  \def\xtoken{PSÜ}
-  \def\xtitle{Programmiersprachen und Übersetzer (PSÜ)}%
-  \def\xterm{SS}
-  \def\xyear{20}
+% Name, token and semester of the course
+\def\xtoken{PSÜ}
+\def\xtitle{Programmiersprachen und Übersetzer (PSÜ)}%
+\def\xterm{SS}
+\def\xyear{20}
 
   % General organization of the course
   \def\PartA{Einführung}
@@ -77,14 +86,6 @@
 
   \title[\xtoken]{\xtitle}
 
-  % Parse job name <number>-<rest>.tex into \fileNumber=<number> and \fileName=<rest>.tex and
-  % set the part-counter so that the first section will be <number>
-  \newcommand{\SetPartNumToFileNum}{
-    \def\retrieveFileName##1-##2\next{\gdef\fileNumber{##1 \relax}\gdef\fileName{##2 \relax}}
-    \expandafter \retrieveFileName\jobname\next\relax
-    % -1, as the \section command first advances the counter
-    \setcounter{part}{\fileNumber}
-  }
   % Customize numbering:
   % We want to number frames as <chapter>-<frame> with <frame> being by-chapter numbers
   % Note: The following works only if a patch is applied to beamerbaseframe.sty (see README)
@@ -105,9 +106,12 @@
 
 
 %*****************************************************************************
-%** bibliography *************************************************************
+%** bibliography
+%*************************************************************
+\usepackage{polyglossia}
+\setdefaultlanguage{german}
 
-\usepackage[style=numeric-comp,hyperref,maxnames=3,minnames=3,defernums=true, backend=bibtex8]{biblatex}
+\usepackage[style=numeric-comp,hyperref,maxnames=3,minnames=3,defernums=true]{biblatex}
 \defbibheading{bibliography}{}
 \bibliography{refs}
 \renewcommand{\bibfont}{\scriptsize}
@@ -240,14 +244,6 @@
   \tikz[baseline]\node[anchor=base,draw=black,fill=#2color,#1]{\color{black}Vorlesung #3};
 }
 
-\newcommand{\dividerframe}[1]{
-  \begin{frame}<handout:0>[noframenumbering]
-    \begin{center}
-      \Huge #1
-    \end{center}
-  \end{frame}
-}
-
 \usepackage{fig/03-common}
 \usepackage{fig/04-common}
 \usepackage{fig/07-common}
@@ -288,7 +284,7 @@
   \global\setbox\@overlaybox=\copy\@overlaybox\relax%
 }
 
-\usepackage{default}
+%\usepackage{default}
 \makeatletter
 \newif\ifOnBeamerModeTransition
 \newcommand{\slideselection}{1-}%

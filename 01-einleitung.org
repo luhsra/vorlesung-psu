@@ -17,9 +17,8 @@
 
 #+BEGIN_SRC latex :tangle-prologue nil
 \subtitle{{{{subtitle()}}}}
-\begin{frame}
-  \maketitle
-\end{frame}
+
+\maketitleframe
 
 \begin{frame}{Der Dozent}
     \PutAt{(10cm,1.6cm)}{

@@ -7,7 +7,7 @@ ORG=index.org $(ORG_PDF)
 PDF=$(foreach i,${ORG_PDF},$(patsubst %.org,build/%.slides.pdf,${i}))
 HTML=$(foreach i,${ORG},$(patsubst %.org,build/html/%.html,${i}))
 
-LATEXMK=latexmk -pdf
+LATEXMK=latexmk -pdf -lualatex
 
 export TEXINPUTS := ./texmf-local//:./texmf//:${TEXINPUTS}
 
@@ -30,12 +30,12 @@ build: texmf/ls-R
 
 
 texmf/ls-R:
-	texhash texmf/
+	mktexlsr texmf/
 
 # Building the figures is only a precondition for this makefile. This is the easy part.
 fig/%.pdf: fig/%.tex texmf-local/lecturefig.cls
 	@${MAKE} build
-	${LATEXMK} $< -outdir=build
+	latexmk -pdf $< -outdir=build
 	@cp $(patsubst fig/%,build/%,$@) $@
 
 fig/%.pdf: fig/%.dot  Makefile

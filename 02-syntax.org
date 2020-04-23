@@ -54,10 +54,10 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 #+begin_src latex
 \subtitle{{{{subtitle()}}}}
-\begin{frame}
-  \maketitle
-\end{frame}
-  \begin{frame}[t]{Einordnung in die Vorlesung: Syntaktische Analyse}
+
+\maketitleframe
+
+\begin{frame}[t]{Einordnung in die Vorlesung: Syntaktische Analyse}
     \begin{center}
       \includegraphics[page=4,width=0.8\linewidth]{fig/01-overview-small}
     \end{center}
@@ -71,7 +71,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
     \ei
     }
     \ei
-  \end{frame}
+ \end{frame}
 
   \begin{frame}{Was ist das Ziel der Syntaktischen Analyse?}
     \begin{center}
