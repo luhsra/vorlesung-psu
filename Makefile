@@ -130,10 +130,10 @@ build/tangle/%.tex: %.org
 	bin/delete-frames $@
 
 build/%.slides.tex: build/tangle/%.tex build
-	@bin/gen-latex-root $< > $@
+	@bin/gen-latex-root beamer $< > $@
 
 build/%.handout.tex: build/tangle/%.tex build
-	@bin/gen-latex-root $< > $@
+	@bin/gen-latex-root handout $< > $@
 
 build/tangle/%.html: %.org
 	${EC} -e "(org-export-to-html-file \"$$PWD/$<\" \"$$PWD/$@\")"

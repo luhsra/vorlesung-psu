@@ -162,7 +162,7 @@ der in Übersetzern verwendet wird.].
 #+begin_src latex
   \dividerframe{Scanner\\und\\Tokenstrom}
 
-  \begin{frame}[t]<handout:3>{Tokenstrom}
+  \begin{frame}<handout:3>[t]{Tokenstrom}
     \animation[width=\linewidth]{1/1,2/2-}{fig/02-token-stream}
     \bi
     \ii<2-> Gruppierung von Zeichen zu sprachspezifischen Bausteinen (Token) {
@@ -355,19 +355,13 @@ hexprefix hexdigit hexdigit*
 0xa2c
 #+end_example
 
-Je nachdem wie die Regeln einer Grammatik strukturiert sind, werden
-Grammatiken in unterschiedliche Klassen eingeteilt{{{wikipedia_de(Chomsky-Hierarchie)}}}.
-Eine der einfachsten Klassen, die
-besonders wünschenswerte Eigenschaften hat, ist die Klasse der
-*regulären Grammatiken*. Bei ihr gilt, dass auf der rechten Seite nur
-ein einzelnes nicht-Terminal stehen darf. Dies bedeutet, dass die
-Regel *kontextfrei* ist, da das nicht-Terminal, egal in welchem
-Kontext es steht, immer gleich ersetzt wird. Weiterhin muss für
-reguläre Grammatiken gelten, dass sie nicht rekursiv sind. Dies
-bedeutet, dass man durch wiederholte Anwendung der Regel nie mehr zum
-selben nicht-Terminal kommen darf. Beim Parsen werden wir
-*kontextfreie* Grammatiken verwenden, die letztere Einschränkung
-nicht erfüllen und daher nicht regulär sind.
+Je nachdem wie die Regeln einer Grammatik strukturiert sind, werden Grammatiken in unterschiedliche Klassen eingeteilt{{{wikipedia_de(Chomsky-Hierarchie)}}}.
+Eine der einfachsten Klassen, die besonders wünschenswerte Eigenschaften hat, ist die Klasse der *regulären Grammatiken*.
+Bei ihr gilt, dass auf der linken Seite nur ein einzelnes nicht-Terminal stehen darf.
+Dies bedeutet, dass die Regel *kontextfrei* ist, da das nicht-Terminal, egal in welchem Kontext es steht, immer gleich ersetzt wird.
+Weiterhin muss für reguläre Grammatiken gelten, dass sie nicht rekursiv sind.
+Dies bedeutet, dass man durch wiederholte Anwendung der Regel nie mehr zum selben nicht-Terminal kommen darf.
+Beim Parsen werden wir *kontextfreie* Grammatiken verwenden, die letztere Einschränkung nicht erfüllen und daher nicht regulär sind.
 
 Das Angenehme an regulären Grammatiken ist, dass man sehr einfach ein
 Programm ableiten kann, das erkennt, ob eine gegebene Zeichenkette von
@@ -551,7 +545,7 @@ Bäume sind hervorragend geeignet, die syntaktische Struktur von Programmen zu e
 Sie sind rekursiv, da jedes Kind eines Knotens wiederum ein Unterbaum ist; dabei sind Blätter sind triviale Bäume.
 
 Für unser Beispiel der arithmetischen Ausdrücke zeigt ein innerer Knoten an, welche Operation ausgeführt werden soll.
-Die Kinder dieses Knotens sind die Operanden, die verrechnet werden sollen.
+Die Kinder dieses Knotens sind die Operanden, die verrechnet werden.
 Da Operationen in der Regel nicht kommutativ sind, ist die Reihenfolge der Kinder wichtig.
 
 Für die Speicherung von Bäumen können wir dann doch wieder Listen verwenden, solange wir Listen als Listenelemente zulassen.
@@ -579,12 +573,12 @@ Daher sind Typ-3-Grammatiken **nicht**[fn::Dies ist auch der Grund, wieso man mi
 Versuchen Sie es nicht, es wird immer scheitern bzw.
 ein Hack bleiben.]
 geeignet, um Programme zu parsen und wir müssen auf die Typ-2 Grammatiken, also die **kontextfreien Sprachen** wechseln.
-Diese erlauben es, dass auf der rechten Seite einer Regel ein Nicht-Terminal stehen darf, welches (direkt oder indirekt) zur linken Seite abgeleitet werden kann.
-Dies erlaubt es, dass eine kontextfreie Grammatik "Klammern zählen" kann, sie erzeugt also korrekt balanciert Klammerungen.
+Diese erlauben es, dass auf der linken Seite einer Regel ein Nicht-Terminal stehen darf, welches (direkt oder indirekt) wiederholt auf der rechten Seite auftauchen kann.
+Dies erlaubt es, dass eine kontextfreie Grammatik "Klammern zählen" kann und daher in der Lage ist korrekt balancierte Klammerungen zu erzeugen.
 
 Im Allgemeinen ist die Komplexität des "Wortproblems" (Prüfung, ob ein Wort in der Sprache ist) für kontextfreie Sprachen kubisch{{{wikipedia_de(Cocke-Younger-Kasami-Algorithmus)}}}.
 Allerdings gibt es mit den **deterministischen kontextfreien Sprachen** eine Klasse von Sprachen, die in linearer Zeit, also viel viel schneller, erkennbar sind.
-Daher sind eigentlich alle  Programmiersprachen in dieser Klasse zu finden, da das Lösen des Wortproblems gleichbedeutend mit parsen ist.
+Daher sind eigentlich alle  Programmiersprachen in dieser Klasse zu finden, da das Lösen des Wortproblems gleichbedeutend mit dem Parsen ist.
 
 Um zu verstehen, was deterministisch im Fall von kontextfreien Sprachen bedeutet, müssen wir uns **Ableitungsbäume** für kontextfreie Grammatiken anschauen.
 Bei Ableitungsbäumen entspricht jeder innere Knoten einem Nicht-Terminal, jedes Blatt entspricht einem Terminal.
@@ -1175,7 +1169,7 @@ Dort können wir diese eindeutige Entscheidung nicht sofort treffen.
 LR(k)-Parser haben die Möglichkeit, beliebige Zeit in einem Zustand des "sich noch nicht entschieden habens" (tristate) zu bleiben.
 Sie führen dazu (virtuell) eine Menge von möglichen Regeln mit sich, die mit jedem weiteren Token weiter eingeschränkt wird.
 Erst wenn diese Menge nur noch eine Regel enthält, wird sie angewendet.
-Wenn Sie weiteres Interesse an LR(k)-Parsern haben, sei Ihnen, neben der Lektüre des Drachenbuches, [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert ans Herz gelegt.
+Wenn Sie weiteres Interesse an LR(k)-Parsern haben, sei Ihnen, neben der Lektüre des Drachenbuches, oder [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert, ans Herz gelegt.
 
 
 ** Abstrakter Syntaxbaum
@@ -1263,7 +1257,7 @@ Der AST ist ein vom Ableitungsbaum abgeleiteter Baum, der die essentielle Strukt
 Was genau wesentlich bedeutet, hängt stark von der Sprache ab.
 
 Um den AST zu generieren, haben wir prinzipiell zwei Möglichkeiten:
-Entweder falten wird den vollständig aufgebauten Ableitungsbaum mittels Baumtransformationen zusammen und kompaktifizieren dabei, oder wir lassen den Parser den AST direkt erzeugen.
+Entweder falten wird den vollständig aufgebauten Ableitungsbaum mittels Baumtransformationen im Nachhinein wieder zusammen und kompaktifizieren ihn dabei, oder wir lassen den Parser den AST direkt erzeugen.
 Für letzteres müssen wir dem Parsergenerator mitteilen, wie diese AST-Konstruktion von statten gehen soll.
 Wir brauchen also zusätzliche Informationen in der Grammatik, die nicht die erkannte formale Sprache verändert, aber dem Generator zusätzliche Informationen liefert. Den Weg, den die meisten Generatoren hier gehen ist eine **Reduktionsaktion** anzugeben:
 
@@ -1290,7 +1284,7 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
 
 #+begin_src latex
 
-  \begin{frame}<handout:2,3>{Parsingprobleme mit realen Sprachen}
+  \begin{frame}<handout:2,3,4>{Parsingprobleme mit realen Sprachen}
     \bi
     \ii Sprachen mit optionalem \texttt{else} können das \emph{dangling-else problem} haben.\\\medskip {
       \btSetNamedTab[1cm]{\first}%
@@ -1311,7 +1305,7 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
      \ei
    }
    \medskip
-   \ii<4-> Oft reicht ein Token Look-Ahead nicht aus, um Konstrukte zu erkennen. {
+   \ii<handout:4|4-> Oft reicht ein Token Look-Ahead nicht aus, um Konstrukte zu erkennen.{%
    \bi
    \ii Java: Felder und Methoden erlauben unterschiedliche Modifer: \\\medskip{
      \btSetNamedTab[5mm]{\first}%
