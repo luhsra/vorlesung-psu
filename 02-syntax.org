@@ -162,7 +162,7 @@ der in Übersetzern verwendet wird.].
 #+begin_src latex
   \dividerframe{Scanner\\und\\Tokenstrom}
 
-  \begin{frame}<handout:3>{Tokenstrom}
+  \begin{frame}[t]<handout:3>{Tokenstrom}
     \animation[width=\linewidth]{1/1,2/2-}{fig/02-token-stream}
     \bi
     \ii<2-> Gruppierung von Zeichen zu sprachspezifischen Bausteinen (Token) {
@@ -196,7 +196,7 @@ der in Übersetzern verwendet wird.].
     }
     \ei
     \begin{code}<3-|handout:3->[tag=Py]
-      \lstinputlisting[style=PY,linerange={scanner0-scanner1,scanner2-scanner3}]{lst/02-scanner.py}
+      \lstinputlisting[style=PY,style=smaller,linerange={scanner0-scanner1,scanner2-scanner3}]{lst/02-scanner.py}
     \end{code}
     \only<1|handout:1>{\begin{tikzpicture}[overlay,remember picture,box/.style={draw=srared,ultra thick}]
         \node[fit=(sig-name),box,pin=-100:Funktionsname]{};
@@ -438,7 +438,7 @@ Mehr zu den Sicherheitsaspekten von Scannern, und auch Parsern, lernen wir in ei
 
   \begin{frame}<handout:2>{Blockstruktur und Klammerung}
     \bi
-    \ii \textbf{Erinnerung}: wir wollen Syntaxbaum aus Tokenstrom erzeugen
+    \ii \textbf{Erinnerung}: Wir wollen Syntaxbaum aus Tokenstrom erzeugen.
     \bigskip
     \ii Programmiersprachen enthalten \emph{geschachtelte} oder \emph{rekursive} Konstrukte{%
       \bi
@@ -652,7 +652,6 @@ Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setz
           \btLstHL<3>{3-4}%
           \btLstHL<4>{5-6}%
           \btLstHL<5>{8}%
-          \btLstHL{}%
         }
         ]{lst/02-ll0-recursive.py}%
     \end{code}
@@ -666,7 +665,6 @@ Dies ist der Sprachklasse LL(1), mit der wir uns nun intensiver auseinander setz
           \btLstHL<3>{7-8}%
           \btLstHL<4>{9-10}%
           \btLstHL<5>{12}%
-          \btLstHL{}%
         }
         ]{lst/02-ll0-recursive.py}%
     \end{code}
@@ -744,14 +742,14 @@ Im Parser mit rekursivem Abstieg könnten wir keine deterministische Entscheidun
       \ii Mit den \PREDICT-Mengen können wir einen LL(1)-Parser generieren.{
         \bi
         \ii Der Parser-Generator (grau) iteriert über Nicht-Terminale und Regeln.
-        \ii Er erzeugt und emittiert, mittels Codeschablonen (gelb), die Zeilen des Parsers.
+        \ii Er erzeugt und emittiert, mittels Codeschablonen (gelb), den Parsercode.
         \ii Innerhalb der Schablonen werden Ersetzungen (grün) vorgenommen.
         \ei
       }
       \ei
 
       \lstdefinestyle{meta}{
-        basicstyle=\ttfamily\fontsize{8}{13}\selectfont,
+        basicstyle=\ttfamily\fontsize{8}{12}\selectfont,
         escapechar={`},
         moredelim=**[is][{\btHL[draw,fill=safegreen!40,rounded corners=0pt,inner ysep=-2pt]}]{@@}{@@},
         moredelim=**[is][{\btHL[fill=badbee!50,rounded corners=0pt]}]{!!}{!!},
@@ -908,7 +906,7 @@ Dabei akzeptiert der Generator alle Grammatiken der Klasse LL(1) und erzeugt ein
     $A \rightarrow \alpha$                                                                      & \PREDICT      & $\EPS(\alpha)$ & $\FIRST(\alpha)$   & $\FOLLOW(A)$ \\\midrule
     \grammarrule{\NT{S}}{\alert<3>{\NT{term}$\dashv$}}                                & Int, Ident, ( & 0         & Int, Ident,(  &              \\\midrule
     \grammarrule{\alert<3>{\NT{term}}}{\alert<3>{\NT{factor} \NT{factor\_tail}}} & Int, Ident, ( & 0         & Int, Ident, ( & ), $\dashv$       \\\midrule
-    \grammarrule{\NT{factor\_tail}}{+ \NT{factor\_tail}}                         & +             & 0         & +             & \only<3>{\cellcolor{badbee!50}}  \\
+    \grammarrule{\alert<3>{\NT{factor\_tail}}}{+ \alert<3>{\NT{factor\_tail}}}   & +             & 0         & +             & \only<3>{\cellcolor{badbee!50}}  \\
     \first%
     \grammarrule{\NT{factor\_tail}}{\EPSILON}                                    & ), $\dashv$        & 1         & $\emptyset$           & \multirow{-2}{*}{), $\dashv$}       \\\midrule
     \grammarrule{\NT{factor}}{Int}                                               & Int           & 0         & Int           &               \\
@@ -1313,7 +1311,7 @@ Noch mehr Details zu diesen Reduktionsaktionen gibt es in den Übungen.
      \ei
    }
    \medskip
-   \ii<4-> Oft reicht ein Token Look-Ahead nicht aus, um das Konstrukt zu erkennen. {
+   \ii<4-> Oft reicht ein Token Look-Ahead nicht aus, um Konstrukte zu erkennen. {
    \bi
    \ii Java: Felder und Methoden erlauben unterschiedliche Modifer: \\\medskip{
      \btSetNamedTab[5mm]{\first}%
