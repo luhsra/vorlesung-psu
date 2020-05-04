@@ -88,6 +88,16 @@ fig/$(1)-stamp.png: ${$(1)_stamp}
 index: fig/$(1)-stamp.png
 endef
 
+define pdf2svg # $(1) fig/03-....pdf, $(2) = pagenumber
+$(patsubst %.pdf, %-$(2).png, $(1)): $(1)
+	convert -density 300 $$<[$(2)] -quality 100 -geometry 800x600 $$@
+
+endef
+
+$(eval $(call pdf2svg,fig/05-dependency-tree.pdf,1))
+03.html: fig/05-dependency-tree-1.png
+
+
 # Wordcount
 wc:
 	@make -s 01.wc 02.wc 03.wc 04.wc 05.wc 06.wc 07.wc 08.wc 09.wc 10.wc| tr "\n" " " | dc -f - -e '[+z1<r]srz1<rp'

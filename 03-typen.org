@@ -2,6 +2,7 @@
 #+SUBTITLE: 03 - Typen
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
+#+DATE: [2020-05-05]
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 
 #+NAME: topic
@@ -28,9 +29,8 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
-  \begin{frame}
-    \maketitle
-  \end{frame}
+
+  \maketitleframe
 
   \begin{frame}{Wieso sollte ich mich mit Typen beschäftigen?}
     \begin{center}
@@ -86,8 +86,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 
   #+end_src
 
-Diese Vorlesung ist der erste Teil unserer Top-Down-Betrachtung von Programmiersprachen.
-Dabei wollen wir uns insgesamt vier Themen herausgreifen (Typen, Namen, Operationen und Objekte), die in der einen oder anderen Form in jeder Programmiersprache vorkommen.
+Diese Vorlesung ist der erste Teil unserer Top-Down-Betrachtung von Programmiersprachen, bei der wir uns insgesamt vier Themen herausgreifen (Typen, Namen, Operationen und Objekte), die in der einen oder anderen Form in jeder Programmiersprache vorkommen.
 Im Zuge dieser Betrachtungen sollen Sie lernen, dass es grundlegende Prinzipien in Programmiersprachen gibt, die immer wieder, in unterschiedlichen Kombinationen und Geschmacksrichtungen, auftreten.
 Der Ingenieur baut eben doch immer das, was er kennt, bzw.
 er verlässt sich auf bewährte Konzepte, die häufig durch einen reichen Korpus an theoretischen Überlegungen fußen.
@@ -99,11 +98,13 @@ Darauf aufbauend werden wir uns dem Bereich der *Polymorphie* zuwenden, der ganz
 Mit diesen polymorphen Typen können wir uns ein, potentiell unendliches, Universum von Typkombinationen definieren, das dabei hilft, unsere Programme sauber zu strukturieren und uns vor uns selbst und unseren Bugs schützt.
 Am Ende dieser Vorlesungseinheit werden wir uns anschauen, wie die Typen, die wir in den vorherigen Kapiteln konstruiert haben, in Programmiersprachen zu einem *Typsystem* kombiniert werden.
 
-Diese Vorlesung über Typen ist deswegen so spannend, weil moderne Programmiersprachen, wie C++ oder Rust, sehr ausgefeilte Typsysteme besitzen, die gewissermaßen das Rückgrat dieser Sprachen bilden. Nur mithilfe dieser rigorosen Typsysteme, die vom Übersetzer vor der Laufzeit durchgesetzt werden, ist es möglich große Programme mit vielen Entwicklern gleichzeit zu entwerfen. Typen sind dabei ein Kommunikationsmittel zwischen einem einzelnen Entwickler und der Maschine, und zwischen Entwicklern. In beiden Fällen verwendet der Programmierer die Typannotationen, um zu kommunizieren: "Beim Anlegen dieser Variable habe ich mir gedacht, dass folgende Eigenschaften und Invarianten gelten sollten".
+Diese Vorlesung über Typen ist deswegen so spannend, weil moderne Programmiersprachen, wie C++ oder Rust, sehr ausgefeilte Typsysteme besitzen, die gewissermaßen das Rückgrat dieser Sprachen bilden. Nur mithilfe dieser rigorosen Typsysteme, die vom Übersetzer vor der Laufzeit durchgesetzt werden, ist es möglich große Programme mit vielen Entwicklern gleichzeit zu entwerfen. Typen sind dabei ein Kommunikationsmittel zwischen einem einzelnen Entwickler und der Maschine, und der Entwickler untereinander. In beiden Fällen verwendet der Programmierer die Typannotationen, um zu kommunizieren: "Beim Anlegen dieser Variable habe ich mir gedacht, dass folgende Eigenschaften und Invarianten gelten sollten".
 
 Wenn der Entwickler mit dem Übersetzer kommuniziert, stehen zwei Aspekte von Typen im Vordergrund: der querschneidende Informationsfluss und das Explizitmachen von Erwartungen.
 
-FIXME: Vielleicht hier einen Baum malen um das Verständnis zu verbessern.
+#+CAPTION: Querschneidender Informationsfluss auf einem Baum
+#+ATTR_HTML: :width 50%
+[[./fig/05-dependency-tree-1.png]]
 
 Im Kapitel über Parsing haben wir gelernt, dass wir die Syntax unserer Maschinenprogramme kontextfrei extrahieren und als Baum darstellen können.
 Der große Nachteil von Bäumen ist allerdings, dass sie streng hierarchisch sind.
@@ -390,7 +391,7 @@ Hier definieren wir das Interface ~Object2D~, welches durch die Methode ~float a
   \end{frame}
   #+end_src
 
-Mit unseren drei Brillen haben wir nur eins geschafft: Wir haben Typen geschaffen, aber bisher können wir mit ihnen nichts anstellen. Ziemlich nutzlose und faule mathematische Objekte so wie sie sind, sich einfach wild von uns erzeugen lassen. Daher wollen wir nun, neben den Typkonstruktoren, weitere Operationen definieren, die auf unserer Typmenge arbeitet. Möglichst nützliche.
+Mit unseren drei Brillen haben wir nur eins geschafft: Wir haben Typen geschaffen, aber bisher können wir mit ihnen nichts anstellen. Ziemlich nutzlose und faule mathematische Objekte, sich einfach wild von uns erzeugen zu lassen. Daher wollen wir nun, neben den Typkonstruktoren, weitere Operationen definieren, die auf unserer Typmenge arbeitet. Möglichst nützliche Operationen.
 
 Die wahrscheinlich wichtigste Frage für einen Übersetzer ist, ob zwei gegebene Typen *äquivalent* sind.
 Also, ob sie das gleiche bedeuten.
@@ -407,14 +408,13 @@ Diese sehr technische Art der Äquivalenz hat allerdings einige gravierende Nach
 Das zweite Problem struktureller Äquivalenz sind *rekursive Datentypen*.
 Solche rekursiven Typen können auftreten, wenn wir Typen einen Namen geben können und diesen Namen in der Definition des Typs selbst verwenden.
 Das Paradebeispiel eines rekursiven Typs, den wir auch schon im Parsing-Kapitel besprochen haben, ist die verkettete Liste, bei der jedes Listenelement einen Pointer auf eine (Rest-)Liste beinhaltet.
-Das Problem entsteht dann, wenn wir jedes Auftreten des Typnamens einfach durch den Erzeugten Typausdruck ersetzen wollen, weil dann ein endlos tief geschachtelter Typausdruck für diese doch sehr einfache Liste entsteht. Zwar wäre eine endlose Struktur für den Mathematiker erst mal in Ordnung, doch man muss einige Tricks[fn::[[https://dl.acm.org/citation.cfm?id=1061632][The Equivalence of Modes and the Equivalence of Finite Automata]]] anwenden, um dies auf einem endlichen Rechner darzustellen.
+Das Problem entsteht dann, wenn wir jedes Auftreten des Typnamens einfach durch den Erzeugten Typausdruck ersetzen wollen, weil dann ein endlos tief geschachtelter Typausdruck für diese doch sehr einfache Liste entsteht. Zwar wäre eine endlose Struktur für den Mathematiker erst mal in Ordnung, doch man muss einige Tricks[fn::[[https://dl.acm.org/citation.cfm?id=1061632][The Equivalence of Modes and the Equivalence of Finite Automata]]] anwenden, um solche unendlichen Typausdrücke auf einem endlichen Rechner zu vergleichen.
 
 Aufgrund dieser Probleme mit struktureller Äquivalenz verwenden die meisten modernen Sprachen *Namensäquivalenz*.
 Die Idee dabei ist, dass jede Definition eines Typs, egal wie der Typ strukturiert ist, ein eigener Typ ist, der nur äquivalent zu sich selbst ist.
 Wenn der Programmierer sich schon die Mühe macht einen Namen auszusuchen, dann sollten wir immerhin sagen, dass dieser Typ was besonderes ist!
 
-Immer wenn ein Typname in einem Typausdruck verwendet wird, speichern wir dort nur den Namen, nicht den referenzierten Typ selbst, womit unser Typausdruck, selbst für rekursive Typen, wieder ein hübscher hierarchischer Baum wird.
-
+Immer wenn ein Typname in einem Typausdruck verwendet wird, speichern wir dort nur den Namen, nicht den zugewiesenen Typausdruck, womit unsere Typausdrücke, selbst für rekursive Typen, wieder hübsch hierarchische Bäume werden.
 
 Zusammen mit Namensäquivalenz kommt dann sofort die Frage auf, ob wir *Aliase* von Typen erstellen können:
 Ein Typalias ist ein zweiter Typname, der den selben Typen (nicht nur den gleichen Typausdruck) referenziert und damit voll äquivalent ist.
@@ -505,7 +505,7 @@ Häufig definiert hier die Programmiersprache noch, dass vorzeichenbehaftete Gan
 
 Ein wichtiger Punkt bei diesen numerischen Typen ist die Frage:
 Was passiert eigentlich, wenn der Wertebereich überschritten wird.
-Also was passiert, wenn ich bei einem ~int8_t~, der gerade den Wert 128 hat eins aufaddiere?
+Also was passiert, wenn ich bei einem ~int8_t~, der gerade den Wert 128 hat, eins aufaddiere?
 An dieser Stelle kann eine Programmiersprache sehr unterschiedliche Entscheidungen treffen:
 Die eine Möglichkeit ist, dass sie ein Überlaufverhalten definiert und bestimmt, dass ~(int8_t)128++~ zum Wert -127 führt.
 Dadurch klopfen wir allerdings auch fest, dass die ganzen Zahlen das Verhalten des Zweierkomplements zeigen müssen.
@@ -528,7 +528,7 @@ MAX_INT = sys.maxsize # Der größte Integer der als <type 'int'> dargestellt we
 print [type(1), type(MAX_INT), type(MAX_INT+1), type((MAX_INT+1)-1)]
 #+end_src
 
-Außerdem gibt es dann noch die Aufzählungstypen, bei denen der Entwickler selbst einen Typ als eine menge diskreter Werte definieren kann.
+Außerdem gibt es dann noch die Aufzählungstypen, bei denen der Entwickler selbst einen Typ als eine Menge diskreter Werte definieren kann.
 Diese Typen sind nützlich, wenn eine Menge von Werten mit lesbaren Namen versehen werden soll.
 Häufig garantiert die Sprachsemantik dann noch, dass die Elemente dieser Aufzählung eine totale Ordnung haben und man, im Beispiel ~red < green~ machen kann.
 Dies rührt daher, dass die Aufzählungstypen normalerweise auf Ganzzahlen abgebildet werden.
@@ -574,7 +574,7 @@ Weiterhin sind auch die Zeiger- bzw.
 Die Objekte dieser Typen sind nicht an sich nützlich, sondern sie enthalten Referenzen auf andere Objekte.
 Im Beispiel ist der Wert ~0x1234~ das Zeigerobjekt selbst und es referenziert das Objekt ~500~.
 Um diese Referenzierung ins Typsystem einzubinden, sagt ein Zeigertyp häufig nicht nur "ich bin eine Referenz", sondern auch "ich bin eine Referenz auf ein Objekt vom Typ X".
-In unserem Fall haben wir einen ~pointer(int)~ vor uns; das referenzierte Objekt ist also immer eine Ganzzahl, niemals aber ein double.
+In unserem Fall haben wir einen ~pointer(int)~ vor uns; das referenzierte Objekt ist also immer ein ~int~, niemals ein ~double~.
 
 Als kleinste Menge an Abstraktionen muss ein Zeigertyp, um nützlich zu sein, dereferenziert werden können.
 Durch das Dereferenzieren kommen wir zur Laufzeit zum referenzierten Objekt.
@@ -711,7 +711,7 @@ Um das ganze etwas plastischer zu machen, wollen wir uns ansehen, wie C-~struct~
   var.feld_2 = 1.5;  // dot_operator(foo_t, feld_2) -> double
 #+end_src
 
-Der Strukturtyp hat zwei Elemente mit den Namen "feld_1" und "feld_2"; beide Elemente haben unterschiedliche Typen (int, double).
+Der Strukturtyp hat zwei Elemente mit den Namen ~"feld_1"~ und ~"feld_2"~; beide Elemente haben unterschiedliche Typen (int, double).
 Der ~dot_operator~ ist als ~.~ in der Sprache als Infixoperator eingebaut.
 Im Beispiel extrahiert der Ausdruck ~var.feld_1~, das Feld ~feld_1~ aus dem Objekt, welches in ~var~ gespeichert ist.
 Dabei ist der Feldname fix und nur das Objekt veränderlich.
@@ -776,7 +776,7 @@ Der zweite geläufige zusammengesetzte Typ sind *Sequenzen*.
 Bei Sequenzen erlauben wir, dass die Anzahl der Elemente zur Laufzeit variabel und potentiell unendlich ist.
 Um dennoch eine eindeutige Typisierung zu bekommen, verlangen wir, dass alle Elemente der Sequenz den gleichen Typ haben.
 Um auf die Elemente von Sequenzen zugreifen zu können, muss die Sequenz zwei Operationen (~head~, ~tail~) anbieten.
-Dabei liefert ~head~ ein Element, bei geordneten Sequenzen das erste, und ~tail eine Sequenz mit allen anderen Elementen zurück.
+Dabei liefert ~head~ ein Element, bei geordneten Sequenzen das erste, und ~tail~ eine Sequenz mit allen anderen Elementen zurück.
 
 Die einfachste Variante eines Sequenztyps ist die einfach verkettete Liste, über die wir schon genug geredet haben.
 Aber auch andere Sequenzen wie eine priorisierte Warteschlange (Java:
@@ -809,7 +809,7 @@ In jedem Fall können wir eins ums andere Element aus der Sequenz entfernen und 
     \end{columns}
 
     \bi
-    \ii Abbildungstypen: Zuordnung zwischen einem Index- und einem Wertetyp{
+    \ii Abbildungstypen: Zuordnung zwischen einem Index- und einem Wertetyp{%
       \bi
       \ii Indexmenge und Wertemengen sind homogen typisiert
       \ii Vordefiniert-beschränkte oder dynamisch-wachsende Abbildungsgröße
@@ -1109,8 +1109,8 @@ Allerdings kann ein Typsystem nicht all diese Fälle, insbesondere den letzten, 
 
 In dieser Vorlesung wollen wir uns mit dem universellen Polymorphismus beschäftigen. Dabei geht es darum, dass die gleichen Typen in allen Kontexten gleich kompatibel sind. Beim ad-hoch Polymorphismus, der uns in den nächsten zwei Vorlesungen begegnen wird, wird in jedem Kontext einzeln festgestellt, ob die gerade vorliegenden Typen und Operationen kompatibel sind bzw. kompatibel gemacht werden können. Einen genaueren Überblick über das Thema des Polymorphismus finden Sie in dem Artikel [[http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf][On Understanding Types, Data Abstraction, and Polymorphism]] von Luca Cardelli und Peter Wegner.
 
-Beim der ersten Form des Polymorphismus, dem *Polymorphismus durch Inklusion* setzen wir unsere denotationelle Brille auf und betrachten die zwei Typen S und T, deren Kompatibilität zur Frage steht.
-Beide dieser Typen spannen eine Menge von Objekten auf, indem sie ein Prädikat über die Zugehörigkeit zur Menge angeben.
+Bei der ersten Form des Polymorphismus, dem *Polymorphismus durch Inklusion* setzen wir unsere denotationelle Brille auf und betrachten die zwei Typen S und T, deren Kompatibilität zur Frage steht.
+Beide dieser Typen spannen eine Menge von Objekten auf, indem sie ein Prädikat über die Zugehörigkeit zur Menge angeben (denotationelle Sicht).
 Alle Elemente dieser Mengen sollten sich so Verhalten wie ein T, respektive ein S. Überschneiden sich jetzt die Mengen, so gibt es Objekte, die sich sowohl wie ein T, als auch wie ein S verhalten; diese Objekte können wir also sicher substituieren.
 Ist die Menge S vollständig in der Menge T enthalten, so können wir nicht nur einzelne Objekte, sondern den gesamten Typen substituieren. Typ S ist ein *Subtyp* von Typ T.
 
@@ -1132,7 +1132,7 @@ Am gezeigten C++-Beispiel kann man die Kompatibilität im Speicherlayout relativ
 Die Funktion ~getX()~, die sowohl mit Base als auch mit Derived-Objekten aufgerufen werden kann, extrahiert das Strukturelement mit dem Namen ~x~ aus dem Objekt.
 Dazu dereferenziert es den übergebenen Zeiger (~a0~) und schlägt ein Offset von 0 auf (~0(a0)~), da das Feld ~x~ ganz vorne in Base- und Derived-Objekten gespeichert wird.
 
-Alle weiteren Regeln, welche Klasse was überschreiben darf, wann welche Felder für wen sicher sind, das sind Sprachspezifika, die allerdings an dem grundlegenden Konzept von Vererbung nichts ändern: Wir, die Programmierer, wünschen uns, dass ein Typ ein Subtyp eines anderen wird. Es ist dann die Aufgabe der Sprache und des Übersetzers alles Notwendige zu tun, damit die daraus folgende Substituierbarkeit gewährleistet wird.
+Alle weiteren Regeln, welche Klasse was überschreiben darf, wann welche Felder für wen sichtbar sind, das sind Sprachspezifika, die allerdings an dem grundlegenden Konzept von Vererbung nichts ändern: Wir, die Programmierer, wünschen uns, dass ein Typ ein Subtyp eines anderen wird. Es ist dann die Aufgabe der Sprache und des Übersetzers alles Notwendige zu tun, damit die daraus folgende Substituierbarkeit gewährleistet wird.
 
 #+begin_src latex
   \begin{frame}[fragile]{Parametrisch: Generische Typen}
@@ -1228,7 +1228,7 @@ Der generische Typ ist also eine Art von Schablone oder /Template/ auf ebene der
 
 Im Java Beispiel lässt sich der beschrieben Mechanismus sehr gut sehen. Dort heißen generische Typen sogar /Generics/. Wir definieren hier einen Typkonstruktor mit dem Namen ~Pair~, der eine Typvariable ~A~ als Argument bekommt. Diese Typvariable kommt im Rumpf des Konstruktors, der einen Strukturtyp erzeugt, zweimal vor, um zwei Strukturelemente zu typisieren. Dieser Konstruktor erzeugt also Typen, die homogen typisierte (beide Elemente haben den gleichen Typ) Paare bilden.
 
-Wie wir im C++-Beispiel, wo generische Typen ~Templates~ heißen, sehen, können wir eine Menge an Schreibarbeit durch die Verwendung von Templates sparen.
+Wie wir im C++-Beispiel, wo generische Typen *Templates* heißen, sehen, können wir eine Menge an Schreibarbeit durch die Verwendung von Templates sparen.
 Wir müssen in unserem Programm nur jedes vorkommen von ~intList~ durch ~List<int>~ und jedes Vorkommen von ~charList~ durch ~List<char>~ ersetzen. Dies spart eine Menge an sich immer wiederholenden Typdefinitionen.
 
 Ein weiterer Vorteil von generischen Typen sehen wir am Typen ~boolList~:
@@ -1390,7 +1390,7 @@ Wenn wir jetzt einen Schritt zurücktreten und uns die denotationale Interpretat
 Syntaktisch noch deutlicher kann man dies bei Rust und Type Traits sehen:
 Dort wird der Typtyp explizit angelegt und ~trait~ genannt.
 Im Fall von Rust ist dieser Trait noch mit einem gebotenem Interface verbunden.
-Mittels ~impl~ können Typen explizit zur Objektmenge des Traits hinzugefügt werden (wobei das Interface entsprechend implementiert werden muss).
+Mittels ~impl~ können Typen explizit zu einem Traits hinzugefügt werden (wobei das Interface entsprechend implementiert werden muss).
 Wenn wir uns jetzt die Signatur von ~fn bake~ anschauen, dann sehen wir die parallele Konstruktion in der Parameterliste des Typen und der Funktion:
 ~Bakable~ ist der Typ des Typparameters ~T~, und ~T~ ist der Typ des (echten) Parameters ~b~.
 Wir müssen uns nur die spitzen Klammern ~<>~ als runde Vorstellen ~()~.
