@@ -8,15 +8,15 @@
     \node[draw](a){variable:foo};
 
 
-    \begin{scope}[visible on=<2>]
+    \begin{scope}[visible on=<3>]
       \node [anchor=east,fill=luhblue!20,draw]
       at ($(a)+(-135:10mm)$) (label){\scriptsize pair(int, int)};
       \draw[ultra thin] (a) -- (label);
     \end{scope}
 
-    \begin{scope}[visible on=<1>]
-      \node[value,xshift=-2em] at (label) (str) {"bar"};
-      \draw[dashed,->] (a) -- (str);
+    \begin{scope}[visible on=<2>]
+      \node[value,xshift=-2em, pin={[,fill=luhblue!20,draw]0:string}] at (label) (str) {"bar"};
+      \draw[->] (a) to[out=180,in=90] (str);
     \end{scope}
 
 
@@ -34,8 +34,9 @@
     \draw(vtype) --(v3);
 
 
-
-    \draw[->] (a) to[bend left=4] (v);
+    \begin{visible}<1>
+      \draw[->] (a) to[bend left=4] (v);
+    \end{visible}
     \end{tikzpicture}
 \end{frame}
 \end{document}
