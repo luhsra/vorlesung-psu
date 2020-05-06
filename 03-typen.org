@@ -304,7 +304,7 @@ Hier definieren wir das Interface ~Object2D~, welches durch die Methode ~float a
             \end{pascal}
           \end{code}
 
-          Mit reiner struktureller Äquivalenz sind beide Typen unterscheidbar.
+          Mit reiner struktureller Äquivalenz sind beide Typen nicht unterscheidbar.
           Sollten sie das sein?
         \end{column}
       \end{columns}
@@ -792,7 +792,7 @@ In jedem Fall können wir eins ums andere Element aus der Sequenz entfernen und 
             \begin{CPP}[basicstyle=\scriptsize\ttfamily]
               // `\typeinline{array(int, 10)}`, `\typeinline{map(int, int)}`
               int rgb[10];
-              // `\typeinline{map(int, map(int, int))}`
+              // `\typeinline{map(int, map(int, char))}`
               char matrix[20][20];
           \end{CPP}
         \end{code}
@@ -877,7 +877,7 @@ Es gibt, mit Lua, sogar eine Programmiersprache, die nur einen solchen flexiblen
     \ii Typen haben jedoch oft gemeinsame Aspekte und sind irgendwie ähnlich{
       \bi
       \ii Strukturell:   \codeinline[style=C]{struct point2D {int x,y}} \codeinline[style=C]{struct point3D {int x,y,z}}
-      \ii Denotational:  \typeinline{uint8\_t} $\in$ \typeinline{uint16\_t} $\in$ \typeinline{uint32\_t} $\in$ \typeinline{uint64\_t}
+      \ii Denotational:  \typeinline{uint8\_t} $\subset$ \typeinline{uint16\_t} $\subset$ \typeinline{uint32\_t} $\subset$ \typeinline{uint64\_t}
       \ii Abstraktional: \siginline{lengthIntList}{list(int)}{int} \siginline{lengthFloatList}{list(float)}{int}
       \ei
     }\medskip
@@ -1517,7 +1517,7 @@ Allerdings sind solche ~reinterpret_cast<B>(a)~ Operationen gefährlich und kön
 
     \bi
     \ii Statische Typisierung erhöht die Menge an \emph{explizit} getippten Zeichen.{
-      \begin{code}[tag=C+11]
+      \begin{code}[tag=C++11]
         \begin{CPP}
           std::vector<int> vec;
           for (std::vector<int>::iterator it : vec) {...}

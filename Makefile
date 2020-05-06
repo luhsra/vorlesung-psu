@@ -78,6 +78,8 @@ $(1).html.view:       build/html/$(2).html
 $(1).handout.html:    build/html/$(2).handout.html
 $(1).handout.html.view:  build/html/$(2).handout.html
 $(1).all:             $(1).html $(1).handout $(1).handout.html
+$(1).pdfpc:           $(1)
+	pdfpc -d 90 -w presenter build/$(2).slides.pdf
 
 $(1).wc:
 	@awk 'BEGIN {IGNORECASE=1; p=1}; /#\+begin_(example|src)/ {p=0}; {if(p) print};  /#\+end_(example|src)/ {p=1}' < $(2).org | wc -w
