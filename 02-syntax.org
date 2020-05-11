@@ -322,11 +322,10 @@ Dezimalnotation handeln kann.
 
 #+end_src
 
-Für den Schritt der Tokenerkennung aus einem Zeichenstrom hat sich
-herausgestellt, dass der Rückgriff auf formale Konzepte aus der
-theoretischen Informatik höchst lohnend ist und, dass man mit *regulären
-Grammatiken* die Token der meisten Programmiersprachen hervorragend
-beschreiben kann. Daher wollen wir nun der ad-hoc Implementierung ~scanner_next()~ aus dem Beispiel einen formaleren Hintergrund geben.
+Für den Schritt der Tokenerkennung aus einem Zeichenstrom hat sich herausgestellt, dass der Rückgriff auf formale Konzepte aus der theoretischen Informatik höchst lohnend ist und, dass man mit *regulären Ausdrücken* die Token der meisten Programmiersprachen hervorragend beschreiben kann.
+Reguläre Ausdrücke beschreiben eine reguläre Sprache und haben die gleiche Ausdrucksstärke wie eine reguläre Grammatik.
+Man kann sagen, dass reguläre Ausdrücke ein Formalismus ist, mit dem man reguläre Grammatiken konstruieren kann, ohne ausversehen in die nächst komplexere Sprachklasse (kontextfrei) zu rutschen.
+Daher wollen wir nun der ad-hoc Implementierung ~scanner_next()~ aus dem Beispiel einen formaleren Hintergrund geben.
 
 Zu Beginn müssen wir uns daran erinnern, was Grammatiken überhaupt
 waren. Die theoretische Informatikvorlesung ist lange her, und die
@@ -356,32 +355,31 @@ hexprefix hexdigit hexdigit*
 0xa2c
 #+end_example
 
-Je nachdem wie die Regeln einer Grammatik strukturiert sind, werden Grammatiken in unterschiedliche Klassen eingeteilt{{{wikipedia_de(Chomsky-Hierarchie)}}}.
-Eine der einfachsten Klassen, die besonders wünschenswerte Eigenschaften hat, ist die Klasse der *regulären Grammatiken*.
-Bei ihr gilt, dass auf der linken Seite nur ein einzelnes nicht-Terminal stehen darf.
-Dies bedeutet, dass die Regel *kontextfrei* ist, da das nicht-Terminal, egal in welchem Kontext es steht, immer gleich ersetzt wird.
-Weiterhin muss für reguläre Grammatiken gelten, dass sie nicht rekursiv sind.
-Dies bedeutet, dass man durch wiederholte Anwendung der Regel nie mehr zum selben nicht-Terminal kommen darf.
-Beim Parsen werden wir *kontextfreie* Grammatiken verwenden, die letztere Einschränkung nicht erfüllen und daher nicht regulär sind.
+Je nachdem wie die Regeln einer Grammatik strukturiert sind, werden diese in unterschiedliche Klassen eingeteilt{{{wikipedia_de(Chomsky-Hierarchie)}}}.
+Die einfachste Klasse, die besonders wünschenswerte Eigenschaften hat, sind die *regulären Grammatiken*.
+Bei dieser Klasse gilt, dass alle Regeln *kontextfrei* sind und das man mit einem endlichen Automaten erkennen kann ob ein Wort in der Sprache ist (Wortproblem).
+Dabei bedeutet kontextfrei, dass auf den linken Seiten der Ersetztungsregeln immer nur ein einzelnes Nichtterminal steht, sodass jedes Nichtterminal, egal in welchem Kontext es steht, immer gleich ersetzt wird.
+Die Abbildbarkeit von regulären Grammatiken auf endliche Automaten führt dazu, dass man aus der Grammatik sehr leicht ein Programm ableiten kann, welches das Wortproblem lößt.
+Dabei drehen wir die Richtung der Grammatik um, und erzeugen keine Zeichenketten mehr, sondern konsumieren diese.
+Genau das, was wir für unseren Scanner brauchen.
 
-Das Angenehme an regulären Grammatiken ist, dass man sehr einfach ein
-Programm ableiten kann, das erkennt, ob eine gegebene Zeichenkette von
-der Grammatik erzeugt werden könnte. Wir drehen also die Richtung der
-Grammatik um, erzeugen keine Zeichenketten mehr, sondern konsumieren
-sie. Genau das, was wir für unseren Scanner brauchen.
+Allerdings ist der Nachweis ob eine gegebene Grammatik wirklich regulär ist, nicht ganz leicht.
+Daher gehen wir das Problem von einer anderen Seite heran und greifen auf **reguläre Ausdrücke** zurück um die Token unserer Sprache zu beschreiben.
+Beim diesem Formalismus ist konstruktiv sicher gestellt, dass jeder reguläre Ausdruck eine reguläre Sprache beschreibt.
+Daher kann man aus jedem regulären Ausdruck eine entsprechende reguläre Grammatik ableiten und es kann niemals geschehen, dass ein regulärer Ausdruck ausversehen nicht mehr regulär ist.
+Erreicht wird diese Garantie durch das Verbot rekursive Ersetzungen[fn::In keiner der möglichen Ersetzung eines Nichtterminals kann das Nichtterminal noch einmal auftreten.].
+Um dennoch das wiederholte Auftreten eines Nichtterminals zu erlauben, welches in regulären Grammatiken möglich ist[fn::Reguläre Grammatik: ~A -> xA~, Regulärer Ausdruck: ~x*~] wird der Kleene-Stern eingeführt, bei dem das direkt vorangegangene Nichtterminal 0 bis N mal ersetzt werden kann.
+Beim Parsen werden wir *kontextfreie* Grammatiken verwenden, die rekursive Ersetzungen enthalten und daher nicht mittels regulärerer Ausdrücke beschrieben werden können.
 
-Für das Erkennen einer regulären Sprache konstruiert man aus den
-Grammatikregeln einen *endlichen Automaten*, der die Zeichenkette
-elementweise konsumiert. An jeder Kante des Automaten gibt es eine
-Bedingung (engl. Guard), die angibt, bei welchen gelesenen Zeichen die
-Transition möglich ist. Ist die Entscheidung, welche Transition
-genommen wird, zu irgendeinem Zeitpunkt nicht eindeutig, so ist der
-Automat *nicht-deterministisch*. Erreichen wir beim Zeichen
-Konsumieren einen akzeptierenden Zustand, so haben wir ein Wort
-der formalen Sprache erkannt. Allerdings können akzeptierende Zustände
-auch wieder verlassen werden, um noch längere Worte der Sprache zu erkennen.
-Im Fall der Hexadezimalzahlen dürfen am Ende noch beliebig viele
-Zeichen aus der Klasse ~[0-9a-fA-F]~ auftauchen.
+
+Für das Erkennen einer regulären Sprache konstruiert man aus den Grammatikregeln einen *endlichen Automaten*, der die Zeichenkette elementweise konsumiert.
+An jeder Kante des Automaten gibt es eine Bedingung (engl.
+Guard), die angibt, bei welchen gelesenen Zeichen die Transition möglich ist.
+Ist die Entscheidung, welche Transition genommen wird, zu irgendeinem Zeitpunkt nicht eindeutig, so ist der Automat *nicht-deterministisch*.
+Erreichen wir beim konsumieren einen akzeptierenden Zustand, so haben wir ein Wort der formalen Sprache erkannt.
+Allerdings können akzeptierende Zustände auch wieder verlassen werden, um noch längere Worte der Sprache zu erkennen.
+Im Fall der Hexadezimalzahlen dürfen am Ende noch beliebig viele Zeichen aus der Klasse ~[0-9a-fA-F]~ auftauchen.
+
 
 Im Kontext eines Scanners bedeutet das Erreichen eines akzeptierenden
 Zustandes, dass wir ein valides Token gefunden haben. Allerdings
@@ -393,14 +391,14 @@ finden, das die maximale Länge hat (*longest possible match*).
 
 Da es in einer Programmiersprache unterschiedliche Arten von Token
 gibt, die es zu erkennen gilt, müssen wir mehrere Automaten
-kombinieren; ein Automat/Grammatik/Sprache für jeden Tokentyp. Dazu
-lassen wir "einfach" all diese Automaten parallel laufen und füttern
-jedes gelesene Zeichen in alle Automaten gleichzeitig, sodass jeder
+kombinieren; ein Automat/Grammatik/regulären Ausdruck/Sprache für jeden Tokentyp. Dazu
+lassen wir "einfach" alle Automaten parallel laufen und füttern
+jedem Automaten jedes gelesene Zeichen, sodass jeder
 Automat eine Transition macht. Hat ein Automat zu einem Zeitpunkt
 keine valide Transition, so fällt er aus (Folien: er wird grau) und
 wird nicht weiter mit Zeichen gefüttert. Erreicht einer der Automaten
 einen akzeptierenden Zustand, so merken wir uns das erkannte Wort (auch
-Lexem genannt). Wir füttern die Automaten so lange mit Zeichen, bis
+**Lexem** genannt). Wir füttern die Automaten so lange mit Zeichen, bis
 auch der letzte von ihnen ausgefallen ist und geben das zuletzt
 gefundene Wort als Token zurück.
 
