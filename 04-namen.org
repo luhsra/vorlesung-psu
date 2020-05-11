@@ -46,13 +46,13 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
   \end{frame}
 
   \lstdefinestyle{defuse}{
-    moredelim=**[is][{\btHL[fill=safegreen!50]<2-3>}]{!}{!},
-    moredelim=**[is][{\btHL[fill=safeblue!50]<3>}]{@}{@},
-    moredelim=**[is][{\btHL[fill=safeblue!50]<3->}]{^u}{^},
-    moredelim=**[is][{\btHL[fill=safegreen!50]<3->}]{^d}{^},
+    moredelim=**[is][{\btHL[fill=safegreen!50]<2-3|handout:2-3>}]{!}{!},
+    moredelim=**[is][{\btHL[fill=safeblue!50]<3|handout:3>}]{@}{@},
+    moredelim=**[is][{\btHL[fill=safeblue!50]<3-|handout:3->}]{^u}{^},
+    moredelim=**[is][{\btHL[fill=safegreen!50]<3-|handout:3->}]{^d}{^},
     escapechar=`,
   }
-  \begin{frame}<handout:2,5>[fragile]{"Motivierendes" Beispiel: C++}
+  \begin{frame}<handout:3,5>[fragile]{"Motivierendes" Beispiel: C++}
     \def\p#1{\tikzmark{p#1}}
     \begin{columns}[t]
       \begin{column}{0.49\textwidth}
@@ -126,22 +126,21 @@ In dieser Vorlesung wollen wir uns damit beschäftigen, wie solche Antworten aus
 Dabei wird keine Sprache alle der hier vorgestellten Prinzipien auch anwenden, sondern es wird immer nur eine Untermenge zur Anwendung kommen.
 
 Auf Seite des Übersetzers ist die Verbindung zwischen der Stelle, an der ein Name eingeführt wird (*Deklaration*), und seinen Verwendungen (*Referenzierung*) eine wichtige Querverbindung, die das Programm zusammenhält.
-Zu jeder Verwendung eines Namens muss der Übersetzer die passende Deklaration finden; diesen Prozess, von der Verwendung zum Deklaration, nennen wir (partielle) *Namensauflösung*[fn::
+Zu jeder Verwendung eines Namens muss der Übersetzer die passende Deklaration finden; diesen Prozess, von der Verwendung zur Deklaration, nennen wir (partielle) *Namensauflösung*[fn::
 Partiell deswegen, weil wir im Übersetzer nur die Deklaration und nicht in jedem Fall das dahinterliegende Laufzeitobjekt finden.
-Vollständige Namensauflösung verbindet einen Namen mit der Speicheradresse eines Objekts.
-Dazu aber später mehr.].
+Vollständige Namensauflösung verbindet einen Namen mit der Speicheradresse eines Objekts. Partielle Namensauflösung findet hier vielleicht nur das relative Offset eines Objekts zu einer Basisaddresse. Dazu aber später mehr.].
 Entlang dieser Verbindungen, die quer zu den Ästen und Blättern des abstrakten Syntaxbaums (AST) gezogen werden, können Informationen zwischen der Deklarationsstelle und der Verwendungsstelle fließen.
 Die wichtigste Art von transportierten Information sind die der Typen.
 
-FIXME: Paar Worte zu Speicherlayout vor Erwähnung von Offsets
+
 Im Beispiel (auf den Folien) etabliert die Namensauflösung einen Link (die roten Pfeile) zwischen der Verwendungsstelle ~y~ und der Deklarationsstelle ~int y~ in Klasse ~B~.
-Entlang dieses Links fließt zum einen die Information, dass ~y~ vom Typ Ganzzahl ist, aber auch dass das Feld ~y~ mit einem relativen Offset (zum ~this~ Zeiger) von 4 zu finden ist.
-Mit diesem Wissen kann der Übersetzer in der Funktion ~func()~ zum einen prüfen, dass nur valide Operationen auf ~y~ ausgeführt werden und zum anderen kann er Code erzeugen, der das Feld, relativ zu einem ~this~ Zeiger, lesen und schreiben kann.
+Entlang dieses Links fließt zum einen die Information, dass ~y~ vom Typ Ganzzahl ist, aber auch dass der Übersetzer das Speicherlayout von ~B~-Objekten so berechnet hat, dass das das Feld ~y~ mit einem relativen Offset (zum ~this~ Zeiger) von 4 zu finden ist.
+Mit diesem Wissen kann der Übersetzer in der Funktion ~func()~ zum einen prüfen, dass nur valide Operationen auf ~y~ ausgeführt werden und zum anderen kann er Code erzeugen, der das Feld, relativ zu einem ~this~ Zeiger, ~y~ lesen und schreiben kann.
 
 In diese Vorlesung werde ich mich hauptsächlich auf solche Deklarationen konzentrieren, hinter denen zur Laufzeit ein Objekt steht, welches eine Speicheradresse hat.
 Allerdings gilt dies nicht für jede Deklaration.
 So haben in übersetzten Sprachen *Typdeklarationen* oft kein Pendant zur Laufzeit (es gibt keine Typobjekte), sondern es sind nur die angehefteten Informationen an der Deklarationsstelle (z.B. der Typausdruck) von Relevanz.
-Allerdings gelten auch für diese Deklarationen die selben Regeln und Prinzipien zur Namensauflösung, sie ist nur schon an der Deklarationsstelle beendet und muss/kann nicht bis zu einer Speicheradresse fortgeführt werden.
+Allerdings gelten auch für diese Deklarationen die selben Regeln und Prinzipien zur Namensauflösung, sie ist nur schon an der Deklarationsstelle beendet und muss/kann nicht bis zu einer Speicheradresse fortgeführt werden. Hier kann der Übersetzer also bereits eine vollständige Namensauflösung durchführen.
 
 Auf Seiten des Sprachdesigns haben die Regeln zur Namensauflösung auch eine zentrale Rolle:
 Eines der Kernprinzipien der Softwaretechnik ist das *Information Hiding*, bei dem man sein Programm in Komponenten[fn::Komponente ist kein allgemein definierter Begriff, und kann in unterschiedlichen Kontexten unterschiedliches bedeuten. Das grundlegende Merkmal von Komponenten ist aber, dass es ein "Innen" und ein "Außen" gibt, zwischen denen eine Schnittstelle definiert wird.] aufteilt (z.B.
@@ -206,8 +205,6 @@ Hier helfen die Sprachkonstrukte der Namensdeklaration dabei, Komponenten entlan
   \end{frame}
 #+end_src
 
-TODO: Add AST in 04-scopes, 1. Bild, Rechte Seite
-
 Nach diesem sehr groben Überblick über den ganzen Bereich der Namen, möchte ich einige Grundbegriffe genauer definieren, damit ich für den Rest dieses Skripts auf eine möglichst wohldefinierte Nomenklatur zurückgreifen kann.
 Der erste Begriff ist der des *Namens*:
 Ein Name ist eine symbolische und statische Referenz im Programmcode.
@@ -225,7 +222,7 @@ Falls es zu einem Namen tatsächlich ein Objekt zur Laufzeit gibt, so ist die *A
 Bereits erwähnt habe ich den Begriff der *Deklaration*.
 Deklarationen sind jene Stellen im Quellcode, die einen Namen einführen und damit dem Übersetzer bekannt machen.
 Für jede Verwendung eines Namens wird der Übersetzer die, im referenzierenden Kontext sichtbare, Deklaration suchen; gibt es keine sichtbare Deklaration, so ist das Programm fehlerhaft.
-In Sprachen gibt es viele Konstrukte, die benannt sind und daher einen Namen deklarieren.
+In Sprachen gibt es unterschiedliche Konstrukte, die benannt sind und daher einen Namen deklarieren.
 
 Der Begriff der *Definition* ist eine Erweiterung der Deklaration.
 Neben der Einführung eines neuen Namens, gehen Definitionen mit der Erstellung (Allokation) des konkreten Objekts einher.
@@ -257,7 +254,7 @@ REF   -> NAME          // Verwendung  eines Namens
 Als erstes werden wir uns mit den Regel der Namensauflösung in geschachtelten Namensräumen beschäftigen.
 Dabei wollen wir uns zunächst nur mit statischer Namensauflösung beschäftigen, bei der hinter jeder Namensdeklaration maximal ein Laufzeitobjekt sein kann.
 Der Gegensatz zu dieser *statischen Namensauflösung* ist die dynamische Namensauflösung, bei der es zu einer Deklaration mehrere Objekte[fn::Hinter einem Attribut in einer Klasse steht in jeder Instanz ein anderes Objekt.
-Der ~this~ Zeiger dient zur Unterscheidung.] geben kann, zwischen denen wir mit zusätzlichem Laufzeitwissen unterscheiden werden.
+Der ~this~ Zeiger dient zur Unterscheidung.] geben kann, zwischen denen wir mit zusätzlichem Laufzeitwissen unterscheiden werden um den Namen doch noch eindeutig und vollständig aufzulösen.
 Dazu aber später mehr.
 
 ** Implizite Namensauflösung
@@ -317,7 +314,7 @@ Dazu beginnen wir unsere Suche nach der Deklaration bei dem Namensraum, der die 
 Diese Regel heißt die "Closest-nested scope rule" (CNSR).
 
 Eine Folge der CNSR ist, dass Deklarationen in untergeordneten Namensräumen *verdeckt* werden können.
-Dabei bleibt die äußere Deklaration weiterhin bestehen, aber wir können sie mittels der impliziten Namensauflösung nicht mehr referenzieren; sie verliert ihre *Sichtbarkeit*.
+Dabei bleibt die äußere Deklaration weiterhin bestehen, aber wir können sie mittels der impliziten Namensauflösung nicht mehr referenzieren; sie verliert ihre *Sichtbarkeit*. Eine Deklaration ist an einer Stelle im Programm sichtbar, wenn eine Namensreferenz zu dieser Deklaration aufgelößt werden könnte.
 Nachdem der Namensraum der inneren Deklaration geschlossen wurde, wird die äußere Deklaration wieder sichtbar und kann referenziert werden.
 Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die letzte Deklaration von A ihre Sichtbarkeit.
 
@@ -393,14 +390,14 @@ Das Pendant auf Dateisystemebene, auch einem hierarchischen Namensraum (siehe Gr
 Ein Reihung von Bezeichnern, die durch Doppelpunkte getrennt sind, ist daher eine Art expliziter Pfad im hierarchischen Namensraum.
 Fängt dieser Pfad mit ~::~ an, so haben wir einen *vollständig qualifizierten Namen* (=absoluter Pfad), ansonsten haben wir einen relativ qualifizierten Namen (=relativer Pfad).
 
-Explizite Namensräume sind eine grundlegende Erweiterung des Namensraumkonzepts, da sie es uns erlauben, kontrolliert auf Unternamensräume zuzugreifen und nicht nur auf die CNSR angewiesen zu sein.
+Explizite Namensräume sind eine grundlegende Erweiterung des Namensraumkonzepts, da sie es uns erlauben, kontrolliert auf Unternamensräume zuzugreifen und wir nicht mehr ausschließlich auf die CNSR angewiesen sind.
 Sehr nah an dieser Erweiterung ist das C++-Konstrukt ~namespace~, welches einem Namensraum wirklich nur einen eigenen Namen gibt, und sonst nichts weiteres tut.
 
-Noch eine spannende Bemerkung zum impliziten Wurzelnamensraum:
+Noch eine spannende Bemerkung zu impliziten Wurzelnamensräumen:
 Wenn eine Sprache keine Möglichkeit bietet, auf diese Wurzel zugreifen zu können, so kann man einen Namensraum vom Rest des Programms isolieren.
-Innerhalb des Namensraums hat man keine Möglichkeit Namen zu notieren, die auf Deklarationen von außerhalb referenzieren.
+Innerhalb des Namensraums hat man keine Möglichkeit Namen zu notieren, die auf Deklarationen, die außerhalb des Namensraums deklariert wurden,referenzieren.
 Nur jene Objekte, die wir (dynamisch) in diesen Namensraum hinein geben, erlauben dem enthaltenen Code auf die Außenwelt zuzugreifen.
-FIXME: die auf Deklaration von außerhalb referenzieren oder auf die?
+
 
 ** Import von Namen
 :PROPERTIES:
@@ -819,7 +816,7 @@ Und das kann ja irgendwie nicht sein. Wir müssen also unseren Formalismus und d
 Wenn wir uns zurückerinnern, dann soll jeder Name eindeutig stellvertretend für (maximal) ein Objekt sein.
 Diesen Grundsatz wollen wir zunächst beibehalten.
 Allerdings können wir am Folienbeispiel von ~struct N~ sehen, dass das Feld ~int a~ der beiden Objekte nicht über ~N::a~, sondern über ~objA.a~ und ~objB.a~ referenziert wird.
-Man könnte also sagen, dass unter den Namen ~objA~ und ~objB~ Kopien des Namensraums von ~struct N~ angelegt wurden.
+Man könnte also sagen, dass unter den Namen ~objA~ und ~objB~ **Kopien des Namensraums** von ~struct N~ angelegt wurden.
 In unserer Namensraumsprache wäre es ungefähr:
 
 #+begin_example
@@ -1147,21 +1144,10 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
     \ii<2-> Ein \structure{Zeiger} speichert das Ergebnis einer vollständigen Namensauflösung.{
       \bi
       \ii Der \codeinline{&(<Namenspfad>)}-Operator löst den Pfad auf und gibt eine Adresse zurück.
-      \ii<3-> Der \codeinline{(*<Name>)}-Operator macht das von Name referenzierte Objekt zugänglich.
+      \ii<3-> Der \codeinline{(*<Name>)}-Operator macht das referenzierte Objekt zugänglich.
       \ei
       \begin{columns}
-        \begin{column}{0.49\textwidth}
-          \begin{code}[tag=C]
-            \begin{C}
-              struct N{
-                int var;
-              };
-              struct N obj;
-              int *ptr = &(obj.var);
-              (*ptr)++;
-            \end{C}
-          \end{code}
-        \end{column}\hfill
+       \hfill
         \begin{column}<3->{0.49\textwidth}
           \begin{code}[tag=C]
             \begin{C}
@@ -1170,10 +1156,11 @@ Mit dem Wissen um Closures und Call-Frames können Sie sich nun überlegen, was 
               };
               struct N obj;
               struct N* ptr = &obj;
-              (*ptr).var;
+              // obj.var == (*ptr).var;
             \end{C}
           \end{code}
         \end{column}
+        \hfill\mbox{}
       \end{columns}
     }
     \ii<4-|handout:4-> \structure{Aliase}: Mehrere Namen (\codeinline{obj}, \codeinline{*ptr}) binden nun das selbe Objekt.{\\
@@ -1194,7 +1181,7 @@ Diesen Zugriff auf das Ergebnis der Adressberechnung können wir in C/C++ mit de
 Zu einem späteren Zeitpunkt können wir das gespeicherte Ergebnis verwenden, um nun tatsächlich auf das Objekt zuzugreifen.
 Bei diesem nachgelagerten Schritt dereferenzieren (~(*ptr)~) wir den Zeiger und berechnen die Adresse des Objekts durch einen Blick in den Speicher. Man könnte also sagen, dass ~*ptr~ auch ein Namensauflösungspfad ist, er hängt nur von zusätzlichem Laufzeitwissen ab. Zeiger sind demnach Teil der dynamischen Namensauflösung.
 
-Mit Zeigern bekommen wir nun Situationen, bei denen mehrere Namen Stellvertreter für das selbe Objekt sind, sie sind *Aliase* voneinander.
+Mit Zeigern bekommen wir nun Situationen, bei denen mehrere Namen Stellvertreter für das selbe Objekt sind; sie sind *Aliase* voneinander.
 In unserem Beispiel zeigt der Name ~obj~ und der Pfad ~*ptr~ auf das selbe Objekt, obwohl die Deklarationen beider Namen nichts miteinander zu tun haben.
 Die beiden Namen wurden erst zur Laufzeit an das selbe Objekt gebunden.
 Solche Aliase haben eine wichtige Bedeutung für einen optimierenden Übersetzer.
@@ -1296,7 +1283,7 @@ Dort muss der Übersetzer die Typen der Argumente ausrechnen und den Namen vervo
 Wir schrieben nur ~isNeg(...)~ und der Übersetzer macht daraus eine Referenz für den Namen ~isNeg(string)~, weil er erkennen kann, dass das Argument ein String ist.
 
 #+begin_src latex
-\begin{frame}{Namensauflösung für überladene Funktionen}
+\begin{frame}<handout:1-5,7>{Namensauflösung für überladene Funktionen}
     \begin{columns}[t]
       \begin{column}{0.38\textwidth}
         \btAnimation[width=\textwidth]{raisebox,range=1-6:<1->,6:<7->}{fig/04-overloading-resolution}
@@ -1312,7 +1299,7 @@ Wir schrieben nur ~isNeg(...)~ und der Übersetzer macht daraus eine Referenz f�
           \bi
           \ii<2-> Suche nach sichtbaren Deklaration
           \ii<2-> \alert<2-3>{Abbruch} der Suche beim ersten Treffer\\[1ex]
-          \OrangeBox<3->{\strut Java: Überladung vs. Überschreiben}
+          \OrangeBox<3-|handout:3->{\strut Java: Überladung vs. Überschreiben}
           \ei
         }\medskip
         \ii<4-|handout:4-> Typsignaturen durch Typsystem ermitteln{
@@ -1325,7 +1312,7 @@ Wir schrieben nur ~isNeg(...)~ und der Übersetzer macht daraus eine Referenz f�
           \bi
           \ii Übereinstimmung in Parameteranzahl
           \ii<6-> Typen müssen gleich sein\\[1ex]
-          \OrangeBox<7>{\strut Statische Namensauflösung möglich!}
+          \OrangeBox<7|handout:7>{\strut Statische Namensauflösung möglich!}
           \ei
         }
         \ee
@@ -1334,7 +1321,7 @@ Wir schrieben nur ~isNeg(...)~ und der Übersetzer macht daraus eine Referenz f�
   \end{columns}
   \end{frame}
 
-  \begin{frame}[fragile]{Fallbeispiel: Statische Überladung in C++}
+  \begin{frame}<beamer:0>[fragile]{Fallbeispiel: Statische Überladung in C++}
     \begin{code}[tag=C++]
       \begin{CPP}[style=highlighting]
         bool isNeg(int x)    {...}

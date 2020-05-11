@@ -9,6 +9,22 @@
       \LINE[onslide=<3>{fill=refcolor}] (use) {A};
     \end{SCOPE}
 
+    \begin{scope}[visible on=<1>]
+      \node[right=6cm of A-start.north west,anchor=north west,draw=badbee,thick,fill=badbee!20,align=center,font=\scriptsize] {
+        FuncDecl\\foo
+      }
+      child { node[draw=badbee,thick,fill=badbee!20,align=center,font=\scriptsize] {
+        VarDecl\\A
+      }}
+      child { node[draw=badbee,thick,fill=badbee!20,align=center,font=\scriptsize] {
+        VarDecl\\B
+      }}
+    child { node[draw=luhblue,thick,fill=luhblue!20,align=center,font=\scriptsize] {
+        VarRef\\A
+      }}
+      ;
+    \end{scope}
+    
     \begin{scope}[visible on=<2>]
       \node[right=2cm of decl.west,anchor=west,draw=badbee,thick,fill=badbee!20,text width=7cm] {
         Wir werden eine Mini-Sprache entwicklen, um wichtige Aspekte der Namensauflösung zu beleuchten.
