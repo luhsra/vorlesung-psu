@@ -1,5 +1,6 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 05 - Semantische Analyse
+#+DATE: [2020-05-19]
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
@@ -24,15 +25,14 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
    - Unifikation
 
 
+
 * Ziele der semantischen Analyse
 :PROPERTIES:
 :CUSTOM_ID: 05-einleitung
 :END:
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
-  \begin{frame}
-    \maketitle
-  \end{frame}
+  \maketitleframe
 
   \begin{frame}{Einordnung in die Vorlesung: Semantische Analyse}
     \begin{center}
@@ -396,7 +396,7 @@ an die Deklarationen/Statements geheftet wurden.
       \ei
     }
     \ei
-    \begin{btBlock}[type=example]{\textbf{Beispiel}: Höhe (h) und Wert (v) in einem Additionsbaum}
+    \begin{btBlock}<handout:2->[type=example]{\textbf{Beispiel}: Höhe (h) und Wert (v) in einem Additionsbaum}
       \btAnimation[width=0.9\textwidth]{center,1:<1>,range=1-9:<2->}{fig/05-attribute-tree}
       \btAnimation[width=0.6\textwidth]{center,10:<11->}{fig/05-attribute-tree}
     \end{btBlock}
@@ -688,7 +688,7 @@ Um dieses Problem zu lösen und besseren Code zu schreiben, faktorisieren wir je
     \end{btBlock}
 
     \bi
-    \ii<2-> Dynamischer Dispatch in den \textbf{ersten zwei Argumenten} nötig{
+    \ii<2-|handout:2-> Dynamischer Dispatch in den \textbf{ersten zwei Argumenten} nötig{
       \bi
       \ii Emulation mittels zweifachem virtuellen Methodenaufruf.
 

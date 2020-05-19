@@ -1,5 +1,7 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 04 - Namen
+#+DATE: [2020-05-12]
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/wJbEo
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
@@ -27,9 +29,7 @@ Was lernt man aus dieser Vorlesung für die Ziele effektiv und effizient?
 :END:
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
-  \begin{frame}
-    \maketitle
-  \end{frame}
+  \maketitleframe
 
   \begin{frame}{Wieso sollte ich mich mit Namen beschäftigen?}
     \begin{center}
@@ -342,7 +342,13 @@ Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die let
           \ii \alert<2>{Grundlegende Erweiterung} des Namensraumkonzepts
           \ei
         }
-        \ii<3-|handout:2-> In C++: \enquote{\texttt{\LET <X>=...}} = \enquote{\texttt{namespace <X>}}{
+        \ii<3-|handout:2-> Impliziter Wurzelnamensraum {
+          \bi
+          \ii Ermöglicht es, alle Namensräume zu adressieren
+          \ii Vollständig qualifizierter Name ist eindeutig
+          \ei
+        }
+        \ii<4-|handout:3-> In C++: \enquote{\texttt{\LET <X>=...}} = \enquote{\texttt{namespace <X>}}{
           \begin{code}[tag=C++]
             \begin{CPP}
               namespace N { namespace M {
@@ -352,12 +358,7 @@ Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die let
           \end{code}
           \vspace{-1ex}
         }
-        \ii<4-|handout:3-> Impliziter Wurzelnamensraum {
-          \bi
-          \ii Ermöglicht es, alle Namensräume zu adressieren
-          \ii Vollständig qualifizierter Name ist eindeutig
-          \ei
-        }
+
         \ei
       \end{column}
     \end{columns}
@@ -760,7 +761,7 @@ Aber Sie wurden gewarnt, dass dies nicht wirklich dasselbe ist!
         \bii
         \ii \codebox{objA.a} und \codebox{objB.a} sind verschieden
         \ii \structure{Punktoperator} macht dynamische Auflösung\\{
-          \texttt{<obj>.<name>}: \codeinline{&obj + offset(N::name))}
+          \texttt{<obj>.<name>}: \codeinline{&obj + offset(N::name)}
         }
         \ii Java unterscheidet syntaktisch nicht zwischen dynamischer und statischer Namensauflösung.
         \eii
@@ -844,7 +845,7 @@ Das zusätzliche Attribut bedeutet, dass zur Adressberechnung von ~NAME~ Laufzei
 Im Gegensatz zu vielen Sprachen, bleiben wir dabei, immer den ~::~-Operator zur Namensauflösung zu nehmen, egal ob wir dynamisches Wissen brauchen oder nicht.
 
 #+begin_src latex
-  \begin{frame}<handout:2>[fragile]{Fallbeispiel: Klassen in C++}
+  \begin{frame}<beamer:0|handout:2>[fragile]{Fallbeispiel: Klassen in C++}
     \begin{columns}[t]
       \begin{column}{0.35\textwidth}
         \begin{code}[]

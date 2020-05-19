@@ -3,6 +3,7 @@
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+DATE: [2020-05-05]
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/QlDPX
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 
 #+NAME: topic

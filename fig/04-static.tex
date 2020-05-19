@@ -4,8 +4,8 @@
 \begin{document}
 \begin{frame}
   \begin{tikzpicture}[start chain=going below,node distance=0cm]
-    \begin{SCOPE}[text={\LET O=},text after={[I]}]{O}
-      \begin{SCOPE}[text={\LET I=},text after={[I]}]{I}
+    \begin{SCOPE}[text={\LET O=},text after={[I,D]}]{O}
+      \begin{SCOPE}[text={\LET I=},text after={[I,D]}]{I}
         \LINE[] (def) {\alt<1>{\LETe}{\LET[E,S]} A};
         \node[right=2 of def.west] (right){};
       \end{SCOPE}
@@ -28,9 +28,9 @@
       (NS.north east)
       ++(east:1cm) node[fill=refcolor] (O) {\strut objO};
 
-      \node[right=0 of O] (d1) {\strut ::};
+      \node[right=0 of O] (d1) {\strut .};
       \node[right=0 of d1,fill=refcolor] (I) {\strut objI};
-      \node[right=0 of I] (d2) {\strut ::};
+      \node[right=0 of I] (d2) {\strut .};
       \node[right=0 of d2] (A) {\strut A};
     \end{scope}
 

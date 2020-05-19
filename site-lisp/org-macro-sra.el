@@ -36,6 +36,7 @@
  (with-file-from-disk file
   (let* ((url (s-replace ".org" ".html" file))
          (date (org-global-prop-value "date"))
+         (video-url (org-global-prop-value "video_url"))
          (date-html (if date (format "<span class=\"structure\">%s</span> " date) ""))
          )
     (concat
@@ -45,8 +46,11 @@
              url (org-global-prop-value "subtitle"))
      (format "<div class=\"row\"><div class=\"col-md-4\"><img class=\"img-index\" src=\"%s\"></div>" img)
      "<div class=\"col-md-8\">\n"
-     "<p> Abschnitte: "
-     (message "%s" (org-macro-headlines file))
+     "<p>"
+     (if video-url
+         (format "<strong><a href=\"%s\">Videoaufzeichnung</a></strong>  - " video-url)
+       "") 
+     "<strong>Abschnitte:</strong> " (org-macro-headlines file)
      "</p></div></div>\n"
      "#+end_export\n"
      ))))

@@ -8,11 +8,13 @@
         \LINE[fill=letcolor] (def) {\LET A};
       \end{SCOPE}
       \LINE[fill=refcolor] (use-short) {\only<2->{M::}A};
-      \begin{SCOPE}{C}
+    \end{SCOPE}
+    \begin{SCOPE}{C}
         \LINE[fill=refcolor,] (use-wide) {\only<3->{::N::M::}A};
         \node at ($(use-wide.west)+(east:2.2cm)$) (right) {};
       \end{SCOPE}
-      \begin{scope}[visible on=<1>]
+    
+    \begin{scope}[visible on=<1>]
         \draw[dashed,->] (use-short) -- (def);
         \draw[dashed,->] (use-wide) -- node[sloped,below]{Intention} (def.south east);
       \end{scope}
@@ -25,7 +27,6 @@
         \draw[->] (use-wide.east) -- (use-wide.east -| right) |- (B-start.east);
         \draw[->] (use-wide.east) -- (use-wide.east -| right) |- (A-start.east);
       \end{scope}
-    \end{SCOPE}
   \end{tikzpicture}
 \end{frame}
 \end{document}
