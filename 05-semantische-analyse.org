@@ -1347,8 +1347,8 @@ In der Literatur gibt es mehrere Verfahren, um die Unifikation effizient durchzu
     \bi
     \ii Semantische Analyse prüft die restlichen kontextsensitiven Sprachregeln{
       \bi
-      \ii \structure{Namensauflösung}: Gibt es zu jeder Referenz es eine Deklaration?
-      \ii \structure{Typkonsistenz}:  Werden die statische Typen korrekt verwendet?\\[1ex]
+      \ii \structure{Namensauflösung}: Gibt es zu jeder Referenz eine Deklaration?
+      \ii \structure{Typkonsistenz}:  Werden die statischen Typen korrekt verwendet?\\[1ex]
       \ii[\color{srared}$\Rightarrow$] Nach der semantischen Analyse haben wir ein korrektes Programm vor uns!
       \ei
     }\medskip
