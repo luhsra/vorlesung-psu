@@ -74,7 +74,7 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
     \ei
     \pause
     \begin{btBlock}{Definition: Objekt}
-      Ein Objekt ist ein existentiell-abhängiger Verbund von Informationen.
+      Ein Objekt ist ein existenziell abhängiger Verbund von Informationen.
     \end{btBlock}
     \pause
     \hspace{-1em}\textbf{Wichtig:} \btSetTab (1) Variablen $\subset$ Objekte! Variablen können Objekte beinhalten.\\
@@ -83,43 +83,43 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
 #+end_src
 
 Nachdem wir uns im Kapitel zur semantischen Analyse stark mit Techniken beschäftigt haben, welche in einem Übersetzer zum Einsatz kommen, wollen wir uns in diesem Kapitel wieder den *Konzepten von Programmiersprachen* widmen.
-Genauer gesagt, wollen wir betrachten, was eigentlich ein *Objekt* ausmacht und welchen Wandel ein einzelnes Objekt im Verlauf eines Programms durchmacht.
-Dabei werde ich ein viel breiteres und gleichzeitig viel engeres Verständnis von "Objekt" annehmen, als man dies in den sogenannten Objekt-Orientierten Programmiersprachen verwendet.
+Genauer gesagt wollen wir betrachten, was eigentlich ein *Objekt* ausmacht und welchen Wandel ein einzelnes Objekt im Verlauf eines Programms durchmacht.
+Dabei werde ich ein viel breiteres und gleichzeitig viel engeres Verständnis von "Objekt" annehmen, als man dies in den sogenannten objektorientierten Programmiersprachen verwendet.
 Breiter deshalb, weil ich jedes Datum und jede Ansammlung von Daten als Objekt betrachte, und enger, weil ich dabei nur auf die passiven Informationen und nicht auf die damit verbundenen (aktiven) Operationen eingehe.
 Diese werde ich erst im nächsten Kapitel genauer diskutieren.
 
-Es lohnt sich jedoch Objekt einmal in Isolation, losgelößt von ihren Operationen, zu betrachten.
+Es lohnt sich jedoch, Objekte einmal in Isolation, losgelöst von ihren Operationen, zu betrachten.
 Objekte sind jene Entitäten mit deren Hilfe wir Informationen im Programmverlauf hin und her werfen.
-Daher ist es für den /effektiven Programmierer/ essentiell zu verstehen wie Objekte entstehen, wie wir sie verwenden und wie sie zerstört werden.
+Daher ist es für den /effektiven Programmierer/ essenziell zu verstehen, wie Objekte entstehen, wie wir sie verwenden und wie sie zerstört werden.
 Um diesen Wandel einzelner Objekte zu verdeutlichen, werde ich für diese Vorlesung die Metapher vom Lebenszyklus eines Objekts verwenden, welche sich in vielen etablierten programmiersprachlichen Begriffen, wie der Lebenszeit eines Objekts, wiederfindet.
-Der /effiziente Programmierer/ lernt in dieser Vorlesung, welche Kosten bei unterschiedlichen Typen von Objekten und Zugriffen entstehen und was es bedeutet wenn eine Sprache automatisches Speichermanagement (Garbage Collection) durchführt.
+Der /effiziente Programmierer/ lernt in dieser Vorlesung, welche Kosten bei unterschiedlichen Typen von Objekten und Zugriffen entstehen und was es bedeutet, wenn eine Sprache automatisches Speichermanagement (Garbage Collection) durchführt.
 
 Zunächst müssen wir aber definieren, was wir, für diese Vorlesung, unter einem "Objekt" überhaupt verstehen.
 Dazu möchte ich noch einmal das Maschinenmodell aus der ersten Vorlesung in Erinnerung rufen:
-Die virtuelle Maschine der Sprache definiert wie wir Informationen ablegen (Objekte im Speicher) und wie wir diese Daten verarbeiten können (Operationen).
-Schauen wir mit dieser Brille auf einen real-existierenden Prozessor, so kennt dessen Maschinenmodell nur Zahlen als Objekte, welche in Registern bzw. dem Hauptspeicher abgelegt werden können.
-Weiterhin ist jede Zahl ein Verbund von 8, 16, 32 oder 64 einzelnen Bits, welche die grundlegendste informations-tragende Entität ist.
+Die virtuelle Maschine der Sprache definiert, wie wir Informationen ablegen (Objekte im Speicher) und wie wir diese Daten verarbeiten können (Operationen).
+Schauen wir mit dieser Brille auf einen real existierenden Prozessor, so kennt dessen Maschinenmodell nur Zahlen als Objekte, welche in Registern bzw. dem Hauptspeicher abgelegt werden können.
+Weiterhin ist jede Zahl ein Verbund von 8, 16, 32 oder 64 einzelnen Bits, welche die grundlegendste informationstragende Entität darstellen.
 
-Verallgemeinern wir dies, so könnten wir sagen, dass ein Objekt ein Verbund von Informationen ist, der existentiell voneinander abhängig ist und logisch zusammengehört.
+Verallgemeinern wir dies, so könnten wir sagen, dass ein Objekt ein Verbund von Informationen ist, der existenziell voneinander abhängig ist und logisch zusammengehört.
 Logisch-zusammengehörig deswegen, weil die Definition unabhängig davon ist, an welchen Orten die Informationen gespeichert sind.
 So sind die einzelnen Bits eines Maschinenworts in unterschiedlichen Flip-Flops bzw.
 DRAM-Zellen[fn::Im Fall von DRAM können die einzelnen Bits einer Speicherzelle sogar auf mehrere Chips verteilt sein.]
 verteilt.
-Dies hält uns aber nicht davon ab, die logisch-zusammengehörigen Bits als eine Zahl zu sehen. Löschen wir die Zahl, zum Beispiel durch überschreiben der Speicherzelle, so gehen auch die Wahrheitswerte der einzelnen Bits verloren. Die Bits sind also in ihrer Existenz abhängig von der Zahl.
+Dies hält uns aber nicht davon ab, die logisch zusammengehörigen Bits als eine Zahl zu sehen. Löschen wir die Zahl, zum Beispiel durch überschreiben der Speicherzelle, so gehen auch die Wahrheitswerte der einzelnen Bits verloren. Die Bits sind also in ihrer Existenz abhängig von der Zahl.
 
-Betten wir ein Objekt ein, so entsteht ein neues, größeres Objekt und die Einbettung wird existentiell abhängig:
+Betten wir ein Objekt ein, so entsteht ein neues, größeres Objekt und die Einbettung wird existenziell abhängig:
 Das Array von Zahlen ist ein Verbund einzelner Zahlen, löschen wir das Array von Zahlen, so löschen wir auch die enthaltenen Zahlen.
-Dabei ist egal, dass die Zahlen weiterhin im Speicher an der Stelle stehen, wo früher das Objekt stand. Für die Programmiersprache sind die Zahl-Objekte verloren.
+Dabei ist egal, dass die Zahlen weiterhin im Speicher an der Stelle stehen, wo früher das Objekt stand. Für die Programmiersprache sind die Zahlobjekte verloren.
 
 Auf Ebene der Programmiersprache haben wir eine deutlich größere Auswahl an verschiedenartigen und strukturierten Objekten als einfach nur Zahlen.
-Einen Einblick in solch strukturierte Daten haben wir bereits in der Typen-Vorlesung kennen gelernt[fn::Damals haben wir Typen, unter anderem, *denotationell* definiert: Typen sind die Menge von Objekten die sie beschreiben.
+Einen Einblick in solch strukturierte Daten haben wir bereits in der Typen-Vorlesung kennengelernt[fn::Damals haben wir Typen, unter anderem, *denotationell* definiert: Typen sind die Menge von Objekten, die sie beschreiben.
 Die Objekte dieser Typen sind es, mit denen wir uns nun beschäftigen werden.]:
 Zahlen, Arrays, Records, Referenzen, etc.
 Diese Objekte können alleine stehen (die Zahl) oder als Einbettung eines größeren Objekts auftreten (Array von Zahlen).
 Auf den Folien ist jeder umrandete Kasten ein einzelnes Objekt.
 
 Anders ist es, wenn wir eine Referenz auf ein anderes Objekt einbetten.
-In diesem Fall haben wir zwei unterschiedliche Objekte, da das referenzierte Objekt *unabhängig* von referenzierenden Objekt existieren könnte.
+In diesem Fall haben wir zwei unterschiedliche Objekte, da das referenzierte Objekt *unabhängig* vom referenzierenden Objekt existieren könnte.
 Das Löschen des einen Objekts führt nicht zwingend zur Löschung des anderen Objekts.
 
 #+begin_src latex
@@ -131,10 +131,10 @@ Das Löschen des einen Objekts führt nicht zwingend zur Löschung des anderen O
 
     \bi
     \ii \structure{Geburt}: Initialisierung von frisch allokiertem Speicher\\
-    \small Objekt-Zustand muss so präpariert werden, dass die Typ-Invarianten gelten.
+    \small Objektzustand muss so präpariert werden, dass die Typinvarianten gelten.
     \smallskip
     \ii<2-> \structure{Leben}: Objekte transportieren Informationen im Programmablauf\\
-    \small Sprache kann es uns erleichtern die Typ-Invarianten zu erhalten, sonst: Bugs.
+    \small Sprache kann es uns erleichtern, die Typinvarianten zu erhalten, sonst: Bugs.
     \smallskip
     \ii<3-> \structure{Tod}: Kontrolliertes Aufräumen des Zustands und Freigabe der Ressourcen\\
     \small Der Zeitpunkt und der Verantwortliche für das Aufräumen ist sprachabhängig.
@@ -144,11 +144,11 @@ Das Löschen des einen Objekts führt nicht zwingend zur Löschung des anderen O
 
 Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Lebenszyklus* von Objekten, denn viele Sprachkonstrukte drehen sich um das Management dieses Lebenszyklus:
 Durch Allokation und Initialisierung wird ein Objekt geboren.
-Während des Lebens, hat es einen, oder mehrere, Besitzer, die es ausgelesen, verändern und an Dritte weitergegeben.
-Und mit der Deinitialisierung und der Freigabe des Speichers, verlässt es uns wieder.
+Während des Lebens hat es einen oder mehrere Besitzer, die es ausgelesen, verändern und an Dritte weitergegeben.
+Und mit der Deinitialisierung und der Freigabe des Speichers verlässt es uns wieder.
 
-Während der gesamten Lebenszeit ist ein Objekt nur deswegen Objekt, weil es die Regeln seines Typen, die *Typ-Invarianten*, einhält.
-Diese Invarianten werden bei der Objekt-Geburt, durch die passende Belegung des Speichers, etabliert und müssen während der gesamten Lebenszeit aufrecht erhalten werden.
+Während der gesamten Lebenszeit ist ein Objekt nur deswegen Objekt, weil es die Regeln seines Typen, die *Typinvarianten*, einhält.
+Diese Invarianten werden bei der Objektgeburt durch die passende Belegung des Speichers etabliert und müssen während der gesamten Lebenszeit aufrecht erhalten werden.
 Verletzen wir diese Invarianten, zum Beispiel indem wir das 0-Byte am Ende eines C-Strings überschreiben, so verletzen wir das Typsystem und es kommt zu einem Bug.
 Erst beim Tod des Objekts dürfen die Typinvarianten wieder verletzt werden.
 Die Dauer dieses Lebenszyklus ist die *Lebenszeit* eines Objekts.
@@ -234,39 +234,39 @@ Mit diesen drei Phasen des Lebenszyklus (Geburt, Leben und Tod) werden wir uns i
   \end{frame}
 #+end_src
 
-Um den Lebenszyklus eines Objekts zu verdeutlichen schauen wir uns einen Logger in C an.
+Um den Lebenszyklus eines Objekts zu verdeutlichen, schauen wir uns einen Logger in C an.
 Hier werden die drei Phasen besonders deutlich, da nichts vom Lebenszyklus durch Sprachkonstrukte vor unserem Auge versteckt bzw.
 abstrahiert wird.
 
-Die ~log_t~-Objekte sind durch eine C-struct Deklaration beschrieben, und sie bestehen aus einem Log-Level (~level_t~) und einem Unix-Dateideskriptor. Beide Unterobjekte sind als Einbettung in der Struktur existentiell abhängig von den ~log_t~-Objekten[fn::Allerdings ist der Dateideskriptor, ohne dass wir das auf Sprachebene sehen, eine Referenz auf ein Objekt im Betriebssystem. Aber das ist Thema von Grundlagen der Betriebssysteme.].
+Die ~log_t~-Objekte sind durch eine C-Struct Deklaration beschrieben und bestehen aus einem Log-Level (~level_t~) und einem Unix-Dateideskriptor. Beide Unterobjekte sind als Einbettung in der Struktur existenziell abhängig von den ~log_t~-Objekten[fn::Allerdings ist der Dateideskriptor, ohne dass wir das auf Sprachebene sehen, eine Referenz auf ein Objekt im Betriebssystem. Aber das ist Thema von Grundlagen der Betriebssysteme.].
 
 Die Geburt eines ~log_t~-Objekts findet in der ~log_init()~-Funktion statt.
-Dort wird der nötige Speicher alloziert und die beiden Felder so initialisiert, dass sie die Invarianten des Objekts erfüllen.
-Leider sind diese Invarianten an dieser Stelle nicht gut sichtbar, weswegen ich sie ihnen verrate:
-(1) ~level~ is ein valides Loglevel.
-(2) ~fd~ is ein offener Dateideskriptor.
-Die anderen Funktionen (~log()~, ~log_deinit()~) verlassen sich auf diese Invarianten um nicht jedesmal prüfen zu müssen ob das übergebene Argument wirklich ein valides ~log_t~-Objekt ist.
+Dort wird der nötige Speicher allokiert und die beiden Felder so initialisiert, dass sie die Invarianten des Objekts erfüllen.
+Leider sind diese Invarianten an dieser Stelle nicht gut sichtbar, weswegen ich sie Ihnen verrate:
+(1) ~level~ ist ein valides Loglevel.
+(2) ~fd~ ist ein offener Dateideskriptor.
+Die anderen Funktionen (~log()~, ~log_deinit()~) verlassen sich auf diese Invarianten, um nicht jedes Mal prüfen zu müssen, ob das übergebene Argument wirklich ein valides ~log_t~-Objekt ist.
 
 Die ~log_init()~-Funktion gibt eine Referenz auf das Objekt zurück, womit die ~main()~-Funktion der Besitzer des Objekts wird.
 Als Besitzer kann ~main()~ das Objekt verändern, indem es zum Beispiel das Loglevel neu setzt oder das Objekt per Parameterübergabe weitergibt.
 
 Das Ende unseres Objekts findet in ~log_deinit()~ statt:
-Dort wird der, bei der Konstruktion, angeforderte Dateideskriptor geschlossen und der angeforderte Speicher zurück gegeben.
+Dort wird der bei der Konstruktion angeforderte Dateideskriptor geschlossen und der angeforderte Speicher zurückgegeben.
 Nach diesem Zeitpunkt existiert das Objekt nicht mehr.
 
-Auch sichtbar an diesem Beispiel wird, dass uns C nicht sehr dabei hilft sorgsam mit Objekten umzugehen:
-So erlaubt es uns C nicht die Typ-Invarianten zu beschreiben und kann uns daher nicht daran hindern diese zu verletzen.
-Auch wäre es möglich den Speicher an dem einst das Objekt gelebt hat, weiter zu verwenden und einen use-after-free Bug zu provozieren, da die Referenz in ~L~ nicht invalidiert wird.
-Außerdem wäre es ein leichtes gewesen die Freigabe des Objekts zu vergessen, womit ein Speicherleck (Memory Leak) entstanden wäre.
-In anderen Sprachen, Konstrukte und Regeln die es uns schwer oder vollständig unmöglich machen solche Probleme und Bugs zu provozieren.
-Alle hängen damit zusammen, wie uns die Sprache erlaubt Objekte zu erzeugen und mit ihnen um zu gehen.
+Auch sichtbar an diesem Beispiel wird, dass uns C nicht sehr dabei hilft, sorgsam mit Objekten umzugehen:
+So erlaubt es uns C nicht, die Typinvarianten zu beschreiben und kann uns daher nicht daran hindern diese zu verletzen.
+Auch wäre es möglich den Speicher, an dem einst das Objekt gelebt hat, weiterzuverwenden und einen use-after-free-Bug zu provozieren, da die Referenz in ~L~ nicht invalidiert wird.
+Außerdem wäre es ein Leichtes gewesen, die Freigabe des Objekts zu vergessen, womit ein Speicherleck (Memory Leak) entstanden wäre.
+In anderen Sprachen gibt es Konstrukte und Regeln, die es uns schwer oder vollständig unmöglich machen, solche Probleme und Bugs zu provozieren.
+Alle hängen damit zusammen, wie uns die Sprache erlaubt, Objekte zu erzeugen und mit ihnen umzugehen.
 
 
 * Geburt von Objekten
 :PROPERTIES:
 :CUSTOM_ID: 06-birth
 :END:
-** Speicher-Allokation
+** Speicherallokation
 :PROPERTIES:
 :CUSTOM_ID: 06-allocation
 :END:
@@ -277,29 +277,29 @@ Alle hängen damit zusammen, wie uns die Sprache erlaubt Objekte zu erzeugen und
     \hspace{-1em}\textbf{Meistens} residieren Objekte in einem zusammenhängenden Speicherbereich
     \medskip
     \begin{center}
-      \texttt{allocate(bytes\_t N)} $\longrightarrow$ Startadresse des zukünfigen Objekts
+      \texttt{allocate(bytes\_t N)} $\longrightarrow$ Startadresse des zukünftigen Objekts
     \end{center}
 
     \bi
-    \ii<2-> \structure{Statische Allokation} durch Übersetzer: Lebenszeit = Programlaufzeit {
+    \ii<2-> \structure{Statische Allokation} durch Übersetzer: Lebenszeit = Programmlaufzeit {
       \bi
       \ii Absolute Adresse des Objekts steht vor der Laufzeit fest
       \ii Bsp.: globale Variablen, konstante Literale, Maschinencode einer Funktion
       \ii 2 statische Objekte: \codeinline{char *global = "foobar";}
       \ei
     }\medskip
-    \ii<3-> \structure{Stack Allokation}: Objekte können auf den Aufrufstapel{
+    \ii<3-> \structure{Stackallokation}: Objekte können auf den Aufrufstapel{
       \bi
-      \ii Allokation als Einbettung des Call-Frames einer Funktionsinstanz.
-      \ii Lebenszeit des Objekts ist $\le$ Lebenszeit des Call-Frames.
+      \ii Allokation als Einbettung des Call-Frames einer Funktionsinstanz
+      \ii Lebenszeit des Objekts ist $\le$ Lebenszeit des Call-Frames
       \ii Beispiele: Argumente, lokale Variablen, \codeinline{alloca()}
       \ei
     }\medskip
-    \ii<4-> \structure{Heap Allokation}: Laufzeitsystem betreibt separaten Speicherpool {
+    \ii<4-> \structure{Heapallokation}: Laufzeitsystem betreibt separaten Speicherpool {
       \bi
-      \ii Lebenszeit unabhängig von Aufrufhierarchie, beliebige Allokations-Zeitpunkte
-      \ii Benötigt komplexeres Speichermanagement und ist daher teurer.
-      \ii Speicher muss irgendwann freigeben werden (manuell oder garbage collection)
+      \ii Lebenszeit unabhängig von Aufrufhierarchie, beliebige Allokationszeitpunkte
+      \ii Benötigt komplexeres Speichermanagement und ist daher teurer
+      \ii Speicher muss irgendwann freigegeben werden (manuell oder Garbage Collection)
       \ei
     }
     \ei
@@ -314,16 +314,16 @@ Alle hängen damit zusammen, wie uns die Sprache erlaubt Objekte zu erzeugen und
     \ii Im klassisches UNIX-Modell wachsen Stack und Heap aufeinander zu.{
       \bi
       \ii Das ELF beschreibt die statisch allokierten Objekte (.text, .data, .bss)
-      \ii Realität ist komplexer: Mehrere Stacks/Heaps, Addressspace-Randomization
+      \ii Realität ist komplexer: Mehrere Stacks/Heaps, Address Space Randomization
       \smallskip
       \ii[$\rightarrow$] Genauere Betrachtung in Grundlagen der Betriebssysteme (GBS)
       \ei
     }\medskip
     \ii Für Programmiersprachen und Übersetzer nehmen wir an, dass... {
       \bi
-      \ii Wir globale Objekte im Assembler anlegen können.
-      \ii Der Prozess einen Stack hat und wir den Stackpointer kontrollieren.
-      \ii Das Laufzeitsystem \codebox{void *malloc(size\_t)}/\codebox{free(void*)} bereitstellt.
+      \ii wir globale Objekte im Assembler anlegen können.
+      \ii der Prozess einen Stack hat und wir den Stackpointer kontrollieren.
+      \ii das Laufzeitsystem \codebox{void *malloc(size\_t)}/\codebox{free(void*)} bereitstellt.
       \ei
     }
     \ei
@@ -331,36 +331,36 @@ Alle hängen damit zusammen, wie uns die Sprache erlaubt Objekte zu erzeugen und
 #+end_src
 
 Der erste Schritt bei der Geburt eines Objekts ist die *Allokation von Speicher*.
-Das Ziel der Allokation ist es eine Menge von Speicherzellen für dieses Objekt zu reservieren. Diese Speicherzellen sind dann ausschließlich für dieses Objekt reserviert.
-Dabei können wir meinst davon ausgehen, dass der Speicherbereich für das Objekt zusammenhängend ist; die Speicherzellen, ab einer Startadresse, fortlaufend für das Objekt reserviert werden[fn::Wie alles in der Informatik, ist auch dies kein Naturgesetz, sondern eine Entscheidung des Menschen. Wenn man sehr viele gleichartige Objekte hat, kann man die Objekte an den Attributen aufteilen und spaltenweise speichern. Dazu gibt es einen sehr guten Talk von Mike Acton auf der CppCon2014: [[https://www.youtube.com/watch?v=rX0ItVEVjHc][Data-Oriented Design and C++]]].
-Um genügend Speicher zu reservieren, brauchen wir die Größe des Objekts, eine Information, die uns normalerweise das Typssystem liefert und rufen eine Allokator-Funktion auf.
+Das Ziel der Allokation ist es, eine Menge von Speicherzellen für dieses Objekt zu reservieren. Diese Speicherzellen sind dann ausschließlich für dieses Objekt reserviert.
+Dabei können wir meinst davon ausgehen, dass der Speicherbereich für das Objekt zusammenhängend ist; die Speicherzellen also ab einer Startadresse fortlaufend für das Objekt reserviert werden[fn::Wie alles in der Informatik, ist auch dies kein Naturgesetz, sondern eine Entscheidung des Menschen. Wenn man sehr viele gleichartige Objekte hat, kann man die Objekte an den Attributen aufteilen und spaltenweise speichern. Dazu gibt es einen sehr guten Talk von Mike Acton auf der CppCon2014: [[https://www.youtube.com/watch?v=rX0ItVEVjHc][Data-Oriented Design and C++]].].
+Um genügend Speicher zu reservieren, brauchen wir die Größe des Objekts, eine Information, die uns normalerweise das Typsystem liefert und rufen damit eine Allokationsfunktion auf.
 
-Die Ihnen wahrscheinlich bekannteste Allokationsfunktion ist wahrscheinlich ~malloc()~.
-Allerdings gibt es noch weitere Arten Speicher für Objekte zu reservieren, die nicht zwingend mit dem Aufruf einer Funktion verbunden sind.
+Die Ihnen wahrscheinlich bekannteste Allokationsfunktion ist ~malloc()~.
+Allerdings gibt es noch weitere Arten, Speicher für Objekte zu reservieren, die nicht zwingend mit dem Aufruf einer Funktion verbunden sind.
 
 Bei der *statischen Allokation* übernimmt der Übersetzer, zusammen mit dem Linker und Loader, die Allokation des Speicherbereichs.
-Dabei wird, von vornherein, eine Ort für das Objekt in der Binärdatei vorgemerkt, sodass die Adresse des Objekts bereits vor der Laufzeit fest steht.
-Die Lebenszeit dieser statisch allokierten Objekte ist normalerweise gleich mit der Laufzeit des Programms; sie werden beim Start des Programs[fn::Oft vor der ~main()~-Funktion.] initialisiert und erst vor dem Beenden des Prozesses werden sie wieder zerstört.
-Das klassische Beispiel für statische Allokation ist die Definition einer *globale Variable*. Aber auch konstante Literale, wie ~"foobar"~ oder die übersetzten Funktionen[fn::In der Binärdatei wird jede Funktion zu eine Sequenz von Maschineninstruktionen. Auch diese benötigen Platz und haben eine Startadresse.] werdem vom Übersetzer statisch alloziert.
-Die statische Allokation ist die inflexibelste Art Speicher zu reservieren, da die maximale Anzahl der Objekte bereits vor der Laufzeit fest stehen muss.
+Dabei wird, von vornherein, eine Ort für das Objekt in der Binärdatei vorgemerkt, sodass die Adresse des Objekts bereits vor der Laufzeit feststeht.
+Die Lebenszeit dieser statisch allokierten Objekte ist normalerweise gleich mit der Laufzeit des Programms; sie werden beim Start des Programms[fn::Oft vor der ~main()~-Funktion.] initialisiert und erst direkt vor dem Beenden des Prozesses werden sie wieder zerstört.
+Das klassische Beispiel für statische Allokation ist die Definition einer *globale Variable*. Aber auch konstante Literale, wie ~"foobar"~ oder die übersetzten Funktionen[fn::In der Binärdatei wird jede Funktion zu einer Sequenz von Maschineninstruktionen. Auch diese benötigen Platz und haben eine Startadresse.] werden vom Übersetzer statisch allokiert.
+Die statische Allokation ist die unflexibelste Art Speicher zu reservieren, da die maximale Anzahl der Objekte bereits vor der Laufzeit feststehen muss.
 Allerdings ist sie auch die effizienteste, da keinerlei Kosten zur Laufzeit entstehen.
 
-Bei der *Stackallokation*, wird der Laufzeit- bzw. Aufrufstapel verwendet um Speicher für Objekte zu allokieren.
-Diesen Mechanismus haben wir bereits im Kapitel über Namensauflösung{{{see(04-call-frames, Function-Call Frames)}}} kennen gelernt, als wir uns mit Funktions-lokalen Variablen beschäftigt haben.
-Objekte, die mittels Stackallokation alloziert werden, sind Einbettung des Function-Call Frames und leben daher maximal so lange wie dieser existiert.
-Normalerweise endet die Lebenszeit der stack-allozierten Objekte also mit der Rückkehr aus der Funktion[fn::Rufen Sie sich in Erinnerung, wann dies nicht der Fall ist.].
-Verglichen mit der statischen Allokation, ist die Stackallokation deutlich flexibler, da wir nun dynamisch Objekte allozieren können.
-Allerdings ist die Lebenszeit dieser Objekte strikt and die Aufrufhierarchie gebunden und wir können nicht einfach die Adresse eines stack-allozierten Objekts zurückgeben.
-Da die Allokation nur aus der Subtraktion der Objektgröße auf den Stackzeiger besteht, hat bringt die Stackallokation nur wenig Laufzeitkosten.
+Bei der *Stackallokation*, wird der Laufzeit- bzw. Aufrufstapel verwendet, um Speicher für Objekte zu allokieren.
+Diesen Mechanismus haben wir bereits im Kapitel über Namensauflösung{{{see(04-call-frames, Function-Call Frames)}}} kennengelernt, als wir uns mit Funktions-lokalen Variablen beschäftigt haben.
+Objekte, die mittels Stackallokation allokiert werden, sind in Function-Call Frames eingebettet und leben daher maximal so lange wie dieser existiert.
+Normalerweise endet die Lebenszeit der stackallokierten Objekte also mit der Rückkehr aus der Funktion[fn::Rufen Sie sich in Erinnerung, wann dies nicht der Fall ist.].
+Verglichen mit der statischen Allokation, ist die Stackallokation deutlich flexibler, da wir nun dynamisch Objekte allokieren können.
+Allerdings ist die Lebenszeit dieser Objekte strikt an die Aufrufhierarchie gebunden und wir können nicht einfach die Adresse eines stackallokierten Objekts zurückgeben.
+Da die Allokation nur aus der Subtraktion der Objektgröße auf den Stackzeiger besteht, bringt die Stackallokation nur wenig Laufzeitkosten.
 
-Mit der *Heap Allokation* (~malloc()~) überwinden wir die Einschränkung der statischen und der Stackallokation, handeln uns aber höhere Verwaltungskosten ein.
-Durch der Aufruf von ~malloc()~ reservieren wir einen Speicherbereich, der völlig unabhängig von der Programmstruktur ist; die darin abgelegeten Objekte können eine beliebige Lebenszeit haben.
-Die so allozierten Speicherbereiche müssen allerdings, da ihne Lebenszeit nicht am Programmablauf hängt, explizit freigegeben werden (~free()~).
+Mit der *Heapallokation* (~malloc()~) überwinden wir die Einschränkung der statischen und der Stackallokation, handeln uns aber höhere Verwaltungskosten ein.
+Durch den Aufruf von ~malloc()~ reservieren wir einen Speicherbereich, der völlig unabhängig von der Programmstruktur ist; die darin abgelegten Objekte können eine beliebige Lebenszeit haben.
+Die so allokierten Speicherbereiche müssen allerdings, da ihre Lebenszeit nicht am Programmablauf hängt, explizit freigegeben werden (~free()~).
 Dies kann entweder manuell geschehen oder automatisch durch einen Garbage Collector (dt.
 Speicherbereinigung).
 Später in dieser Vorlesung werden wir uns noch Strategien zur (semi-)automatischen Speicherbereinigung anschauen.
 
-In allen Fällen, ist das Ergebnis der Speicherallokation die Startadresse des resevierten Speicherbereichs.
+In allen Fällen ist das Ergebnis der Speicherallokation die Startadresse des reservierten Speicherbereichs.
 Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Objekt leben.
 
 ** Initialisierung
@@ -370,7 +370,7 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
 #+begin_src latex
   \begin{frame}{Initialisierung und Konstruktoren}
     \begin{btBlock}{}
-      Wie wird aus dem allozierten, noch blanken, Speicherbereich ein Objekt?
+      Wie wird aus dem allokierten, noch blanken, Speicherbereich ein Objekt?
     \end{btBlock}
 
     \bi
@@ -378,8 +378,8 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
         \small\emph{Was macht ein Stück Speicher für meine Sprache zu einem Objekt?}\\[1ex]
         {
           \bi
-          \ii Einige Sprachfeatures  erfordern zusätzliche Informationen an jedem Objekt.
-          \ii Zum Beispiel  \btSetTab -- Dynamische Typinformationen in Form eines \structure{Typ-Tags}.\\
+          \ii Einige Sprachfeatures erfordern zusätzliche Informationen an jedem Objekt.
+          \ii Zum Beispiel  \btSetTab -- Dynamische Typinformationen in Form eines \structure{Typ-Tags}\\
                             \btUseTab -- Registrierung des Objekts am Garbage Collector (später mehr)
           \ei
         }\medskip
@@ -424,7 +424,7 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
     \ii \structure{Definition} von eigenen Konstruktoren {
       \bi
       \ii Definieren wir keine eigenen, werden Default-Konstruktoren erzeugt
-      \ii Konstruktoren haben Parameter und können Überladen werden
+      \ii Konstruktoren haben Parameter und können überladen werden
       \ii Sehen aus wie Funktionen, haben aber keinen Rückgabewert
       \ei
     }\medskip
@@ -444,43 +444,43 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
 
 #+end_src
 
-Nun, da wir genügend Speicher haben, der allerdings noch und oft von undefiniertem Inhalt ist[fn::Den Speicher immer zu nullen, würde unnötige Kosten erzeugen.]
-können wir damit anfangen unser Objekt zu *initialisieren*.
+Nun, da wir genügend Speicher haben, der allerdings noch und oft von undefiniertem Inhalt ist[fn::Den Speicher immer zu nullen, würde unnötige Kosten erzeugen.],
+können wir damit anfangen, unser Objekt zu *initialisieren*.
 Das Ziel der Initialisierung ist es, den Speicher mit Werten zu füllen, damit er wie ein Objekt vom passenden Typen aussieht.
 Diese Bedingung, was ein Objekt ausmacht, zerfällt in zwei separate Teilaspekte:
-den Sprachspezifischen und den Nutzerspezifischen.
+den sprachspezifischen und den nutzerspezifischen Aspekt.
 
 Der *sprachabhängige Teil der Initialisierung* ist vom Sprachprozessor (Übersetzer bzw.
 Interpreter) und der Laufzeitumgebung abhängig.
-So müssen wir alle Informationen, die wir zur Laufzeit benötigen um die Features der Sprachezu implementieren, mit in das Objekt schreiben.
-Unterstützt unsere Sprache, zum Beispiel, dynamische Typen, so müssen wir die Typinformationen, in Form eines Typ-Tags der eines ~vtable~-Zeigers, in den Speicherbereich des Objekts schreiben.
-Andernfalls hätten wir später keine Möglichkeit mehr den dynamischen Typen des Objekts heraus zu finden.
+So müssen wir alle Informationen, die wir zur Laufzeit benötigen, um die Features der Sprache zu implementieren, mit in das Objekt schreiben.
+Unterstützt unsere Sprache zum Beispiel dynamische Typen, so müssen wir die Typinformationen, in Form eines Typ-Tags der eines ~vtable~-Zeigers, in den Speicherbereich des Objekts schreiben. FIXME: Typ-Tag oder vtable? vtable Implementationsdetail?
+Andernfalls hätten wir später keine Möglichkeit mehr den dynamischen Typen des Objekts herauszufinden.
 
-Eine andere Sorte der sprachabhängigen Initialisierung ist die Registrierung des Objekts beim Garbage Collector (GC). Wie wir später sehen werden, benötigt der GC eine globale Sicht auf alle existierenden Objekte. Eine Möglichkeit dies zu schaffen ist es, jedes Objekt, bei seiner Erstellung, in eine verkettete Liste einzufügen.
+Eine andere Sorte der sprachabhängigen Initialisierung ist die Registrierung des Objekts beim Garbage Collector (GC). Wie wir später sehen werden, benötigt der GC eine globale Sicht auf alle existierenden Objekte. Eine Möglichkeit dies zu schaffen ist es, jedes Objekt bei seiner Erstellung in eine verkettete Liste einzufügen.
 
 Zum Vergleich: Bei der Sprache C gibt es keine sprachabhängige Initialisierung von Objekten.
-Jedes Stück Speicher sieht für ein C Programm erstmal wie ein valides Objekt aus.
+Jedes Stück Speicher sieht für ein C Programm erst mal wie ein valides Objekt aus.
 Sie können sich denken, welche Probleme, aber auch welche Effizienz, wir durch diese Entscheidung bekommen.
 
-Bei der *benutzerdefinierten Initialisierung*, darf der Benutzer Code ausführen, der die Felder des Objekts nach seinem Geschmack richtig belegt.
+Bei der *benutzerdefinierten Initialisierung* darf der Benutzer Code ausführen, der die Felder des Objekts nach seinem Geschmack richtig belegt.
 Diesen Code nennen wir *Konstruktor* und es ist die Aufgabe des Konstruktors die semantischen Invarianten des Typs zu etablieren.
-Außerdem können Konstruktoren noch weitere Resourcen (wie Dateideskriptoren oder andere Objekte) anfordern.
+Außerdem können Konstruktoren noch weitere Ressourcen (wie Dateideskriptoren oder andere Objekte) anfordern.
 Nach der Ausführung des Konstruktors ist das Objekt nicht nur aus Sicht der Laufzeitumgebung, sondern auch aus Sicht des Programmierers ein vollständiges, ordentliches, einsatzfähiges Objekt; es ist ausgewachsen!
 
 Wie wir bereits am Beispiel des C-Loggers gesehen haben, hat nicht jede Sprache eingebaute Unterstützung für Konstruktoren.
-In solchen Fällen, verwenden wir normale Funktionen um das Konstrukt "Konstruktor" ab zu bilden.
+In solchen Fällen, verwenden wir normale Funktionen, um das Konstrukt "Konstruktor" abzubilden.
 Jedoch bleibt die Idee die Gleiche:
-Ein Konstruktor bekommt einen Speicherbereich übergeben, in den es ein Objekt vom entsprechnenden Typen hinein-initialisiert.
+Ein Konstruktor bekommt einen Speicherbereich übergeben, in den es ein Objekt vom entsprechenden Typen hinein-initialisiert.
 
 In Sprachen, die Konstruktoren als Konzept bieten, werden diese meist mit dem Typen zusammen definiert.
 Um die Initialisierung von Objekten flexibel zu gestalten, sind Konstruktoren normalerweise parametrisierbar und teilen sich ansonsten die meiste Syntax mit Funktionen.
 Definieren wir keine eigenen Konstruktoren, so erstellt der Übersetzer einen Default-Konstruktor für uns.
 
-Wie Funktionen, lassen sich Konstruktoren in C++ und Java überladen, besitzen aber keinen Rückgabewert, da das Ergebnis des Konstruktors klar ist: ein fertig initialisiertes Objekt.
+Wie Funktionen lassen sich Konstruktoren in C++ und Java überladen, besitzen aber keinen Rückgabewert, da das Ergebnis des Konstruktors klar ist: ein fertig initialisiertes Objekt.
 Wie bei allen Methoden, wird das zu bearbeitende Objekt als nullter Parameter (~this~-Zeiger) übergeben.
 Außerdem haben Konstruktoren auch eine Sichtbarkeit.
 
-Gehen Sie einen Moment zurück... was soll das heißen, Konstruktoren haben eine Sichtbarkeit?! Wie sollten wir denn jemals einen Konstruktor aufrufen der ~private~ ist, wenn dies nur durch Methoden geschehen kann die innerhalb der Klasse definiert sind. Und wozu wäre dies Überhaupt gut? Die Antwort darauf sind ~statische Methoden~, die auch ohne ein existierendes Objekt aufgerufen werden können. Ein Beispiel, wo ein privater Konstruktor Sinn ist folgendes Stück Code:
+Gehen Sie einen Moment zurück... was soll das heißen, Konstruktoren haben eine Sichtbarkeit?! Wie sollten wir denn jemals einen Konstruktor aufrufen der ~private~ ist, wenn dies nur durch Methoden geschehen kann die innerhalb der Klasse definiert sind? Und wozu wäre dies Überhaupt gut? Die Antwort darauf sind ~statische Methoden~, die auch ohne ein existierendes Objekt aufgerufen werden können. Ein Beispiel, wo ein privater Konstruktor Sinn macht, ist folgendes Stück Code:
 
 #+begin_src C++
 class Object() {
@@ -494,7 +494,7 @@ public:
 };
 #+end_src
 
-Die einzige Art diesen Typen zu instantiieren ist es die ~Create()~-Methode aufzurufen, welche immer eine Heapallokation mittels ~new~ durchführt.
+Die einzige Art diesen Typen zu instantiieren ist es, die ~Create()~-Methode aufzurufen, welche immer eine Heapallokation mittels ~new~ durchführt.
 Es kann niemals geschehen, dass ein Benutzer ein solches Objekt aus Versehen auf dem Stack anlegt.
 Grund für eine solche Beschränkung kann sein, dass das Objekt sehr groß ist und daher leicht einen Stacküberlauf provozieren könnte. Weitere Gründe für einen privaten Konstruktor finden sich in [[https://stackoverflow.com/questions/2062560/what-is-the-use-of-making-constructor-private-in-a-class][dieser Diskussion auf Stackoverflow]].
 
@@ -503,7 +503,7 @@ der Laufzeitumgebung aufgerufen.
 Dadurch kann es niemals sein, dass es ein Objekt vom passenden Typen gibt, für das kein Konstruktor gelaufen ist.
 
 Bei Sprachen mit Vererbung muss der Sprachprozessor allerdings eine gewisse Sorgfalt walten lassen, in welcher Reihenfolge die Konstruktoren von Eltern- bzw.
-Kindsklasse aufgerufen werden.
+Kindsklassen aufgerufen werden.
 Generell gilt:
 Die Konstruktoren der Elternklasse werden von den Konstruktoren der Kindsklasse aufgerufen.
 Auf diese Weise findet ein Konstruktor der Kindsklasse bereits ein vollständig konstruiertes und valides Eltern-Objekt als ~this~-Zeiger vor.
@@ -521,7 +521,7 @@ Auf diese Weise findet ein Konstruktor der Kindsklasse bereits ein vollständig 
         \bii
         \ii Java {\bi
           \ii Konstruktoren heißen wie die Klasse.
-          \ii Nicht-initialisierte Attribute werden automatisch 0 oder \texttt{null}
+          \ii Nicht-initialisierte Attribute werden automatisch 0 oder \texttt{null}.
           \ei
         }
         \medskip
@@ -559,7 +559,7 @@ Auf diese Weise findet ein Konstruktor der Kindsklasse bereits ein vollständig 
   \end{frame}
 #+end_src
 
-Wir werfen nun einen genaueren Blick auf Konstruktoren bei Java.
+Wir werfen nun einen genaueren Blick auf Konstruktoren in Java.
 Zum Ersten fällt auf, dass in Java Konstruktoren so wie ihre Klasse heißen müssen und überladen sein können.
 Im Fall von ~new Derived("123")~ startet die benutzerdefinierte Initialisierung beim Konstruktor ~Derived(String)~.
 Hier parsen wir den String zur Ganzzahl 123 und rufen den anderen Konstruktor (~Derived(int)~) in gleichen Klasse mittels ~this()~ auf.
@@ -568,17 +568,17 @@ Die Delegation zwischen Konstruktoren erlaubt es uns weniger Code zu duplizieren
 Im ~Derived(int)~ Konstruktor rufen wir explizit einen gewissen Konstruktor (~Counter(int)~) der Elternklasse mittels ~super()~ auf.
 Hätten wir keinen expliziten ~super()~-Aufruf platziert, so hätte Java automatisch den "no-arg"-Konstruktor ~Counter()~ aufgerufen.
 
-Schließlich angekommen in ~Counter(int)~, initialisieren wir das Feld ~start~. Da diese Feld ~final~ ist, zwingt uns Java dieses Feld in einem Konstruktor zu initialisieren; sein Wert kann später nicht mehr geändert werden.
-Der Sprachstandard von Java sieht weiterhin vor, dass das Feld ~next~  automatisch auf ~0~ initialisiert wird. Auf diese Weise verhindert Java, dass es uninitialisierte Felder gibt.
+Schließlich angekommen in ~Counter(int)~ initialisieren wir das Feld ~start~. Da diese Feld ~final~ ist, zwingt uns Java dieses Feld in einem Konstruktor zu initialisieren; sein Wert kann später nicht mehr geändert werden.
+Der Sprachstandard von Java sieht weiterhin vor, dass das Feld ~next~ automatisch auf ~0~ initialisiert wird. Auf diese Weise verhindert Java, dass es uninitialisierte Felder gibt.
 
 Auf den Folien habe ich außerdem noch ein Stück Pseudo-C Code aufgeschrieben, welches eine ähnliche Initialisierung durchführen würde, wie die Java Laufzeitumgebung.
-Besonders interessant ist hier das ~memset(..., 0, ...)~ welches die automatische Nullung durchführt und das setzen des ~vtable~-Zeigers, welches für virtuelle Methodenaufrufe nötig ist.
+Besonders interessant ist hier das ~memset(..., 0, ...)~, welches die automatische Nullung durchführt und das Setzen des ~vtable~-Zeigers, welches für virtuelle Methodenaufrufe nötig ist.
 
 #+begin_src latex
   \begin{frame}[fragile]{Was sollte \textbf{mein} Konstruktor leisten?}
     \begin{btBlock}{\small Sinnvolle Konvention: Konstruktoren stellen semantische Invarianten her}\small
-      -- Entwickler trifft \textbf{immerwährende Annahmen} über den Zustand eines Objekts. \\
-      -- \textbf{Jeder} Konstruktor hinterlässt ein Objekt, dass die Annahmen einhält.\\
+      -- Entwickler trifft \textbf{immerwährende Annahmen} über den Zustand eines Objekts.\\
+      -- \textbf{Jeder} Konstruktor hinterlässt ein Objekt, das die Annahmen einhält.\\
       -- Jede weitere Operation auf dem Objekt muss diese Annahmen \textbf{erhalten}.
     \end{btBlock}
 
@@ -628,34 +628,34 @@ Besonders interessant ist hier das ~memset(..., 0, ...)~ welches die automatisch
   \end{frame}
 #+end_src
 
-Ich habe bereits angeschnitten, dass eine Aufgabe von Konstruktoren ist die semantischen Invarianten des Types zu etablieren.
+Ich habe bereits angeschnitten, dass eine Aufgabe von Konstruktoren ist, die semantischen Invarianten des Typs zu etablieren.
 Da dies ein wichtiger Punkt ist, komme ich noch einmal darauf zurück.
-Klar ist, dass dieser Punkt nicht mit den Sprachregeln zu tun hat, sondern eher eine sinnvolle Konvention darstellt.
+Klar ist, dass dieser Punkt nichts mit den Sprachregeln zu tun hat, sondern eher eine sinnvolle Konvention darstellt.
 Niemand hält Sie davon ab, im Konstruktor eines Objekts dumme Dinge zu tun.
 Sie sollten allerdings zu Ihrem und zum Wohle der Welt davon absehen.
 
 Invarianten sind Annahmen, die über die gesamte Lebenszeit eines Objektes, vom Konstruktor bis zum Tod des Objekts gelten.
 Alle Operationen/Methodenaufrufe, die auf diesem Objekt arbeiten, können sich auf diese Invarianten verlassen.
-Wenn sie allerdings verändern, müssen sie dafür Sorgen, dass die Invarianten nach Beendigung der Operation wieder gelten.
+Wenn sie das Objekt allerdings verändern, müssen sie dafür Sorgen, dass die Invarianten nach Beendigung der Operation wieder gelten.
 Während die Operation ausgeführt wird, dürfen die Invarianten kurzzeitig verletzt werden[fn::Denken Sie an dieser Stelle darüber nach, wie Nebenläufigkeit und semantische Invarianten zusammenspielen und alles kompliziert machen. Überlegen Sie sich auch wie ~synchronized~ das Problem auf Java-Sprachebene löst.].
 
-Das Beispiel auf den Folien zeigt eine Art Array, für welches der Konstruktor genügend Speicher alloziert, die Länge des Arrays abspeichert und ~ptr~ auf das erste Array-Element zeigen lässt.
-Diese drei Operationen im Konstruktor etablieren die aufgelisteten Invarianten, auf diese sich dann auch die Funktion  ~void set(int)~ verlässt, wenn sie Blind den Zeigern ~ptr~ dereferenziert und den übergebenen Parameter in das entsprechende Array-Element speichert.
+Das Beispiel auf den Folien zeigt eine Art Array, für welches der Konstruktor genügend Speicher allokiert, die Länge des Arrays abspeichert und ~ptr~ auf das erste Array-Element zeigen lässt.
+Diese drei Operationen im Konstruktor etablieren die aufgelisteten Invarianten, auf diese sich dann auch die Funktion ~void set(int)~ verlässt, wenn sie blind den Zeigern ~ptr~ dereferenziert und den übergebenen Parameter in das entsprechende Array-Element speichert.
 
 Wenn Sie selbst eine Klasse definieren, überlegen Sie sich, welche Invarianten gelten sollten. *All* ihre Konstruktoren sollten das Objekt so hinterlassen, dass diese Invarianten erfüllt sind.
-Jede Methode darf sich dann auf diese Invarianten verlassen, muss aber das Objekt so valide zurück lassen, wie es vorgefunden wurde.
+Jede Methode darf sich dann auf diese Invarianten verlassen, muss aber das Objekt so valide hinterlassen, wie es vorgefunden wurde.
 
-Besonders gut ist ihre *Datenabstraktion*, wenn es dem externen Benutzer unmöglich ist, das Objekt in einen Zustand zu bringen in dem seine Invarianten verletzt sind.
-Besonders öffentlich-schreibbare  Felder, bei denen nicht jede Belegung die Invarianten erfüllt, sind ein häufiges Problem, was diesem Ziel entgegen steht.
+Besonders gut ist Ihre *Datenabstraktion*, wenn es dem externen Benutzer unmöglich ist, das Objekt in einen Zustand zu bringen, in dem seine Invarianten verletzt sind.
+Besonders öffentlich schreibbare Felder, bei denen nicht jede Belegung die Invarianten erfüllt, sind ein häufiges Problem, was diesem Ziel entgegensteht.
 
 * Leben von Objekten
 :PROPERTIES:
 :CUSTOM_ID: 06-life
 :END:
-Nachdem wir wissen wie Objekte ins Leben kommen, stellt sich die Frage, was wir zu ihren Lebzeiten damit machen können.
+Nachdem wir nun wissen, wie Objekte ins Leben kommen, stellt sich die Frage, was wir zu ihren Lebzeiten damit machen können.
 Wir müssen diese Objekte im Programmtext, genauer gesagt mittels Variablen, ablegen, wiederfinden und weitergeben können.
-Außerdem wollen wir die Informationen des Objekts auslesen und gegebenfalls verändern können.
-Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwickler leicht machen sollte die Objekt-Invarianten aufrecht zu erhalten.
+Außerdem wollen wir die Informationen des Objekts auslesen und gegebenenfalls verändern können.
+Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwickler leicht machen sollte, die Objekt-Invarianten aufrechtzuerhalten.
 
 ** Werte- und Referenzmodell
 :PROPERTIES:
@@ -672,7 +672,7 @@ Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwick
 
     \hspace{-1em}Mittels gebundener Namen können wir Objekte \alert{ansprechen und weitergeben}.\\[0.5ex]
     \uncover<2-|handout:2->{
-      \hspace{-1em}\textbf{Aber:} Ist der Wert einer Variable das Objekt oder eine Objekt-Referenz?
+      \hspace{-1em}\textbf{Aber:} Ist der Wert einer Variable das Objekt oder eine Objektreferenz?
     }
 
     \begin{columns}<3-|handout:2->
@@ -721,18 +721,18 @@ Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwick
         \bii
         \ii A und B enthalten \alert{verschiedene} Objekte
         \ii Initialisierung von B durch Kopie
-        \ii Objekte-Inhalte/Speicher werden kopiert
+        \ii Objektinhalte/Speicher werden kopiert
         \eii
       \end{column}
     \end{columns}
     \medskip
 
     \bi
-    \iiad<2-> Das Wertemodell is \advantage{flexibler} und kann \advantage{effizienter} sein. {
+    \iiad<2-> Das Wertemodell ist \advantage{flexibler} und kann \advantage{effizienter} sein. {
       \bi
       \ii Indirektion nur auf Nachfrage; kleine Objekte lassen sich effizient kopieren.
-      \ii Referenzen sind explizit im Code sichtbar (als Zeiger-Typ)
-      \ii Objekte in lokalen Variablen können am Stack alloziert werden.
+      \ii Referenzen sind explizit im Code sichtbar (als Zeiger-Typ).
+      \ii Objekte in lokalen Variablen können auf dem Stack allokiert werden.
       \ei
     }\medskip
     \iida<3-> Das Wertemodell ist \alert{komplexer} und \alert{schwieriger zu beherrschen}. {
@@ -762,7 +762,7 @@ Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwick
       \end{column}\hfill
       \begin{column}{0.53\textwidth}
         \bii
-        \ii Beide referenzieren das \alert{gleiche Objekt}
+        \ii Beide referenzieren das \alert{selbe Objekt}
         \ii Automatisch Dereferenzierung
         \ii Objekterzeugung nur mittels \codeinline[style=java,style=smaller]{new T()}
         \eii
@@ -773,18 +773,18 @@ Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwick
     \bi
     \iiad<2-> Im Referenzmodell sind Variablen und Objekte \advantage{orthogonal}. {
       \bi
-      \ii Objekte existieren \textbf{immer} unabhängig von Variablen und Funktionsaufrufen
+      \ii Objekte existieren \textbf{immer} unabhängig von Variablen und Funktionsaufrufen.
       \ii Weitergabe quer zur Aufrufhierarchie ist trivial.
-      \ii Keine Probleme mit Kind-Klassen die mehr Speicher brauchen.\\
+      \ii Keine Probleme mit Kind-Klassen, die mehr Speicher brauchen.\\
           Problematisch in C++: \codeinline[style=CPP,style=smaller]{Base func() { Derived d; return d; }}
       \ei
     }\medskip
-    \iida<3-> Im Referenzmodell tragen wir immer \alert{die Kosten} der Indirektion {
+    \iida<3-> Im Referenzmodell tragen wir immer \alert{die Kosten} der Indirektion. {
       \bi
-      \ii Ohne Optimierungen müssen alle Objekte am Heap alloziert werden.
+      \ii Ohne Optimierungen müssen alle Objekte am Heap allokiert werden.
       \ii Todeszeitpunkt von Objekten ist unklar.
       \ii Primitive Typen: Jeder Integer hinter einem Pointer? \\
-          Java: Wertemodell für Zahlen, außer wenn nicht (Auto(un-)boxing).
+          Java: Wertemodell für Zahlen, außer wenn nicht (Auto(un-)boxing)
       \ei
     }
     \ei
@@ -793,10 +793,9 @@ Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwick
 #+end_src
 
 Die grundlegendste Frage für die Verbindung von Programmtext und Objekten ist, wie diese abgelegt und weitergereicht werden.
-Also wie die Verbindung von Namen und Objekten genau aussieht und wie ein Teil des Programms ein Objekt an einen anderen Teil des Programms weiter geben kann.
-
+Also wie die Verbindung von Namen und Objekten genau aussieht und wie ein Teil des Programms ein Objekt an einen anderen Teil des Programms weitergeben kann.
 Dazu erinnern wir uns an die Vorlesung zur Namensauflösung{{{see(04-binding-time, Binding Time)}}}: Zum Bindezeitpunkt wird ein konkretes Objekt an einen Namen gebunden, sodass das Objekt über diesen Namen wieder aufgefunden werden kann.
-Damals haben wir auch gesagt, dass das Ergebnis der *vollständigen Namensauflösung* die Startadresse des Objekts ist. Es schließt sich hier also der Kreis: die Startadresse, an der wir das Objekt initialisiert haben, wird zum Bindezeitpunkt an einen Namen gebunden. Ein solcher Name kann eine Variable sein, wie wir das in den Folien bei ~var_foo~ beispielhaft sehen.
+Damals haben wir auch gesagt, dass das Ergebnis der *vollständigen Namensauflösung* die Startadresse des Objekts ist. Es schließt sich hier also der Kreis: Die Startadresse, an der wir das Objekt initialisiert haben, wird zum Bindezeitpunkt an einen Namen gebunden. Ein solcher Name kann eine Variable sein, wie wir das in den Folien bei ~var_foo~ beispielhaft sehen.
 
 Allerdings stellt sich eine wichtige, zunächst aber philosophisch anmutende, Frage:
 Beinhaltet eine gebundene Variable das Objekt oder beinhaltet sie nur eine Referenz auf das Objekt.
@@ -805,15 +804,15 @@ Wenn eine Variable das Objekt beinhaltet, was wir das *Wertemodell für Variable
 Dies hat zur Folge, dass jedes Objekt in maximal einer Variable gespeichert ist.
 Wollen wir ein Objekt mit zwei Namen in Verbindung bringen, so müssen wir beim Wertemodell ein explizites Zwischenobjekt, eine Referenz bzw.
 einen Pointer, anlegen und abspeichern.
-Wertemodell bedeutet also, dass es separate Referenz-Objekte gibt.
+Wertemodell bedeutet also, dass es separate Referenzobjekte gibt.
 
-Dass ein Objekt in maximal einer Variable abgelegt werden kann, führt auch dazu, dass Zuweisungen zwischen Variablen zwangsläufig eine *Objekt-Kopie* erfordern.
-Um ein Objekt zu kopieren, allozieren wir Speicher für ein zweites Objekt und kopieren die enthaltenen Informationen in den neuen Speicher.
+Dass ein Objekt in maximal einer Variable abgelegt werden kann, führt auch dazu, dass Zuweisungen zwischen Variablen zwangsläufig eine *Objektkopie* erfordern.
+Um ein Objekt zu kopieren, allokieren wir Speicher für ein zweites Objekt und kopieren die enthaltenen Informationen in den neuen Speicher.
 Das kopieren der Informationen kann entweder über bitweises Kopieren des Speichers geschehen (~memcpy()~) oder über einen nutzerdefinierten Copy-Konstruktor (C++).
 In beiden Fällen läuft beim Kopieren der normale Konstruktor nicht.
 
 Klassische Vertreter für das Wertemodell sind C, C++ oder, in modernen Zeiten, Rust.
-Überlegen Sie sich für das folgende Stück C-Code, an wie viele und welche Objekte es gibt und wann es zu einer Objekt-Kopie kommt:
+Überlegen Sie sich für das folgende Stück C-Code, wie viele und welche Objekte es gibt und wann es zum Kopieren eines Objekts kommt:
 
 #+begin_src C
 typedef struct { int x; } object_t;
@@ -825,29 +824,29 @@ object_t *d = c;
 
 Der Gegenentwurf zum Wertemodell ist das *Referenzmodell für Variablen*, bei dem Variablen und Objekte unabhängig voneinander existieren und die Variable nur eine Referenz auf ein Objekt speichert.
 Die Variable steht aber weiterhin für das Objekt und es bedarf keiner manuellen Dereferenzierung des Zeigers durch den Entwickler; die Sprache dereferenziert automatisch und unbedingt beim Zugriff auf das Objekt.
-Da jede Variable nur Referenzen enthält, führen Zuweisungen zu keinen Objekt-Kopien, sondern es wird nur die Referenz von der einen Variable in die andere kopiert.
+Da jede Variable nur Referenzen enthält, führen Zuweisungen zu keinen Objektkopien, sondern es wird nur die Referenz von der einen Variable in die andere kopiert.
 Am Ende stehen zwei Variablen für dasselbe Objekt.
 Da Variablen alle Objekten nur referenzieren, benötigt eine Sprache, die nach dem Referenzmodell arbeitet, keine separaten Referenz-Objekte.
 
 Die meisten Skriptsprachen verwenden das Referenzmodell.
 Auch Java arbeitet hauptsächlich mit dem Referenzmodell, macht aber bei primitiven Datentypen (~int~, ~float~) eine Ausnahme und wendet für diese das Wertemodell an.
-Etwas, was jedem Java-Lernendem zuerst komisch vorkommen muss.
+Etwas, was jedem Java-Lernenden zuerst komisch vorkommen muss.
 
-Sowohl das Wertemodell, als auch das Referenzmodell haben ihre *Vor- und Nachteile*.
-Wenn wir versuchen die Brille des effektiven Programmierers auf zu setzen, so ist ein reines Referenzmodell einfacher zu erlernen, da Objekte unabhängig von Variablen existieren und wir uns keine Gedanken darüber machen müssen ob wir eine Kopie oder eine Referenz weiter reichen wollen.
-Außerdem werden Objekte beim Referenzmodell niemals implizit durch Kopieren angelegt, sonder immer explizit und mit Hilfe der Konstruktoren.
-Diese Reduktion der Variablen-Objekt Abhängigkeit ist auch der Grund, wieso Java und die meisten Skriptsprachen das Referenzmodell bevorzugen; es ist einfacher zu handhaben.
+Sowohl das Wertemodell als auch das Referenzmodell haben ihre *Vor- und Nachteile*.
+Wenn wir versuchen die Brille des effektiven Programmierers aufzusetzen, so ist ein reines Referenzmodell einfacher zu erlernen, da Objekte unabhängig von Variablen existieren und wir uns keine Gedanken darüber machen müssen, ob wir eine Kopie oder eine Referenz weiterreichen wollen.
+Außerdem werden Objekte beim Referenzmodell niemals implizit durch Kopieren angelegt, sondern immer explizit und mit Hilfe der Konstruktoren.
+Diese Reduktion der Variablen-Objekt-Abhängigkeit ist auch der Grund, wieso Java und die meisten Skriptsprachen das Referenzmodell bevorzugen; es ist einfacher zu handhaben.
 
 Die Komplexität des Wertemodells können wir aber auch als eine Stärke auffassen:
-Da alle Referenzen sichtbar und explizit sind, erlaubt uns das Wertemodell fein-granular zu steuern wann wir ein Objekt referenzieren und wann es in einer Variable lebt.
+Da alle Referenzen sichtbar und explizit sind, erlaubt uns das Wertemodell feingranular zu steuern, wann wir ein Objekt referenzieren und wann es in einer Variable lebt.
 Dies erlaubt uns effizientere Programme zu schreiben:
 Beim Referenzmodell tragen wir immer die Kosten für die Indirektion über die Referenz.
 Beim Wertemodell müssen wir explizit danach verlangen eine Indirektion zu bekommen.
-So kann es effizienter sein ein Objekt als Kopie an eine Funktion zu übergeben, als eine Referenz zu übergeben, die dann dereferenziert wird.
-Dazu kommt, dass das Referenzmodell eigentlich nur mit Heap-allozierten Objekten richtig gut funktioniert, was zusätzliche Kosten erzeugt.
-Beim Wertemodell können wir Objekte viel leichter auf dem Stack allozieren.
+So kann es effizienter sein, ein Objekt als Kopie an eine Funktion zu übergeben, als eine Referenz zu übergeben, die dann dereferenziert wird.
+Dazu kommt, dass das Referenzmodell eigentlich nur mit Heap-allokierten Objekten richtig gut funktioniert, was zusätzliche Kosten erzeugt.
+Beim Wertemodell können wir Objekte viel einfach auf dem Stack allokieren.
 Aber Vorsicht, die starke Kopplung von Variablen und Objekten und die implizierte Kopien können beim Wertemodell zu Overheads führen, die auf den ersten Blick nicht sichtbar sind.
-So alloziert das folgende Stück C-Code 8192 Bytes vom Stack und kopiert 4096 Bytes in einer unscheinbaren Zuweisung:
+So allokiert das folgende Stück C-Code 8192 Bytes vom Stack und kopiert 4096 Bytes in einer unscheinbaren Zuweisung:
 
 #+begin_src C
 typedef struct { char stack[4096]; } thread_t;
@@ -858,17 +857,17 @@ void foo() {
 }
 #+end_src
 
-Weitere Probleme des Wertemodells tritt bei Vererbung auf.
-Wenn abgeleitete Klassen mehr Felder haben ihre Elternklassen, is das Kind-Objekt größer als das Elternobjekt.
+Ein weiteres Problem des Wertemodells tritt bei Vererbung auf.
+Wenn abgeleitete Klassen mehr Felder haben ihre Elternklassen, ist das Kindobjekt größer als das Elternobjekt.
 Daher passt es, vom benötigten Speicherplatz her, nicht mehr in Variablen vom Elterntyp.
 Dies spiegelt sich in C++ im Object Slicing{{{wikipedia_en(Object_slicing)}}} und in der Beschränkung, dass dynamische Typumwandlung nur mit Zeigern funktioniert, wieder.
 
-Das andere Aspekt des Wertemodells, was sowohl Segen als auch Fluch ist, ist eine Folge der Starken Bindung der Lebenszeit eines Objekts an die Gültigkeit einer Variable.
+Der andere Aspekt des Wertemodells, was sowohl Segen als auch Fluch ist, ist eine Folge der starken Bindung der Lebenszeit eines Objekts an die Gültigkeit einer Variable.
 Ein Objekt, welches in einer Variable residiert, muss zwangsläufig sterben, wenn die Variable ihre Gültigkeit verliert.
-So sterben Objekte in lokalen Variablen, wenn die Funktion beendet wir.
-Aber dazu später, bei der Deinitialisierung mehr.
+So sterben Objekte in lokalen Variablen, wenn die Funktion beendet wird.
+Aber dazu später bei der Deinitialisierung mehr.
 
-Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem Wertemodell, lässt sich gut Arbeiten und beide Modelle haben ihre Vor- und Nachteile. Ich persönlich finde das Wertemodell angenehmer, weil ich darin expliziter Ausdrücken kann, was ich haben möchte.
+Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell als auch mit dem Wertemodell lässt sich gut Arbeiten und beide Modelle haben ihre Vor- und Nachteile. Ich persönlich finde das Wertemodell angenehmer, weil ich darin expliziter Ausdrücken kann, was ich haben möchte.
 
 ** Zugriff auf ein Objekt
 :PROPERTIES:
@@ -896,7 +895,7 @@ Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem We
     \ii Welche \structure{Arten von Zugriffen} gibt es? {
       \bi
       \ii Daten aus dem einem Objekt auslesen oder verändern.
-      \ii Direkter Speicherzugriff oder gefiltert über getter/setter.
+      \ii Direkter Speicherzugriff oder gefiltert über Getter/Setter.
       \ii Ableitung weiterer Referenzen (z.B. Subobjekte: \codebox{\&obj.x}). \hfill \ALERT<1>{Gefährlich!}
       \ei
     }\smallskip
@@ -906,38 +905,38 @@ Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem We
       \begin{center}
         \vfill{}
         \OrangeBox{
-          \textbf{Wer} greift \textbf{Wie} mit \textbf{welchem Recht} zu?
+          \textbf{Wer} greift \textbf{wie} mit \textbf{welchem Recht} zu?
         }
     \end{center}
     }
   \end{frame}
 #+end_src
-Nun, da wir Objekte herumreichen, und mittels Variablen in unserem Code verankern können, wollen wir natürlich auch auf diese Zugreifen, Informationen auslesen und Informationen verändern.
+Nun, da wir Objekte herumreichen, und mittels Variablen in unserem Code verankern können, wollen wir natürlich auch auf diese zugreifen, Informationen auslesen und Informationen verändern.
 Dazu müssen wir zunächst die Akteure eines Zugriffs identifizieren:
 Ganz klar und naheliegend ist, dass das Objekt auch das *Objekt des Zugriffs*[fn::In einem grammatikalischen Sinne von Subjekt - Verb - Objekt.] ist.
 
 Aber welche Entitäten können Subjekt, also Handelnder, des Zugriffs sein?
-Hier müssen wir uns anschauen, was die aktiven Teile unseres Programms sind, all diese können wir als *Benutzer eines Objekts* bezeichnen. Da haben wir zum einen das Stück Code von dem aus der Zugriff erfolgt; meist ist dies eine zugreifende Funktion. Aber auch der Thread von dem aus der Zugriff geschieht kann als Benutzer auftreten. Wichtig wird diese Festlegung, wie wir noch diskutieren werden, des Benutzers, wenn wir den Benutzerkreis eines Objekts einschränken wollen.
+Hier müssen wir uns anschauen, was die aktiven Teile unseres Programms sind, all diese können wir als *Benutzer eines Objekts* bezeichnen. Da haben wir zum einen das Stück Code, von dem aus der Zugriff erfolgt; meist ist dies eine zugreifende Funktion. Aber auch der Thread, von dem aus der Zugriff geschieht, kann als Benutzer auftreten. Wichtig wird diese Festlegung des Benutzers, wie wir noch diskutieren werden, wenn wir den Benutzerkreis eines Objekts einschränken wollen.
 
 Der zweite Teil eines Zugriffs besteht aus der Frage:
 Mit welchem Recht wir zugegriffen.
-Dabei ist der Besitz einer Referenz auf das Objekt das Notwendige um einen Zugriff durch zu führen.
+Dabei ist der Besitz einer Referenz auf das Objekt die Bedingung, um einen Zugriff durchzuführen.
 Aber nicht jede Referenz muss gleich mächtig sein, und es kann eingeschränkte Referenzen (wie read-only Referenzen) geben, über die nicht jeder Zugriff möglich ist.
 Daher können wir Referenzen auch als Capabilities bzw. Befähigungen{{{wikipedia_de(Capability-based security)}}} zum Objektzugriff ansehen.
 
-Die letzte Frage ist welche Arten von Zugriffen es gibt. Hier fallen einem Sofort lesen und schreiben ein. Aber eigentlich ist auch das Erzeugen einer neuen Referenz ein Zugriff auf das Objekt, da wir mit einer Referenz Macht über ein Objekt weiter geben können. Wir wollen uns hier mit expliziten Setter und Getter Methoden auseinander setzen, die den Zugriff auf das Objekt filtern können.
+Die letzte Frage ist, welche Arten von Zugriffen es gibt. Hier fallen einem sofort lesen und schreiben ein. Aber eigentlich ist auch das Erzeugen einer neuen Referenz ein Zugriff auf das Objekt, da wir mit einer Referenz Macht über ein Objekt weitergeben können. Wir wollen uns hier mit expliziten Setter- und Getter-Methoden auseinandersetzen, die den Zugriff auf das Objekt filtern können.
 
-Zusammenfassen kann man die Frage des Objekt-Zugriffs mit der Frage: *Wer greift Wie und mit welchem Recht auf ein Objekt zu?*
+Zusammenfassen kann man die Frage des Objektzugriffs mit der Frage: *Wer greift wie und mit welchem Recht auf ein Objekt zu?*
 
 #+begin_src latex
-  \begin{frame}{Benutzer-abhängige Zugriffseinschränkungen}
+  \begin{frame}{Benutzerabhängige Zugriffseinschränkungen}
     \btAnimation{center,padding,3:<1->}{fig/06-access}
     \medskip
     \bi
     \ii \textbf{Ziel:} Benutzergruppen mit unterschiedlichen Zugriffsrechten {
       \bi
       \ii Identifikation der unterschiedlichen Gruppen \hfill(Wer greift zu?)
-      \ii Einteilung anhand der zugreifenden Instruktionadresse
+      \ii Einteilung anhand der zugreifenden Instruktionsadresse
       \ii[$\Rightarrow$] Wir können den Code mit unbeschränktem Zugriff kontrollieren.
       \ei
     }\medskip
@@ -951,40 +950,40 @@ Zusammenfassen kann man die Frage des Objekt-Zugriffs mit der Frage: *Wer greift
   \end{frame}
   #+end_src
 
-Beginnen wir also bei den Benutzern eines Objekts und beschränken uns darauf von welcher Codestelle ein Zugriff erfolgt.
-Die Idee einen Zugriff anhand des Zugreifenden einzuschränken haben wir bereits, mit der Sichtbarkeit von Feldern in Klassen, kennen gelernt.
-Dort unterscheiden wir zwischen Zugriffen, die von innerhalb der Klasse kommen und solchen die von außerhalb kommen.
+Beginnen wir also bei den Benutzern eines Objekts und beschränken uns darauf, von welcher Codestelle ein Zugriff erfolgt.
+Die Idee einen Zugriff anhand des Zugreifenden einzuschränken, haben wir bereits mit der Sichtbarkeit von Feldern in Klassen kennengelernt.
+Dort unterscheiden wir zwischen Zugriffen, die von innerhalb der Klasse kommen und solchen, die von außerhalb kommen.
 Private Felder dürfen nur von innen, öffentliche Felder von überall her zugegriffen werden.
 
-Generell müssen wir bei der Benutzer-abhängigen Zugriffseinschränkung die einzelnen Nutzergruppen definieren und ihnen gewisse Rechte zuschreiben. Bei der Sichtbarkeit von Felder geschiet diese Unterscheidung daran ob eine Funktion innerhalb der Klasse als Methode definiert wurde, oder außerhalb. Interne Benutzer bekommen bei dieser Einschränkung weitere Rechte.
+Generell müssen wir bei der benutzerabhängigen Zugriffseinschränkung die einzelnen Nutzergruppen definieren und ihnen gewisse Rechte zuschreiben. Bei der Sichtbarkeit von Felder geschieht diese Unterscheidung daran, ob eine Funktion innerhalb der Klasse als Methode definiert wurde, oder außerhalb. Interne Benutzer bekommen bei dieser Einschränkung weitere Rechte.
 
 Der große Vorteil einer solchen Einschränkung der externen Nutzer ist, dass wir sicher sein können, dass es in der gesamten Code-Basis keinen Zugriff auf die privaten Felder gibt, der nicht von einer unserer Methoden ausgeht.
 *Alle Zugriffe auf private Felder laufen über Methoden.*
-Auf diese Weise können wir viel leichter sicherstellen, dass die Invarianten des Objekts nicht verletzt werden.
+Auf diese Weise können wir viel einfacher sicherstellen, dass die Invarianten des Objekts nicht verletzt werden.
 Außerdem können wir das Innere der Klasse beliebig verändern, da keine externer Benutzer Abhängigkeiten entwickeln konnte.
-Dies ermöglicht es uns Implementierung und Daten zu *kapseln*.
+Dies ermöglicht es uns, Implementierung und Daten zu *kapseln*.
 
-Allerdings wird eine solche Kapselung löchrig, wenn wir in einer Methode eine Referenz auf ein eingebettetes Objekt an einen externen Benutzer heraus geben.
-Mit solchen *flüchtenden Referenz* verlieren wir die Kontrolle über unser Objekt, unsere Invarianten und überhaupt alles an unserem Objekt.
+Allerdings wird eine solche Kapselung löchrig, wenn wir in einer Methode eine Referenz auf ein eingebettetes Objekt an einen externen Benutzer herausgeben.
+Mit solchen *flüchtenden Referenzen* verlieren wir die Kontrolle über unser Objekt, unsere Invarianten und überhaupt alles an unserem Objekt.
 Überlegen Sie sich demnach immer gut, ob Sie Code der Form ~inner_t* Object::method() {return &(this->inner);}~ schreiben sollten.
 
 #+begin_src latex
-  \begin{frame}{Referenzen-abhängige Zugriffseinschränkungen}
+  \begin{frame}{Referenzabhängige Zugriffseinschränkungen}
     \btAnimation{center,padding,4:<1->}{fig/06-access}
     \medskip
 
     \bi
-    \ii \textbf{Ziel:} Einschränkbare Referenzen erlauben kontrolliertes Sharing {
+    \ii \textbf{Ziel:} Einschränkbare Referenzen erlauben kontrolliertes Sharing. {
       \bi
-      \ii Über eingeschränkte Referenzen dürfen nicht alle Zugriffe erfolgen
+      \ii Über eingeschränkte Referenzen dürfen nicht alle Zugriffsarten erfolgen.
       \ii Referenzen dürfen nur weiter eingeschränkt und nicht geweitet werden.
-      \ii Beispiel: Ableitung einer read-only Referenz aus einer read-write Referenz
+      \ii Beispiel: Ableitung einer read-only-Referenz aus einer read-write-Referenz
       \ei
     }\medskip
     \ii<2-> \textbf{Implementierung (const):}  Erweiterung des Typsystems{
       \bi
       \ii Weiterer Zeiger-Typkonstruktor:    \typeinline{const\_pointer(T)}\\[.5ex]
-      \ii Implizite Typumwandlung zur read-only Referenz\\[.5ex]
+      \ii Implizite Typumwandlung zur read-only-Referenz\\[.5ex]
       \ii Asymmetrische Typ-Kompatibilität:  \typeinline{const\_pointer(T)} $\ll$ \typeinline{pointer(T)}\\[.5ex]
       \ei
     }
@@ -1003,19 +1002,19 @@ Mit solchen *flüchtenden Referenz* verlieren wir die Kontrolle über unser Obje
 Die zweite Frage, die wir betrachten wollen ist die der *eingeschränkten Referenzen*.
 Wie bereits gesagt, sind Referenz (bzw. Zeiger) Befähigungen über ein Objekt:
 Wer eine Referenz hat, hat Macht über ein Objekt.
-Da nicht jede Nutzung eines Objekts volle Rechte braucht, erlauben es viele Sprachen Referenzen zu erzeugen, die *nicht* Allmächtig sind und nicht jede Art von Zugriff erlauben.
-Der klassische Vertreter der *Referenz-abhängigen Zugriffseinschränkung* ist die read-only Referenz.
+Da nicht jede Nutzung eines Objekts volle Rechte braucht, erlauben es viele Sprachen Referenzen zu erzeugen, die *nicht* allmächtig sind und nicht jede Art von Zugriff erlauben.
+Der klassische Vertreter der *referenzabhängigen Zugriffseinschränkung* ist die read-only-Referenz.
 
 Sehen wir eine eingeschränkten Referenz, so können wir uns sicher sein, dass der Nutzer nur eine eingeschränkte Menge von Zugriffsarten durchführen wird.
-So kann der Besitzer einer read-only Referenz das Objekt nur auslesen, nicht aber verändern.
+So kann der Besitzer einer read-only-Referenz das Objekt nur auslesen, nicht aber verändern.
 Wichtig ist, dass Referenzen nur weiter eingeschränkt werden dürfen.
-So sollte es dem Nutzer einer read-only Referenz (eigentlich) nicht möglich sein, wieder eine read-write Referenz abzuleiten.
+So sollte es dem Nutzer einer read-only-Referenz (eigentlich) nicht möglich sein, wieder eine read-write-Referenz abzuleiten.
 
-Implementiert sind solche Referenz-abhängigen Zugriffseinschränkungen in Programmiersprachen normalerweise mittels unterschiedlicher Referenz-Typen.
+Implementiert sind solche referenzabhängigen Zugriffseinschränkungen in Programmiersprachen normalerweise mittels unterschiedlicher Referenztypen.
 Dort gibt es dann nicht nur den normalen Typkonstruktor für eine Referenz (~pointer(T)~), sondern noch weitere Referenztypen, die beispielsweise nur Lesezugriff erlauben (~const_pointer(T)~).
 Die Propagierung der Zugriffseinschränkung und ihre Durchsetzung geschieht dann im Typ-spezifischen Teil der semantischen Analyse.
 
-Bemerkenswert ist auch, wie unterschiedliche Sprachen den Read-only oder den read-write Fall zum Standardverhalten machen.
+Bemerkenswert ist auch, wie unterschiedliche Sprachen den read-only- oder den read-write-Fall zum Standardverhalten machen.
 Bei C++ ist der normale Zeiger eine allmächtige Referenz auf ein Objekt und der Entwickler muss explizit mittels ~const~ angeben, wenn eine eingeschränkte Referenz vorliegt.
 Bei Rust ist es genau umgekehrt.
 Dort sind Referenzen per Default schreibgeschützt und wir müssen explizit veränderbare Referenzen erzeugen (~&mut~), für die dann noch weitere Einschränkungen gelten.
@@ -1081,20 +1080,20 @@ Ein Stichwort, mit dem man C++-Entwickler an dieser Stelle gut reizen kann ist [
 
 Der letzte Teil unserer Zugriffsbetrachtungen ist das "Wie?":
 Wie greifen wir auf ein Objekt zu?
-Der einfachste Fall, der am wenigsten Kosten verursacht und auf den am Ende /alle Zugriffe abgebildet werden müssen/ ist der *direkte Speicherzugriff*.
+Der einfachste Fall, der am wenigsten Kosten verursacht und auf den am Ende /alle Zugriffe abgebildet werden müssen/, ist der *direkte Speicherzugriff*.
 Bei diesem leiten wir aus der Objektadresse eine Zugriffsadresse ab (z.B. auf ein Feld) und lesen bzw. schreiben die Informationen des Objekts.
-Wie bereits mehrfach erwähnt, kann es problematisch sein, jedem direkten Speicherzugriff auf unser Objekt zu geben, da wir dadurch die Kontrolle über die Zugriffe verlieren und Invarianten verletzt werden könnte.
+Wie bereits mehrfach erwähnt, kann es problematisch sein, jedem direkten Speicherzugriff auf unser Objekt zu geben, da wir dadurch die Kontrolle über die Zugriffe verlieren und Invarianten verletzt werden könnten.
 
-Gut wäre es, wenn wir bei Objekt-Zugriffen aktiven Code dazwischen schalten könnten.
+Gut wäre es, wenn wir bei Objektzugriffen aktiven Code dazwischen schalten könnten.
 Genau dies wird bei *Zugriffsmethoden*{{{wikipedia_en(Mutator_method)}}} gemacht.
 Bei diesem Entwicklungsmuster verbietet man den Zugriff von Außen mittels Sichtbarkeit und legt Zugriffsmethoden mit kanonischen Namen an (~getLength(), ~setLength()~).
-Auf diese Weise können wir Zugriffe auf das Objekte Filtern und sicherstellen, dass der (externe) Nutzer des Objekts die Invarianten nicht verletzt.
+Auf diese Weise können wir Zugriffe auf das Objekte filtern und sicherstellen, dass der (externe) Nutzer des Objekts die Invarianten nicht verletzt.
 
-Allerdings, Sie sehen das Problem bereits, das ganz artet, wenn man es von Anfang an, konsequent umsetzen will in eine richtige Boilerplate-Schlacht aus.
+Allerdings, Sie sehen das Problem bereits, das ganze artet, wenn man es von Anfang an konsequent umsetzen will, in eine richtige Boilerplateschlacht aus.
 Und man muss es von Anfang an durchführen, weil ansonsten das hinzufügen eines Zugriffsfilters Änderung an allen Benutzer des Objekts nach sich ziehen würde.
-Jeder direkte Zugriff müsste dann, in der gesamten Code-Basis, bei allen Kunden und deren Enkeln, zu einem Methodenaufruf umgebogen werden.
+Jeder direkte Zugriff müsste dann, in der gesamten Codebasis, bei allen Kunden und deren Enkeln, zu einem Methodenaufruf umgebogen werden.
 
-Daher bieten manche Sprache es an, Getter- und Setter-Methoden zu definieren, die beim Benutzer syntaktisch genauso aussehen, wie ein direkter Speicherzugriff. Ein Beispiel davon für C# sehen sie auf den Folien. Dort kann der Benutzer weiterhin ~obj.Name = "Max Mustermensch"~ schreiben und es wird dennoch die passende Setter-Funktion aufgerufen. Diese Syntaktische Gleichheit erlaubt es auch, solche Zugriffsmethoden im Nachhinein hinzuzufügen. In Python können Sie sich den ~@property~-Dekorator [[https://docs.python.org/3/library/functions.html#property][anschauen]].
+Daher bieten manche Sprachen es an, Getter- und Setter-Methoden zu definieren, die beim Benutzer syntaktisch genauso aussehen, wie ein direkter Speicherzugriff. Ein Beispiel davon für C# sehen Sie auf den Folien. Dort kann der Benutzer weiterhin ~obj.Name = "Max Mustermensch"~ schreiben und es wird dennoch die passende Setter-Funktion aufgerufen. Diese syntaktische Gleichheit erlaubt es auch, solche Zugriffsmethoden im Nachhinein hinzuzufügen. In Python können Sie sich den ~@property~-Dekorator [[https://docs.python.org/3/library/functions.html#property][anschauen]].
 
 ** Fallstudie: Unveränderliche Objekte
 :PROPERTIES:
@@ -1102,48 +1101,48 @@ Daher bieten manche Sprache es an, Getter- und Setter-Methoden zu definieren, di
 :END:
 #+begin_src latex
   \begin{frame}[fragile]{Fallstudie: Unveränderliche Objekte}
-    \begin{btBlock}{Unveränderliche Obejekte (immutable objects)}
-      Gibt es für ein Objekt, im gesamten Programm, keine read-write Referenzen, so ist sein Inhalt unveränderlich.
+    \begin{btBlock}{Unveränderliche Objekte (immutable objects)}
+      Gibt es für ein Objekt, im gesamten Programm, keine read-write-Referenzen, so ist sein Inhalt unveränderlich.
     \end{btBlock}
 
     \bi
-    \ii<2-> Immutability für ein Objekt bringt spannende Eigenschaften {
+    \ii<2-> Immutability für ein Objekt bringt spannende Eigenschaften. {
       \bi
       \ii Thread-Safety: Keine Probleme mit konkurrierenden Schreibzugriffen
-      \ii Werte- und Referenzmodell werden equivalent.
+      \ii Werte- und Referenzmodell werden äquivalent.
       \ii Deduplikation von Objekten ist möglich (=interning).
-      \ii \textbf{Aber:} Verändernde Operation müssen das Objekt verändert kopieren
+      \ii \textbf{Aber:} Verändernde Operation müssen das Objekt verändert kopieren.
       \ei
     }\medskip
-    \ii<3-> Manche Objekte sind natürlichweise Immutable {
+    \ii<3-> Manche Objekte sind natürlicherweise Immutable. {
       \bi
       \ii \structure{Zahlen}: Die Zahl 5 kann nicht so verändert werden, dass alle Fünfen im gesamten Programm plötzlich Achten sind.
       \smallskip
-      \ii \structure{String-Literale}: Der Übersetzer legt literale Zeichenketten (\codeinline[style=C,style=smaller]{"Hello"}) nur einmal in die Binärdatei.
+      \ii \structure{Stringliterale}: Der Übersetzer legt literale Zeichenketten (\codeinline[style=C,style=smaller]{"Hello"}) nur einmal in die Binärdatei.
       \ei
     }
     \ei
   \end{frame}
 #+end_src
 
-Wir wollen uns nun eine Sorte von Objekten ansehen, bei denen mehrere Aspekte des Objekt-Zugriffs zusammen kommen:
-*Unveränderliche Objekte*.
+Wir wollen uns nun eine Sorte von Objekten ansehen, bei denen mehrere Aspekte des Objektzugriffs zusammenkommen:
+*unveränderliche Objekte*.
 Diese Objekte werden nur während der Initialisierungsphase verändert und in ihrem gesamten weiteren Leben gibt es keine Schreibzugriffe mehr.
 Dies ist gleichbedeutend damit, dass es im gesamten Programm keine Referenzen mit Schreibrechten gibt.
 
-Diese unveränderlichen Objekte haben einige spannende Eigenschaften: Das sie nie verändert werden, gibt es keinerlei Probleme mit konkurierenden Zugriffen in  nebenläufigen Programmen; es gibt keine read-write oder write-write Wettlaufsituationen (race conditions), wenn es kein "write" gibt.
+Diese unveränderlichen Objekte haben einige spannende Eigenschaften: Da sie nie verändert werden, gibt es keinerlei Probleme mit konkurrierenden Zugriffen in  nebenläufigen Programmen; es gibt keine read-write- oder write-write-Wettlaufsituationen (race conditions), wenn es kein "write" gibt.
 
 Außerdem ist das Werte- und das Referenzmodell zu weiten Teilen bei unveränderlichen Objekten gleich.
-Da diese Objekte niemals verändert werden, kann ich sie zwar, wie vom Wertemodell gefordert, bei einer Zuweisung kopieren, aber der Übersetzer kann auch einfach eine Referenz weiter geben, falls dies effizienter ist.
+Da diese Objekte niemals verändert werden, kann ich sie zwar, wie vom Wertemodell gefordert, bei einer Zuweisung kopieren, aber der Übersetzer kann auch einfach eine Referenz weitergeben, falls dies effizienter ist.
 
-Weiterhin können wir unveränderliche Objekte auch einfach *deduplizieren*, wenn ihr Konstruktor nur von der Parametern abhängt. Deduplizieren bedeutet, dass wir die Daten mehrerer gleicher Objekte nur einmal speichern und die gleiche Referenz mehrfach heraus geben. Ein klassisches Beispiel für diese Deduplizierung ist die *Internalisierung von Strings*[fn::In Python: https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de]:
+Weiterhin können wir unveränderliche Objekte auch einfach *deduplizieren*, wenn ihr Konstruktor nur von der Parametern abhängt. Deduplizieren bedeutet, dass wir die Daten mehrerer gleicher Objekte nur einmal speichern und die gleiche Referenz mehrfach herausgeben. Ein klassisches Beispiel für diese Deduplizierung ist die *Internalisierung von Strings*[fn::In Python: https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de]:
 
 #+include: ../lst/06-intern.py
 
 In diesem Beispiel übersetzen wir die Argumente von ~Intern()~ in eine Ganzzahl und tragen diese in zwei Tabellen ein, welche wir für die bidirektionale Übersetzung verwenden können.
-Die Rückggabewerte von ~Intern()~ sind Referenzen in auf die tatsächlichen Strings, können aber deutlich schneller herumgereicht und auf Gleichheit geprüft werden.
+Die Rückgabewerte von ~Intern()~ sind Referenzen in auf die tatsächlichen Strings, können aber deutlich schneller herumgereicht und auf Gleichheit geprüft werden.
 
-Was in diesem Beispiel sehr Hemdsärmlig und nur Skizzenhaft gezeigt ist, ist eine Technik des Übersetzerbaus, die bei der Implementierung der Symboltabelle zum Einsatz kommt. Dort müssen Bezeichner in der Symboltabelle schnell wieder gefunden werden, was viele Vergleiche von Strings erfordert. Da die Anzahl der Bezeichner in einem Programm allerdings meist begrenzt ist, kann die Internalisierung von Strings signifikant Laufzeit sparen.
+Was in diesem Beispiel sehr hemdsärmlig und nur skizzenhaft gezeigt ist, ist eine Technik des Übersetzerbaus, die bei der Implementierung der Symboltabelle zum Einsatz kommt. Dort müssen Bezeichner in der Symboltabelle schnell wiedergefunden werden, was viele Vergleiche von Strings erfordert. Da die Anzahl der Bezeichner in einem Programm allerdings meist begrenzt ist, kann die Internalisierung von Strings signifikant Laufzeit sparen.
 
 Es gibt auch Objekte, die klassischerweise unveränderlich sind:
 Dazu gehören normalerweise Zahlen und Literale.
@@ -1151,8 +1150,8 @@ So macht es keinen Sinn die Zahl 5 an sich zu verändern.
 Sicherlich möchten wird nicht, dass ~a = 5; a++~ dazu führt, dass alle Fünfen im gesamten Programm zu einer Sechs werden.
 Ebenso wenig wäre es hilfreich, wenn die Modifikation eines String-Literals (~a = "abc"; a[1] = 'x';~) dazu führt, dass alle literal notierten Strings ~"abc"~ plötzlich den Wert ~"axc"~ hätten.
 Daher sind diese Objekte in jeder vernünftigen Sprache unveränderlich.
-Zu diesem Thema lasse ich ihnen als Rätsel das folgende Stück Code da. Die Ausgabe ist ~Six times Seven = 43~.
-Zur Hilfe lasse ich ihnen noch die Stichwörter Autoboxing und Integer-Cache da:
+Zu diesem Thema lasse ich Ihnen als Rätsel das folgende Stück Code da. Die Ausgabe ist ~Six times Seven = 43~.
+Zur Hilfe lasse ich Ihnen noch die Stichwörter Autoboxing und Integer-Cache da:
 
 #+begin_src java
 import java.lang.reflect.*;
@@ -1173,8 +1172,8 @@ class IntReflection {
 :END:
 #+begin_src latex
   \begin{frame}[fragile]{Ownership für Objekte}
-    \begin{btBlock}[type=alert]{Wem gehört ein dieses Objekt?}
-        Viele Bugs und Probleme  rühren daher, dass man sich keine Gedanken darüber gemacht hat, wer Verantwortung für ein Objekt hat.
+    \begin{btBlock}[type=alert]{Wem gehört ein Objekt?}
+        Viele Bugs und Probleme rühren daher, dass man sich keine Gedanken darüber gemacht hat, wer die Verantwortung für ein Objekt hat.
     \end{btBlock}
 
     \bi
@@ -1215,7 +1214,7 @@ class IntReflection {
         \ii Modernste Sprachenentwicklungen:{%
           \bi
           \ii Hilfestellungen: \codeinline[style=CPP,style=smaller]{std::unique_ptr<T>}
-          \ii Übersetzer prüft Besitzer statisch: Rust's Borrowchecker
+          \ii Übersetzer prüft Besitzer statisch: Rusts Borrowchecker
           \ei
         }
         \eii
@@ -1227,33 +1226,33 @@ class IntReflection {
   \end{frame}
 #+end_src
 
-Das andere Thema auf das ich beim Komplex "Objekte in Programmiersprachen" noch unbedingt eingehen möchte ist das Konzept des *Besitzers eines Objekts*.
+Das andere Thema, auf das ich beim Komplex "Objekte in Programmiersprachen" noch unbedingt eingehen möchte, ist das Konzept des *Besitzers eines Objekts*.
 In den meisten Programmiersprachen, mit Rust als erste wirkliche Ausnahme, ist der Besitz eines Objekts ein informelles und intentionales Konzept.
-Entweder der Entwickler denkt darüber nach, wem ein gewisses Objekt gehört, oder er begibt sich in die Gefahr Bugs am laufenden Band zu produzieren.
+Entweder der Entwickler denkt darüber nach, wem ein gewisses Objekt gehört, oder er begibt sich in die Gefahr, Bugs am laufenden Band zu produzieren.
 
-Den was bedeutet Besitz bei Objekten:
+Denn was bedeutet Besitz bei Objekten:
 Besitzer eines Objekts bedeutet mehr als eine Referenz auf ein Objekt in Händen zu halten.
 *Besitz bedeutet Verantwortung*.
 Wer ein Objekt besitzt, der ist für den Lebenszyklus des Objekts verantwortlich.
 Insbesondere bedeutet dies, dass der letzte Besitzer eines Objekts die Deinitialisierung einleiten muss.
-Hat das Objekt, zum Beispiel, Ressourcen im Konstruktor nachgefordert, so müssen diese geordnet freigegeben werden.
+Hat das Objekt zum Beispiel Ressourcen im Konstruktor nachgefordert, so müssen diese geordnet freigegeben werden.
 
 Als Beispiel sei hier ein Netzwerksocket genannt.
 Im Konstruktor bzw.
-zu Beginn seines Lebens wurde, wurde der Netzwerksocket geöffnet.
+zu Beginn seines Lebens wurde der Netzwerksocket geöffnet.
 Bevor nun der letzte Besitzer seinen Anspruch an dem Socket abgibt, sollte dieser den Socket schließen, da sonst irgendwann die Zahl der gleichzeitig offenen Sockets (ein Limit des Betriebssystems) erreicht wird und keine weiteren Sockets geöffnet werden können.
 
 Besonders schwierig wird das Konzept von Besitz, wenn es mehrere unabhängige Besitzer zum gleichen Zeitpunkt geben kann. Dies kann zum Beispiel auftreten, wenn mehrere Threads sich den Besitz eines Objekts teilen und diesen in unbestimmter Reihenfolge aufgeben können. In diesem Fall ist es, aufgrund der Nebenläufigkeit, besonders schwierig den letzten Besitzer ausfindig zu machen.
 
-Das andere Problem, welches mit Besitz zu tun hat ist das *dangling-reference problem*, wie es auf den Folien zu sehen ist.
+Das andere Problem, welches mit Besitz zu tun hat, ist das *dangling-reference problem*, wie es auf den Folien zu sehen ist.
 In diesem Beispiel gibt es unterschiedliche Auffassungen über den Besitz des Objekts ~obj~:
-Das Proxy-Objekt ~p~ hält eine Referenz auf ~obj~, was erstmal keinen Besitzanspruch impliziert.
+Das Proxyobjekt ~p~ hält eine Referenz auf ~obj~, was erst mal keinen Besitzanspruch impliziert.
 Allerdings geht der Code von Proxy davon aus (Invariante!), dass es Besitzer des referenzierten Objekts ist und dieses nicht einfach verschwindet.
-Der umgebende Code gibt das Objekt allerdings einfach frei (~delete obj~), weil es davon ausgeht, dass es der letzte Besitzer des Objekts ist.
+Der umgebende Code gibt das Objekt allerdings einfach frei (~delete obj~), weil er davon ausgeht, dass er der letzte Besitzer des Objekts ist.
 Der nachfolgende Aufruf ~p.call()~ führt nun dazu, dass der Referenz ~p.ref~ gefolgt wird, obwohl das referenzierte Objekt längst freigegeben wurde; das sogenannte dangling-reference problem.
-Denn die Freigabe des Objekts führt nicht dazu, dass alle Referenzen auf das Objekt im gesamten Programm gelöscht werden, da dies viel zu aufwändig wäre.
+Denn die Freigabe des Objekts führt nicht dazu, dass alle Referenzen auf das Objekt im gesamten Programm gelöscht werden, da dies viel zu aufwendig wäre.
 
-Da Besitz von Objekten schwierig ist, gibt es moderne Sprachkonzepte, wie den ~std::unique_ptr<>~ von C++ und den Borrowchecker von Rust[fn::Siehe: Rust Manual, [[https://doc.rust-lang.org/1.8.0/book/ownership.html][Ownership]]], die es leichter machen beim Besitzen von Objekten weniger falsch zu machen.
+Da Besitz von Objekten schwierig ist, gibt es moderne Sprachkonzepte, wie den ~std::unique_ptr<>~ von C++ und den Borrowchecker von Rust[fn::Siehe: Rust Manual, [[https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html][Ownership]]], die es einfacher machen, beim Besitzen von Objekten weniger falsch zu machen.
 Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, so lohnt es sich dennoch immer zu überlegen:
 *Wer ist aktuell der Besitzer dieses Objekts?* und *An welchen Stellen übergebe, oder gar teile, ich den Besitz dieses Objekts*.
 
@@ -1290,8 +1289,8 @@ Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, 
         \structure{Referenzzählung}
         \bii
         \ii Zählen der existierenden Referenzen
-        \ii Exakter Todes-Zeitpunkt
-        \ii Probleme mit Referenz-Zyklen
+        \ii Exakter Todeszeitpunkt
+        \ii Probleme mit Referenzzyklen
         \eii
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
@@ -1307,25 +1306,25 @@ Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, 
 
   #+end_src
 
-Kommen wir nur zur letzten Phase im Lebenszyklus eines einzelnen Objekts: seinem Tod und der Freigabe all seiner angeforderten Ressourcen. Dabei gibt es zwei grundlegende Fragen: "Wann endet die Lebenszeit eines Objekts?" und "Wann und Wie wird das Objekt freigegeben?". Diesen beiden Fragen werden wir nun nachgehen.
+Kommen wir nur zur letzten Phase im Lebenszyklus eines einzelnen Objekts: seinem Tod und der Freigabe all seiner angeforderten Ressourcen. Dabei gibt es zwei grundlegende Fragen: "Wann endet die Lebenszeit eines Objekts?" und "Wann und wie wird das Objekt freigegeben?". Diesen beiden Fragen werden wir nun nachgehen.
 
 Ganz generell können wir sagen, dass die Freigabe eines Objekts erst dann erfolgen darf, wenn seine Lebenszeit geendet hat.
 Eine Verletzung dieses Prinzips haben wir gerade eben, beim dangling-reference problem, gesehen.
 Aber wann genau endet denn die Lebenszeit eines Objekts?
 
-Mit der Definition auf den Folien verknüpfen wir die Lebenszeit eines Objekts mit seiner Nutzung; Wird ein Objekt in der Zukunft nicht mehr verwendet werden, so endet seine tatsächliche Lebenszeit nach dem letzten Zugriff.
-Wie wir schon sehen ist die genaue Feststellung der Lebenszeit schwierig, da wir im vor hinein nicht wissen, ob später noch einmal ein Zugriff auf das Objekt stattfinden wird.
+Mit der Definition auf den Folien verknüpfen wir die Lebenszeit eines Objekts mit seiner Nutzung; wird ein Objekt in der Zukunft nicht mehr verwendet werden, so endet seine tatsächliche Lebenszeit nach dem letzten Zugriff.
+Wie wir schon sehen, ist die genaue Feststellung der Lebenszeit schwierig, da wir im Vorhinein nicht wissen, ob später noch einmal ein Zugriff auf das Objekt stattfinden wird.
 
 Allerdings gibt es einige Indikatoren, die das Ende der Lebenszeit eines Objekts anzeigen können.
 So ist es notwendig, dass kein Teil des Programms noch einen Besitzanspruch auf das Objekt erhebt.
-Als eine Überabschätzung können wir diesen Zustand technisch feststellen, indem wir feststellen ob es noch gültige Referenzen auf das Objekt gibt.
+Als eine Überabschätzung können wir diesen Zustand technisch feststellen, indem wir feststellen, ob es noch gültige Referenzen auf das Objekt gibt.
 Denn wo es keine Referenzen mehr gibt, da kann es auch keine Zugriffe mehr geben. Diese Bedingung ist daher sogar hinreichend.
 
 Umgekehrt gilt dies übrigens nicht:
 Nur weil es keinen Besitzer gibt, der sich verantwortlich fühlt, kann es dennoch sein, dass noch eine Referenz existiert.
 Der letzte Besitzer könnte schlicht und ergreifend vergessen haben die Referenz zu löschen.
 
-Die einfachste Lösung, jedenfalls aus Sicht der Programmiersprache, ist die *Explizite Freigabe*.
+Die einfachste Lösung, jedenfalls aus Sicht der Programmiersprache, ist die *explizite Freigabe*.
 Dort gibt der Programmierer ein Objekt ganz explizit und selbständig frei und er tut damit kund:
 "Dieses Objekt hat seine Lebenszeit überschritten, wir können es freigeben!"
 Damit zieht sich die Programmiersprache ganz fein aus der Affäre und überlässt die Verantwortung über die Lebenszeit ganz und gar dem Entwickler...
@@ -1333,10 +1332,10 @@ ausgefuchst, diese faulen Sprachentwickler...
 Im Code sieht die explizite Freigabe dann so aus, dass es dedizierte Aufrufe zu Freigabefunktionen (~log_deinit()~) bzw.
 dedizierte Schlüsselwörter zur Freigabe (~delete~) gibt.
 
-Da explizite Freigabe von Objekten, und dem für sie reservierten Speicher, mühsam und fehleranfällig ist[fn::Mal gibt man zu früh (dangling-reference problem), mal zu spät (Speicherleck) frei], haben die Designer von Programmiersprachen Mechanismen zur *automatischen Freigabe*, auch automatische Speicherbereinigung genannt, entwickelt.
+Da explizite Freigabe von Objekten, und dem für sie reservierten Speicher, mühsam und fehleranfällig ist[fn::Mal gibt man zu früh (dangling-reference problem), mal zu spät (Speicherleck) frei.], haben die Designer von Programmiersprachen Mechanismen zur *automatischen Freigabe*, auch automatische Speicherbereinigung genannt, entwickelt.
 Diese lassen sich in zwei große Bereiche einteilen:
 *Referenzzähler* und die Nutzung eines *Garbage Collectors*.
-Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt (keine gültige Referenz mehr), funktionieren aber gänzlich unterschiedlich.
+Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunkt (keine gültige Referenz mehr), funktionieren aber gänzlich unterschiedlich.
 
 ** Referenzzählung
 :PROPERTIES:
@@ -1368,9 +1367,9 @@ Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt (keine gült
 
 
     \bi
-    \ii \structure{Manuell}: Besitzer zeigt Referenz weiter- bzw. aufgabe an {
+    \ii \structure{Manuell}: Besitzer zeigt Referenzweiter- bzw. -aufgabe an {
       \bi
-      \ii Reihenfolge von \texttt{claim()} und \texttt{release()} sind kritisch
+      \ii Reihenfolge von \texttt{claim()} und \texttt{release()} ist kritisch
       \ii Fällt der Zähler auf 0, wird das Objekt automatisch freigegeben.
       \ii<2-> Referenzieren sich Objekte zyklisch, wird \ALERT{niemals} freigegeben.
       \ei
@@ -1398,18 +1397,18 @@ Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt (keine gült
   \end{frame}
   #+end_src
 
-Die erste Variante der automatischen Speicherbereinigung, die wir uns genauer anschauen werden ist die Referenzzählung.
-Die Idee ist, dass wir Zählen, wieviele Referenzen es auf ein Objekt gibt.
+Die erste Variante der automatischen Speicherbereinigung, die wir uns genauer anschauen werden, ist die Referenzzählung.
+Die Idee ist, dass wir zählen, wie viele Referenzen es auf ein Objekt gibt.
 Fällt der Referenzzähler auf ~0~, so geben wir das Objekt frei, da wir wissen, dass niemand es in der Zukunft verwenden kann.
 Diese Referenzzählung kann entweder manuell erfolgen oder durch programmiersprachliche Abstraktionen.
 
 Generell assoziieren wir mit jedem Objekt, welches wir per Referenzzählung verwalten wollen, einen *Referenzzähler*.
-Dieser Zähler kann, beispielsweise, als vorzeichenlose Zahl in dem Objekt selbst angelegt werden. Die Invariante für diesen Zähler ist, dass er immer die aktuelle Anzahl der gültigen Referenzen *oder* die aktuelle Anzahl der verantwortlichen Besitzer speichert[fn::Überlegen Sie sich welchen Unterschied dies macht. Auf jeden Fall muss man sich auf eine Semantik fest legen, sonst kommt alles massiv durcheinander.] .
-Um diese Invariante zu etablieren, setzt der Konstruktor den Zähler auf den Wert ~1~; Zum Zeitpunkt der Konstruktion gibt es immer genau einen Besitzer bzw. genau eine Referenz.
+Dieser Zähler kann beispielsweise als vorzeichenlose Zahl in dem Objekt selbst angelegt werden. Die Invariante für diesen Zähler ist, dass er immer die aktuelle Anzahl der gültigen Referenzen *oder* die aktuelle Anzahl der verantwortlichen Besitzer speichert[fn::Überlegen Sie sich, welchen Unterschied dies macht. Auf jeden Fall muss man sich auf eine Semantik festlegen, sonst kommt alles massiv durcheinander.].
+Um diese Invariante zu etablieren, setzt der Konstruktor den Zähler auf den Wert ~1~; zum Zeitpunkt der Konstruktion gibt es immer genau einen Besitzer bzw. genau eine Referenz.
 
 Bei der *manuellen Referenzzählung* bietet das Objekt zusätzlich eine API an, um den Referenzzähler zu erhöhen (~claim()~), bzw.
 zu verringern (~release()~).
-Fällt der Zähler beim verringern auf ~0~[fn::Hinweis: In einem mehrfädigen Prozess ist das dekrementieren und prüfen eine heikle Stelle bei der es zu Wettlaufsituationen kommen kann. Dies löst man normalerweise mit einer atomaren ~decrement_and_fetch()~-Operation], so löscht sich das Objekt, mittels expliziter Freigabe, selbst.
+Fällt der Zähler beim verringern auf ~0~[fn::Hinweis: In einem mehrfädigen Prozess ist das dekrementieren und prüfen eine heikle Stelle, bei der es zu Wettlaufsituationen kommen kann. Dies löst man normalerweise mit einer atomaren ~decrement_and_fetch()~-Operation], so löscht sich das Objekt mittels expliziter Freigabe selbst.
 
 Wenn wir jetzt unser heikles Beispiel von gerade eben mit dieser API absichern wollen würden, dann sähe unser Proxy jetzt so aus:
 
@@ -1432,25 +1431,25 @@ p.call();
 #+end_src
 
 Wie Sie sehen, löschen wir das Objekt nicht mehr explizit, sondern der erste Besitzer des Objekts zeigt nur an, dass er dieses Objekt nicht mehr besitzt.
-Das Objekt ~obj~ wird jetzt allerdings vom Proxy-Objekt ~p~ besessen, sodass es noch zu keiner Freigabe kommt.
+Das Objekt ~obj~ wird jetzt allerdings vom Proxyobjekt ~p~ besessen, sodass es noch zu keiner Freigabe kommt.
 
-Ein Beispiel wo solche manuelle Referenzzählung zum Einsatz kommt, ist der Linux-Kern. Dort wird der Referenzzähler durch den Typen ~struct kref~ abstrahiert. Mittels Einbettung, werden verschiedenste Objekte im Kern durch Referenzzählung verwaltet. Die API-Funktionen heißen dort: ~kref_get()~ (= ~claim()~) und ~kref_put()~ (= ~release()~). Den Source-Code finden Sie in der Datei [[https://elixir.bootlin.com/linux/latest/source/include/linux/kref.h#L43][include/linux/kref.h]].
+Ein Beispiel, wo solche manuelle Referenzzählung zum Einsatz kommt, ist der Linux-Kern. Dort wird der Referenzzähler durch den Typen ~struct kref~ abstrahiert. Mittels Einbettung werden verschiedenste Objekte im Kern durch Referenzzählung verwaltet. Die API-Funktionen heißen dort ~kref_get()~ (= ~claim()~) und ~kref_put()~ (= ~release()~). Den Source-Code finden Sie in der Datei [[https://elixir.bootlin.com/linux/latest/source/include/linux/kref.h#L43][include/linux/kref.h]].
 
 Ein generelles Problem der Referenzzählung sind *zyklische Abhängigkeiten*.
 Referenzieren bzw.
 besitzen sich Objekte gegenseitig.
-Wird die letzte Referenz, die von außen kommt, auf den Zyklus weggenommen wird, so halten bleibt bei jedem Mitglied des Objekt-Zyklus der Referenzzähler mindestens bei ~1~ und die Objekte halten sich gegenseitig im Speicher; ein Speicherleck ist enstanden!
-Dieses Problem ist mit Referenzzählung niemals zu lösen, da das Problem nur mit einer globalen Sicht auf den Referenzgraphen gelöst werden kann, die Referenzzählung aber nur lokal an einem Objekt statt findet.
-Ist man sich dieses Problems allerdings bewusst ist, so ist Referenzzählung ein recht effizienter Mechanismus um automatische Speicherverwaltung durch zu führen[fn::Effizient wird sie auch dadurch, dass die Modifikation eines eingebetteten Referenzzählers in den gleichen Cachezeilen stattfindet, in denen auch das Objekt liegt.].
+Wird die letzte Referenz, die von außen kommt, auf den Zyklus weggenommen, so bleibt bei jedem Mitglied des Objektzyklus der Referenzzähler mindestens bei ~1~ und die Objekte halten sich gegenseitig im Speicher; ein Speicherleck ist entstanden!
+Dieses Problem ist mit Referenzzählung niemals zu lösen, da das Problem nur mit einer globalen Sicht auf den Referenzgraphen gelöst werden kann, die Referenzzählung aber nur lokal an einem Objekt stattfindet.
+Ist man sich dieses Problems allerdings bewusst ist, so ist Referenzzählung ein recht effizienter Mechanismus, um automatische Speicherverwaltung durchzuführen[fn::Effizient wird sie auch dadurch, dass die Modifikation eines eingebetteten Referenzzählers in den selben Cachezeilen stattfindet, in denen auch das Objekt liegt.].
 
-Eine weitere Verbesserung des Referenzzähler-Konzepts, ist der ~Smart Pointer~.
+Eine weitere Verbesserung des Referenzzähler-Konzepts ist der ~Smart Pointer~.
 Im Hintergrund werkelt dabei die gleiche Maschinerie wie bei der manuellen Referenzzählung, allerdings wird das in/dekrementieren des Zählers automatisch durchgeführt.
-Dazu wird ein Datentyp eingeführt, der als Ersatz für die normalen Referenzen dient und nach außen hin genauso verhält wie ein normaler Zeiger.
-Um dies am Beispiel zu verdeutlichen: Der Typausdruck für eine Ganzzahlzeiger in C++ ist ~pointer(int)~, der Typ eines Smart-Pointers auf einen Int (=Typ der Variable ~A~ und ~B~) ist ~shared_ptr(int)~[fn::Rufen Sie sich aus der Vorlesung über Typen in Erinnerung, dass generische Typen dem Benutzer die Möglichkeit gibt eigene Typkonstruktoren anzulegen.].
+Dazu wird ein Datentyp eingeführt, der als Ersatz für die normalen Referenzen dient und sich nach außen hin genauso verhält wie ein normaler Zeiger.
+Um dies am Beispiel zu verdeutlichen: Der Typausdruck für einen Ganzzahlzeiger in C++ ist ~pointer(int)~, der Typ eines Smart-Pointers auf einen Int (=Typ der Variable ~A~ und ~B~) ist ~shared_ptr(int)~[fn::Rufen Sie sich aus der Vorlesung über Typen in Erinnerung, dass generische Typen dem Benutzer die Möglichkeit geben, eigene Typkonstruktoren anzulegen.].
 
 Gekoppelt mit dem Wertemodell für Variablen kann so eine automatische Referenzzählung durchgeführt werden:
-Bei jeder Kopie eines ~shared_ptr<T>~-Refernzobjekts wird ~claim()~ im Kopier-Konstruktor ausgeführt.
-Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der es residiert ungültig wird, so ruft der Destruktor ~release()~ auf. 
+Bei jeder Kopie eines ~shared_ptr<T>~-Referenzobjekts wird ~claim()~ im Kopier-Konstruktor ausgeführt.
+Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable, in der es residiert, ungültig wird, so ruft der Destruktor ~release()~ auf. 
 
 ** Garbage Collector
 :PROPERTIES:
@@ -1466,8 +1465,8 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
     \bi
     \ii<2-> Erreichbarkeitsanalyse im Referenzgraphen {
       \bi
-      \ii Jedes existierende Objekt ist ein Knoten im Referenzgraphen
-      \ii Jede Referenz/Zeiger ist eine gerichtete Kante
+      \ii Jedes existierende Objekt ist ein Knoten im Referenzgraphen.
+      \ii Jede Referenz/Zeiger ist eine gerichtete Kante.
       \ii Root Set: globale/lokale Variablen, Registerinhalte
       \ei
     }\medskip
@@ -1479,7 +1478,7 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
       \ii Iteration über alle Objekte ist teuer     \hfill Partitionierte Objektmenge
       \ei
       \smallskip
-        $\Rightarrow$ GC hauptsächlich in gemanagten Sprachen, wie Java oder Python.
+        $\Rightarrow$ GC hauptsächlich in gemanagten Sprachen, wie Java oder Python
     }
     \ei
   \end{frame}
@@ -1493,24 +1492,24 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable in der
   \end{frame}
   #+end_src
 
-Die zweite Art der automatischen Speichververaltung ist die Verwendung eines *Garbage Collectors*.
-Dieser findet tote Objekte ebenfalls mittels der hinreichenden Bedingung, dass jedes Objekt, welches nicht mehr referenziert wird auf jeden Fall tot ist. 
+Die zweite Art der automatischen Speicherveraltung ist die Verwendung eines *Garbage Collectors*.
+Dieser findet tote Objekte ebenfalls mittels der hinreichenden Bedingung, dass jedes Objekt, welches nicht mehr referenziert wird, auf jeden Fall tot ist. 
 Der Kernbegriff für den Garbage Collector ist die Erreichbarkeit eines Objekts im Referenzgraphen.
 
-Der *Referenzgraph* ist ein gerichteter Graph, bei dem jedes existierende Objekt ein Knoten ist
+Der *Referenzgraph* ist ein gerichteter Graph, bei dem jedes existierende Objekt ein Knoten ist.
 Für jede Referenz, die von einem Objekt ausgeht, gibt es im Referenzgraphen eine ausgehende Kante auf das referenzierte Objekt.
 Stellen Sie sich aber nicht vor, dass dabei eine separate Datenstruktur reference_graph_t aufgebaut wird. Der Referenzgraph ist nur implizit über die Belegung der Felder gegeben.
 
-Um in diesem Geflecht aus sich gegenseitig referenzierenden Objekten, die toten Objekte zu finden, drehen wir die hinreichende Bedingung auf den Kopf und finden all jene Objekte, die vielleicht noch nicht tot sind.
-Bewaffnet mit einem sogenannten "root set" finden wird alle Objekte die transitiv über die Kanten des Referenzgraphen erreichbar sind.
+Um in diesem Geflecht aus sich gegenseitig referenzierenden Objekten die toten Objekte zu finden, drehen wir die hinreichende Bedingung auf den Kopf und finden all jene Objekte, die vielleicht noch nicht tot sind.
+Bewaffnet mit einem sogenannten "root set" finden wird alle Objekte, die transitiv über die Kanten des Referenzgraphen erreichbar sind.
 Alle Objekte, die nicht erreichbar sind, sind auf jeden Fall tot und können freigegeben werden.
 
-Das *root set* beinhaltet all Entitäten über die ein Zugriff auf ein Objekt starten kann.
-Dies beinhaltet die lokalen Variablen, alle globalen Variablen, aber auch der aktuelle Inhalt der Prozessorregister.
-Zu einem späteren Zeitpunkt könnte nämlich das Programm ein Element aus dem root sets herausnehmen, mehreren Referenzen folgen und auf ein Objekt tief im Referenzgraphen zugreifen. Daher muss jedes Objekt, welches potentiell noch verwendet werden könnte erhalten bleiben.
+Das *root set* beinhaltet alle Entitäten, über die ein Zugriff auf ein Objekt starten kann.
+Dies beinhaltet die lokalen Variablen, alle globalen Variablen, aber auch den aktuellen Inhalt der Prozessorregister.
+Zu einem späteren Zeitpunkt könnte nämlich das Programm ein Element aus dem root sets herausnehmen, mehreren Referenzen folgen und auf ein Objekt tief im Referenzgraphen zugreifen. Daher muss jedes Objekt, welches potentiell noch verwendet werden könnte, erhalten bleiben.
 
-Für die Verwendung eines Garbage Collectors gibt es allerdings einige Vorbedingungen (siehe Folien), die alle damit zusammen hängen, dass wir das existierende Geflecht der Referenzen korrekt erfassen. Wir dürfen auf keinen Fall eine Referenz übersehen, sonst löschen wir vielleicht Objekte, die noch gebraucht werden.
-Um dies präzise durch zu führen, braucht es daher eine typsichere Sprache, bei der der Benutzer keine beliebigen Referenzen aus dem Nichts erzeugen kann und bei der für jedes Objekt klar ist, welche anderen Objekte referenziert werden. 
+Für die Verwendung eines Garbage Collectors gibt es allerdings einige Vorbedingungen (siehe Folien), die alle damit zusammenhängen, dass wir das existierende Geflecht der Referenzen korrekt erfassen. Wir dürfen auf keinen Fall eine Referenz übersehen, sonst löschen wir vielleicht Objekte, die noch gebraucht werden.
+Um dies präzise durchzuführen, braucht es daher eine typsichere Sprache, bei der der Benutzer keine beliebigen Referenzen aus dem Nichts erzeugen kann und bei der für jedes Objekt klar ist, welche anderen Objekte referenziert werden. 
 Dies ist auch der Grund, wieso Sprachen wie C und C++ keinen Garbage Collector anbieten.
 
 Ein anderer Nachteil bei der Verwendung eines Garbage Collectors ist, dass der Todeszeitpunkt und der Moment der Löschung eines Objekts voneinander entkoppelt sind.
@@ -1519,15 +1518,15 @@ Daher kann es beliebig lange[fn::Eine Strategie den Garbage Collector zu starten
 Wir allokieren solange aus einem Speicherpool, bis dieser leer ist.
 Finden wir für eine angeforderte Allokation keinen Platz im Pool, so starten wir den Garbage Collector.
 Ist danach immer noch kein Platz, vergrößern wir den Pool.]
-dauern bis ein totes Objekt freigegeben wird.
-Daher ist es bei der Verwendung des Garbage Collectors schwierig die Freigabe von nachgeforderten Ressourcen (z.B.
+dauern, bis ein totes Objekt freigegeben wird.
+Daher ist es bei der Verwendung des Garbage Collectors schwierig, die Freigabe von nachgeforderten Ressourcen (z.B.
 offener Socket) an die Löschung des Objekts zu koppeln.
 Daher muss es in Java mehr ~deinit()~-Funktionen als in C++ geben.
 
 Ein konkrete Technik für Garbage Collection ist der *Mark-and-Sweep Garbage Collector*, für den Sie auf den Folien eine Animation seiner Funktionsweise finden.
-Dieser Garbage Collector arbeitet mit einer Markierung an jedem Objekt. Nachdem die Welt angehalten wurde, wird das root-set bestimmt und die Marke an allen Objekten zurück gesetzt. Mittels Tiefensuche im Graph, markiert der Mark-and-Sweep GC alle Erreichbaren Objekte (die Mark Phase).
-Dabei starten wir die Suche von jedem Element des root sets, aber brechen die Suche immer dann ab, wenn wir auf eine Positiv-Marke treffen; ab dort haben wir bereits alles Erreichbare markiert.
-In der Sweep Phase, iterieren wir über alle existierenden Objekte und geben jene Objekte frei, die in der Mark Phase nicht markiert wurde.
+Dieser Garbage Collector arbeitet mit einer Markierung an jedem Objekt. Nachdem die Welt angehalten wurde, wird das root-set bestimmt und die Marke an allen Objekten zurückgesetzt. Mittels Tiefensuche im Graph markiert der Mark-and-Sweep GC alle erreichbaren Objekte (die Mark Phase).
+Dabei starten wir die Suche von jedem Element des root sets aus, aber brechen die Suche immer dann ab, wenn wir auf eine Positiv-Marke treffen; ab dort haben wir bereits alles Erreichbare markiert.
+In der Sweep Phase iterieren wir über alle existierenden Objekte und geben jene Objekte frei, die in der Mark Phase nicht markiert wurden.
 Fertig. Ein Mark-and-Sweep GC als Python-Pseudocode sähe in etwa so aus:
 
 #+begin_src python
@@ -1554,7 +1553,7 @@ Fertig. Ein Mark-and-Sweep GC als Python-Pseudocode sähe in etwa so aus:
      sweep()
 #+end_src
 
-In realen Laufzeitumgebungen werden weitere Verfeinerungen vorgenommen um den Garbage-Collection Prozess effizienter zu machen.
+In realen Laufzeitumgebungen werden weitere Verfeinerungen vorgenommen, um den Garbage-Collection-Prozess effizienter zu machen.
 So können die Objekte in mehrere Generationen eingeteilt werden, je nachdem wie viele GC Läufe sie bereits überlebt haben.
 Es hat sich nämlich heraus gestellt, dass die meisten Objekte nicht besonders lange leben, sondern nur für kurze Zeit in Verwendung sind.
 
@@ -1597,13 +1596,13 @@ Es hat sich nämlich heraus gestellt, dass die meisten Objekte nicht besonders l
 #+end_src
 
 CPython3 ist die Standardimplementierung von Python 3 (geschrieben in der Programmiersprache C).
-Dieser GC verwendet eine Kombination von Referenzzählung und gelegentlicher Garbage Collection mit einem Mark-and-Sweep GC mit drei Genreationen.
-Diese Kombination ist deswegen möglich, da ein Referenzzähler von ~0~ bereits eine hinreichende Bedinung für ein totes Objekt ist.
+Dieser GC verwendet eine Kombination von Referenzzählung und gelegentlicher Garbage Collection mit einem Mark-and-Sweep GC mit drei Generationen.
+Diese Kombination ist deswegen möglich, da ein Referenzzähler von ~0~ bereits eine hinreichende Bedingung für ein totes Objekt ist.
 Nur für die zyklische Referenzkringel brauchen wir eine globale Sicht auf den Referenzgraphen.
 
-Das schöne bei diesem GC ist, dass wir auf ihn aus der Sprache heraus mit dem Modul ~gc~ zugreifen können.  So können wir uns mit ~gc.get_objects()~ die Liste aller existierenden Objekte geben lassen. Außerdem können wir uns die Vorgänger und die Nachfolger eines Objekts im Referenzgraphen anzeigen lassen. Das Objekt, welches von der Variable ~x~ referenziert wird [fn::Python folgt dem Referenzmodell!] (eine Liste), referenziert sein einziges Element und selbst wird es vom Wurzelnamensraum Referenziert. Daher hat diese Liste eine eingehende und eine ausgehende Kante im Referenzgraphen.
+Das schöne bei diesem GC ist, dass wir auf ihn aus der Sprache heraus mit dem Modul ~gc~ zugreifen können. So können wir uns mit ~gc.get_objects()~ die Liste aller existierenden Objekte geben lassen. Außerdem können wir uns die Vorgänger und die Nachfolger eines Objekts im Referenzgraphen anzeigen lassen. Das Objekt, welches von der Variable ~x~ referenziert wird [fn::Python folgt dem Referenzmodell!] (eine Liste), referenziert sein einziges Element und selbst wird es vom Wurzelnamensraum referenziert. Daher hat diese Liste eine eingehende und eine ausgehende Kante im Referenzgraphen.
 
-Zusätzlich können wir uns den Referenzzähler der Liste mittels ~sys.getrefcount()~ anzeigen lassen. Hier ist besonders, das nicht nur die eine eingehende Kante vom Wurzelnamensraum gezählt wird, sondern auch die Referenz, die durch die Übergabe an ~getrefcount()~ entsteht, mitgezählt wird. Daher ist der ausgegebene Referenzzähler ~2~.
+Zusätzlich können wir uns den Referenzzähler der Liste mittels ~sys.getrefcount()~ anzeigen lassen. Hier ist besonders, dass nicht nur die eine eingehende Kante vom Wurzelnamensraum gezählt wird, sondern auch die Referenz, die durch die Übergabe an ~getrefcount()~ entsteht, mitgezählt wird. Daher ist der ausgegebene Referenzzähler ~2~.
 
 ** Deinitialisierung
 :PROPERTIES:
@@ -1646,8 +1645,8 @@ Zusätzlich können wir uns den Referenzzähler der Liste mittels ~sys.getrefcou
     }\medskip
     \ii<2-> Destruktoren und Vererbung: Umgekehrte Konstruktionsreihenfolge  {
       \bi
-      \ii Destruktor für Derived, muss ein gültiges Derived-Objekt vorfinden
-      \ii \texttt{\~Derived()} muss vor \texttt{\~Base()} aufgerufen werden.
+      \ii Destruktor für Derived muss ein gültiges Derived-Objekt vorfinden
+      \ii \texttt{\~Derived()} muss vor \texttt{\~Base()} aufgerufen werden. FIXME ~ in Wort
       \ei
     }\medskip
     \ii<3-> Schwierige Semantik für Sprachen mit Garbage Collection {
@@ -1662,13 +1661,13 @@ Zusätzlich können wir uns den Referenzzähler der Liste mittels ~sys.getrefcou
 #+end_src
 
 Nachdem wir die toten Objekte gefunden haben, entweder durch explizites Freigaben, durch Referenzzählung, oder durch einen Garbage Collector, müssen wir sie nur noch wirklich Freigeben.
-Dazu ruft die Laufzeitumgebung zuerst eine benutzerdefinierte *Destruktormethode( auf, bevor der Speicher an die Speicherverwatung zurückgegeben wird.
+Dazu ruft die Laufzeitumgebung zuerst eine benutzerdefinierte *Destruktormethode* auf, bevor der Speicher an die Speicherverwaltung zurückgegeben wird.
 
-Die Aufgabe des Destruktors ist es die Effekte des Konstruktors rückgängig zu machen.
-Dies bezieht sich insbesondere auf die Rückggabe von nachgeforderten Ressourcen. Auch muss das Objekt jedeweden Besitz an anderen Objekten aufgeben[fn::Fast schon philosophisch an dieser Stelle: Mit dem Tod gibt ein Objekt all seinen Besitz auf], was zu weiteren Freigaben führen kann.
-Bei expliziter Freigabe, muss das Objekt auch noch dafür sorgen, dass es nicht mehr bei anderen Objekten registriert ist.
+Die Aufgabe des Destruktors ist es, die Effekte des Konstruktors rückgängig zu machen.
+Dies bezieht sich insbesondere auf die Rückgabe von nachgeforderten Ressourcen. Auch muss das Objekt jedweden Besitz an anderen Objekten aufgeben[fn::Fast schon philosophisch an dieser Stelle: Mit dem Tod gibt ein Objekt all seinen Besitz auf.], was zu weiteren Freigaben führen kann.
+Bei expliziter Freigabe muss das Objekt auch noch dafür sorgen, dass es nicht mehr bei anderen Objekten registriert ist.
 
-Bei Vererbung wird immer zuerst der Destruktor des Kindes und dann das der Elternklasse aufgerufen. Also in der umgekehrten Reihenfolge wie die Konstruktoren. Hintergrund ist, das jeder Destruktor ein valides Objekt seines Typs vorfindet.
+Bei Vererbung wird immer zuerst der Destruktor des Kindes und dann der der Elternklasse aufgerufen. Also in der umgekehrten Reihenfolge wie die Konstruktoren. Hintergrund ist, das jeder Destruktor ein valides Objekt seines Typs vorfinden muss.
 
 #+begin_src latex
   \begin{frame}[fragile]{Fallstudie: Resource Aquisition is Initialization (RAII)}
@@ -1715,9 +1714,9 @@ Bei Vererbung wird immer zuerst der Destruktor des Kindes und dann das der Elter
           \ii Exceptions (direkt und indirekt)
           \ei
         }
-        \ii[$\Rightarrow$] \advantage{Garantierte} Ressourcen-Freigabe\
+        \ii[$\Rightarrow$] \advantage{Garantierte} Ressourcenfreigabe\
         \bigskip
-        \ii<3-> Anwendbar für alle Resourcentypen\\[1ex]{
+        \ii<3-> Anwendbar für alle Ressourcentypen\\[1ex]{
           \begin{code}[]
             \begin{CPP}[style=smaller]
               mutex lock; // Das Lock-Objekt
@@ -1744,28 +1743,28 @@ Bei Vererbung wird immer zuerst der Destruktor des Kindes und dann das der Elter
   \end{frame}
 #+end_src
 
-Mit den Destruktoren haben wir alles beisammen um ein zentrales Konzept des C++ Ökosystems kennen zu lernen: *Resource Aquisition is Initialization* oder kurz *RAII*. Im Grunde habe ich ihnen, dies dies ganze Zeit bereits heimlich unter geschoben, als ich meinte, das Konstruktoren weitere Ressourcen nachfordern können. Aber hinter RAII steht noch viel mehr.
+Mit den Destruktoren haben wir alles beisammen, um ein zentrales Konzept des C++-Ökosystems kennenzulernen: *Resource Aquisition is Initialization* oder kurz *RAII*. Im Grunde habe ich Ihnen dies die ganze Zeit bereits heimlich untergeschoben, als ich meinte, das Konstruktoren weitere Ressourcen nachfordern können. Aber hinter RAII steht noch viel mehr.
 
 C++ folgt dem Wertemodell für Variablen.
 Dies bedeutet, dass die Lebenszeit von Objekten, die in lokalen Variablen leben, mit dem Ende des aktuellen Scopes endet.
 Für diese Objekte *garantiert* C++, dass der Destruktor in *jedem* Fall aufgerufen wird, wenn der Scope verlassen wird.
 Dies ist insbesondere auch dann der Fall, wenn der Scope durch eine Exception verlassen wird!
-Wirft also irgendeine Unterfunktion eine Exception, die erst irgendwo ganz oben im Programm gefangen wird, so werden *alle* Destruktoren aller lokalen Variablen, die auf dem Weg sind ausgeführt.
+Wirft also irgendeine Unterfunktion eine Exception, die erst irgendwo ganz oben im Programm gefangen wird, so werden *alle* Destruktoren aller lokalen Variablen, die auf dem Weg sind, ausgeführt.
 
-Diese Garantie erlaubt es uns, das wir den Besitz von nachgeforderten Ressourcen in Stack-allozierten lokalen Objekten bündeln können.
-Die Funktion besitzt die lokale Variable samt Objekt, und das Objekt besitzt alle nachgeforderten Ressourcen. Endet die Funktion, so gibt sie den Besitz an der lokalen Variable auf, und der gesamte Untergraph im Referenzgraphen wird frei gegeben. Dabei kommt es zu keinen Problemen mit nicht aufgeräumten Ressourcen, falls uns eine Exception um die Ohren fliegt.
+Diese Garantie erlaubt es uns, dass wir den Besitz von nachgeforderten Ressourcen in stackallokierten lokalen Objekten bündeln können.
+Die Funktion besitzt die lokale Variable samt Objekt und das Objekt besitzt alle nachgeforderten Ressourcen. Endet die Funktion, so gibt sie den Besitz an der lokalen Variable auf und der gesamte Untergraph im Referenzgraphen wird freigegeben. Dabei kommt es zu keinen Problemen mit nicht aufgeräumten Ressourcen, falls uns eine Exception um die Ohren fliegt.
 
-Das RAII Konzept lässt sich auch auf Ressourcen anwenden, die sich nicht in einer Referenz manifestieren.
+Das RAII-Konzept lässt sich auch auf Ressourcen anwenden, die sich nicht in einer Referenz manifestieren.
 So kann man mit einem *Lock-Guard* Objekt (~std::lock_guard~) den Besitz eines Mutexes koppeln.
-Mit der Definition des Lock-Guards (~X~) nehmen wir uns das Lock, mit dem Ende des Scopes wird es automatisch wieder frei gegeben.
+Mit der Definition des Lock-Guards (~X~) nehmen wir uns das Lock, mit dem Ende des Scopes wird es automatisch wieder freigegeben.
 
 * Zusammenfassung
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
-    \ii Objekte sind ein \STRUCTURE{existentieller Verbund} von Informationen {
+    \ii Objekte sind ein \STRUCTURE{existentieller Verbund} von Informationen. {
       \bi
-      \ii Objekte transportieren Informationen (typsicher) im Programmablauf
+      \ii Objekte transportieren Informationen (typsicher) im Programmablauf.
       \ii Referenz- und Wertemodell für Variablen
       \ei
     }\medskip
@@ -1775,16 +1774,16 @@ Mit der Definition des Lock-Guards (~X~) nehmen wir uns das Lock, mit dem Ende d
       \ii \structure{Konstruktoren} setzen Felder, fordern Ressourcen an und etablieren Invarianten
       \ei
     }\medskip
-    \ii \STRUCTURE{Leben}: Kontrollierter und gefilter Zugriff auf die enthaltenen Daten {
+    \ii \STRUCTURE{Leben}: Kontrollierter und gefilterter Zugriff auf die enthaltenen Daten {
       \bi
-      \ii \structure{Wer} greift \structure{Wie}, mit welchem \structure{Recht}, auf das Objekt zu?
+      \ii \structure{Wer} greift \structure{wie}, mit welchem \structure{Recht}, auf das Objekt zu?
       \ii Der \structure{Besitz} von Objekten verpflichtet zu ihrer Pflege
       \ei
     }\medskip
     \ii \STRUCTURE{Tod}: Objekt verliert den letzten \structure{Besitzer} oder die letzte \structure{Referenz} {
       \bi
       \ii Manuelles Management, Referenzzähler oder automatische Garbage Collection
-      \ii Destruktoren geben angeforderte Resourcen wieder frei
+      \ii Destruktoren geben angeforderte Ressourcen wieder frei
       \ei
     }
     \ei
