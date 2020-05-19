@@ -1,6 +1,7 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 05 - Semantische Analyse
 #+DATE: [2020-05-19]
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/paWmj
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
