@@ -254,7 +254,7 @@ REF   -> NAME          // Verwendung  eines Namens
 Als erstes werden wir uns mit den Regel der Namensauflösung in geschachtelten Namensräumen beschäftigen.
 Dabei wollen wir uns zunächst nur mit statischer Namensauflösung beschäftigen, bei der hinter jeder Namensdeklaration maximal ein Laufzeitobjekt sein kann.
 Der Gegensatz zu dieser *statischen Namensauflösung* ist die dynamische Namensauflösung, bei der es zu einer Deklaration mehrere Objekte[fn::Hinter einem Attribut in einer Klasse steht in jeder Instanz ein anderes Objekt.
-Der ~this~ Zeiger dient zur Unterscheidung.] geben kann, zwischen denen wir mit zusätzlichem Laufzeitwissen unterscheiden werden um den Namen doch noch eindeutig und vollständig aufzulösen.
+Der ~this~ Zeiger dient zur Unterscheidung.] geben kann, zwischen denen wir mit zusätzlichem Laufzeitwissen unterscheiden werden, um den Namen doch noch eindeutig und vollständig aufzulösen.
 Dazu aber später mehr.
 
 ** Implizite Namensauflösung

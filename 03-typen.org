@@ -421,9 +421,9 @@ Zusammen mit Namensäquivalenz kommt dann sofort die Frage auf, ob wir *Aliase* 
 Ein Typalias ist ein zweiter Typname, der den selben Typen (nicht nur den gleichen Typausdruck) referenziert und damit voll äquivalent ist.
 So kann man in der Sprache C, die für Records Namensäquivalenz verwendet, mittels ~typedef~ einen Typalias erzeugen. In C ist ~typedef~ sogar die einzige Methode einen neuen Typnamen zu definieren{{{see(02-real-language-problems, Lexer Hack)}}}.
 
-Es ist wichtig zu verstehen, dass alle ~typedef~ auf den gleichen Typausdruck äquivalent sind und keine Unterscheidung machen. Dies bedeutet, dass (auf den Folien) ~celsius_t~ und ~fahrenheit_t~ der gleiche Typ (~double~) ist. Daher kann uns der Übersetzer nicht dabei helfen eine Fehlverwendung von ~heating_set~ zu erkennen. Ein ähnlicher Fehler hat die Menschheit schon einen [[https://en.wikipedia.org/wiki/Mars_Climate_Orbiter#Cause_of_failure][Mars Climate Orbiter]] gekostet.
+Es ist wichtig zu verstehen, dass alle ~typedef~ auf den gleichen Typausdruck äquivalent sind und keine Unterscheidung machen. Dies bedeutet, dass (auf den Folien) ~celsius_t~ und ~fahrenheit_t~ der gleiche Typ (~double~) ist. Daher kann uns der Übersetzer nicht dabei helfen, eine Fehlverwendung von ~heating_set~ zu erkennen. Ein ähnlicher Fehler hat die Menschheit schon einen [[https://en.wikipedia.org/wiki/Mars_Climate_Orbiter#Cause_of_failure][Mars Climate Orbiter]] gekostet.
 
-Eine Möglichkeit dies in C zu lösen sind Records mit nur einem Feld. Da für ~struct~ Namensäquivalenz gilt, kann man auf diese Art nicht-äquivalente Typen erzeugen, bei denen der Übersetzer prüft, ob wir sie aus Versehen vermischen. Zum Beispiel verwendet der [[https://github.com/spotify/linux/blob/master/include/linux/types.h][Linux Kern]] eine Typdefinition für ~atomic_t~ mit der verhindert wird, dass man aus Versehen einen atomaren Datentyp mittels ~++~ hochzählt und sicherstellt, dass man stattdessen die spezielle API ~atomic_add(int i, atomic_t *v)~ verwendet.
+Eine Möglichkeit dies in C zu lösen sind Records mit nur einem Feld. Da für ~struct~ Namensäquivalenz gilt, kann man auf diese Art nicht-äquivalente Typen erzeugen, bei denen der Übersetzer prüft, ob wir sie aus Versehen vermischen. Zum Beispiel verwendet der [[https://github.com/torvalds/linux/blob/master/include/linux/types.h][Linux Kern]] eine Typdefinition für ~atomic_t~ mit der verhindert wird, dass man aus Versehen einen atomaren Datentyp mittels ~++~ hochzählt und sicherstellt, dass man stattdessen die spezielle API ~atomic_add(int i, atomic_t *v)~ verwendet.
 
 #+begin_src C
 typedef struct {
@@ -978,7 +978,7 @@ Am Beispiel des 3D-Punktes:
 Durch ignorieren der 3.
 Dimension kann sich jeder 3D-Punkt wie ein 2D-Punkt verhalten.
 Der 3D-Punkt schlüpft also in die Rolle, und betreibt Mimikry, des 2D-Punkts.
-Ein anderes Beispiel dem wir nachgehen werden, ist der parametrische Polymorphismus, bei dem die Gemeinsamkeiten in einem generischen Typen gebündelt werden. Anstatt ein Listentyp jeweils für int-Liste, float-Liste, und double-Liste anzulegen, führen wir einfach den generischen Typ "Liste von beliebigen Elementen" ein.
+Ein anderes Beispiel, dem wir nachgehen werden, ist der parametrische Polymorphismus, bei dem die Gemeinsamkeiten in einem generischen Typen gebündelt werden. Anstatt ein Listentyp jeweils für int-Liste, float-Liste, und double-Liste anzulegen, führen wir einfach den generischen Typ "Liste von beliebigen Elementen" ein.
 
 Allerdings ist die Sache doch nicht ganz so einfach wie sie scheint, wenn wir sagen:
 Ein Typ soll sich halt so wie der andere Verhalten.
