@@ -1505,7 +1505,7 @@ Lexer, Parser und semantische Analyse müssen also noch enger verzahnt werden, a
         \ii Welche Deklaration wählen wir?
         \eii
         \smallskip
-        \alert{$\Rightarrow$ Berechnung der Spezfifizät}
+        \alert{$\Rightarrow$ Berechnung der Spezifität}
 
       \end{column}\hfill
       \begin{column}<4->{0.49\textwidth}

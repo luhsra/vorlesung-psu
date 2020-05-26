@@ -1459,7 +1459,7 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable, in de
   \begin{frame}{Garbage Collection}
     \begin{btBlock}{\textbf{Kernidee}: Nicht-referenzierte Objekte können freigegeben werden}\small
       \structure{Schritt 1}\quad\btSetTab Finde alle Objekte, die transitiv von einem \structure{root set} erreichbar sind.\\
-      \structure{Schritt 2} \btUseTab Gebe alle nicht-erreichbaren Objekte frei.
+      \structure{Schritt 2} \btUseTab Gib alle nicht-erreichbaren Objekte frei.
     \end{btBlock}
     \medskip
     \bi
@@ -1616,7 +1616,7 @@ Zusätzlich können wir uns den Referenzzähler der Liste mittels ~sys.getrefcou
           \begin{CPP}[style=smaller]
             class A { ...
               A() {
-                global.register(this);
+                global->register(this);
                 this->mem = malloc(3);
               }
             \end{CPP}
