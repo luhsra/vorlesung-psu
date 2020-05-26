@@ -14,12 +14,12 @@ class Counter {
       return start+(next++);
   }
 }
-
-class Derived extends Counter {
+class Derived
+     extends Counter {
   Derived(int x) {
-      super(3+x);     // `\dn{2}`
+      super(3+x); // `\dn{2}`
   }
   Derived(String s) { // `\dn{1}`
-      this(Integer.parseInt(s));
+      this(parseInt(s));
   }
 }

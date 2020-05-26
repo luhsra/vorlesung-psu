@@ -42,9 +42,7 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
 
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
-  \begin{frame}
-    \maketitle
-  \end{frame}
+  \maketitleframe
 
   \begin{frame}{Einordnung in die Vorlesung: Objekte}
     \begin{center}
@@ -77,7 +75,7 @@ Was soll der Studierende aus dieser Vorlesung mitnehmen?
       Ein Objekt ist ein existentiell-abhängiger Verbund von Informationen.
     \end{btBlock}
     \pause
-    \hspace{-1em}\textbf{Wichtig:} \btSetTab (1) Variablen $\subset$ Objekte! Variablen können Objekte beinhalten.\\
+    \hspace{-1em}\textbf{Wichtig:} \btSetTab (1) Variablen $\ne$ Objekte! Variablen können Objekte beinhalten.\\
     \btUseTab (2) Diese Definition umfasst auch primitive Objekte, wie Zahlen!
   \end{frame}
 #+end_src
@@ -157,6 +155,7 @@ Mit diesen drei Phasen des Lebenszyklus (Geburt, Leben und Tod) werden wir uns i
 
 #+begin_src latex
   \begin{frame}[fragile]{Beispiel: Leben eines Loggers}
+\vspace{-1em}
     \begin{columns}
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=C]
@@ -190,10 +189,10 @@ Mit diesen drei Phasen des Lebenszyklus (Geburt, Leben und Tod) werden wir uns i
           \begin{C}[style=smaller]
             log_t * log_init() {
               // Allokation: Speicher am Heap
-              log_t *l = malloc(sizeof(log_t));
+              log_t *l= malloc(sizeof(log_t));
               // Initialisierung des Zustands
               l->level = WARN;
-              l->fd    = open("/dev/stderr", 0);
+              l->fd = open("/dev/stderr", 0);
               return l;
             }
           \end{C}
@@ -203,9 +202,8 @@ Mit diesen drei Phasen des Lebenszyklus (Geburt, Leben und Tod) werden wir uns i
           \begin{C}[style=smaller]
             void
             log(log_t *l, level_t ll, char *m) {
-              if (ll >= l->level) {
+              if (ll >= l->level)
                 write(l->fd, m, strlen(m));
-              }
             }
           \end{C}
         \end{code}
@@ -214,7 +212,7 @@ Mit diesen drei Phasen des Lebenszyklus (Geburt, Leben und Tod) werden wir uns i
           \begin{C}[style=smaller]
             void log_deinit(log_t *l) {
               close(l->fd); // Datei schließen
-              free(l);      // Speicher freigeben
+              free(l); // Speicher freigeben
             }
           \end{C}
         \end{code}
@@ -398,7 +396,7 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
     \begin{columns}
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=C++]
-          \begin{CPP}
+          \begin{CPP}[style=smaller]
             class Object {
               public:
                 Object(int x)    { ... }
@@ -409,7 +407,7 @@ Ab dieser Adresse aufsteigend (zu den hohen Adressen) wird unser Neugeborenes Ob
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=Java]
-          \begin{java}
+          \begin{java}[style=smaller]
             class Object {
               public Object(int x)    { ... }
               public Object(String x) { ... }
@@ -509,7 +507,7 @@ Die Konstruktoren der Elternklasse werden von den Konstruktoren der Kindsklasse 
 Auf diese Weise findet ein Konstruktor der Kindsklasse bereits ein vollständig konstruiertes und valides Eltern-Objekt als ~this~-Zeiger vor.
 
 #+begin_src latex
-\begin{frame}<handout:1,3>[fragile]{Konstruktoren in Aktion: Java}
+\begin{frame}<beamer:0|handout:1,3>[fragile]{Konstruktoren in Aktion: Java}
     \begin{columns}
       \begin{column}{0.4\textwidth}
         \begin{code}[]
@@ -540,7 +538,7 @@ Auf diese Weise findet ein Konstruktor der Kindsklasse bereits ein vollständig 
             \begin{code}[tag=Pseudo-C]
               \begin{C}[style=smaller]
                 // Allokation
-                Derived *this = malloc(sizeof(Derived));
+                Derived *this = malloc(...);
 
                 // Sprachspezifisches Init
                 memset(this, 0, sizeof(Derived));
@@ -707,11 +705,11 @@ Dabei sollten wir stets im Hinterkopf behalten, dass eine Sprache es dem Entwick
   \begin{frame}[fragile]{Wertemodell: Vor- und Nachteile}
     \begin{columns}
       \begin{column}{0.45\textwidth}
-        \begin{code}[tag=C++11]
+        \begin{code}
           \begin{CPP}
             class foo_t { int x; };
             ...
-            foo_t A { 23 };
+            foo_t A = { .x = 23 };
             foo_t B = A;
             A.x = 42; // B.x == 23
           \end{CPP}
@@ -886,13 +884,13 @@ Zusammenfassend ist zu sagen: Sowohl mit dem Referenzmodell, als auch mit dem We
       \ii Eigentlich: Das laufende Programm (aktiv) greift auf ein Objekt (passiv) zu.
       \ii Nützliche Präzisierungen: Zugreifende Funktion, zugreifender Thread
       \ei
-    }\smallskip
+    }\medskip
     \ii Welche \structure{Berechtigungen} hat der Benutzer? {
       \bi
       \ii Referenzen sind Befähigungen (Capabilities) ein Objekt zu nutzen.
       \ii Nicht jede Referenz auf ein Objekt muss gleich mächtig sein.
       \ei
-    }
+    }\medskip
     \ii Welche \structure{Arten von Zugriffen} gibt es? {
       \bi
       \ii Daten aus dem einem Objekt auslesen oder verändern.
@@ -1190,12 +1188,12 @@ class IntReflection {
     \begin{columns}<2->
       \begin{column}{0.49\textwidth}
         \begin{code}[]
-          \begin{CPP}
+          \begin{CPP}[style=smaller]
             class Proxy {
               obj_t* ref;
-              public:
-                void set(obj_t* o) { ref = o; }
-                void call()    { ref->call(); }
+             public:
+              void set(obj_t* o) { ref = o; }
+              void call()    { ref->call(); }
             };
             Proxy p; p.set(obj);
             delete obj;
@@ -1344,6 +1342,7 @@ Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt (keine gült
 :END:
 #+begin_src latex
   \begin{frame}[fragile]{Referenzzählung}
+  \vspace{-1em}
   \begin{columns}
     \begin{column}{0.49\textwidth}
         \begin{code}[tag=C++]
@@ -1366,7 +1365,6 @@ Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt (keine gült
     \end{column}
   \end{columns}
 
-
     \bi
     \ii \structure{Manuell}: Besitzer zeigt Referenz weiter- bzw. aufgabe an {
       \bi
@@ -1374,11 +1372,11 @@ Beide beruhen auf der hinreichende Bedingung für den Todeszeitpunt (keine gült
       \ii Fällt der Zähler auf 0, wird das Objekt automatisch freigegeben.
       \ii<2-> Referenzieren sich Objekte zyklisch, wird \ALERT{niemals} freigegeben.
       \ei
-    }\medskip
+    }\smallskip
     \ii<4-|handout:4-> \structure{Smart Pointer}: Automatische Referenzzählung {
       \begin{columns}
         \hfill
-        \begin{column}{0.6\textwidth}
+        \begin{column}{0.75\textwidth}
         \begin{code}[]
           \begin{CPP}[style=smaller]
             { // Typausdruck: shared_ptr(int) vs ptr(int);
@@ -1559,7 +1557,7 @@ So können die Objekte in mehrere Generationen eingeteilt werden, je nachdem wie
 Es hat sich nämlich heraus gestellt, dass die meisten Objekte nicht besonders lange leben, sondern nur für kurze Zeit in Verwendung sind.
 
 #+begin_src latex
-\begin{frame}[fragile]{Fallstudie: Der CPython3 Garbage Collector}
+\begin{frame}<beamer:0>[fragile]{Fallstudie: Der CPython3 Garbage Collector}
     \bi
     \ii Leistungsfähiger GC für eine Sprache bei der alles ein Objekt ist {
       \bi
@@ -1582,7 +1580,7 @@ Es hat sich nämlich heraus gestellt, dass die meisten Objekte nicht besonders l
             // +1 für temp-argument
             Refcount: 2
 
-            // Eingehende und Ausgehende Kanten
+            // Ein- und Ausgehende Kanten
             x -> *: [<object at 0x1000>]
             ,* ->: x [<namespace: root>]
 
@@ -1685,7 +1683,7 @@ Bei Vererbung wird immer zuerst der Destruktor des Kindes und dann das der Elter
     \begin{columns}<2->
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=C++]
-          \begin{CPP}
+          \begin{CPP}[style=smaller]
             class log {
               level_t level;
               int fd;
@@ -1725,7 +1723,7 @@ Bei Vererbung wird immer zuerst der Destruktor des Kindes und dann das der Elter
               void foo() {
                 lock_guard<mutex> X(lock);
 
-                // Lock wird immer freigegeben
+                // Implizites Unlock
               }
             \end{CPP}
           \end{code}
