@@ -121,11 +121,11 @@ TL;DR: Semantische Analyse(AST) -> AST mit semantischen Attributen an jedem Knot
 #+end_src
 
 Um die Schritte der semantischen Analyse deutlicher zu machen, wollen wir uns ein Beispiel ansehen.
-Beim AST, den wir aus dem Parser bekommen, sind alle Kinder eines AST Knotens erst einmal gleichberechtigt, haben aber eine Ordnung, die sich aus den Regeln der Grammatik ergeben; Wir können diese also in einem Knoten in einem Array speichern (im Beispiel ist der Rückgabetyp der Funktion in ~function.children[2]~ gespeichert).
-Da solche magischen Konstanten den Code unseres Übersetzers unübersichtlich machen, geben wir den Kindern der AST Knoten, wo dies Sinn macht, symbolische Namen (~function.rettype~).
+Beim AST, den wir aus dem Parser bekommen, sind alle Kinder eines AST Knotens erst einmal gleichberechtigt, haben aber eine Ordnung, die sich aus den Regeln der Grammatik ergeben; wir können diese also in einem Knoten in einem Array speichern (im Beispiel ist der Rückgabetyp der Funktion in ~function.children[2]~ gespeichert).
+Da solche magischen Konstanten den Code unseres Übersetzers unübersichtlich machen, geben wir den Kindern der AST-Knoten, wo dies Sinn macht, symbolische Namen (~function.rettype~).
 
 Bei der *Namensauflösung* prüfen wir zum einen, ob es eine passende Deklaration (*Deklariertheitseigenschaft*) gibt und zum anderen speichern wir die gefundene Referenz als Attribut an der Verwendungsstelle.
-Bemerkenswert im Beispiel ist, dass wir bei der Referenz ~"a"~ nicht auf den deklarierenden Bezeichner ~"a"~ zeigen lassen, sondern auf den inneren Knoten der das semantische Element "Variablendeklaration" darstellt; wir etablieren so eine *semantische Querverbindung* im AST.
+Bemerkenswert im Beispiel ist, dass wir bei der Referenz ~"a"~ nicht auf den deklarierenden Bezeichner ~"a"~ zeigen lassen, sondern auf den inneren Knoten, der das semantische Element "Variablendeklaration" darstellt; wir etablieren so eine *semantische Querverbindung* im AST.
 Querverbindung deshalb, weil sich die Kante nicht entlang der Kanten des Baums hangelt, sondern direkt, quer zu jeder Eltern-Kind-Beziehung, gezogen wird.
 
 Das Ziel der *Typprüfung* ist es sicherzustellen, dass jede angewandte Operation kompatibel zu den statischen Typen der Operanden ist; Operanden und Operationen müssen konsistent zueinander sein!
@@ -143,7 +143,7 @@ Wir wollen uns im Folgenden den notwendigen Techniken für diese beiden Aspekte 
 Neben Typkonsistenz und Deklariertheit kann es allerdings noch andere Sprachregeln geben, die nicht kontextfrei prüfbar sind und daher in den Bereich der semantischen Analyse fallen.
 Diese lassen sich in aller Regel mit den selben Techniken erledigen.
 
-* AST Struktur und Knotenattribute
+* AST-Struktur und Knotenattribute
 :PROPERTIES:
 :CUSTOM_ID: 05-ast-types
 :END:
@@ -432,7 +432,7 @@ Für die literalen Blätter ist die Baumhöhe immer 1 und der Wert ist der Ganzz
 Für ~plus~-Knoten, die nur als innere Knoten auftreten können, ist das Attribut ~v~ die Summe der ~v~-Attribute der Kinder; für die Höhe ist es das Maximum der Höhe der beiden Unterbäume plus eins.
 Um dieses Gleichungssystem zu verstehen, stelle ich mir immer vor, ganz lokal auf einem der Knoten zu stehen:
 Dort sehe ich genau die ausgehenden Kanten zu den Kinds- und zum Elternknoten, und kann von den Gleichungen sagen, dass sie im Prinzip wahr sind.
-So kann ich mir auf einem ~plus~-Konten sagen:
+So kann ich mir auf einem ~plus~-Knoten sagen:
 "Ich bin ~x~ und meine Wert ~x.v~ ist die Addition der Werte ~v~ meiner linken Seite (~x.lhs.v~) und meiner rechten Seite (~x.rhs.v~)!
 Das sollte mal jemand ausrechnen, und mir ist eigentlich auch egal wie!"
 
@@ -792,7 +792,7 @@ Diese Art einen double-dynamic dispatch durchzuführen ist nur möglich, wenn ei
       \ii \structure{Innere Knoten}: Jeder Knotentyp hat eine Typ-Gleichung.\\
                    \btUseTab Jeder Knoten propagiert seinen Ergebnistypen nach oben.\\
       \ei
-      \OrangeBox{Typberechnung und -prüfung geschiet \enquote{in einem Rutsch}!}
+      \OrangeBox{Typberechnung und -prüfung geschieht \enquote{in einem Rutsch}!}
     }
     \ei
 
@@ -838,7 +838,7 @@ Dafür berechnen wir für jeden (relevanten) Knoten im AST einen statischen Rüc
 
 Lassen wir alle Feinheiten, wie Namensauflösung und Polymorphie, außer Acht, so ist der Knotentyp ein S-Attribut, welches von unten nach oben propagiert wird.
 Wir müssen also für alle Blätter einen Typ angeben und für jeden inneren Knotentyp eine Berechnungsvorschrift für die Propagation von unten nach oben.
-Bei literalen Konstanten (z.B., ~23~, ~"foo"~) geben die Sprachregeln genau vor, welchen Typ diese Ausdrücke haben (z.B. int, string).
+Bei literalen Konstanten (z.B. ~23~, ~"foo"~) geben die Sprachregeln genau vor, welchen Typ diese Ausdrücke haben (z.B. int, string).
 Diese Sprachregeln lassen sich sehr klar in unserem ~TypeVisitor~ kodieren, indem wir das Typattribut in den Blättern entsprechend setzen.
 Bei manchen Knoten, wie dem address-of-Operator (~&FOO~), besteht die Typberechnung daraus, einen Typkonstruktor (~pointer()~) auf dem Typen des einzigen Kindes anzuwenden.
 Informeller gesagt ist der Ergebnistyp des address-of-Operators ein Pointertyp, der als Pointee-Typ den Typ des Kindes hat; ~&"foobar"~ hat den Typ ~pointer(string)~, wenn ~"foobar"~ den Typ ~string~ hat.
@@ -877,7 +877,7 @@ Wir übergeben der ~traversal()~-Funktion die Wurzel des ASTs und das Visitor-Ob
       \bi
       \ii \structure{Ganzzahlweitung}: Umwandlung in breitere Integer ohne Informationsverlust
       \ii C: \codebox{char}$\rightarrow$\codebox{short}$\rightarrow$\codebox{int}$\rightarrow$\codebox{long}
-      \ii C++: Implizite Umwandlung von \codebox{void*} zu beliebigen Zeigern (z.B., \codebox{int *})
+      \ii C++: Implizite Umwandlung von \codebox{void*} zu beliebigen Zeigern (z.B. \codebox{int *})
       \ei
     }
     \ei
@@ -1119,13 +1119,13 @@ Zum Beispiel:
 ~tmp -> B~ oder ~fib -> D~. 
 Wenn wir einen benannten Namensraum besuchen (~math~), legen wir zuerst ein Mapping im aktuellen Namensraum an (~math->C~) und legen erst danach einen neuen, leeren Namensraum auf den Stack.
 
-Treffen wir auf eine Namensreferenz, so führt die ~findName()~-Funktion die CSNR-Namensauflösung durch:
+Treffen wir auf eine Namensreferenz, so führt die ~findName()~-Funktion die CNSR-Namensauflösung durch:
 Beginnend beim obersten Namensraum auf dem Stack suchen wir nach dem referenzierten Namen.
 Finden wir den Namen nicht, so gehen wir immer eine Ebene in unserem Stack nach unten.
 Erst, wenn wir auch im Wurzelnamensraum keine Deklaration finden, geben wir einen Übersetzungsfehler aus; es wurde ein Name verwendet, der niemals deklariert wurde.
 Die gefundene Deklaration speichern wir als Referenz in einem Attribut (gestrichelte Linien).
 
-Beim Aufsteigen aus dem rekursiven Abstieg, bauen wir die aufgestapelten Namensräume wieder ab. Um sie im weiteren noch verfügbar zu haben, können wir die befüllten Namensräume aber auch als AST-Attribut an die Knoten hängen (nicht gezeigt).
+Beim Aufsteigen aus dem rekursiven Abstieg bauen wir die aufgestapelten Namensräume wieder ab. Um sie im weiteren noch verfügbar zu haben, können wir die befüllten Namensräume aber auch als AST-Attribut an die Knoten hängen (nicht gezeigt).
 
 Im Folgenden sehen Sie eine minimale Implementierung einer Symboltabelle. Zum Experimentieren habe ich alle AST-Knoten durch entsprechende Strings ersetzt und die einzelnen API-Aufrufe selbst getätigt. Spielen Sie damit herum! Benennen Sie, beispielsweise, die zweite Deklaration von ~tmp~ um und beobachten Sie, wie sich die Ausgabe ändert.
 
@@ -1223,7 +1223,7 @@ Die andere Interaktion, die wir bereits im Kapitel zur Namensauflösung besproch
   \end{frame}
   #+end_src
 
-Mit der Baumtraversierung haben wir eine Technik bekommen um S-Attribute auszurechnen. Die Symboltabelle hat uns dazu befähigt, Namensauflösung als ein L-Attribut zu berechnen. Aber was tun wir, wenn wir einen Zyklus in unseren Attributabhängigkeiten haben.
+Mit der Baumtraversierung haben wir eine Technik bekommen, um S-Attribute auszurechnen. Die Symboltabelle hat uns dazu befähigt, Namensauflösung als ein L-Attribut zu berechnen. Aber was tun wir, wenn wir einen Zyklus in unseren Attributabhängigkeiten haben.
 Also wie berechnen wir eine Attributgleichung, bei der ein Attribut über Umwege von seinem eigenen Attributwert abhängt. Oder, wenn die Abhängigkeiten komplexer sind als einfach von unten nach oben oder von links nach rechts.
 
 Im Beispiel habe ich eine solche Attributabhängigkeit mit zwei Knoten gezeigt. Zum einen sollen dort die beiden Attributwerte ~x.h~ und ~y.h~ aufeinander folgende Ganzzahlen sein, und zum anderen soll ~y.h~ genau doppelt so groß sein wie ~x.h~. Diese Bedingungen sind zyklisch und können nur von ~x.h=1~ und ~y.h=2~ erfüllt werden. Ich habe diese Beispiel absichtlich so gestaltet, dass es nichts mit Programmiersprachen zu tun hat, sondern es soll nur klar werden, was es bedeutet, eine zyklische Attributabhängigkeit in einem AST zu haben.
