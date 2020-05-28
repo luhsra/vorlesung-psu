@@ -8,8 +8,8 @@
 {{{topic(./03-typen.org,fig/03-stamp.png)}}}
 {{{topic(./04-namen.org,fig/04-stamp.png)}}}
 {{{topic(./05-semantische-analyse.org,fig/05-stamp.png)}}}
------
 {{{topic(./06-objekte.org,fig/06-stamp.png)}}}
+
 * COMMENT FIXME
 
 {{{topic(./07-operationen.org,fig/07-stamp.png)}}}
