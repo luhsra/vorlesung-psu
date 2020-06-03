@@ -50,10 +50,10 @@ Effizienz: Seiteneffekte
       \includegraphics[page=12,width=0.6\linewidth]{fig/01-overview-small}
     \end{center}
     \bi
-    \ii Operation \alert{kombinieren Daten} und \alert{manipulieren Objekte} {
+    \ii Operationen \alert{kombinieren Daten} und \alert{manipulieren Objekte}. {
       \bi
-      \ii Operationen hängen implizit und/oder explizit voneinander ab
-      \ii Abbildung des virtuellen Operationsstrom auf die reale, sequentielle Maschine
+      \ii Operationen hängen implizit und/oder explizit voneinander ab.
+      \ii Abbildung des virtuellen Operationsstrom auf die reale sequentielle Maschine
       \ei
     }
     \ei
@@ -70,8 +70,8 @@ Effizienz: Seiteneffekte
     }\medskip
     \ii Operationen sind Aktiv $\leftrightarrow$ Objekte sind Passiv {
       \bi
-      \ii \structure{Quelloperanden}: Eingabeobjekte, die von der Operation gelesen werden.
-      \ii \structure{Abbildungsvorschrift}: Kombinationsregel für die gelesenen Daten.
+      \ii \structure{Quelloperanden}: Eingabeobjekte, die von der Operation gelesen werden
+      \ii \structure{Abbildungsvorschrift}: Kombinationsregel für die gelesenen Daten
       \ii \structure{Zieloperanden}: Ausgabeobjekt nimmt das Rechenergebnis auf
       \ei
     }
@@ -92,21 +92,21 @@ Effizienz: Seiteneffekte
 
 #+end_src
 
-In dieser Vorlesung widmen wir uns wieder einem der essentiellen Konzepten von Programmiersprachen:
+In dieser Vorlesung widmen wir uns wieder einem der essenziellen Konzepten von Programmiersprachen:
 *Operationen*.
-Im Rahmen unserer Betrachtungen, sind die Operationen der letzte Baustein um verschiedenste Programmiersprachen und Programmierparadigmen einheitlich fassen zu können.
-Für ihr geistiges Modell: Denken sie sich zunächst bei "Operation" einfach "Addition". Wir werden später auf komplexere Operationen kommen.
+Im Rahmen unserer Betrachtungen sind die Operationen der letzte Baustein, um verschiedenste Programmiersprachen und Programmierparadigmen einheitlich fassen zu können.
+Für Ihr geistiges Modell: Denken Sie sich zunächst bei "Operation" einfach "Addition". Wir werden später auf komplexere Operationen kommen.
 
 So wie Typen und Namen ein zusammengehöriges Konzeptpaar sind (beide werden in der semantischen Analyse verbunden), so gehören auch Objekte und Operationen zusammen; sie sind zwei Seiten der Medaille "Laufzeitverhalten" des Programms.
 Wo Objekte die passiven Träger der Information sind, sind die Operationen die aktiven Verarbeiter dieser Informationen.
 Um bei der Addition zu bleiben: Die Objekte ~2~ und die ~3~ werden von der Operation "Addition" auf das Objekt ~5~ abgebildet.
 
 Für die Einordnung in die Vorlesung müssen Sie sich vor Augen führen, wie eng "Operationen" mit Übersetzern zusammenhängen:
-In der ersten Vorlesung habe ich ihnen das geschichtete Maschinenmodell näher gebracht.
-Dort haben wir gesagt, dass es für jede Ebene ein virtuelles Maschinenmodell, als eine Kombination aus Objekten und Operationen, gibt.
-Ein Programm für dieses Maschinenmodell, ist eine, von uns mühsam erarbeitete, Ansammlung von Operationen, welche auf den Objekten ausgeführt werden soll.
-Der Übersetzer, als ein Prozessor dieser Programme, nimmt diese virtuellen Operationen und bildet sie auf Operationen der darunter-liegende Schicht ab.
-Da unsere real-existierenden Maschinen sequentiell sind, bedeutet das für Programmiersprachen-Übersetzer, dass wir die im AST angeordneten Operationen in einen (hauptsächlich linearen) Strom von realen Operationen abbilden müssen.
+In der ersten Vorlesung habe ich Ihnen das geschichtete Maschinenmodell nähergebracht.
+Dort haben wir gesagt, dass es für jede Ebene ein virtuelles Maschinenmodell als eine Kombination aus Objekten und Operationen gibt.
+Ein Programm für dieses Maschinenmodell ist eine, von uns mühsam erarbeitete, Ansammlung von Operationen, welche auf den Objekten ausgeführt werden soll.
+Der Übersetzer, als ein Prozessor dieser Programme, nimmt diese virtuellen Operationen und bildet sie auf Operationen der darunterliegenden Schicht ab.
+Da unsere real existierenden Maschinen sequentiell sind, bedeutet das für Programmiersprachen-Übersetzer, dass wir die im AST angeordneten Operationen in einen (hauptsächlich linearen) Strom von realen Operationen abbilden müssen.
 
 Aber zurück zu den Operationen selbst.
 Diese können wir über ihre Schnittstelle und ihre Verhalten beschreiben.
@@ -117,15 +117,15 @@ aufnehmen.
 Wenn es so aussieht, als würden Daten direkt zwischen zwei Operationen fließen, wie dies auf den Folien zwischen Addition und Zuweisung der Fall ist, so ist eigentlich ein implizites *temporäres Objekt* zwischengeschaltet, welches wir nur (normalerweise) der Übersichtlichkeit halber weg lassen. 
 
 Das Verhalten einer Operation zu fassen ist deutlich schwieriger als ihre Schnittstelle zu beschreiben.
-Eine Möglichkeit ist es eine Abbildungsvorschrift anzugeben, welche die Eingabedaten auf die gewünschte Ausgabe abbildet.
+Eine Möglichkeit ist es, eine Abbildungsvorschrift anzugeben, welche die Eingabedaten auf die gewünschte Ausgabe abbildet.
 Im Beispiel beschreiben wir die 32-Bit Addition so:
 Die Addition wertet zuerst ihre beiden Quelloperanden (LHS, RHS) aus, um an die darin enthaltenen Informationen (L, R) zu kommen.
 Diese beiden Zahlen addieren wir mit der Ganzzahl-Addition und beschneiden das Ergebnis auf 32-Bit mit der Modulo Operation. Das Ergebnis wird dem Zieloperanden zugewiesen.
 
 Im Folgenden werden wir uns nicht weiter mit Abbildungsvorschriften beschäftigen und uns auf eine informale, eher gefühlte, Verhaltensbeschreibung verlassen.
-Allerdings möchte ich noch erwähnen, dass formale Beschreibungen von Operationen eine wichtige Rolle bei der Verifikation von Hard- und Software sind, da wir dort ganz genau erfassen müssen, was eigentlich das Verhalten einer Operation ist.
+Allerdings möchte ich noch erwähnen, dass formale Beschreibungen von Operationen eine wichtige Rolle bei der Verifikation von Hard- und Software spielen, da wir dort ganz genau erfassen müssen, was eigentlich das Verhalten einer Operation ist.
 Nur so kann man bei der formalen Verifikation eines Programms zeigen, dass die Komposition mehrerer Operationen das gewünschte Verhalten zeigt.
-Sollten Sie etwas neugierig auf diesen Aspekt sein, kann ich ihnen das Papier zu Beschreibungssprache [[https://www.cl.cam.ac.uk/~pes20/sail/][SAIL]] auf der POPL 2019 [[http://dx.doi.org/10.1145/3290384]["ISA Semantics for ARMv8-A, RISC-V and CHERI-MIPS"]] von Armstrong et. al. empfehlen.
+Sollten Sie etwas neugierig auf diesen Aspekt sein, kann ich Ihnen das Papier zu Beschreibungssprache [[https://www.cl.cam.ac.uk/~pes20/sail/][SAIL]] auf der POPL 2019 [[http://dx.doi.org/10.1145/3290384]["ISA Semantics for ARMv8-A, RISC-V and CHERI-MIPS"]] von Armstrong et. al. empfehlen.
 
 
 * Operationen und Seiteneffekte
@@ -146,7 +146,7 @@ Sollten Sie etwas neugierig auf diesen Aspekt sein, kann ich ihnen das Papier zu
     \bi
     \ii<-2|handout:1> \structure{Notationen} in unterschiedlichen Sprachen {
       \bi
-      \ii Prefix: \codebox{\op{} A B} oder \codebox{\op(A,B)} oder \codebox{(\op{} A B)} \hfill Lisp, Scheme
+      \ii Präfix: \codebox{\op{} A B} oder \codebox{\op(A,B)} oder \codebox{(\op{} A B)} \hfill Lisp, Scheme
       \ii Infix:  \codebox{A \op{} B}  \hfill C, C++, Java, \ldots
       \ii Postfix: \codebox{A B \op}   \hfill Forth, PostFix
       \ei
@@ -161,7 +161,7 @@ Sollten Sie etwas neugierig auf diesen Aspekt sein, kann ich ihnen das Papier zu
     \bi
     \ii<3-|handout:2> \ALERT{Wichtige} Eigenschaften dieser Operationen {
       \bi
-      \ii Quelloperanden werden \alert{alle ausgewertet, bevor} die Operation ausgeführt wird
+      \ii Quelloperanden werden \alert{alle ausgewertet, bevor} die Operation ausgeführt wird.
       \ii Keine \structure{Seiteneffekte} und genau ein \structure{temporäres Objekt} als Zieloperand
       \ei
     }
@@ -170,24 +170,24 @@ Sollten Sie etwas neugierig auf diesen Aspekt sein, kann ich ihnen das Papier zu
 #+end_src
 
 
-Zunächst beschäftigen wir uns mit *arithmetische, bit-weise und logische Operationen*, die in allen Programmiersprachen auftauchen, da wir ansonsten nichts ausrechnen können.
-Sie sind gewissermaßen die Brot- und Butteroperationen bei denen man nichts aufregendes erwarten darf.
-Sie haben einen (*unäre Operationen*) oder zwei (*binäre Operationen*) Quelloperanden und ein *tempräres Objekt* als Zieloperand.
-Für Ihre Schnittstelle und ihr Verhalten sind, nebst einiger kleiner Abweichungen, in allen Sprachen gleich und es gibt nur bei der Notation Unterschiede.
+Zunächst beschäftigen wir uns mit *arithmetischen, bit-weisen und logischen Operationen*, die in allen Programmiersprachen auftauchen, da wir ansonsten nichts ausrechnen können.
+Sie sind gewissermaßen die Brot- und Butteroperationen, bei denen man nichts aufregendes erwarten darf.
+Sie haben einen (*unäre Operationen*) oder zwei (*binäre Operationen*) Quelloperanden und ein *temporäres Objekt* als Zieloperand.
+Ihre Schnittstelle und ihr Verhalten sind, nebst einiger kleiner Abweichungen, in allen Sprachen gleich und es gibt nur bei der Notation Unterschiede.
 
 
-Bei der Notation dieser "einfachen" Operationen gibt es drei Aspekte die wichtig sind: Wo steht die Operation in Verhältnis zu ihren Operanden? Welchen *Vorrang* hat diese Operation über andere Operationen beim Parsen? Und wird eine ungeklammerte Aneinanderreihung dieser Operationen Links- oder Rechts-Assoziativ geparst?
+Bei der Notation dieser "einfachen" Operationen gibt es drei Aspekte, die wichtig sind: Wo steht die Operation im Verhältnis zu ihren Operanden? Welchen *Vorrang* hat diese Operation über andere Operationen beim Parsen? Und wird eine ungeklammerte Aneinanderreihung dieser Operationen links- oder rechts-assoziativ geparst?
 All diese Fragen sind wichtig für die Syntax, werden aber vollständig von der Grammatik und vom Parser behandelt. Im AST sind all diese Fragen der Notation bereits geklärt und wir müssen uns nicht näher damit beschäftigen.
 
 Ich möchte nur noch kurz auf das "Wo steht die Operation" eingehen.
-Die meisten Programmiersprachen verwenden für die binären Operationen die Infix-Notation (~2+3~), da diese für Menschen natürlicher und leichter lesbar ist.
-Bei den unären Operationen verwendet man meist die Prefix-Notation (~!cond~, ~(-x)~).
+Die meisten Programmiersprachen verwenden für die binären Operationen die Infix-Notation (~2+3~), da diese für Menschen natürlicher und einfacher lesbar ist.
+Bei den unären Operationen verwendet man meist die Präfix-Notation (~!cond~, ~(-x)~).
 
 Da die notationellen Besonderheiten vom Parser aufgelöst werden, sind diese "einfachen" Operationen im Grunde langweilig.
 Aber es gibt zwei Aspekte, die dann wichtig werden, wenn wir Operationen behandeln, die sich anders verhalten.
 Zum einen werten die einfachen Operationen all ihre Operanden aus, bevor sie selbst zur Tat schreiten.
 Zum anderen haben die einfachen Operationen *keine Seiteneffekte* über ihr temporäres Zielobjekt hinaus.
-Verwerfen wir dieses temporäre Objekt, so hat eine Seiteneffekt-freie Operation keinen dauerhaften Einfluss auf den Zustand der Maschine.
+Verwerfen wir dieses temporäre Objekt, so hat eine seiteneffekt-freie Operation keinen dauerhaften Einfluss auf den Zustand der Maschine.
 
 #+begin_src latex
 \begin{frame}{Auswertungsreihenfolge von einfachen Operationen}
@@ -195,12 +195,12 @@ Verwerfen wir dieses temporäre Objekt, so hat eine Seiteneffekt-freie Operation
     \ii Semantische Lücke zwischen virtueller und realer Maschine {
       \bi
       \ii Operationen auf Sprachebene sind als (expliziter oder impliziter) Baum notiert
-      \ii Alle realen Maschinen sind \structure{Sequentielle Maschinen}\smallskip
+      \ii Alle realen Maschinen sind \structure{sequentielle Maschinen}\smallskip
       \ei
     }
     \ei
     \begin{btBlock}{Auswertungsreihenfolge}
-      Abbildung der Operationen des ASTs auf eine lineare Befehlssequenz.
+      Abbildung der Operationen des ASTs auf eine lineare Befehlssequenz
     \end{btBlock}
 
     \begin{columns}<2->
@@ -209,9 +209,9 @@ Verwerfen wir dieses temporäre Objekt, so hat eine Seiteneffekt-freie Operation
       \end{column}\hfill
       \begin{column}{0.69\textwidth}
         \bii
-        \ii \enquote{Links nach Rechts}      \hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=3}]{fig/07-simple-expr}
-        \ii \enquote{Rechts nach Links}      \hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=4}]{fig/07-simple-expr}
-        \ii \enquote{Beliebiges Kind zuerst}:\hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=5}]{fig/07-simple-expr}
+        \ii \enquote{links nach rechts}      \hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=3}]{fig/07-simple-expr}
+        \ii \enquote{rechts nach links}      \hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=4}]{fig/07-simple-expr}
+        \ii \enquote{beliebiges Kind zuerst}:\hfill\btImage[baseline,anchor=west,text width=3.5cm,opts={page=5}]{fig/07-simple-expr}
         \eii
       \end{column}
     \end{columns}
@@ -231,70 +231,70 @@ Verwerfen wir dieses temporäre Objekt, so hat eine Seiteneffekt-freie Operation
     \medskip
 
     \bi
-    \ii \structure{Abhängigkeit}: Eine Operationen hängt vom Ergebnis einer anderen ab{
+    \ii \structure{Abhängigkeit}: Eine Operationen hängt vom Ergebnis einer anderen ab.{
       \bi
-      \ii Abhängige Operationen müssen zuerst ausgewertet werden
-      \ii Bei der Auswertungsreihenfolge: Keine Abhängigkeiten in die Zukunft
+      \ii Abhängige Operationen müssen zuerst ausgewertet werden.
+      \ii Bei der Auswertungsreihenfolge: keine Abhängigkeiten in die Zukunft
       \ii AST definiert hierarchische Abhängigkeiten zwischen Eltern und Kind
       \ei
     }\medskip
     \ii<3-> \advantage{\textbf{Freiheiten}} in der Auswertungsreihenfolge {
       \bi
-      \ii Haben Operationen keine Abhängigkeit ist ihre Reihenfolge \textbf{\advantage{beliebig}}
-      \ii[$\Rightarrow$] Übersetzer kann Reihenfolge frei wählen um Ausführung zu optimieren\\
+      \ii Haben Operationen keine Abhängigkeit, ist ihre Reihenfolge \textbf{\advantage{beliebig}}.
+      \ii[$\Rightarrow$] Übersetzer kann Reihenfolge frei wählen, um Ausführung zu optimieren\\
          z.B: Weniger Speicherlatenz durch Einschieben von unabhängigen Operationen
       \ei
     }
     \ei
 
     \begin{btBlock}<4->{}\small
-      Viele Sprachkonstrukte und -regeln erlauben es uns die \textbf{Auswertungsreihenfolge zu formen}, um die Abhängigkeiten explizit zu machen.
+      Viele Sprachkonstrukte und -regeln erlauben es uns, die \textbf{Auswertungsreihenfolge zu formen}, um die Abhängigkeiten explizit zu machen.
     \end{btBlock}
 
   \end{frame}
 #+end_src
 
-Ein Programm besteht aus einer Menge an Operationen die in mit Hilfe der Sprachkonstrukte in eine logisch Beziehung (z.B.
+Ein Programm besteht aus einer Menge an Operationen, die in mit Hilfe der Sprachkonstrukte in eine logische Beziehung (z.B.
 wenn-dies-dann-das) zueinander gesetzt werden.
-Die Extraktion dieser Strukturen ist das Parsen, welches den Abstrakte Syntaxbaum produziert.
+Die Extraktion dieser Strukturen ist das Parsen, welches den abstrakten Syntaxbaum produziert.
 Jetzt haben wir bei der Übersetzung allerdings das Problem, dass die realen Maschinen keinen Baum abarbeiten können.
 Was wir haben sind sequentielle Maschinen, deren CPUs in einem einzelnen Zyklus genau eine Operation ausführen können.
-Wir müssen daher die Baumstruktur des ASTs *flachklopfen* um eine linearisierte Befehlssequenz zu erhalten, die wir mit unserem x86 oder ARM Prozessor ausführen können.
+Wir müssen daher die Baumstruktur des ASTs *flachklopfen*, um eine linearisierte Befehlssequenz zu erhalten, die wir mit unserem x86- oder ARM-Prozessor ausführen können.
 
 Aber welche *Auswertungsreihenfolge* der Baumknoten sollen wir wählen?
 Auf der Folie sehen wir 4 Operationen mit insgesamt 5 Operanden, die in einem AST angeordnet sind.
-Auf der rechten Seite sehen wir 3 verschiedene Auswertungsreihenfolgen für die wir uns entscheiden können, diesen AST auf eine sequentielle Maschine abzubilden.
-Wir könnten uns zum Beispiel dazu entscheiden, die Kinder von ~*~ von links nach rechts, von rechts nach links oder irgendwie gemischt ab zu arbeiten, bevor wir mit den gesammelten Ergebnissen die Multiplikation durchführen.
+Auf der rechten Seite sehen wir 3 verschiedene Auswertungsreihenfolgen, für die wir uns entscheiden können, um diesen AST auf eine sequentielle Maschine abzubilden.
+Wir könnten uns zum Beispiel dazu entscheiden, die Kinder von ~*~ von links nach rechts, von rechts nach links oder irgendwie gemischt abzuarbeiten, bevor wir mit den gesammelten Ergebnissen die Multiplikation durchführen.
 Diese drei Varianten sind alle valide und bei den meisten Sprachen kann der Übersetzer die Auswertereihenfolge der Kinder frei bestimmen[fn::Java ist hier eine Aufnahme, dort wird immer strikt von links nach rechts ausgewertet.].
-Diese Freiheit erlaubt dem Übersetzer eine Sequenz zu wählen, die von der CPU am schnellsten abgearbeitet wird.
+Diese Freiheit erlaubt dem Übersetzer, eine Sequenz zu wählen, die von der CPU am schnellsten abgearbeitet wird.
 Generell gilt, dass Freiheiten bei der Auswertungsreihenfolge dem Übersetzer Möglichkeiten zur Optimierung an die Hand gibt; nur so kann er Operationen zusammenfassen und verschieben.
 
 Allerdings sind nicht alle Linearisierungen dieses Baums ein valides Programm.
-Bei den genannten dreien haben wir immer eine Post-Fix Besuchsreihenfolge angenommen, bei der die Kinder zuerst ausgewertet werden.
+Bei den genannten dreien haben wir immer eine postfix-Besuchsreihenfolge angenommen, bei der die Kinder zuerst ausgewertet werden.
 Aber was würde eigentlich passieren, wenn wir die Multiplikation vor den drei Kind-Operationen ausführen wollen würden?
 Kurz gesagt: Das geht nicht bzw. es geht halt kaputt, weil die Multiplikation das Ergebnis der Addition, der Negation und des Bit-Shifts braucht.
 Wenn wir diese, etwas Umgangssprachlich umschriebene Situation etwas gewählter ausdrücken wollen würden, würden wir sagen: /"Die Multiplikation ist abhängig vom Ergebnis der Addition"/.
-Da real-existierende sequentielle Maschinen *nicht* in die Zukunft blicken können[fn::Wie schön wäre es doch nicht-deterministische Turing-Maschinen zu haben, die da viel flexibler sind.], folgt daraus direkt, dass die Addition vor der Multiplikation ausgeführt werden muss.
+Da real existierende sequentielle Maschinen *nicht* in die Zukunft blicken können[fn::Wie schön wäre es doch nicht-deterministische Turing-Maschinen zu haben, die da viel flexibler sind.], folgt daraus direkt, dass die Addition vor der Multiplikation ausgeführt werden muss.
 
 Für die einfachen Operationen (arithmetisch, bit-weise, logisch) sind die Abhängigkeiten ganz einfach:
 Die Operation hängt von ihren jeweiligen Kindern ab, diese müssen also vorher ausgewertet werden; wir haben eine streng hierarchische Struktur von Abhängigkeiten.
-Wir werden im folgenden Unterkapitel Sprachkonstrukte kennen lernen, mit denen wir die Ausführungsreihenfolge über diese hierarchische Struktur hinaus formen können.
+Wir werden im folgenden Unterkapitel Sprachkonstrukte kennenlernen, mit denen wir die Ausführungsreihenfolge über diese hierarchische Struktur hinaus formen können.
 Zum Beispiel indem wir sagen: Diese zwei Operationen müssen immer in dieser Reihenfolge ausgeführt werden (Sequenzierung:
 ~op1 ; op2~).
 
 
 #+begin_src latex
-  \begin{frame}{Die Zuweisungs-Operation (\texttt{:=})}
+  \begin{frame}{Die Zuweisungsoperation (\texttt{:=})}
     \bi
     \ii Auswertung der rechten Seite $\rightarrow$ Ergebnis in der linken Seite speichern{
       \bi
       \ii Linke und rechte Seite werden \alert{nicht} symmetrisch übersetzt!
-      \ii \structure{R-Wert}: Auf der rechten Seite berechnen wir das Ergebnis eines Ausdrucks
-      \ii \structure{L-Wert}: Auf der linken Seite muss berechnet werden wohin das Ergebnis soll
+      \ii \structure{R-Wert}: Auf der rechten Seite berechnen wir das Ergebnis eines Ausdrucks.
+      \ii \structure{L-Wert}: Auf der linken Seite muss berechnet werden, wohin das Ergebnis soll.
       \ei
       \btAnimation[height=1.5cm]{center,padding,1:<1->}{fig/07-lvalue}
     }
-    \ii<2-> Nicht jede Operation hat einen L-Wert{
+    \ii<2-> Nicht jede Operation hat einen L-Wert.{
       \bi
       \ii Konstanten (\codebox{1}, \codebox{"abc"}) haben keinen L-Wert\hfill\codebox{1   := 2}
       \ii Temporäre Zwischenergebnisse haben keinen L-Wert             \hfill\codebox{a+b := 2}
@@ -302,9 +302,9 @@ Zum Beispiel indem wir sagen: Diese zwei Operationen müssen immer in dieser Rei
     }
     \ii<3-> Unterschied bei L-Werten zwischen Werte- und Referenzmodell{
       \bi
-      \ii \structure{Referenzmodell}: Alles was eine Referenz speichern kann ist ein L-Wert\\
-          Variablen, Array-Elemente und Felder.\\[0.5ex]
-      \ii \structure{Wertemodell}: Alles was ein Objekt speichern kann ist ein L-Wert\\
+      \ii \structure{Referenzmodell}: Alles, was eine Referenz speichern kann, ist ein L-Wert\\
+          Variablen, Array-Elemente und Felder\\[0.5ex]
+      \ii \structure{Wertemodell}: Alles, was ein Objekt speichern kann, ist ein L-Wert\\
           zusätzlich: Dereferenzierung: \codebox{*(ptr)}
       \ei
     }
@@ -313,47 +313,47 @@ Zum Beispiel indem wir sagen: Diese zwei Operationen müssen immer in dieser Rei
   #+end_src
 
 
-Eine Operation, bei der die Abhängigkeiten nicht so einfach sind, ist die *Zuweisungs-Operation*, für die ich hier die Notation ~:=~ verwende um eine deutliche Unterscheidung zur Vergleichs-Operation ~==~ zu machen.
+Eine Operation, bei der die Abhängigkeiten nicht so einfach sind, ist die *Zuweisungsoperation*, für die ich hier die Notation ~:=~ verwende, um eine deutliche Unterscheidung zur Vergleichs-Operation ~==~ zu machen.
 Ziel einer Zuweisung ist das Ergebnis einer Berechnung einer Variable, oder einem Objekt, zuzuweisen.
-Dafür hat die Zuweisungs-Operation zwei Operanden (rechte Seite/RHS und linke Seite/LHS) in denen sich die Asymmetrie des Informationsflusses wieder spiegelt.
+Dafür hat die Zuweisungsoperation zwei Operanden (rechte Seite/RHS und linke Seite/LHS), in denen sich die Asymmetrie des Informationsflusses widerspiegelt.
 Die rechte Seite wird ausgewertet und dann der linken Seite zugewiesen. 
 
-Aus diese Asymmetrie folgt auch, dass die beiden Operanden auf unterschiedliche Weisen ausgewertet werden müssen[fn::Dies wird wichtig beim Übersetzerbau]. 
-Die rechte Seite wird als *R-Wert* (rvalue) ausgewertet, was bedeutet dass wir uns nur für das Ergebnis der Rechnung interessieren, unabhängig davon wie und wo dieses gespeichert wird.
+Aus diese Asymmetrie folgt auch, dass die beiden Operanden auf unterschiedliche Weisen ausgewertet werden müssen[fn::Dies wird wichtig beim Übersetzerbau.]. 
+Die rechte Seite wird als *R-Wert* (rvalue) ausgewertet, was bedeutet dass wir uns nur für das Ergebnis der Rechnung interessieren, unabhängig davon, wie und wo dieses gespeichert wird.
 Die linke Seite wird als *L-Wert* (lvalue) ausgewertet. Dabei ist unser Ziel eine Speicheradresse zu erfahren, an die wir das Ergebnis ablegen sollen.
-Im Beispiel ~a := b~, wollen beim Auswerten der Variable ~b~ (als R-Wert) wissen was ihr Inhalt ist, beim Auswerten der Variable ~a~ (als L-Value) geht es um die Speicheradresse der Variable. 
-Gehen Sie noch einmal in sich, und wiederholen Sie: *"Zuweisungen werten ihre beiden Operanden asymmetrisch aus, bei der rechten Seite interessiert uns der Wert, bei der Linken ein Zielort für das Ergebnis"*.
+Im Beispiel ~a := b~, wollen beim Auswerten der Variable ~b~ (als R-Wert) wissen, was ihr Inhalt ist, beim Auswerten der Variable ~a~ (als L-Value) geht es um die Speicheradresse der Variable. 
+Gehen Sie noch einmal in sich, und wiederholen Sie: *"Zuweisungen werten ihre beiden Operanden asymmetrisch aus, bei der rechten Seite interessiert uns der Wert, bei der linken ein Zielort für das Ergebnis"*.
 
 Die Unterscheidung beider Auswertungsarten wird noch deutlicher, wenn wir uns anschauen, dass nicht jede Operation/jeder Operand einen L-Wert hat:
-So haben Literale keinen L-Wert, da sie nicht wirklich an einem Ort gespeichert werden. Weisen wir einen C-Übersetzer an den Ausdruck ~1 = 2~ zu Übersetzen, so bekommen wir die Fehlermeldung /"error: lvalue required as left operand of assignment"/ um die Ohren gehauen. Und zurecht! Denn was sollte es denn bedeuten, wenn wir dem Literal 1 den Wert 2 zuweisen? Sollen ab jetzt alle Einsen im Programm zur Zwei werden? 
+So haben Literale keinen L-Wert, da sie nicht wirklich an einem Ort gespeichert werden. Weisen wir einen C-Übersetzer an den Ausdruck ~1 = 2~ zu übersetzen, so bekommen wir die Fehlermeldung /"error: lvalue required as left operand of assignment"/ um die Ohren gehauen. Und zurecht! Denn was sollte es denn bedeuten, wenn wir dem Literal 1 den Wert 2 zuweisen? Sollen ab jetzt alle Einsen im Programm zur Zwei werden? 
 
 Die selbe Fehlermeldung über einen fehlenden L-Wert bekommen wir, wenn wir einem temporären Ergebnisobjekt einer einfachen Operation etwas zuweisen wollen (~(a + b) = c~).
 Wir können für den Ausdruck ~a + b~ keine sinnvolle Antwort darauf geben, wo der Speicher des Ergebnisses liegt.
-Selbst wenn linke und rechte Seite vom typkompatibel sind, so hätte der Programmierer nichts davon, wenn dem temprären Objekt der Wert von c zugewiesen wird; es gibt keine Möglichkeit darauf später zuzugreifen.
+Selbst wenn linke und rechte Seite vom Typ her kompatibel sind, so hätte der Programmierer nichts davon, wenn dem temporären Objekt der Wert von c zugewiesen wird; es gibt keine Möglichkeit darauf später zuzugreifen.
 
-Welche Operationen als L-Wert ausgewertet werden können ist sprachabhängig.
+Welche Operationen als L-Wert ausgewertet werden können, ist sprachabhängig.
 Der größte Unterschied in dieser Frage kommt aus der Entscheidung über Referenz- oder Wertemodell für Variablen.
 Beim *Referenzmodell für Variablen* gibt es keine separaten Zeiger- bzw.
 Referenzobjekte, die dem Benutzer zugänglich sind.
 Daher können nur Variablen, Feld-Zugriffe und Array-Zugriffe als L-Wert ausgewertet werden.
-Beim *Wertemodell* kommt zu diesen L-Werten noch die *Derefenzierung* hinzu.
-Während wir auf der rechten Seite dem Zeiger hinterherlaufen um den Wert aus zu lesen, schreiben wir auf der linken Seite an genau die diese Stelle das Ergebnis. 
+Beim *Wertemodell* kommt zu diesen L-Werten noch die *Dereferenzierung* hinzu.
+Während wir auf der rechten Seite dem Zeiger hinterherlaufen, um den Wert auszulesen, schreiben wir auf der linken Seite an genau diese Stelle das Ergebnis. 
 
 #+begin_src latex
   \begin{frame}<handout:2,3>{Seiteneffekte und Idempotenz}
     \begin{btBlock}{}
-      Die Zuweisungs-Operation hat den gewollten \structure{Seiteneffekt} den Zustand der virtuellen Maschine zu verändern.
+      Die Zuweisungsoperation hat den gewollten \structure{Seiteneffekt}, den Zustand der virtuellen Maschine zu verändern.
     \end{btBlock}
 
     \bi
     \ii \structure{Seiteneffekte}: Wirkung über ein temporäres Zielobjekt hinaus {
       \bi
-      \ii Operationen sind nicht mehr \structure{idempodent}\hfill \codebox{i := i + 1}
+      \ii Operationen sind nicht mehr \structure{idempotent}\hfill \codebox{i := i + 1}
       \ii Nur beobachtbare Seiteneffekte sind ein Problem (seiteneffektfreie Funktion)
-      \ii Strikt-Funktionale Sprachen (Haskell): Verbot jeglicher Seiteneffekte 
+      \ii Strikt funktionale Sprachen (Haskell): Verbot jeglicher Seiteneffekte 
       \ei
     }\medskip
-    \ii<2-> Wer sich auf Seiteneffekte verlässt erzeugt eine implizite Abhängigkeit.\\[0.5ex]{
+    \ii<2-> Wer sich auf Seiteneffekte verlässt, erzeugt eine implizite Abhängigkeit.\\[0.5ex]{
      \begin{columns}
        \begin{column}{0.27\textwidth}
          \btAnimation[width=\textwidth] {padding,center,1:<-2>,2:<3->}{fig/07-side-effect}
@@ -361,7 +361,7 @@ Während wir auf der rechten Seite dem Zeiger hinterherlaufen um den Wert aus zu
        \begin{column}{0.7\textwidth}
          \bi
          \ii Das Ergebnis von \codebox{(a := 2) + (b := a)} hängt von der Auswertungsreihenfolge ab
-         \ii Ohne strikt-definierte Auswertungsreihenfolge ist das Ergebnis \ALERT{undefiniert}!
+         \ii Ohne strikt definierte Auswertungsreihenfolge ist das Ergebnis \ALERT{undefiniert}!
          \ii Sprachregeln und -konstrukte \textbf{vermeiden} implizite Abhängigkeiten oder \textbf{machen sie explizit}.
          \ei
        \end{column}
@@ -372,13 +372,13 @@ Während wir auf der rechten Seite dem Zeiger hinterherlaufen um den Wert aus zu
 #+end_src
 
 Das mit der Asymmetrie zwischen linker und rechter Seite ist schon diffizil, aber es kommt noch schlimmer!
-Denn die Zuweisung-Operation ist der Inbegriff der *Seiteneffekt-behafteten Operation*.
+Denn die Zuweisungsoperation ist der Inbegriff der *Seiteneffekt-behafteten Operation*.
 Wir führen Zuweisungen ja sogar ausschließlich wegen ihrer Seiteneffekte aus!
 Wir wollen den Zustand der virtuellen Maschine mit der Zuweisung ja ganz explizit verändern.
 
 Ich habe bereits angedeutet, dass eine Operation dann frei von Seiteneffekten ist, wenn sie ausschließlich einen temporäres Zielobjekt verändern.
 Wenn wir den gesamten Zustand der Maschine vor und nach der einer seiteneffektfreien Operation vergleichen, so gibt kommt nur ein einzelnes temporäres Ergebnisobjekt hinzu, der Rest des Speichers bleibt unverändert.
-Verwerfen wir das Ergebnis ist es als wäre nie etwas passiert. Dies bedeutet auch, dass wir die Operation immer und immer wieder direkt hintereinander ausführen können ohne das es zu einem anderen Ergebnis kommt; seiteneffektfreie Operationen sind immer *idempotent*.
+Verwerfen wir das Ergebnis, ist es, als wäre nie etwas passiert. Dies bedeutet auch, dass wir die Operation immer und immer wieder direkt hintereinander ausführen können, ohne dass es zu einem anderen Ergebnis kommt; seiteneffektfreie Operationen sind immer *idempotent*.
 
 Ganz anderes sieht das bei Operationen mit Seiteneffekten aus.
 Dort wird nicht nur ein Ergebnis erzeugt, sondern der Speicher der Maschine verändert.
@@ -389,12 +389,12 @@ Daher gibt es Programmiersprachen, die keine bzw. fast keine Operationen mit Sei
 
 Mit den Seiteneffekten der Zuweisung wird auch unsere Auswertungsreihenfolge schwieriger. Denn was passiert, wenn die Auswertung eines Operanden einen Seiteneffekt hat, auf den sich der andere Operand verlässt. In diesem Fall sollte der Übersetzer die Operanden tunlichst in der richtigen Reihenfolge auswerten, da ansonsten eine Verletzung der Abhängigkeiten vorliegt und das Programm nicht korrekt arbeitet.
 
-Im Beispiel sehen wir das zwei Zuweisungs-Operationen als Operanden für eine Addition benutzt werden.
+Im Beispiel sehen wir, dass zwei Zuweisungsoperationen als Operanden für eine Addition benutzt werden.
 Semantisch bedeutet dies, dass die rechte Seite nicht nur der linken Seite zugewiesen wird, sondern zusätzlich als temporäres Objekt nach oben zur Addition fließt.
-Im Beispiel von ~(a := 2) + (b := a)~ kommt es zu gänzlich unterschiedlichen Ergebnissen wenn wir von links nach rechts oder von rechts nach links auswerten.
-Gibt die Sprache keine strikte Auswertereihenfolge vor, so können wir auch garnicht wissen für welche Variante sich der Übersetzer entscheiden wird und das Ergebnis des Programms wird *undefiniert*!
+Im Beispiel von ~(a := 2) + (b := a)~ kommt es zu gänzlich unterschiedlichen Ergebnissen, wenn wir von links nach rechts oder von rechts nach links auswerten.
+Gibt die Sprache keine strikte Auswertereihenfolge vor, so können wir auch gar nicht wissen, für welche Variante sich der Übersetzer entscheiden wird und das Ergebnis des Programms ist *undefiniert*!
 
-Im folgenden werden wir Sprachkonstrukte kennen lernen, die es uns erlauben ein Programm so auf zu notieren, dass es nicht zu solche Uneindeutigkeiten kommt und dass die Auswertung des Programms entweder das eine (~a := 2; b := a~) oder das andere (~b := a; a := 2~) hat.
+Im Folgenden werden wir Sprachkonstrukte kennenlernen, die es uns erlauben, ein Programm so zu notieren, dass es nicht zu solchen Uneindeutigkeiten kommt und, dass die Auswertung des Programms entweder das eine (~a := 2; b := a~) oder das andere (~b := a; a := 2~) Ergebnis hat.
 Wir lösen die impliziten Abhängigkeiten auf, indem wir eine feste Ausführungsreihenfolge vorgegeben.
 
 
@@ -429,23 +429,23 @@ Wir lösen die impliziten Abhängigkeiten auf, indem wir eine feste Ausführungs
   \end{frame}
 #+end_src
 
-Um die verschiedenen Sprachkonstrukte und ihre Auswirkung auf die Auswertereihenfolge zu verstehen, müssen wir uns zunächst ein genaueres geistes Modell vor Augen führen.
-Das Modell beginnt damit, sich einen Entwickler vorzustellen, der mit der Aufgabe konfrontiert ist ein Programm für ein gewisses Problem zu entwickeln.
-Beim Nachdenken über dieses Problem tauchen in seinem Geist verschiedene Operationen (mit und ohne Seiteneffekte) aus, die abgearbeitet werden müssen um das Problem zu lösen.
+Um die verschiedenen Sprachkonstrukte und ihre Auswirkung auf die Auswertereihenfolge zu verstehen, müssen wir uns zunächst ein genaueres geistiges Modell vor Augen führen.
+Das Modell beginnt damit, sich einen Entwickler vorzustellen, der mit der Aufgabe konfrontiert ist, ein Programm für ein gewisses Problem zu entwickeln.
+Beim Nachdenken über dieses Problem tauchen in seinem Geist verschiedene Operationen (mit und ohne Seiteneffekte) auf, die abgearbeitet werden müssen, um das Problem zu lösen.
 Im Modell ist es egal, welcher Art diese Operationen sind, weswegen ich sie mit griechischen Buchstaben abstrahiere.
 
-Beim Ordnen dieser Menge von Operationen fällt dem Entwickler auf, dass die Operationen, zum Beispiel über Seiteneffekte, voneinander abhängen.
+Beim Ordnen dieser Menge von Operationen fällt dem Entwickler auf, dass die Operationen, zum Beispiel durch Seiteneffekte, voneinander abhängen.
 So muss die Operation Alpha vor der Operation Gamma ausgeführt werden; die Reihenfolge von Alpha und Beta ist egal.
-Der Entwickler wählt nun Sprachkonstrukte  aus um die Auswertungsreihenfolge der Operationen so zu formen, dass die Abhängigkeiten in jedem Fall erfüllt sind; egal welche Optimierungen der Übersetzer anweden wird.
+Der Entwickler wählt nun Sprachkonstrukte aus, um die Auswertungsreihenfolge der Operationen so zu formen, dass die Abhängigkeiten in jedem Fall erfüllt sind; egal, welche Optimierungen der Übersetzer anwenden wird.
 
-Der Übersetzer extrahiert diese Vorgaben über die Reihenfolge der Operationen aus dem Programmtext mittels Parsing und erzeugt eine Operationssequenz für die reale Maschine, die kompatibel ist mit der Regeln der Sprache und der kundgetanen Intention des Entwicklers.
+Der Übersetzer extrahiert diese Vorgaben über die Reihenfolge der Operationen aus dem Programmtext mittels Parsing und erzeugt eine Operationssequenz für die reale Maschine, die kompatibel ist mit den Regeln der Sprache und der kundgetanenen Intention des Entwicklers.
 Diese linearisierte Operationssequenz wird dann von der sequentiellen Maschine ausgeführt.
 
-Im folgenden werden wir uns mit 4 Klassen von Sprachkonstrukten beschäftigen, mit denen diese Modellierung der Auswertungsreihenfolge erfolgt.
+Im Folgenden werden wir uns mit 4 Klassen von Sprachkonstrukten beschäftigen, mit denen diese Modellierung der Auswertungsreihenfolge erfolgt.
 Sie kennen all diese Konstrukte natürlich bereits (Bedingungen, Schleifen).
-Ich möchte Sie jedoch dazu anhalten, bei jedem Teilabschnitt einen Schritt zurück zu gehen von den Konstrukten, die Sie bereits kennen, und zu fragen:
-*Welche Konstrukte sind auf einer abstrakteren Ebene ähnlich zueinander?* Ziel dieser Übung ist es, Sie darin zu schulen diese Frage bei jedem neuen Konstrukt, dem Sie begegnen, erneut zu stellen.
-Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller ein effektiver Entwickler für die aktuelle Hype-Sprache zu werden.
+Ich möchte Sie jedoch dazu anhalten, bei jedem Teilabschnitt einen Schritt von den Konstrukten, die Sie bereits kennen, zurückzutreten und zu fragen:
+*Welche Konstrukte sind auf einer abstrakteren Ebene ähnlich zueinander?* Ziel dieser Übung ist es, Sie darin zu schulen, diese Frage bei jedem neuen Konstrukt, dem Sie begegnen, erneut zu stellen.
+Auf diese Weise werden Sie es schaffen, Neues schneller einzuordnen und schneller ein effektiver Entwickler für die aktuelle Hype-Sprache zu werden.
 
 ** Sequenzierung: Statements und Goto
 :PROPERTIES:
@@ -456,12 +456,12 @@ Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller
     \bi
     \ii \structure{Sequenzierung}: Vorgabe einer linearen, strikten Reihenfolge {
       \bi
-      \ii Der Sequenzoperator (\codebox{;}) führt seine Kinder hintereinander aus
-      \ii Die Operanden des Sequenzoperators heißen \structure{Statements}
-      \ii Ergebnisse werden verworfen oder das erste/letzte wird zurückgegeben
+      \ii Der Sequenzoperator (\codebox{;}) führt seine Kinder hintereinander aus.
+      \ii Die Operanden des Sequenzoperators heißen \structure{Statements}.
+      \ii Ergebnisse werden verworfen oder das erste/letzte wird zurückgegeben.
       \ei
     }
-    \ii<2-> Statements sind das grundlegende Sprachmittel in imperativen Sprachen\\[1ex] {
+    \ii<2-> Statements sind das grundlegende Sprachmittel in imperativen Sprachen.\\[1ex] {
       \btAnimation{center,padding,1:<1->}{fig/07-statements}
     }
     \ei
@@ -495,32 +495,32 @@ Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller
         \structure{Ruby}
         \bii
         \ii Sequenzierung: \texttt{'\textbackslash n'}, Semikolon
-        \ii Letztes Statement liefert  den Rückggabewert
+        \ii Letztes Statement liefert den Rückgabewert
         \eii
       \end{column}
     \end{columns}
   \end{frame}
 
   \begin{frame}[fragile]{Unterscheidung zwischen Ausdrücken und Statements}
-    \OrangeBox{Die meisten Sprachen treffen diese Unterscheidung}\medskip
+    \OrangeBox{Die meisten Sprachen treffen diese Unterscheidung.}\medskip
 
     \bi
     \ii \structure{Ausdrücke/Expressions} {
       \bi
       \ii Haben einen Rückgabewert
-      \ii Haben einen Rückggabetypen (bei statischer Typisierung)
+      \ii Haben einen Rückgabetypen (bei statischer Typisierung)
       \ii Können Operanden anderer Expressions sein
       \ei
     }\medskip
     \ii \structure{Statements} {
       \bi
-      \ii Haben keinen Rückggabewert und daher auch keinen Typen
+      \ii Haben keinen Rückgabewert und daher auch keinen Typen
       \ii Dienen als Elemente der Sequenzierung und anderer Programmstrukturen
       \ii Entsprechen (in etwa) einer Zeile Code
-      \ii Werden in Code-Blöcken bzw. Compound-Statements zusammengefasst.
+      \ii Werden in Code-Blöcken bzw. Compound-Statements zusammengefasst
       \ei
     }\medskip
-    \ii<2-> Manche Operationen haben eine Ausdrucks- und eine Statement-Form\\
+    \ii<2-> Manche Operationen haben eine Ausdrucks- und eine Statement-Form.\\
     C: \codeinline{if (cond) { then_block } else { else_block}}\hfill%
     \codeinline{ cond ? then_expr : else_expr}
 
@@ -530,10 +530,10 @@ Auf diese Weise werden Sie es schaffen Neues schneller einzuordnen und schneller
 #+end_src
 
 
-Das erste Klasse von Sprachkonstrukten, die wir uns ansehen, haben Sie wahrscheinlich bisher noch nicht einmal als wirkliche Konstrukte wahrgenommen. Sie sind so sehr Teil von Programmierung, dass sie ihre Existenz in einer Sprache uns beinahe als gegebenes Naturgesetz vorkommen mag[fn::Es ist selten so, dass irgendetwas in einer Programmiersprache ein Naturgesetz ist. Sehr, sehr selten.]. Ich rede von der *Sequenzierung von Operationen*.
+Das erste Klasse von Sprachkonstrukten, die wir uns ansehen, haben Sie wahrscheinlich bisher noch nicht einmal als wirkliche Konstrukte wahrgenommen. Sie sind so sehr Teil von Programmierung, dass ihre Existenz in einer Sprache uns beinahe als gegebenes Naturgesetz vorkommen mag[fn::Es ist selten so, dass irgendetwas in einer Programmiersprache ein Naturgesetz ist. Sehr, sehr selten.]. Ich rede von der *Sequenzierung von Operationen*.
 
-Bei der Sequenzierung, nehmen wir zwei Operationen und legen fest, dass die eine Operation vor bzw. nach der anderen ausgeführt werden muss; Wir drücken eine feste Auswertungsreihenfolge aus.
-Da Sequenzierungen sehr nah an dem sind wie die reale Maschinen arbeiten, können durch-sequentialisierte Programme, bei denen alles geordnet ist, einfach übersetzt werden.
+Bei der Sequenzierung nehmen wir zwei Operationen und legen fest, dass die eine Operation vor bzw. nach der anderen ausgeführt werden muss; wir drücken eine feste Auswertungsreihenfolge aus.
+Da Sequenzierungen sehr nah an dem sind, wie die reale Maschinen arbeiten, können durchsequentialisierte Programme, bei denen alles geordnet ist, einfach übersetzt werden.
 Daher waren die ersten Programmiersprachen, die die Informatik entwickelt hat, die *imperativen Sprachen*.
 
 Zu Sequenzierung haben wir zwei grundlegende Konstrukte:
@@ -541,24 +541,24 @@ Den *Sequenzoperator* und den *unbedingten Sprung* (~goto~).
 
 Der *Sequenzoperator*, der in Java mit dem Semikolon notiert wird, hat zwei Operanden, die jeweils Operationen sind und die wir *Statements* nennen.
 Bei der Ausführung wird das linke Statement vor dem rechten Statement ausgeführt; die Auswertungsreihenfolge ist starr.
-Um die Semantik "von links nach rechts" aufrecht zu erhalten, muss der Sequenzoperator rechts-assoziativ geparst werden bzw.
+Um die Semantik "von links nach rechts" aufrechtzuerhalten, muss der Sequenzoperator rechts-assoziativ geparst werden bzw.
 die Statements in einer Liste gespeichert werden.
-Aus ~A; B; C;~ wird in Prefix-Form ~seq(A, seq(B, C))~ bzw.
+Aus ~A; B; C;~ wird in Präfix-Form ~seq(A, seq(B, C))~ bzw.
 ~seq([A, B, C])~.
-Eine Sequenz von Statements nennen wir auch *Block*, *Code-Block*, oder *Compound Statement*.
+Eine Sequenz von Statements nennen wir auch *Block*, *Code-Block*, oder *Compound-Statement*.
 
 Wenn wir Operationen sequenzieren, geben wir die Auswertungsreihenfolge ganz genau vor, womit wir häufig eine Überapproximation der tatsächlichen Abhängigkeiten erreichen.
 Das Programm ist also häufig strikter geordnet als die Abhängigkeiten dies verlangen würden.
 
 
-Wie mit den Ergebnissen der Statements umgegangen wird ist unterschiedlich und manche Sprachen bieten sogar unterschiedliche Sequenzierungsoperatoren.
-So gibt es in C/C++ die "normale" Sequenzierung mit dem Semikolon, bei dem alle Rechenergebnisse der Statements verworfen werden[fn::Wir führen die Statements nur um ihrer Seiteneffekte aus.].
-Zusätzlich gibt es aber noch den Komma-Operator, der deutlich unbekannter ist, bei dem die Statements ebenfalls in dieser Reihenfolge ausgeführt werden, aber das Ergebnis des letzten Statements zum Rückggabewert der gesamten Sequenz wird.
+Wie mit den Ergebnissen der Statements umgegangen wird, ist unterschiedlich und manche Sprachen bieten sogar unterschiedliche Sequenzierungsoperatoren.
+So gibt es in C/C++ die "normale" Sequenzierung mit dem Semikolon, bei dem alle Rechenergebnisse der Statements verworfen werden[fn::Wir führen die Statements nur wegen ihrer Seiteneffekte aus.].
+Zusätzlich gibt es aber noch den Komma-Operator, der deutlich unbekannter ist, bei dem die Statements ebenfalls in dieser Reihenfolge ausgeführt werden, aber das Ergebnis des letzten Statements zum Rückgabewert der gesamten Sequenz wird.
 So liefert ~1+3, 4+5, 1+1~ den Wert 2.
 
 In der Skriptsprache Ruby ist die Rückgabe des letzten Statement-Ergebnisses das Standardverhalten.
-In Ruby werden Statements durch das Neue-Zeile-Zeichen (~\n~) oder durch den Semikolon sequenziert.
-Durch die Rückggabe des letzten Ergebnisses kann ein explizites ~return~ an vielen Stellen vermieden werden:
+Statements werden durch das Neue-Zeile-Zeichen (~\n~) oder durch ein Semikolon sequenziert.
+Durch die Rückgabe des letzten Ergebnisses kann ein explizites ~return~ an vielen Stellen vermieden werden:
 
 #+begin_src ruby
   def foo(a)
@@ -568,28 +568,28 @@ Durch die Rückggabe des letzten Ergebnisses kann ein explizites ~return~ an vie
 
 Versuchen Sie nun nach zu vollziehen, wieso die Variable ~a~ auf den Folien am Ende der Zuweisung den Wert 10 hat.
 
-Sequenzierung und der Umgang mit Rückggabewerten führt in den meisten Programmiersprachen zu einer Unterscheidung der Operationen in *Statements* und in *Ausdrücke*.
-Jede Operation, die bei der Auswertung einen Rückggabewert liefert ist ein Ausdruck (oder auch Expression).
-Daher müssen Ausdrücke in statisch typisierten Sprachen einen Rückggabetyp haben.
+Sequenzierung und der Umgang mit Rückgabewerten führt in den meisten Programmiersprachen zu einer Unterteilung der Operationen in *Statements* und in *Ausdrücke*.
+Jede Operation, die bei der Auswertung einen Rückgabewert liefert, ist ein Ausdruck (oder auch Expression).
+Daher müssen Ausdrücke in statisch typisierten Sprachen einen Rückgabetyp haben.
 Da sie einen Wert liefern, können sie als Operanden für andere Operationen dienen. 
 Alle arithmetischen, bit-weisen und logischen Operationen sind Ausdrücke!
 
-Statements dagegen haben *keinen Rückggabewert* und können daher nicht an beliebigen Stellen als Operanden auftauchen.
-Statements dienen lediglich der Strukturierung und der Sequenzierung des Programms und sie treten als Operanden von Sprachkonstrukten auf.
+Statements dagegen haben *keinen Rückgabewert* und können daher nicht an beliebigen Stellen als Operanden auftauchen.
+Statements dienen lediglich der Strukturierung und der Sequenzierung des Programms und treten als Operanden von Sprachkonstrukten auf.
 So hat eine Bedingung ein bzw.
 zwei Statements als Operand (then- und else- Block).
 
-Diese Unterscheidung von Ausdrücken und Statements führt dazu, dass es manche Sprachkonstrukte in einer Ausdrucks- und einer Statement Variante gibt.
-Bei der Ausdrucksform für Bedingungen in C (~cond ? then_expr : else_expr~) wird anhand der Bedingung geprüft welcher Ausdruck ausgewertet werden soll um ein Ergebnis zu liefern.
-Folge der Wert-Rückggabe ist, dass der Rückggabetyp von ~then_expr~ und ~else_expr~ gleich sein muss.
+Diese Unterscheidung von Ausdrücken und Statements führt dazu, dass es manche Sprachkonstrukte in einer Ausdrucks- und einer Statement-Variante gibt.
+Bei der Ausdrucksform für Bedingungen in C (~cond ? then_expr : else_expr~) wird anhand der Bedingung geprüft, welcher Ausdruck ausgewertet werden soll, um ein Ergebnis zu liefern.
+Folge der Wert-Rückgabe ist, dass der Rückgabetyp von ~then_expr~ und ~else_expr~ gleich sein muss.
 Bei der Statement-Form ist die Typisierung egal.
 
 #+begin_src latex
 \begin{frame}{Sequenzierung: Goto}
     \bi
-    \ii Ein \structure{unbedingter Sprung} verbindet syntaktisch entfernte Statements {
+    \ii Ein \structure{unbedingter Sprung} verbindet syntaktisch entfernte Statements. {
       \bi
-      \ii \structure{Sprungmarke}: Gibt einer Operation einen Namen
+      \ii \structure{Sprungmarke}: gibt einer Operation einen Namen
       \ii \structure{Sprung}: \btSetTab Auswertung wird an dieser Stelle \alert{abgebrochen} und an der\\
                               \btUseTab genannten Sprungmarke fortgesetzt.
       \ei
@@ -607,9 +607,9 @@ Bei der Statement-Form ist die Typisierung egal.
     \medskip
 
     \bi
-    \ii<5-|handout:5-> Nachfolge-Operation einer Operation wird explizit und statisch benannt {
+    \ii<5-|handout:5-> Nachfolgeoperation einer Operation wird explizit und statisch benannt {
       \bi
-      \ii Sprünge erlauben es Sequenzen zusammen zu stückeln
+      \ii Sprünge erlauben es, Sequenzen zusammenzustückeln
       \ii (Endlos laufende) Schleifen sind nun möglich \hfill \textit{Rückwärtssprünge}
       \ei
     }
@@ -627,18 +627,18 @@ Um springen zu können, müssen wir Operationen mittels Sprungmarken benennen (F
 Der unbedingte Sprung (~goto~) ist ein /Statement/, das eine Sprungmarke als Operand hat und das die Auswertung der aktuellen Sequenz abbricht und an der benannten Operation fortsetzt.
 
 
-Mit dem unbedingtem Sprung ist es möglich Sequenzen die textuell weit auseinander liegen hintereinander aus zu führen bzw.
+Mit dem unbedingten Sprung ist es möglich, Sequenzen, die textuell weit auseinander liegen, hintereinander auszuführen bzw.
 die eine Sequenz in die Ausführung der anderen Sequenz *einzuschieben*.
-Da die Sprungmarken allerdings in den meisten Sprachen statisch angegeben werden müssen (als Literale im Code), ist dieses aneinander-stückeln von Sequenzen sehr statisch.
+Da die Sprungmarken allerdings in den meisten Sprachen statisch angegeben werden müssen (als Literale im Code), ist dieses aneinanderstückeln von Sequenzen sehr statisch.
 
-Mit dem unbedingten Sprung haben wir auch unsere erste Möglichkeit erhalten Operationen mehrfach auszuführen. Springen wir am Ende einer Sequenz wieder an den Anfang, etwas das wir Rücksprung nennen, führen wir die Sequenz mehrfach aus. Mehrfach ist allerdings eine Untertreibung, denn eigentlich muss es "für immer" heißen, denn wir haben bisher keine Möglichkeit diese Schleife abzubrechen. Dazu kommen wir später.
+Mit dem unbedingten Sprung haben wir auch unsere erste Möglichkeit erhalten, Operationen mehrfach auszuführen. Springen wir am Ende einer Sequenz wieder an den Anfang, etwas das wir Rücksprung nennen, führen wir die Sequenz mehrfach aus. Mehrfach ist allerdings eine Untertreibung, denn eigentlich muss es "für immer" heißen, denn wir haben bisher keine Möglichkeit, diese Schleife abzubrechen. Dazu kommen wir später.
 
-Mit unbedingten Sprüngen kommt auch ein Konzept zu Tage, was im folgenden sehr wichtig wird: *Kontrollflüsse*. Ein Kontrollfluss ist eine strikte Sequenz von Operationen, die genau in dieser Reihenfolge von einer sequentiellen Maschine abgearbeitet wird. Der Name dieses Konzepts stammt vom "Kontrollwerk" in einer klassischen von-Neumann Maschine. Sie können sich einen Kontrollfluss als die Sequenz von Zeigern vorstellen, die der Programmzähler bei der Abarbeitung annimmt.
+Mit unbedingten Sprüngen kommt auch ein Konzept zutage, was im Folgenden sehr wichtig wird: *Kontrollflüsse*. Ein Kontrollfluss ist eine strikte Sequenz von Operationen, die genau in dieser Reihenfolge von einer sequentiellen Maschine abgearbeitet wird. Der Name dieses Konzepts stammt vom "Kontrollwerk" in einer klassischen von-Neumann-Maschine. Sie können sich einen Kontrollfluss als die Sequenz von Zeigern vorstellen, die der Programmzähler bei der Abarbeitung annimmt.
 
 Der Unterschied zur Auswertungsreihenfolge ist folgender:
-Die Auswertungsreihenfolge gibt normativ Regel vor wie Operationen hintereinander ausgeführt werden müssen; dabei kann es Uneindeutigkeiten geben.
+Die Auswertungsreihenfolge gibt normativ Regeln vor, wie Operationen hintereinander ausgeführt werden müssen; dabei kann es Uneindeutigkeiten geben.
 Beim einem Kontrollfluss gibt es genau eine Reihenfolge, die ausgeführt wird.
-Der Übersetzer extrahiert die Auswertereihenfolge aus dem Programm und leitet daraus einen Kontrollfluss ab.
+Der Übersetzer extrahiert die Auswertungsreihenfolge aus dem Programm und leitet daraus einen Kontrollfluss ab.
 
 ** Invokation: Funktionsaufrufe
 :PROPERTIES:
@@ -647,17 +647,17 @@ Der Übersetzer extrahiert die Auswertereihenfolge aus dem Programm und leitet d
 #+begin_src latex
   \begin{frame}<handout:3,4,5,6>{Invokation: Funktionsaufrufe}
     \bi
-    \ii Unbedingter Sprung und Funktionsaufruf sind sehr ähnlich.{
+    \ii Unbedingte Sprünge und Funktionsaufrufe sind sehr ähnlich.{
       \bi
-      \ii Der Kontrollfluss verlässt die aktuelle Operations-Sequenz
-      \ii Die Auswertung wird an einer entfernten, benannten Operation fortgesetzt
+      \ii Der Kontrollfluss verlässt die aktuelle Operationssequenz.
+      \ii Die Auswertung wird an einer entfernten benannten Operation fortgesetzt.
       \ei
     }\medskip
     \ii<2-> \textbf{Aber}: Funktionsaufrufe haben zwei \structure{grundlegende Erweiterungen} {
       \bi
       \ii \structure{Rücksprung}: \btSetTab Wir können von verschiedenen Stellen angesprungen werden und \\
-                                  \btUseTab zur jeweiligen verlassenen Operations-Sequenz zurückkehren.
-      \ii \structure{Argumente}: Wir können Daten an den Kontrollfluss heften
+                                  \btUseTab zur jeweiligen verlassenen Operationssequenz zurückkehren.
+      \ii \structure{Argumente}: Wir können Daten an den Kontrollfluss heften.
       \ei
     }
     \ei
@@ -679,14 +679,14 @@ Dieser funktioniert auf Ebene des Kontrollflusses sehr ähnlich wie der unbeding
 
 Wo der unbedingte Sprung nur ein Statement war, was wir für Hin- und Rücksprung verwendet haben, so werden diese Situationen beim Funktionsaufruf durch zwei unterschiedliche Statements herbeigeführt:
 Das Call-Statement springt an die angegebene Sprungmarke *und* speichert sich eine Rücksprungadresse.
-Auf den Folien, wäre die Rücksprungaddresse ein Zeiger auf die Operation Delta.
-Beim Return-Statement springen wir an dies Adresse zurück und setzen die Ausführung nach der Aufrufstelle fort.
+Auf den Folien, wäre die Rücksprungadresse ein Zeiger auf die Operation Delta.
+Beim Return-Statement springen wir an diese Adresse zurück und setzen die Ausführung nach der Aufrufstelle fort.
 Durch einen Funktionsaufruf können wir eine entfernte Operationssequenz leicht einschieben.
 
 Zusätzlich zur Formung des Kontrollflusses hat der Funktionsaufruf auch eine *Datenfluss-Komponente*.
 Wir übertragen die Argumente an die aufgerufene Funktion und machen sie dort als Parameter verfügbar.
 Auf diese Weise können wir die aufgerufene Funktion wortwörtlich *parametrisieren*.
-Die Erfindung des Funktionsaufrufs war ein Meilenstein in der Geschichte der Informatik, da nun Wiederverwendung von Code deutlich leichter wurde. Daher sind Funktionen die Erweiterung, die uns von rein imperativen Programmiersprachen zu *prozeduralen Programmiersprachen* gebracht haben. Ein Beispiel für eine rein imperative Sprache ohne Prozeduren BASIC{{{wikipedia_de(BASIC)}}}.
+Die Erfindung des Funktionsaufrufs war ein Meilenstein in der Geschichte der Informatik, da nun Wiederverwendung von Code deutlich einfacher wurde. Daher sind Funktionen die Erweiterung, die uns von rein imperativen Programmiersprachen zu *prozeduralen Programmiersprachen* gebracht haben. Ein Beispiel für eine rein imperative Sprache ohne Prozeduren ist BASIC{{{wikipedia_de(BASIC)}}}.
 
 #+begin_src latex
 \begin{frame}[fragile]{Vergleich: Sprünge vs. Invokation}
@@ -714,7 +714,7 @@ Die Erfindung des Funktionsaufrufs war ein Meilenstein in der Geschichte der Inf
           \bi
         \ii Sprungmarken, Sprünge und der Aufruf von Labels werden schnell unübersichtlich.
         \ii Dijkstra, 1968: \enquote{GOTO considered harmful}
-        \ii Manche argumentieren, dass goto einen Anwendungsfall bei der Fehlerbehandlung hat (z.B. Linus Torvalds)
+        \ii Manche argumentieren, dass goto einen Anwendungsfall bei der Fehlerbehandlung hat (z.B. Linus Torvalds).
         \ii<3->[$\Rightarrow$] \structure{Funktionen mit Blockstruktur}, Sprünge nur selten:
         % 
         \begin{columns}
@@ -745,18 +745,18 @@ Die Erfindung des Funktionsaufrufs war ein Meilenstein in der Geschichte der Inf
 #+end_src
 
 Da unbedingte Sprünge und Funktionsaufrufe sehr ähnlich sind, lohnt es sich die beiden Sprachmittel zu vergleichen.
-Sprünge haben der Nachteil, dass sie Code schnell unübersichtlich werden lassen, da wir immer nur einzelne Operationen anspringen und Hin- und Rücksprung von einer Sequenz völlig voneinander entkoppelt sind und syntaktisch nicht als zusammengehörig erscheinen.
-Beim Funktionsaufruf springt man nicht nur eine Operation an, an der es dann "zufällig" weiter geht, sondern wir springen ein ganzen  Programmabschnitt an.
+Sprünge haben den Nachteil, dass sie Code schnell unübersichtlich werden lassen, da wir immer nur einzelne Operationen anspringen und Hin- und Rücksprung einer Sequenz völlig voneinander entkoppelt sind und syntaktisch nicht als zusammengehörig erscheinen.
+Beim Funktionsaufruf springt man nicht nur eine Operation an, an der es dann "zufällig" weiter geht, sondern wir springen einen ganzen Programmabschnitt an.
 
 In gewissen Weise ist ein ~goto~ flexibler als ein ~call~.
 Dennoch verwenden wir kaum noch unbedingte Sprünge in unseren Programmen.
 Warum?
 Im Jahr 1968 hat Dijkstra einen Paper namens "GOTO considered harmful" veröffentlicht, bei dem er argumentiert, dass ein Programm welches *ausschließlich* durch Sprünge strukturiert wird[fn::Dijkstra meinte nicht nur Sprünge innerhalb von Funktionen, sondern wildes rumspringen durch die gesamte Codebasis.], völlig unlesbar und unverifizierbar wird.
 Im Gegensatz dazu führen Funktionsaufrufe, die den Kontrollfluss viel disziplinierter formen, zu einer klaren Hierarchie von Funktionsaufrufen.
-Funktionsaufrufe sind also ein Beispiel bei eine Einschränkung der Flexibilität zu einer Verbesserung des Programmierens geführt hat.
+Funktionsaufrufe sind also ein Beispiel, bei dem eine Einschränkung der Flexibilität zu einer Verbesserung des Programmierens geführt hat.
 Ähnlich wie dies statische Typisierung bei ihrer Einführung erreicht hat.
 
-Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit Blockstruktur. Wenn Entwickler für die Daseinsberechtigung von unbedingte Sprüngen plädieren, wie dies Linus Torvalds tut, so wird immer nur ein Sprung innerhalb einer Funktion gemeint. Niemals aber ein Sprung durch über Datei- und Modulgrenzen hinweg[fn::"Da hinten, diesen Befehl, den kann ich brauchen, lass uns dort hinspringen." -- Nein].
+Daher verwenden wir heute kaum noch Sprünge sondern hauptsächlich Funktionen mit Blockstruktur. Wenn Entwickler für die Daseinsberechtigung von unbedingten Sprüngen plädieren, wie dies Linus Torvalds tut, so wird immer nur ein Sprung innerhalb einer Funktion gemeint. Niemals aber ein Sprung durch über Datei- und Modulgrenzen hinweg[fn::"Da hinten, diesen Befehl, den kann ich brauchen, lass uns dort hinspringen." -- Nein].
 
 ** Selektion: Bedingte Ausführung
 :PROPERTIES:
@@ -770,9 +770,9 @@ Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit B
     \end{btBlock}
     \bigskip
     \bi
-    \ii<2-> \ALERT{Wichtiger} als Operationen zu reihen, ist es \textbf{Operationen auszuwählen} {%
+    \ii<2-> \ALERT{Wichtiger} als Operationen zu reihen, ist es \textbf{Operationen auszuwählen}. {%
       \bi
-      \ii if-then-else--Operation (\texttt{ite}) wählt eine der Nachfolge-Operationen aus
+      \ii if-then-else--Operation (\texttt{ite}) wählt eine der Nachfolgeoperationen aus
       \ii Auswahl der nächsten Operation erfolgt anhand des \textbf{Programmzustandes}
       \ei
     }
@@ -788,7 +788,7 @@ Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit B
     \end{columns}
     \smallskip
     \bii
-    \ii<3-> Mit Bedingungen gibt es plötzlich \structure{mehrere Kontrolflüsse} durch das Programm
+    \ii<3-> Mit Bedingungen gibt es plötzlich \structure{mehrere Kontrollflüsse} durch das Programm
     \ii<4-> Variationen von Bedingungen: Wie viele Nachfolger? Wie wird ausgewählt?
     \eii
 
@@ -839,35 +839,35 @@ Daher verwenden wir heute kaum noch Sprünge und hauptsächlich Funktionen mit B
   \end{frame}
 #+end_src
 
-Durch den Sequenzoperator, Sprünge und Funktionsaufrufe können wir Operationen aneinander reihen.
+Durch den Sequenzoperator, Sprünge und Funktionsaufrufe können wir Operationen aneinanderreihen.
 Allerdings ergibt sich dabei nur ein einziger Kontrollfluss.
 Dies bedeutet, dass es genau einen Pfad durch das Programm gibt und die Sequenz der Operation absolut klar ist, wenn wir uns den Programmtext anschauen.
-Funktionsaufrufe werden nur verwendet um Code wieder zu verwenden.
+Funktionsaufrufe werden nur verwendet, um Code wiederzuverwenden.
 Für die meisten Probleme ist allerdings nicht von vorne herein so klar, was zu tun ist.
 Es könnte zum Beispiel sein, dass wir erst anhand der Eingabedaten entscheiden wollen, was eigentlich zu tun ist.
 Solche *datenabhängigen Kontrollflüsse* können wir mittels Selektion ausdrücken.
 
-Der geläufigste Vertreter der *Selektions-Operatore* ist die Bedinung (~if-then-else~).
-Mit Hilfe eine Selektion ist es Möglich aufgrund eines Datenwerts zwischen zwei (oder mehr) Operationen zu wählen.
+Der geläufigste Vertreter der *Selektionsoperatoren* ist die Bedingung (~if-then-else~).
+Mit Hilfe eine Selektion ist es Möglich aufgrund eines Datenwerts, zwischen zwei (oder mehr) Operationen zu wählen.
 Nur die ausgewählte Operation wird ausgewertet, alle anderen Operationen werden ausgelassen.
 Normalerweise sequenziert eine Selektion auch die Auswertung der Bedingung und die Auswertung der ausgewählten Operation[fn::"Der Then-Block wird direkt nach der Entscheidung ausgeführt und nicht irgendwann."].
 
-Mit der Selektion wird unser Programm schlagartig komplexer, denn es gibt jetzt nicht nur einen Pfad (=ein Kontrollfluss) durch das Programm, sondern die Menge der möglichen Pfade spaltet sich bei der Selektions-Operation.
-Im Beispiel sehen, dass die Selektion ~ite~ dazu führt, dass es zwei unterschiedliche Kontrollflüsse durch unser Programm gibt.
+Mit der Selektion wird unser Programm schlagartig komplexer, denn es gibt jetzt nicht nur einen Pfad (=ein Kontrollfluss) durch das Programm, sondern die Menge der möglichen Pfade spaltet sich bei der Selektionsoperation.
+Im Beispiel sehen Sie, dass die Selektion ~ite~ dazu führt, dass es zwei unterschiedliche Kontrollflüsse durch unser Programm gibt.
 Einmal folgt Beta, und einmal folgt Gamma auf unsere Selektionsoperation.
 Und noch besser:
 Diese Entscheidung wird abhängig vom Zustands der virtuellen Maschine getroffen.
-Dies erhöht die Mächtigkeit einer Sprache von "langweilig, linear und endlich" auf "geil, Turing-mächtig und schwer analysierbar".
+Dies erhöht die Mächtigkeit einer Sprache von "langweilig, linear und endlich" auf "geil, Turing-mächtig und schwierig analysierbar".
 
-Wenn wir uns die Selektions-Operation anschauen, dann wirkt diese erstmal wie jede andere Operation auch, obwohl sie in ihrem Verhalten höchst besonders ist.
-Ganz ordinär können wir die stellvertretende ~ite~-Operation beschreiben als eine Operation mit 3 Operanden:
+Wenn wir uns die Selektionsoperation anschauen, dann wirkt diese erst mal wie jede andere Operation auch, obwohl sie in ihrem Verhalten höchst besonders ist.
+Ganz ordinär können wir die stellvertretende ~ite~-Operation als eine Operation mit 3 Operanden beschreiben:
 Der erste Operand ist die Bedingung und vom Typ ~bool~.
-Der zweite und der dritte Operand sind eine beliebige andere Operation (Codeblock, Statement oder Expression), die wir wegen ihres Seiteneffekts oder ihres Rückgabwertes Willen ausführen möchten.
+Der zweite und der dritte Operand sind eine beliebige andere Operation (Codeblock, Statement oder Expression), die wir wegen ihres Seiteneffekts oder ihres Rückgabewertes Willen ausführen möchten.
 
-*Aber*, ~ite~ ist eine besondere Operation, denn sie wertet nicht all ihre Kinder aus. Bei einfachen Operationen wird die eigentliche Berechung erst dann durchgeführt, wenn das Ergebnis von *allen* Kindern vorliegt; diese Operationen hängen von all ihren Kindern ab. Eine Selektion hängt nur von der Bedingung und der ausgewählten Operation ab, und sie führt auch nur diese beiden Kinder aus.
-Daher ist die Abhängigkeitstruktur der *ite*-Operation nicht vorgegeben, sondern tritt erst zur Laufzeit zutage und ist Daten-sensitiv. 
+*Aber*, ~ite~ ist eine besondere Operation, denn sie wertet nicht all ihre Kinder aus. Bei einfachen Operationen wird die eigentliche Berechnung erst dann durchgeführt, wenn das Ergebnis von *allen* Kindern vorliegt; diese Operationen hängen von all ihren Kindern ab. Eine Selektion hängt nur von der Bedingung und der ausgewählten Operation ab, und sie führt auch nur diese beiden Kinder aus.
+Daher ist die Abhängigkeitsstruktur der *ite*-Operation nicht vorgegeben, sondern tritt erst zur Laufzeit zutage und ist Daten-sensitiv. 
 
-Eine direkte Folge aus dieser Besonderheit ist, dass es ihnen in einer imperativen Programmiersprache nicht möglich ist eine Funktion ~ite(Cond, Then, Else)~ zu schreiben, die sich ganz genauso verhält wie das Programmkonstrukt ~ite~. Überlegen Sie sich anhand des folgenden Beispiels, was der Unterschied ist:
+Eine direkte Folge aus dieser Besonderheit ist, dass es Ihnen in einer imperativen Programmiersprache nicht möglich ist, eine Funktion ~ite(Cond, Then, Else)~ zu schreiben, die sich ganz genauso verhält wie das Programmkonstrukt ~ite~. Überlegen Sie sich anhand des folgenden Beispiels, was der Unterschied ist:
 
 #+begin_src python
   def ite(Cond, Then, Else):
@@ -902,7 +902,7 @@ Eine direkte Folge aus dieser Besonderheit ist, dass es ihnen in einer imperativ
   print "Zweite Ausgabe:", [a, b]
 #+end_src
 
-Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen auswertet, die Selektion ~if-else~ aber nur die Bedingung und den ausgewählten Ast. Diese Erkenntnis, dass Selektionen sehr besondere Operationen sind, wurde schon sehr früh von McCarthy, dem Erfinder von Lisp, und seiner Forschungsgruppe gemacht. Die Gruppe hat damals versucht einen möglichst minimalen Lisp-Interpreter zu schreiben. Und sie haben fieberhaft versucht den Ausdruck ~(if cond then else)~ anders auszudrücken ohne einen Sonderfall in ihrem Interpreter dafür zu schaffen. Stellte sich heraus: Dies ist prinzipiell nicht möglich! Bedingungen sind besonders!
+Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen auswertet, die Selektion ~if-else~ aber nur die Bedingung und den ausgewählten Ast. Diese Erkenntnis, dass Selektionen sehr besondere Operationen sind, wurde schon sehr früh von McCarthy, dem Erfinder von Lisp, und seiner Forschungsgruppe gemacht. Die Gruppe hat damals versucht, einen möglichst minimalen Lisp-Interpreter zu schreiben. Und sie haben fieberhaft versucht den Ausdruck ~(if cond then else)~ anders auszudrücken ohne einen Sonderfall in ihrem Interpreter dafür zu schaffen. Stellte sich heraus: Dies ist prinzipiell nicht möglich! Bedingungen sind besonders!
 
 #+begin_src latex
 
@@ -935,7 +935,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
         \end{code}
 
         \bii
-        \ii Frühzeitiger Auswertungs-Abbruch, sobald der Wahrheitswert feststeht.
+        \ii Frühzeitiger Auswertungs-Abbruch sobald der Wahrheitswert feststeht.
         \ii \texttt{!expr1} $\Rightarrow$ Übersprung von expr2/3
         \eii
 
@@ -977,7 +977,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
         \end{code}
 
         \bii
-        \ii Verzweigungs-Auswahl am Wert
+        \ii Verzweigungsauswahl am Wert
         \ii Wertebereiche, Default-Verzweigung
         \ii Effizient durch Sprungtabellen
         \eii
@@ -988,28 +988,28 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
   \end{frame}
 #+end_src
 
-Auf dieser Folie zeige ich ihnen einige Arten von Selektions-Operationen, die sie in unterschiedlichen Sprachen in unterschiedlichen Notationen wieder finden werden. Alle haben gemein, dass Sie anhand von Daten-abhängigen Entscheidungen nur einen Teil ihrer Kinder ausführen. Sie *selektieren* alle ein Untermenge ihrer Operationen und führen nur diese aus.
+Auf dieser Folie zeige ich Ihnen einige Arten von Selektionsoperationen, die sie in unterschiedlichen Sprachen in unterschiedlichen Notationen wiederfinden werden. Alle haben gemein, dass sie anhand von Daten-abhängigen Entscheidungen nur einen Teil ihrer Kinder ausführen. Sie *selektieren* alle ein Untermenge ihrer Operationen und führen nur diese aus.
 
 Die *if-then-else*-Operationen haben eine Bedingung und eine fixe Anzahl an Kindern. Will man mehrere Bedingungen abprüfen, so kann man im Then- oder im Else-Teil weitere Selektionen ausführen.
 
-Die etwas flexiblere Variante ist die *if-elseif-else*-Operation, die eine flexible Anzahl an Kindern hat die jeweils (bis auf den letzten) mit einem Test versehen sind.
-Die Bedingungen werden linear, von oben nach unten, ausgewertet. Bei der ersten Bedingung die erfolgreich ist, bricht die Suche ab, und der zugehörige Ast wird ausgeführt.
+Die etwas flexiblere Variante ist die *if-elseif-else*-Operation, die eine flexible Anzahl an Kindern hat, die jeweils (bis auf den letzten) mit einem Test versehen sind.
+Die Bedingungen werden linear, von oben nach unten, ausgewertet. Bei der ersten Bedingung, die erfolgreich ist, bricht die Suche ab, und der zugehörige Ast wird ausgeführt.
 Es ist ratsam, sowohl beim normalen if-else, als auch bei if-elseif-else, die Auswertung der Bedingungen frei von Seiteneffekten zu gestalten.
 
 Ähnlich zur if-elseif-else Kaskade ist die *Switch/Case-Operation*.
 Allerdings wird dort nur anhand eines einzelnen Wertes (~number~) entschieden, welcher Ast ausgeführt werden soll.
 Der Wert im Switch wird mit den Werten an jedem Case-Statement verglichen und daran entschieden.
-Die Werte-Zentrierung der Switch/Case-Operation erlaubt es dem Übersetzer erweitere Checks unseres Programms durchzuführen:
+Die Werte-Zentrierung der Switch/Case-Operation erlaubt es dem Übersetzer, erweitere Checks unseres Programms durchzuführen:
 Zum Beispiel kann der Übersetzer statisch prüfen, dass der gesamte Wertebereich abgedeckt ist oder dass keine Bedingungen überlappen.
-Außerdem kann ein Übersetzer mittels Sprungtabellen leichter effizienteren Code erstellen. Seien sie sich aber gewahr, dass optimierende Übersetzer ihr Switch/Case auch gern in eine if-elseif-else-Kaskade verwandelt, wenn es ratsam erscheint.
+Außerdem kann ein Übersetzer mittels Sprungtabellen einfacher effizienteren Code erstellen. Seien Sie sich aber gewahr, dass optimierende Übersetzer Ihr Switch/Case auch gern in eine if-elseif-else-Kaskade verwandeln, wenn es ratsam erscheint.
 
 Die vierte Variante sind *Short-Circuit-Expressions*, die auf den ersten Blick nicht wie Selektionen aussehen.
 Bei diesen Ausdrücken fallen die Bedingungen und die auszuführenden Operationen zusammen.
 Bei einem ~&&~ werden die Operationen der Reihe nach, von links nach rechts ausgewertet.
 Gibt eine der Operationen ~False~ zurück, so wird die Auswertung abgebrochen[fn::Bei ~||~ ist es genau andersrum, dort wird beim ersten ~True~ abgebrochen.].
-Hintergrund ist, dass schon zu diesem Zeitpunkt der Wahrheitswert des gesamten Ausdrucks fest steht und wir die restlichen Kinder garnicht auswerten müssen.
+Hintergrund ist, dass schon zu diesem Zeitpunkt der Wahrheitswert des gesamten Ausdrucks feststeht und wir die restlichen Kinder gar nicht auswerten müssen.
 Die Auswertung wird an dieser Stelle "kurzgeschlossen".
-Gehen Sie jetzt zu unserer Python Funktion ~ite()~ zurück und versuchen Sie die Implementierung mit dem wissen zu verstehen, dass ~and/or~ in Python Short-Circuit-Expressions sind.
+Gehen Sie jetzt zu unserer Python Funktion ~ite()~ zurück und versuchen Sie, die Implementierung mit dem Wissen zu verstehen, dass ~and/or~ in Python Short-Circuit-Expressions sind.
 
 #+begin_src latex
   \begin{frame}<handout:2,3>{Rekursion: Invokation und Selektion}
@@ -1023,10 +1023,10 @@ Gehen Sie jetzt zu unserer Python Funktion ~ite()~ zurück und versuchen Sie die
     \end{columns}
     \medskip
     \bi
-    \ii Rekursion ist das Zusammenspiel von Invokation und Selektion{
+    \ii Rekursion ist das Zusammenspiel von Invokation und Selektion.{
       \bi
-      \ii \texttt{call} erlaubt uns Operationen mehrfach auszuführen
-      \ii \texttt{ite} erlaubt uns die Invokation irgendwann auszulassen
+      \ii \texttt{call} erlaubt uns, Operationen mehrfach auszuführen.
+      \ii \texttt{ite} erlaubt uns, die Invokation irgendwann auszulassen.
       \ii Selbe Operation mit unterschiedlichen Daten auswerten ($\alpha_1, \alpha_2$,\ldots)
       \ei
     }\medskip
@@ -1034,7 +1034,7 @@ Gehen Sie jetzt zu unserer Python Funktion ~ite()~ zurück und versuchen Sie die
       \bi
       \ii \texttt{call} hat formt nicht nur den Kontrollfluss, sondern auch den Datenfluss!
       \ii Argumente \enquote{fließen} in die Call-Operation, Rückgabewerte hinaus\\[1ex]
-      \ii Datenfluss trotz seiteneffekt-freier Operationen
+      \ii Datenfluss trotz seiteneffektfreier Operationen
       \ii[$\Rightarrow$] \texttt{call F1} ist eine \structure{Komplexoperation} (= zusammengesetzte Operation)
       \ei
     }
@@ -1042,12 +1042,12 @@ Gehen Sie jetzt zu unserer Python Funktion ~ite()~ zurück und versuchen Sie die
   \end{frame}
 #+end_src
 
-Bewaffnet mit der Selektion können wir uns nun noch einmal der Invokation widmen um zu sehen, dass beide Operationen in Kombination uns ordentliche Rekursion erlaubt, die auch irgendwann endet.
-Bisher war das Problem bei Rekursion, dass wir keine Chance hatten die Invokation *nicht* auszuführen.
-Die führt dazu, dass wir uns endlos im Kreis drehen werden; bis zum St. Nimmerleinstag.
-Mit eine selektierenden Operation haben wir nun die Möglichkeit die Invokation einmal aus zu lassen.
+Bewaffnet mit der Selektion können wir uns nun noch einmal der Invokation widmen, um zu sehen, dass beide Operationen in Kombination uns ordentliche Rekursion erlaubt, die auch irgendwann endet.
+Bisher war das Problem bei Rekursion, dass wir keine Chance hatten, die Invokation *nicht* auszuführen.
+Dies führt dazu, dass wir uns endlos im Kreis drehen werden; bis zum St. Nimmerleinstag.
+Mit einer selektierenden Operation haben wir nun die Möglichkeit, die Invokation einmal auszulassen.
 
-Zusammen mit der Parameterisierbarkeit des Funktionsaufrufs kann auch jede Funktionsinstanz mit anderen Daten gestartet werden. Wird das Argument, zum Beispiel, in jeder Rekursionsstufe incrementiert und prüft die Bedingung ob das Argument größer als 3 wird, so endet die Rekursion irgendwann:
+Zusammen mit der Parameterisierbarkeit des Funktionsaufrufs kann auch jede Funktionsinstanz mit anderen Daten gestartet werden. Wird das Argument, zum Beispiel, in jeder Rekursionsstufe inkrementiert und prüft die Bedingung, ob das Argument größer als 3 wird, so endet die Rekursion irgendwann:
 
 #+begin_src python
   def F1(P):
@@ -1060,10 +1060,10 @@ Zusammen mit der Parameterisierbarkeit des Funktionsaufrufs kann auch jede Funkt
   F1(0)
 #+end_src
 
-Schauen wir uns die Sequenz an Operationen auf der Maschine an, so sehen wir, dass zuerst drei Alpha-Operationen (eine für jede Rekursionsstufe 1,2,3) ausgeführt wird bevor die Beta-Operationen der einzelnen Funktionsinstanzen ausgeführt werden.
+Schauen wir uns die Sequenz an Operationen auf der Maschine an, so sehen wir, dass zuerst drei Alpha-Operationen (eine für jede Rekursionsstufe 1,2,3) ausgeführt werden, bevor die Beta-Operationen der einzelnen Funktionsinstanzen ausgeführt werden.
 
 Durch den hierarchischen Kontrollfluss und die Kombination mit dem Datenfluss können wir Call-Operationen als *Komplexoperationen* betrachten.
-Eine Funktion ist wie andere Operationen, sie bekommt Quelloperanden (Argumente) und hat einen Zieloperanden (Rückggabewert).
+Eine Funktion ist wie andere Operationen, sie bekommt Quelloperanden (Argumente) und hat einen Zieloperanden (Rückgabewert).
 Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufzufassen, ist es deutlich einfacher ein rekursives Programm zu schreiben[fn::Außerdem versteht man in "Grundlagen der Betriebssysteme" viel besser, warum ein Systemaufruf eine komplexe Maschineninstruktion ist, die vom Betriebssystem teilinterpretiert wird.].
 
 ** Iteration: Wiederholte Ausführung
@@ -1073,7 +1073,7 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
 #+begin_src latex
   \begin{frame}<handout:2,3>{Iteration: Dasselbe, immer wieder tun}
     \bi
-    \ii Operationen in \structure{Schleifen} werden wiederholt ausgeführt {
+    \ii Operationen in \structure{Schleifen} werden wiederholt ausgeführt. {
       \bi
       \ii Nur Kontrollfluss-, \alert{keine Datenflusseigenschaften} ($\Leftrightarrow$ Invokation)
       \ii Selbe Operation, selbe Operanden, immer wieder auswerten.
@@ -1096,7 +1096,7 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
     \bi
     \ii<4-> Wie oft wird der \structure{Schleifenkörper} (loop body) ausgewertet? {
       \bi
-      \ii \structure{Logically-Controlled}: Wiederholung bis die Abbruchbedingung fehl schlägt
+      \ii \structure{Logically-Controlled}: Wiederholung bis die Abbruchbedingung fehlschlägt
       \ii \structure{Enumeration-Controlled}: Wiederholung für jedes Element einer Aufzählung
       \ei
     }
@@ -1106,16 +1106,16 @@ Mit diesem Mindset, Funktionsaufrufe als Operationen mit komplexer Semantik aufz
 
 Die letzte Klasse von Operationen, die wir uns anschauen wollen sind *Iterationen*.
 Iterationen, gemeinhin auch als Schleifen bekannt, führen ihren *Schleifenkörper* mehrfach hintereinander aus.
-Definierend für eine Iterations-Operation ist also, dass sie eine Operation als Schleifenkörper hat, die sequenziert mehrfach hintereinander ausgeführt werden kann.
+Definierend für eine Iterationsoperation ist also, dass sie eine Operation als Schleifenkörper hat, die sequenziert mehrfach hintereinander ausgeführt werden kann.
 
 
 In der Regel gibt es keinen impliziten Datenfluss zwischen zwei Schleifeniterationen, sondern es werden die gleichen Operationen mit den gleichen Operanden, einfach immer und immer wieder ausgeführt.
-Ein Vorgehen, dass nur dann Sinn macht, wenn der Schleifenkörper Seiteneffekte hat; nur so können Daten zwischen den Durchläufen und zwischen der Schleife und dem Rest des Programms transportiert werden.
+Ein Vorgehen, das nur dann Sinn macht, wenn der Schleifenkörper Seiteneffekte hat; nur so können Daten zwischen den Durchläufen und zwischen der Schleife und dem Rest des Programms transportiert werden.
 Schleifen machen als in Sprachen ohne Seiteneffekten (Haskell) inhärent keinen Sinn!
 
-Im Beispiel ist die Veränderung der Variable ~a~ der Seitenkanal, der verwendet wird um Informationen zwischen den drei Durchläufen zu transportieren. Wir führen das Incrementieren mehrfach, durch weil es in jedem Durchlauf einen anderen Seiteneffekt gibt (~a := 1~, ~a := 2~, ~a := 3~,...).
+Im Beispiel ist die Veränderung der Variable ~a~ der Seitenkanal, der verwendet wird, um Informationen zwischen den drei Durchläufen zu transportieren. Wir führen das Inkrementieren mehrfach durch, weil es in jedem Durchlauf einen anderen Seiteneffekt gibt (~a := 1~, ~a := 2~, ~a := 3~,...).
 
-Wie oft der Schleifenkörper ausgeführt wird, hängt von der Art der Schleife und vom Zustand der Maschine ab. Also spalten Iterationen, ebenso wie Selektionen, den Kontrollfluss auf. Wie sich dies weiter auswirkt werden wir später sehen. Erstmal schauen wir uns die zwei groben Klassen von Iterations-Operationen an: *logisch-kontrollierte Schleifen* (logically-controlled) und *Aufzählungsschleifen* (enumeration-controlled).
+Wie oft der Schleifenkörper ausgeführt wird, hängt von der Art der Schleife und vom Zustand der Maschine ab. Also spalten Iterationen, ebenso wie Selektionen, den Kontrollfluss auf. Wie sich dies weiter auswirkt, werden wir später sehen. Erst mal schauen wir uns die zwei groben Klassen von Iterations-Operationen an: *logisch kontrollierte Schleifen* (logically-controlled) und *Aufzählungsschleifen* (enumeration-controlled).
 
 #+begin_src latex
 \begin{frame}[fragile]{Logically-Controlled Loops}
@@ -1147,13 +1147,13 @@ Wie oft der Schleifenkörper ausgeführt wird, hängt von der Art der Schleife u
     \medskip
 
     \bi
-    \ii Logisch-kontrollierte Schleifen unterscheiden sich kaum {
+    \ii Logisch kontrollierte Schleifen unterscheiden sich kaum {
       \bi
-      \ii Liefert der Test ein \alert{negatives} Ergebnis, wird die Schleife \alert{abgebrochen}
+      \ii Liefert der Test ein \alert{negatives} Ergebnis, wird die Schleife \alert{abgebrochen}.
       \ii Zeitpunkt des Tests: \textbf{Vor oder nach} jedem Durchlauf?
       \ei
     }\medskip
-    \ii<2-> Komplexere Schleifentypen können in einfachere umgewandelt werden {
+    \ii<2-> Komplexere Schleifentypen können in einfachere umgewandelt werden. {
       \begin{columns}
         \begin{column}{0.4\textwidth}
           \begin{code}[tag=C]
@@ -1193,15 +1193,15 @@ Bei diesen Schleifen wird der Schleifenkörper im Wechsel mit einer Bedingung au
 Schlägt die Bedingung fehl, so wird die Schleife beendet und der Programmablauf wird nach der Schleife fortgesetzt.
 Im Grunde ist dies ähnlich zu einer Selektion[fn::Ich möchte Sie niemals den Begriff ~if~-Schleife verwenden hören!], nur dass der Körper nicht nur einmal oder keinmal ausgeführt wird, sondern null bis unendlich oft.
 
-Die verschiedenen Formen von logisch-kontrollierten Schleifen unterscheiden sich darin, ob die Bedingung vor oder nach dem Körper ausgeführt wird.
+Die verschiedenen Formen von logisch kontrollierten Schleifen unterscheiden sich darin, ob die Bedingung vor oder nach dem Körper ausgeführt wird.
 Dies hat zur Folge, dass die ~do {} while()~-Schleife in C ihren Körper immer mindestens einmal ausführt, während die ~while() {}~-Schleife ihren Körper auch ganz auslassen kann.
 
 In einigen Sprachen gibt es noch die komplexere Form der ~for(init ; cond ; next) {}~-Schleife.
-Obwohl diese oft dazu verwendet wird um über jedes Element einer Zahlenfolge zu iterieren, ist sie im Kern doch eine logisch-kontrollierte Schleife, da sie abgebrochen wird sobald der Test fehl schlägt.
+Obwohl diese oft dazu verwendet wird, um über jedes Element einer Zahlenfolge zu iterieren, ist sie im Kern doch eine logisch kontrollierte Schleife, da sie abgebrochen wird, sobald der Test fehlschlägt.
 Dies wird klar, wenn wir die ~for(;;)~-Schleife in eine semantisch äquivalente While-Schleife übersetzen.
-So sehen wir, dass die Initialisierung (~init~) und die Schrittoperation (~next~) nur synaktischer Zucker sind die eine kompaktere Schreibweise erlauben.
+So sehen wir, dass die Initialisierung (~init~) und die Schrittoperation (~next~) nur syntaktischer Zucker sind, die eine kompaktere Schreibweise erlauben.
 
-Zusätzlich gibt es auch noch die Möglichkeit Schleifenkörper auf halbem Wege abzubrechen. Die ~break~- und ~continue~-Operationen erlauben es uns den Test in die Mitte der Schleifenausführung zu packen:
+Zusätzlich gibt es auch noch die Möglichkeit Schleifenkörper auf halbem Wege abzubrechen. Die ~break~- und ~continue~-Operationen erlauben es uns, den Test in die Mitte der Schleifenausführung zu packen:
 
 #+begin_src python
   a = 0
@@ -1215,7 +1215,7 @@ Zusätzlich gibt es auch noch die Möglichkeit Schleifenkörper auf halbem Wege 
       a *= 2
 #+end_src
 
-Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~break~ die ganze Schleife. Im Grunde sind beide Operationen spezialisierte ~goto~-Operationen,  die es uns erlauben die Schleifenausführung zu manipulieren und dabei sehr diszipliniert vor zu gehen.
+Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~break~ die ganze Schleife. Im Grunde sind beide Operationen spezialisierte ~goto~-Operationen, die es uns erlauben, die Schleifenausführung zu manipulieren und dabei sehr diszipliniert vorzugehen.
 
 #+begin_src latex
   
@@ -1260,7 +1260,7 @@ Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~bre
 
     \medskip
     \bi
-    \ii \structure{Aufzählungsschleifen} iterieren über eine Aufzählung {
+    \ii \structure{Aufzählungsschleifen} iterieren über eine Aufzählung. {
       \bi
       \ii Aufzählung liefert eine \structure{Sequenz von Objekten}
       \ii Für jedes Sequenz-Element wird der Schleifenkörper einmal ausgeführt
@@ -1276,7 +1276,7 @@ Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~bre
     \ii Bei der Aufzählung muss man sich für eine Ordnung entscheiden{
       \bi
       \ii Vorgegeben bei Sequenzen/Listen und Arrays
-      \ii Belibig bei ungeordneten Mengen (häufig: internen Datenstruktur)
+      \ii Beliebig bei ungeordneten Mengen (häufig: internen Datenstruktur)
       \ii Pre-, Post-, oder In-Order bei Bäumen
       \ei
     }
@@ -1286,9 +1286,9 @@ Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~bre
 
   \begin{frame}[fragile]{Iteratoren und Generatoren}
     \bi
-    \ii Aufzählungen können als eigenständige Objekte existieren{
+    \ii Aufzählungen können als eigenständige Objekte existieren.{
       \bi
-      \ii \structure{Iterator}: Ein Objekt auf dem man \texttt{next(obj)} ausführen kann
+      \ii \structure{Iterator}: Ein Objekt, auf dem man \texttt{next(obj)} ausführen kann.
       \ii \structure{Generator}: Eine \structure{pausierte Funktionsinstanz} (Continuation)
       \ei
     }
@@ -1327,26 +1327,26 @@ Die semantisch interessantere Variante von Schleifen sind die Aufzählungsschlei
 Diese operieren auf einer "Aufzählung von Werten", die eine Sequenz von Objekten erzeugt.
 Für jedes Objekt in der Aufzählung wird der Schleifenkörper einmal ausgeführt, wobei dieses Objekt über eine lokale Variable dem Schleifenkörper zugänglich gemacht wird.
 
-Diese Art von Schleifen ist deswegen semantisch reicher, weil sie ein Verständnis von Aufzählungen haben. Klar kann ich all das was eine Aufzählungsschleife kann auch mit einer logisch-kontrollierten Schleife erreichen. Aber ebenso kann ich alles was eine Invokation kann auch mit einem Sprung erreichen. Dennoch verwenden wir Funktionsaufrufe, weil diese semantisch reicher sind.
+Diese Art von Schleifen ist deswegen semantisch reicher, weil sie ein Verständnis von Aufzählungen haben. Klar kann ich all das, was eine Aufzählungsschleife kann, auch mit einer logisch kontrollierten Schleife erreichen. Aber ebenso kann ich alles, was eine Invokation kann, auch mit einem Sprung erreichen. Dennoch verwenden wir Funktionsaufrufe, weil diese semantisch reicher sind.
 
 Um Aufzählungsschleifen in einer Sprache zu haben, braucht die Sprache ein Verständnis davon bzw. eine Übereinkunft darin, was eigentlich so eine Aufzählung sein kann.
 Generell ist so eine Aufzählung eine *geordnete Sequenz von Objekten*; wir wollen die Elemente der Aufzählung ja schließlich in einer bestimmten Reihenfolge abarbeiten.
 Eine Aufzählung eines Listen-Objekts sind die Listenelemente in der Reihenfolge "von vorne nach hinten". Eine andere Aufzählung wäre die umgekehrte Reihenfolge.
 
-Aber nicht bei jeder Datenstruktur ist so definiert wie bei einer Liste. So ist die Aufzählung einer ungeordneten Menge (Python: ~set()~), erstmal egal. Für die Implementierung wird jedoch häufig eine Reihenfolge von der internen Ablage der Mengen-Elemente abgeleitet[fn::~std::set<T>~ ist intern als Rot-Schwarz-Baum gespeichert. Iterieren wir über die Elemente einer solchen Menge, bekommen wir diese in der Speicherreihenfolge].
+Aber nicht bei jeder Datenstruktur ist das so definiert wie bei einer Liste. So ist die Aufzählung einer ungeordneten Menge (Python: ~set()~), erst mal egal. Für die Implementierung wird jedoch häufig eine Reihenfolge von der internen Ablage der Mengen-Elemente abgeleitet[fn::~std::set<T>~ ist intern als Rot-Schwarz-Baum gespeichert. Iterieren wir über die Elemente einer solchen Menge, bekommen wir diese in der Speicherreihenfolge.].
 
-Ähnlich sieht es bei Bäumen aus, bei denen wir die Elemente des Baums in Prefix-, Infix-, Postfix-Reihenfolge abarbeiten können.
+Ähnlich sieht es bei Bäumen aus, bei denen wir die Elemente des Baums in Präfix-, Infix-, Postfix-Reihenfolge abarbeiten können.
 Bietet ein Baum ein solche Aufzählungsschnittstelle an, könnten wir schreiben: ~for elem in tree.prefix_order():~.
 
 
-Sprachen die Aufzählungsschleifen besitzen, bieten dem Entwickler normalerweise eine Möglichkeiten eigene Arten von Aufzählungen zu definieren. Auf diese Weise könnten wir, zum Beispiel, die oben genannte Prefix-Order Schleife für unsere super-spezial-premium Baumklasse als Aufzählung definieren.
-Dazu wird die Aufzählung als ein *eigenständiges Objekt* instantiiert und von der Schleife abgearbeitet. Es gibt zwei Sorten von Iterationsobjekten, die das gleiche Ziel auf gänzlich unterschiedliche Weisen erreichen.
+Sprachen die Aufzählungsschleifen besitzen, bieten dem Entwickler normalerweise eine Möglichkeit, eigene Arten von Aufzählungen zu definieren. Auf diese Weise könnten wir, zum Beispiel, die oben genannte Präfix-Order Schleife für unsere super-spezial-premium Baumklasse als Aufzählung definieren.
+Dazu wird die Aufzählung als ein *eigenständiges Objekt* instanziiert und von der Schleife abgearbeitet. Es gibt zwei Sorten von Iterationsobjekten, die das gleiche Ziel auf gänzlich unterschiedliche Weisen erreichen.
 
-Ein *Iterator* ist ein Objekt, dass eine eine ~next()~-Methode anbietet, die mit jedem Aufruf das nächste Element der Aufzählung erzeugt.
-Das Iterator-Objekt speichert in seinem internen Zustand an welcher Stelle der zu Grunde liegenden Datenstruktur wir gerade sind um das nächste Element zu errechnen.
+Ein *Iterator* ist ein Objekt, das eine ~next()~-Methode anbietet, die mit jedem Aufruf das nächste Element der Aufzählung erzeugt.
+Das Iterator-Objekt speichert in seinem internen Zustand, an welcher Stelle der zu Grunde liegenden Datenstruktur wir gerade sind, um das nächste Element zu errechnen.
 Die Aufzählungsschleife erzeugt also zum Beginn der Iteration ein Iterator-Objekt und ruft dann immer wieder ~next()~ auf bis die Aufzählung zu Ende ist.
 
-Im Beispiel sehen wir wie einen Iterator in Python, wo eine Aufzählungsschleife mittels ~for variable in enumeratable~ notiert wird. Für das Beispiel habe ich die Klasse ~FancyList~ erstellt, die von Liste erbt und nur dafür da ist unser eigenes Iterator-Objekt einzuschleusen. Wenn wir über eine solche ~FancyList~ iterieren wird die ~__iter__()~-Methode Aufgerufen, die ein neues ~PairIterator~-Objekt erzeugt, dem die Liste übergeben wird. Der Iterator kopiert sich zunächst die Liste weg, um bei jedem Aufruf von ~__next__()~ die ersten beiden Elemente zurück zu geben und aus seinem Zustand zu löschen. Führen wir den Code auf den Folien aus, so erhalten wir:
+Im Beispiel sehen wir einen Iterator in Python, wo eine Aufzählungsschleife mittels ~for variable in enumeratable~ notiert wird. Für das Beispiel habe ich die Klasse ~FancyList~ erstellt, die von Liste erbt und nur dafür da ist, unser eigenes Iterator-Objekt einzuschleusen. Wenn wir über eine solche ~FancyList~ iterieren, wird die ~__iter__()~-Methode aufgerufen, die ein neues ~PairIterator~-Objekt erzeugt, dem die Liste übergeben wird. Der Iterator kopiert sich zunächst die Liste weg, um bei jedem Aufruf von ~__next__()~ die ersten beiden Elemente zurückzugeben und aus seinem Zustand zu löschen. Führen wir den Code auf den Folien aus, so erhalten wir:
 
 #+begin_example
 [1, 2]
@@ -1354,16 +1354,16 @@ Im Beispiel sehen wir wie einen Iterator in Python, wo eine Aufzählungsschleife
 #+end_example
 
 Die andere Variante eine Aufzählung zu definieren sind *Generatoren*, die auf den ersten Blick einem Iterator sehr ähnlich sind. Allerdings funktionieren Generatoren technisch sehr anders.
-Ein Generator ist eine Funktionsinstanz die auf halbem Wege seiner Ausführung pausiert wurde und widerholt fortgesetzt werden kann.
-Für Aufzählungsschleifen wird der Generator immer wieder ein Stückchen weiter laufen lassen um ein neues Element der Aufzählung zu generieren.
+Ein Generator ist eine Funktionsinstanz, die auf halbem Wege seiner Ausführung pausiert wurde und wiederholt fortgesetzt werden kann.
+Für Aufzählungsschleifen wird der Generator immer wieder ein Stückchen weiter laufengelassen, um ein neues Element der Aufzählung zu generieren.
 
 Im Beispiel auf den Folien sehen wir einen Generator, der eine Liste ebenso paarweise abgeht, wie das der ~PairIterator~ macht.
 Das besondere am Generator ist das ~yield~-Statement.
 Erreicht der Kontrollfluss eines Generators dieses Statement, so wird der Operand von ~yield~ zurückgegeben und die Funktionsinstanz(!) an dieser Stelle pausiert. Sie können sich ~yield~ wie ein ~return~ vorstellen, nur dass der Kontrollfluss in der Zeile darunter fortgesetzt werden kann.
-Den Zustand, den der Generator braucht um zu wissen an welcher Stelle in der Aufzählung wir gerade sind, speichert er sich in seinen lokalen Variablen[fn::Ein Generator ist eine Funktionsinstanz, keine Funktion! Führen sie sich das vor Augen.].
+Den Zustand, den der Generator braucht, um zu wissen, an welcher Stelle in der Aufzählung wir gerade sind, speichert er sich in seinen lokalen Variablen[fn::Ein Generator ist eine Funktionsinstanz, keine Funktion! Führen Sie sich das vor Augen.].
 
-Um Generatoren noch besser zu verstehen, können sie zurück zum Kapitel über Function-Call Frames gehen{{{see(04-call-frames, Function-Call Frames)}}} und sich anschauen, wie Closures funktionieren. 
-Stellen Sie sich dabei vor, dass in der Closure nicht nur der ~body~, sondern auch noch ein Programmzähler gespeichert wird an dem die Closure fortgesetzt wird. 
+Um Generatoren noch besser zu verstehen, können Sie zurück zum Kapitel über Function-Call Frames gehen{{{see(04-call-frames, Function-Call Frames)}}} und sich anschauen, wie Closures funktionieren. 
+Stellen Sie sich dabei vor, dass in der Closure nicht nur der ~body~, sondern auch noch ein Programmzähler gespeichert wird, an dem die Closure fortgesetzt wird. 
 
 * Vom Kontrollfluss zum Kontrollflussgraphen
 :PROPERTIES:
@@ -1380,34 +1380,34 @@ Stellen Sie sich dabei vor, dass in der Closure nicht nur der ~body~, sondern au
       \btAnimation[width=0.8\textwidth]{center,padding=2ex,1:<1>,range=1-6:<2->}{fig/07-cfg}
     }
 
-   \textbf{\advantage{Intuition}}: Im Kontrollflussgraphen sind alle potentiellen Kontrollflüsse
+   \textbf{\advantage{Intuition}}: Im Kontrollflussgraphen sind alle potentiellen Kontrollflüsse.
 
 
   \end{frame}
 #+end_src
 
-Wir lösen uns nun von konkreten Sprachkonstrukten mit denen wir den *potentiellen* Kontrollfluss formen können und schauen uns an, wie die Idee vom Kontrollfluss als wichtigster Eigenschaft eines Programms Einzug in den Übersetzer gefunden hat.
-Dazu werden wir das Konzept des *Kontrollflussgraphen* (control-flow graph/CFG) kennen lernen.
+Wir lösen uns nun von konkreten Sprachkonstrukten, mit denen wir den *potentiellen* Kontrollfluss formen können und schauen uns an, wie die Idee vom Kontrollfluss als wichtigster Eigenschaft eines Programms Einzug in den Übersetzer gefunden hat.
+Dazu werden wir das Konzept des *Kontrollflussgraphen* (control-flow graph/CFG) kennenlernen.
 Für Sie ist dieses Konzept deswegen besonders wichtig, weil die gesamte zweite Hälfte des Übersetzers nicht mehr auf dem AST arbeitet, sondern auf dem CFG.
 Also los, lassen Sie uns gemeinsam das Konzept des Kontrollflussgraphen entwickeln.
 
 
-In einer Nussschale, ist der Kontrollflussgraph die *Überlagerung aller möglichen Kontrollflüsse* durch ein Programm[fn::Ich rede an dieser Stelle ganz absichtlich von "Programm" und nicht von "Funktion", da ich mich hier noch nicht festlegen möchte auf welcher Ebene wir den Kontrollflussgraphen entwickeln. Stellen Sie sich für den Moment einfach ein Stück Code vor, das völlig losgelößt von Funktionen, Klassen oder Modulen existiert.]. In den Folien sehen Sie wie wir einen solchen CFG inkrementell entwickeln, indem wir Kontrollflüsse (Sequenzen von Operationen) beobachten und in einem CFG kombinieren.
+In einer Nussschale ist der Kontrollflussgraph die *Überlagerung aller möglichen Kontrollflüsse* durch ein Programm[fn::Ich rede an dieser Stelle ganz absichtlich von "Programm" und nicht von "Funktion", da ich mich hier noch nicht festlegen möchte, auf welcher Ebene wir den Kontrollflussgraphen entwickeln. Stellen Sie sich für den Moment einfach ein Stück Code vor, das völlig losgelöst von Funktionen, Klassen oder Modulen existiert.]. In den Folien sehen Sie, wie wir einen solchen CFG inkrementell entwickeln, indem wir Kontrollflüsse (Sequenzen von Operationen) beobachten und in einem CFG kombinieren.
 
 Im ersten Kontrollfluss, den wir beobachten, sehen wir vier Operationen in einer gewissen Sequenz.
 Wir erstellen für jede Operation einen Knoten in unserem Kontrollflussgraphen.
 Immer dann, wenn zwei Operationen direkt hintereinander ausgeführt werden, ziehen wir eine (Kontrollfluss-)Kante zwischen den entsprechenden Knoten (z.B Alpha->Beta).
 
-Beim zweiten Kontrollfluss kennen wir schon beinahe alle Operationen und wir müssen nur noch einen Gamma-Knoten, nebst entsprechender Kanten hinzufügen. An dieser Stelle sehen wir schon, dass Beta zwei ausgehende Kanten hat. Diese ausgehenden Kanten haben die Semantik: "Nach Beta kann entweder Gamma oder Delta ausgeführt werden".
+Beim zweiten Kontrollfluss kennen wir schon beinahe alle Operationen und wir müssen nur noch einen Gamma-Knoten nebst entsprechender Kanten hinzufügen. An dieser Stelle sehen wir schon, dass Beta zwei ausgehende Kanten hat. Diese ausgehenden Kanten haben die Semantik: "Nach Beta kann entweder Gamma oder Delta ausgeführt werden".
 
-Mit dem dritten Kontrollfluss lernen wir, weil Delta mehrfach hintereinander vorkommt und wir eine Kante zwischen Delta und Delta (direkt benachbarte Operationen), dass Delta in einer Schleife ausgeführt werden kann. Allerdings haben wir im Kontrolflussgraph keine Informationen darüber wie oft oder aus welchen Gründen Delta mehrfach ausgeführt wird. Man sagt, dass der Kontrollflussgraph Daten-insensitiv ist.
+Mit dem dritten Kontrollfluss lernen wir, weil Delta mehrfach hintereinander vorkommt und wir eine Kante zwischen Delta und Delta (direkt benachbarte Operationen) ziehen, dass Delta in einer Schleife ausgeführt werden kann. Allerdings haben wir im Kontrollflussgraph keine Informationen darüber, wie oft oder aus welchen Gründen Delta mehrfach ausgeführt wird. Man sagt, dass der Kontrollflussgraph Daten-insensitiv ist.
 
-Der vierte Kontrolfluss bringt keine Neuerungen, außer dass wir noch eine weitere Operation beobachten konnten.
+Der vierte Kontrollfluss bringt keine Neuerungen, außer dass wir noch eine weitere Operation beobachten konnten.
 
 Im fertigen CFG sehen wir, dass Alpha die einzige Operation ist, die nur eine einzige ausgehende Kante hat; alle anderen Operationen haben mehrere Nachfolger.
 Daraus, dass es nur einen Nachfolger gibt, können wir schließen, dass Alpha und Beta immer direkt hintereinander ausgeführt werden.
 
-Aus diesem Grund fasse ich die Alpha und Beta Operationen im letzten Animationsschritt zu einem Knoten zusammen.
+Aus diesem Grund fasse ich die Alpha- und Beta-Operationen im letzten Animationsschritt zu einem Knoten zusammen.
 Außerdem habe ich den CFG etwas umgestellt und anders formatiert und eine Eingangs- und eine Ausgangskante hinzugefügt.
 Aus diesem hübscher formatierten CFG können wir die Programmstruktur sogar einigermaßen erahnen:
 Wir haben hier ein Stück Code vor uns, bei dem zuerst eine Selektion (Beta) ausgeführt wird, die eine zweite Selektion (Gamma) enthält.
@@ -1416,7 +1416,7 @@ Im Anschluss gibt es eine Iteration (Delta) an die noch abschließender Code (Rh
 #+begin_src latex
 \begin{frame}[t]{Der Kontrollflussgraph}
     \begin{btBlock}{Definition: \structure{Kontrollflussgraph} (CFG)}
-      Der CFG ist ein gerichteter Graph, der \structure{Basisblöcke} als Knoten; Kanten entsprechen den möglichen Übergängen zwischen den Blocken.
+      Der CFG ist ein gerichteter Graph mit \structure{Basisblöcke} als Knoten; Kanten entsprechen den möglichen Übergängen zwischen den Blöcken.
     \end{btBlock}
     \begin{btBlock}{Definition: \structure{Basisblock} (BB)}
       Ein Basisblock ist eine Sequenz von Operationen.\\
@@ -1448,9 +1448,9 @@ Ein Basisblock ist eine lineare Sequenz von Operationen, die immer in genau dies
 Wird die erste Operation eines Basisblocks angesprungen, so werden alle Operationen der Sequenz abgearbeitet und erst am Ende der Sequenz kann wieder irgendwo hin gesprungen werden.
 Es gibt also keine Sprünge in der Mitte eines Basisblocks.
 Außerdem gibt es keine Sprünge von außen, die in die Mitte eines Basisblocks springen könnte.
-Daher hat auch nur die erste Operation eines Basisblocks ein Label, der den gesamten Block identifizieren kann.
+Daher hat auch nur die erste Operation eines Basisblocks ein Label, das den gesamten Block identifizieren kann.
 
-Schauen wir uns ein Programm an, was wir gleich noch machen werden, so ist es nicht vollständig eindeutig wie groß die Basisblöcke sind.
+Schauen wir uns ein Programm an, was wir gleich noch machen werden, so ist es nicht vollständig eindeutig, wie groß die Basisblöcke sind.
 Enthält ein Programm eine Sequenz aus drei Operationen (~A;B;C;~), so kann jede Operation für sich auch schon ein Basisblock sein (*minimaler Basisblock*).
 Aber auch ~[A;B]~ + ~[C]~, ~[A]~ + ~[B,C]~ oder ~[A;B;C]~ sind valide Basisblöcke.
 Können wir einen Basisblock nicht weiter nach vorne oder hinten ausdehnen, ohne die Definition eines Basisblocks zu verletzen, so reden wir von einem *maximalen Basisblock*.
@@ -1460,7 +1460,7 @@ Beim Kontrollflussgraph ist zu sagen, dass er eine Überabschätzung der später
 Das bedeutet, dass er mehr Pfade durch ein Programm enthalten kann, als tatsächlich auftreten können.
 So ist die Sequenz ~Alpha, Beta, Gamma, Pi, Delta, Delta, Delta, Rho~ im letzten CFG möglich.
 Tatsächlich haben wir einen solchen Kontrollfluss nicht beobachten können (Es gab Pi + Delta-Schleife nie zusammen).
-Eine Kante im Kontrollfluss zeigt also an, dass es vielleicht möglich wäre, dass es einen Übergang hier gibt, aber sie zeigt erstmal nicht an, dass diese auch auftreten muss.
+Eine Kante im Kontrollfluss zeigt also an, dass es vielleicht möglich wäre, dass es einen Übergang hier gibt, aber sie zeigt erst mal nicht an, dass dieser auch auftreten muss.
 Diese konservative Überabschätzung macht den CFG wertvoll für den Übersetzerbau.
 
 
@@ -1485,12 +1485,12 @@ Diese konservative Überabschätzung macht den CFG wertvoll für den Übersetzer
           \ii<3-|handout:3-> BB endet nach Sprüngen
           \ii<4-|handout:4-> BB endet vor Sprungmarken
           \ii<5-|handout:5-> \structure{Maximale Basisblöcke}
-          \ii<6-|handout:6-> Kanten anhand von Sprüngen und beim Durchfallen.
+          \ii<6-|handout:6-> Kanten anhand von Sprüngen und beim Durchfallen
           \ei
         }\medskip
         \ii<7-|handout:7-> Vorteile des CFG vs. AST {
           \bi
-          \ii Flachegeklopfte Hierarchie
+          \ii Flachgeklopfte Hierarchie
           \ii Nähe zum Maschinenmodell
           \ii Optimierung durch Graphalgorithmen
           \ei
@@ -1522,8 +1522,8 @@ Diese konservative Überabschätzung macht den CFG wertvoll für den Übersetzer
   \end{frame}
 #+end_src
 
-Nachdem wir einen CFG aus mehreren Kontrollflüssen rekonstruiert haben, möchte ich ihnen zeigen, dass ein CFG nicht nur eine theoretisches Konstrukt ist, sondern dass wir seinen Fußabdruck im erzeugten Assemblercode wirklich wieder finden können.
-Den in der Code-Erzeugung leitet der Übersetzer einen Kontrollflussgraphen aus dem AST ab, indem er alle Kontrollstrukturen zu (un-)bedingten Sprüngen flach klopft und die Basisblöcke mit Instruktionen füllt.
+Nachdem wir einen CFG aus mehreren Kontrollflüssen rekonstruiert haben, möchte ich Ihnen zeigen, dass ein CFG nicht nur ein theoretisches Konstrukt ist, sondern dass wir seinen Fußabdruck im erzeugten Assemblercode wirklich wiederfinden können.
+Denn in der Codeerzeugung leitet der Übersetzer einen Kontrollflussgraphen aus dem AST ab, indem er alle Kontrollstrukturen zu (un-)bedingten Sprüngen flachklopft und die Basisblöcke mit Instruktionen füllt.
 Aus diesem CFG wird dann anschließend der Assembler abgeleitet.
 
 Auf den Folien sehen wir, wie man den CFG aus einem Stück Assembler wiederherstellen kann. Dazu fügen wir schrittweise Schnittmarken ein (rote Linien): 
@@ -1556,7 +1556,7 @@ Die Wahl eines gerichteten Graphen als Zwischenrepräsentation unseres Programms
 
         \centerline{$\Downarrow$}
 
-        \columntitle{Funktions-lokaler CFG}
+        \columntitle{Funktionslokaler CFG}
 
         \bii
         \ii Nur Sprünge teilen einen BB
@@ -1575,7 +1575,7 @@ Die Wahl eines gerichteten Graphen als Zwischenrepräsentation unseres Programms
         \ii Kante: \texttt{call}$\rightarrow$Aufgerufene Funktion
         \ii Alle Blöcke aus allen Funktionen
         \ii Whole-Program Analysis\\[1ex]
-        \ii[$\Rightarrow$] Der selten-verwandte CFG
+        \ii[$\Rightarrow$] Der selten verwandte CFG
         \eii
       \end{column}
     \end{columns}
@@ -1588,51 +1588,51 @@ Die Wahl eines gerichteten Graphen als Zwischenrepräsentation unseres Programms
   \end{frame}
 #+end_src
 
-Bevor ich Sie für diesen Abschnitt entlasse, möchte ich sie noch auf einen Aspekt von Kontrollflussgraphen hinweisen, der mir persönlich sehr lange unklar war, wie man damit umgeht [fn::Ich musste zuerst eine Dissertation schreiben, bei dem Kontrollflussgraphen ein zentrales Thema waren, bevor ich es wirklich durchdrungen hatte. Ihnen möchte ich diesen konkreten Schmerz ersparen.].
+Bevor ich Sie für diesen Abschnitt entlasse, möchte ich Sie noch auf einen Aspekt von Kontrollflussgraphen hinweisen, bei dem mir persönlich sehr lange unklar war, wie man damit umgeht [fn::Ich musste zuerst eine Dissertation schreiben, bei der Kontrollflussgraphen ein zentrales Thema waren, bevor ich es wirklich durchdrungen hatte. Ihnen möchte ich diesen konkreten Schmerz ersparen.].
 Die Frage:
-*Was ist eigentlich mit Funktionsaufrufen?* Beenden ~call~-Instruktionen den aktuellen Basisblock (so wie das ein ~goto~ eben tut) oder beendet er ihn nicht.
+*Was ist eigentlich mit Funktionsaufrufen?* Beenden ~call~-Instruktionen den aktuellen Basisblock (so wie das ein ~goto~ eben tut) oder beenden sie ihn nicht.
 Brauchen wir nach einem Funktionsaufruf eine Schnittmarke?
 
-Die Antwort ist eine Salomonische: Es zwei Arten von Kontrollflussgraphen, je nachdem welche Entscheidung wir in dieser Frage treffen.
+Die Antwort ist eine Salomonische: Es gibt zwei Arten von Kontrollflussgraphen, je nachdem welche Entscheidung wir in dieser Frage treffen.
 Beide Arten von Kontrollflussgraphen sind nützlich, haben jedoch eine unterschiedlichen Granularität und unterschiedliche Anwendungsbereiche.
 
-Wenn wir Funktionsaufrufe nicht als Sprünge werten, sondern sagen, dass eine Invokation ein Komplexbefehl ist, dann kommen wir zum *Funktions-lokalen CFG*.
+Wenn wir Funktionsaufrufe nicht als Sprünge werten, sondern sagen, dass eine Invokation ein Komplexbefehl ist, dann kommen wir zum *funktionslokalen CFG*.
 Dieser CFG enthält nur den Code einer einzelnen Funktion und er deckt nur diejenigen Kontrollflüsse ab, die im Kontext dieser Funktion stattfinden.
-Daher ist dieser CFG dafür geeignet den Code einer einzelnen Funktion zu erzeugen und zu optimieren. Daher ist der Funktions-lokale CFG auch der normale CFG und Sie müssen sich eigentlich nur diesen merken.
+Daher ist dieser CFG dafür geeignet den Code einer einzelnen Funktion zu erzeugen und zu optimieren. Deswegen ist der funktionslokale CFG auch der normale CFG.
 
-Wenn wir die Entscheidung treffen, dass eine Invokation ein Sprung ist, erhalten wir den *Interprozeduralen CFG* (ICFG).
+Wenn wir die Entscheidung treffen, dass eine Invokation ein Sprung ist, erhalten wir den *interprozeduralen CFG* (ICFG).
 Hier verbinden wir die ~call~-Instruktion mit dem Eingangsblock der aufgerufenen Funktion und die ~ret~-Instruktion mit der Rücksprungadresse.
 Dadurch enthalten die Basisblöcke des ICFG den Code des gesamten Programms und aller aufgerufenen Funktionen.
 Der ICFG deckt den Instruktionsstrom, wie er auf der realen CPU ablaufen wird, auch viel genauer ab.
 Denn tatsächlich wird nach jeder ~call bar~ Instruktion nicht ~inc EAX~ ausgeführt, sondern ~mul EAX, 2~. Der ICFG deckt alle Kontrollflüsse im Kontext des gesamten Programms ab.
 
 Der ICFG wird allerdings nur selten verwendet.
-Aufgrund seiner Größe, eignet er sich hauptsächlich für intensive statische Analysen über das gesamte Programm.
-Für den normalen Übersetzungsprozess wird *außschließlich* der Funktions-lokale CFG benötigt.
+Aufgrund seiner Größe eignet er sich hauptsächlich für intensive statische Analysen über das gesamte Programm.
+Für den normalen Übersetzungsprozess wird *ausschließlich* der funktionslokale CFG benötigt.
 
 * Zusammenfassung
 #+begin_src latex
 
   \begin{frame}{Zusammenfassung: Operationen}
     \bi
-    \ii \structure{Operationen} lesen Objekte, verarbeiten Daten und liefern Ergebnisse {
+    \ii \structure{Operationen} lesen Objekte, verarbeiten Daten und liefern Ergebnisse. {
       \bi
-      \ii \structure{Abhängigkeiten} zu anderen Operationen müssen zuerst ausgewertet werden
-      \ii \structure{Seiteneffekte}: Operation verändert ein Objekt oder eine Variable
+      \ii \structure{Abhängigkeiten} zu anderen Operationen müssen zuerst ausgewertet werden.
+      \ii \structure{Seiteneffekte}: Operation verändert ein Objekt oder eine Variable.
       \ii \structure{Auswertungsreihenfolge} bildet Operationen auf lineare Operationssequenz ab
       \ei
     }\medskip
-    \ii Sprachkonstrukte formen die möglichen \structure{Kontrolflüsse}{
+    \ii Sprachkonstrukte formen die möglichen \structure{Kontrollflüsse}{
       \bi
-      \ii \structure{Sequenzierung} \btSetTab Operationen werden direkt hintereinander ausgeführt
+      \ii \structure{Sequenzierung} \btSetTab Operationen werden direkt hintereinander ausgeführt.
       \ii \structure{Invokation} \btUseTab Einschub einer Funktionsausführung, Komplexbefehl
       \ii \structure{Selektion} \btUseTab Operationen durch dynamische Entscheidungen auslassen
       \ii \structure{Iteration} \btUseTab Operationen wegen ihrer Seiteneffekte mehrfach ausführen
       \ei
     }\medskip
-    \ii \structure{Kontrollflussgraphen} überdecken die möglichen Kontrolflüsse {
+    \ii \structure{Kontrollflussgraphen} überdecken die möglichen Kontrollflüsse. {
       \bi
-      \ii \structure{Basisblöcke} sind ununterbrochen Operationssequenzen
+      \ii \structure{Basisblöcke} sind ununterbrochene Operationssequenzen.
       \ii \textbf{Ausblick}: Ergebnis der Codeerzeugung und Grundlage für die Optimierung
       \ei
     }
