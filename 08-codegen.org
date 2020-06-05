@@ -47,8 +47,8 @@
     \bi
     \ii \structure{Zwischencodeerzeugung}: Linearisierung und Übersetzung des ASTs{%
       \bi
-      \ii \structure{Zielarchitektur}: Virtuelle Maschinen mit wohldefiniertem Funktionsumfang
-      \ii Konkret genug für  Assemblererzeugung, Abstrakt genug für Optimierungen
+      \ii \structure{Zielarchitektur}: virtuelle Maschinen mit wohldefiniertem Funktionsumfang
+      \ii Konkret genug für  Assemblererzeugung, abstrakt genug für Optimierungen
       \ii Wiederverwendung des Middle- und Backend für \advantage{mehrere Frontend-Sprachen}
       \ei
     }
@@ -60,13 +60,13 @@
     \footnote{Zahlen für Clang (C/C++ Frontend, 700k) und LLVM 9.0 (18 Backends, 1.4M)}
 
     \bi
-    \ii Die Konstruktion eines Übersetzers ist aufwändig und schwierig!{
+    \ii Die Konstruktion eines Übersetzers ist aufwendig und schwierig!{
       \bi
       \ii Assembler im Parser erzeugen ist (manchmal) möglich \hfill(One-Pass Compiler)
       \ii Wiederverwendung von Komponenten erleichtert das portieren (\textasciitilde 60\,\% Re-Use)
       \ei
     }\medskip
-    \ii<2-> \structure{Zwischenrepresentation} erhält die Programm-Semantik{
+    \ii<2-> \structure{Zwischenrepräsentation} erhält die Programmsemantik{
       \bi
       \ii AST ist bereits eine \structure{Intermediate Representation} (IR-Form)
       \ii Der klassische IR-Code: CFG mit Instruktionen für eine sequentielle Maschine
@@ -77,46 +77,46 @@
   \end{frame}
 #+end_src
 
-Nachdem wir uns in den letzten zwei Vorlesungen wieder mit Elementen von Programmiersprachen beschäftigt haben, wollen wir uns in dieser, und den nächsten beiden, Vorlesungen anschauenen, wie wir Objekte und Operationen auf die reale Maschine abbilden.
-Letztendlich werden wir durch diese Abbildung die verbleibende *Semantische Lücke* zum Maschinencode hin schließen.
-Ausgangspunkt dieser Abbildung ist der abstrakte Syntaxbaum, Endpunkt ist eine Programmdatei welche wir zur Ausführung bringen.
+Nachdem wir uns in den letzten zwei Vorlesungen wieder mit Elementen von Programmiersprachen beschäftigt haben, wollen wir uns in dieser, und den nächsten beiden Vorlesungen, anschauen, wie wir Objekte und Operationen auf die reale Maschine abbilden.
+Letztendlich werden wir durch diese Abbildung die verbleibende *semantische Lücke* zum Maschinencode schließen.
+Ausgangspunkt dieser Abbildung ist der abstrakte Syntaxbaum, Endpunkt ist eine Programmdatei, welche wir zur Ausführung bringen.
 Wir befinden uns in den nächsten drei Vorlesungen wieder im Übersetzer, wo wir "von unten" auf die Sprachsemantik blicken und diese "nach unten" auf die Hardware abbilden.
-Dazu werden wir einige Konzepte und Techniken kennen lernen, die es uns erlauben einen übersichtlichen Übersetzer zu konstruieren, sowie effiziente Programme zu erzeugen.
+Dazu werden wir einige Konzepte und Techniken kennenlernen, die es uns erlauben, einen übersichtlichen Übersetzer zu konstruieren, sowie effiziente Programme zu erzeugen.
 Wollen wir also Beginnen.
 
 
-Der abstrakte Syntaxbaum ist eine hierarchische Darstellung des Programms, welche wir im Parser erzeugt und in der semantischen Analyse auf Validität hin geprüft haben.
-Allerdings kennt keine unserer echten Maschinen hierarchische Befehle, sondern am Ende sind alle real-existierenden CPUs sequentielle Maschinen, die einen Befehl nach dem anderen (entlang des Kontrollflusses) ausführen.
-Wir müssen die hierarchische Struktur des ASTs *linearisieren*, um sie die sequentielle Semantik der Maschinen abzubilden.
+Der abstrakte Syntaxbaum ist eine hierarchische Darstellung des Programms, welche wir im Parser erzeugt und in der semantischen Analyse auf Validität geprüft haben.
+Allerdings kennt keine unserer echten Maschinen hierarchische Befehle, sondern am Ende sind alle real existierenden CPUs sequentielle Maschinen, die einen Befehl nach dem anderen (entlang des Kontrollflusses) ausführen.
+Wir müssen die hierarchische Struktur des ASTs *linearisieren*, um sie in die sequentielle Semantik der Maschinen abzubilden.
 
 Während Übersetzer in der Frühzeit der Informatik aus dem AST direkt Maschinencode erzeugt haben, hat sich gezeigt, dass ein zusätzlicher Zwischenschritt, in Form von *Zwischencode*, fruchtbar ist.
-Er erlaubt es Übersetzer einfacher zu strukturieren, Optimierungen leichter durchzuführen und Komponenten des Übersetzers für verschiedene Programmiersprachen und Zielplattformen wieder zu verwenden.
+Er erlaubt es Übersetzer einfacher zu strukturieren, Optimierungen einfacher durchzuführen und Komponenten des Übersetzers für verschiedene Programmiersprachen und Zielplattformen wiederzuverwenden.
 Dieser Zwischencode, in den wir das Programm übersetzen, ist der Maschinencode einer virtuellen Maschine, die wir einzig und allein zu diesem Zecke definieren.
 
 Den Aspekt der Wiederverwendbarkeit von Übersetzerkomponenten möchte ich an dieser Stelle besonders herausstellen:
 Zwar ist es möglich für jede neue Programmiersprache, die man sich erdenkt, auf der grünen Wiese einen neuen Übersetzer anzufangen, jedoch würde ich es Ihnen nicht raten. 
 Denn, Übersetzer sind komplexe Programme und die Anwender möchten beständig neue Sprach-Features, effizientere Programme und Support für ihren Lieblingsprozessor.
 Ganz selbstverständlich, quasi nebenbei, soll Ihr Übersetzer natürlich auch immer korrekt funktionieren und die versprochene Sprachsemantik eins zu eins einhalten.
-Und wehe, wenn ein Anwender eine Besonderheit in ihrer Implementierung (=Bug) gefunden hat und sich, für sein Mission-Critical Programm, darauf verlässt.
-Kurzum, eigentlich wollen Sie keinen ganzen Übersetzer schreiben, sondern nur an den Teilen arbeiten für die Sie sich begeistern, den ihre Kunden ihnen bezahlen; der Rest darf von der Stange kommen.
+Und wehe, wenn ein Anwender eine Besonderheit in Ihrer Implementierung (=Bug) gefunden hat und sich für sein Mission-Critical Programm darauf verlässt.
+Kurzum, eigentlich wollen Sie keinen ganzen Übersetzer schreiben, sondern nur an den Teilen arbeiten, für die Sie sich begeistern bzw. den Ihre Kunden ihnen bezahlen; der Rest darf von der Stange kommen.
 
-Um nicht für jede Kombination auf Frontend-Sprache und Backend-Platform einen ganzen Übersetzer konstruieren zu müssen, hat der Zwischencode eine zentrale *Scharnierfunktion*.
-Jedes Sprach-Frontend hat seinen eigenen Parser und prüft die Sprachregeln ganz nach der intendierten Facón, generiert aber am Ende Zwischenrepresentation des Programms als Zwischencode.
-Hierbei ist zu betonen, dass die ASTs der einzelnen Frontends auch schon Zwischenrepresentationen sind, die Semantik des Programms einfangen, aber diese sind nicht kompatibel zueinander.
-Erst mit der *Zwischencode-Erzeugung* kommen wir zu einer Zwischenrepresentation (oder "Immediate Representation"), die einer einheitlichen Sprache entspricht.
+Um nicht für jede Kombination von Frontend-Sprache und Backend-Plattform einen ganzen Übersetzer konstruieren zu müssen, hat der Zwischencode eine zentrale *Scharnierfunktion*.
+Jedes Sprach-Frontend hat seinen eigenen Parser und prüft die Sprachregeln ganz nach der intendierten Facón, generiert aber am Ende die Zwischenrepräsentation des Programms als Zwischencode.
+Hierbei ist zu betonen, dass die ASTs der einzelnen Frontends auch schon Zwischenrepräsentationen sind, die die Semantik des Programms einfangen, aber diese sind nicht kompatibel zueinander.
+Erst mit der *Zwischencodeerzeugung* kommen wir zu einer Zwischenrepräsentation (oder "Immediate Representation"), die einer einheitlichen Sprache entspricht.
 
-Auf diesem IR-Code, der Befehle für eine wohldefinierte virtuelle Maschine enthält, können wir Semantik-erhaltende Optimierungen durchführen, bevor wir das Programm an die Plattformabhängigen Backends geben. Dort werden die Befehle der IR-Maschine auf Befehle des jeweiligen Backends abgebildet.
+Auf diesem IR-Code, der Befehle für eine wohldefinierte virtuelle Maschine enthält, können wir Semantik-erhaltende Optimierungen durchführen, bevor wir das Programm an die plattformabhängigen Backends geben. Dort werden die Befehle der IR-Maschine auf Befehle des jeweiligen Backends abgebildet.
 
-Ein Übersetzer, der diesem Prinzip als Kerngedanke mit sich trägt, ist die Kombination aus *Clang und LLVM*.
+Ein Übersetzer, der dieses Prinzip als Kerngedanke mit sich trägt, ist die Kombination aus *Clang und LLVM*.
 Clang ist das Sprachfrontend für C und C++.
-Es generiert LLVM IR-Code generiert und hat insgesamt einen Umfang von ungefähr 700.000 Zeilen C++ Code.
+Es generiert LLVM IR-Code und hat insgesamt einen Umfang von ungefähr 700.000 Zeilen C++-Code.
 Jedoch gibt es noch andere Frontends, die ebenfalls LLVM IR erzeugen:
 Das Frontend für Go hat 91k Codezeilen und für Rust sind es 382k Codezeilen.
 Hätten wir für jede dieser Sprachen die 1.4M Codezeilen neu entwickelt, so würden wir jetzt auf einem Berg von 5.4M Codezeilen sitzen anstatt jetzt 2.6M.
-Natürlich hätten wir, auf dem Weg, im selben Maße mehr Bugs erzeugt und Entwicklerstunden verbraten.
-Zwischencode spart also nicht nur Geld, sondern auch Nerven, und ermöglicht schnelle Fortschritte bei der Entwicklung neuer Programmiersprachen zu machen.
+Natürlich hätten wir auf dem Weg im selben Maße mehr Bugs erzeugt und Entwicklerstunden verbraten.
+Zwischencode spart also nicht nur Geld sondern auch Nerven und ermöglicht schnelle Fortschritte bei der Entwicklung neuer Programmiersprachen.
 
-Um ihnen einen Eindruck über den LLVM  IR-Code zu geben, zeige ich ihnen kurz den IR-Code für einen rekursiven Fibonacci:
+Um Ihnen einen Eindruck von LLVM IR-Code zu geben, zeige ich Ihnen kurz den IR-Code für einen rekursiven Fibonacci:
 
 #+begin_example
 ; Function Attrs: noinline nounwind optnone uwtable
@@ -155,14 +155,14 @@ define dso_local i32 @fib(i32) #0 {
 :END:
 
 Um die Übersetzung vom AST in IR-Code vorzunehmen, müssen wir zunächst die virtuelle Maschine definieren, für die wir die Codeerzeugung durchführen wollen.
-Eine solche IR-Maschine zu definieren ist mehr eine Kunst als eine exakte Wissenschaft.
-Unterschiedliche Maschinenen-Typen und -Ausprägungen eigenen sich für manche Arten der Optimierungen besser als andere (und umgekehrt).
-Auch ist das Abstraktions-Niveau, welches man der IR-Code noch bietet eine Design-Entscheidung, die Einfluss auf die Komplexität des Übersetzers hat.
-Daher bedienen sich manche Übersetzer nicht nur einer IR-Maschine, sondern sie haben mehrerere virtuelle Maschinen, die sukkzessive weniger Abstraktionen bieten.
-So hat der Rust Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch eine [[https://blog.rust-lang.org/2016/04/19/MIR.html][High-Level IR (HIR) und eine Mid-Level IR]].
+Eine solche IR-Maschine zu definieren, ist mehr eine Kunst als eine exakte Wissenschaft.
+Unterschiedliche Maschinentypen und -ausprägungen eigenen sich für manche Arten der Optimierungen besser als andere (und umgekehrt).
+Auch ist das Abstraktionsniveau, welches man dem IR-Code noch bietet, ist eine Design-Entscheidung, die Einfluss auf die Komplexität des Übersetzers hat.
+Daher bedienen sich manche Übersetzer nicht nur einer IR-Maschine, sondern sie haben mehrere virtuelle Maschinen, die sukzessive weniger Abstraktionen bieten.
+So hat der Rust-Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch eine [[https://blog.rust-lang.org/2016/04/19/MIR.html][High-Level IR (HIR) und eine Mid-Level IR]].
 
 #+begin_src latex
-  \dividerframe{Virtuelle Maschinen\\für die\\Zwischencodeereugung}
+  \dividerframe{Virtuelle Maschinen\\für die\\Zwischencodeerzeugung}
 
   \begin{frame}[fragile,t]{Virtuelle Stack- und Register-Maschinen}
     \vspace{-1em}
@@ -233,19 +233,19 @@ So hat der Rust Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch
   \end{frame}
 
   \begin{frame}{Design-Kriterien für Virtuelle Maschinen}
-    \OrangeBox{\textbf{Vorneweg}: Die Spezifikation einer Virtuellen Maschine ist schwierig}
+    \OrangeBox{\textbf{Vorneweg}: Die Spezifikation einer virtuellen Maschine ist schwierig.}
     \medskip
     \bi
     \ii Wahl des Abstraktionsniveaus: Endlicher oder \alert<2->{unendlicher Registersatz?}{%
       \bi
       \ii Abstraktere Semantik $\Rightarrow$ IR-Code ist näher an Programmstruktur
-      \ii Leichtere Codeerzeugung und Optimierung, komplexeres Backend
+      \ii Einfachere Codeerzeugung und Optimierung, komplexeres Backend
       \ei
     }\medskip
     \ii Ausführungsmodell: \alert<2->{Register-Maschine} oder Stack-Maschine?{%
       \bi
       \ii Stack-Maschinen haben besonders kompakte Programmdarstellung
-      \ii Register-Maschinen sind näher an real-existierenden Prozessoren 
+      \ii Register-Maschinen sind näher an real existierenden Prozessoren
       \ei
     }\medskip
     \ii Verbraucher der IR-Form: Interpreter oder \alert<2->{Übersetzer-Backend}?{
@@ -262,30 +262,30 @@ So hat der Rust Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch
 
 #+end_src
 
-Grundlegend gibt es zwei Arten von Maschinene-Typen, die für IR-Maschinenen heran gezogen werden: Stack-Maschinen und Register-Maschinen. Beide Typen von Maschinen sind (natürlich) gleich mächtig, haben jedoch ein grundlegend andere virtuelle Architektur. 
+Grundlegend gibt es zwei Arten von Maschinentypen, die für IR-Maschinen herangezogen werden: Stack-Maschinen und Register-Maschinen. Beide Typen von Maschinen sind (natürlich) gleich mächtig, haben jedoch eine grundlegend unterschiedliche virtuelle Architektur.
 
 Bei der *Stack-Maschine* ist der zentrale Ort der Berechnung ein Operandenstack.
 Jeder Befehl verwendet diesen Operandenstack als impliziten Parameter. So legt ~push~ den angegebenen Wert auf den Stack; ~add~ nimmt die obersten beiden Elemente vom Stack, addiert sie, und legt das Ergebnis auf den Stack. Eine Stack-Maschine ist daher ähnlich zur umgekehrten Polnischen Notation (~3 4 +~), bei der die selbe Auswertungsmethode angewendet wird.
-Durch den Operandenstack ist der Datenfluss, inbesondere langen Operationssequenzen, nicht mehr offensichtlich, da wir im Programmtext keinen Hinweis darauf finden wo ein Operand herkommt. Wir müssten, beim Betrachten solcher IR-Programme, immer den Operandenstack im Kopf mitdenken. Dazu habe ich keine Lust und ich lehne Stack-Maschinen daher ab[fn::Zur Ehrenrettung von Stack-Maschinen ist aber zu sagen, dass sie für den Übersetzerbau eine wundervolle Eigenschaft haben: Reine Stack-Maschinen-Programme sind automatisch in SSA Form.].
+Durch den Operandenstack ist der Datenfluss, insbesondere langer Operationssequenzen, nicht mehr offensichtlich, da wir im Programmtext keinen Hinweis darauf finden, wo ein Operand herkommt. Wir müssten uns beim Betrachten solcher IR-Programme immer den Operandenstack im Kopf mitdenken. Dazu habe ich keine Lust und ich lehne Stack-Maschinen daher ab[fn::Zur Ehrenrettung von Stack-Maschinen ist aber zu sagen, dass sie für den Übersetzerbau eine wundervolle Eigenschaft haben: Reine Stack-Maschinen-Programme sind automatisch in SSA Form.].
 
-Das prominenteste Beispiel für eine Stack-Maschine als Zwischenrepresentation ist die Java Virtual Maschine, deren IR-Code (der Java-Byte-Code) genau nach diesem Muster funktioniert. Die Zwischenrepresentation von .NET verwendet, mit der Common Interpreter Language (CIL), ebenfalls eine Stack-basierte Zwischensprache.
-In beiden Fällen wir der IR-Code allerdings nicht hauptsächlich als Eingabe für ein Übersetzerbackend verwendet, sondern als Eingabeformat für eine interpretierte und Just-in-Time übersetzte Ausführung.
+Das prominenteste Beispiel für eine Stack-Maschine als Zwischenrepräsentation ist die Java Virtual Maschine, deren IR-Code (der Java-Byte-Code) genau nach diesem Muster funktioniert. Die Zwischenrepräsentation von .NET verwendet mit der Common Interpreter Language (CIL) ebenfalls eine Stack-basierte Zwischensprache.
+In beiden Fällen wird der IR-Code allerdings nicht hauptsächlich als Eingabe für ein Übersetzerbackend verwendet, sondern als Eingabeformat für eine interpretierte und Just-in-Time übersetzte Ausführung.
 
 Der andere Typus von IR-Maschinen sind die *Register-Maschinen*.
 Dort sind alle Operanden, sowohl Quell- als auch Zieloperanden, explizit an den Operationen vermerkt und sichtbar.
-Im Unterschied zu den real-existierenden Register-Maschinen nehmen wir allerdings an, dass es nicht nur eine begrenzte Anzahl von Registern gibt, sondern unendlich viele.
-Mit dieser Annahme von unendlich vielen Register verhindern wir, dass wir uns zu früh auf eine konkrete Zielplattform fest legen. Stellen Sie sich vor, wir hätten gesagt, unsere Maschine hat genau 16 Register und am Ende hat die Zielplattform dann 32 oder 8 Register; in beiden Fällen müssten wir das Programm umstrukturieren um eine Abbildung vorzunehmen.
+Im Unterschied zu den real existierenden Register-Maschinen nehmen wir allerdings an, dass es nicht nur eine begrenzte Anzahl von Registern gibt, sondern unendlich viele.
+Mit dieser Annahme von unendlich vielen Register verhindern wir, dass wir uns zu früh auf eine konkrete Zielplattform festlegen. Stellen Sie sich vor, wir hätten gesagt, unsere Maschine hat genau 16 Register und am Ende hat die Zielplattform dann 32 oder 8 Register; in beiden Fällen müssten wir das Programm umstrukturieren, um eine Abbildung vorzunehmen.
 
 Da die Register nur virtuell sind, können wir ihnen auch symbolische Namen geben (~arg0_a~), anstatt Nummern (~r23~) zu verwenden.
-Auf diese Weise wird der IR-Code für uns lesbarer, während es für den Übersetzer (beinahe) keinen Unterschied machen.
-Die virtuellen Register sind also sehr ähnlich zu Variablen, weswegen ich auch, im Folgenden, IR-Register und IR-Variablen als austauschbare Begriffe verwende.
+Auf diese Weise wird der IR-Code für uns lesbarer, während es für den Übersetzer (beinahe) keinen Unterschied macht.
+Die virtuellen Register sind also sehr ähnlich zu Variablen, weswegen ich auch im Folgenden IR-Register und IR-Variablen als austauschbare Begriffe verwende.
 
-Die Codeerzegugung für beide Maschinen-Typen sieht sehr ähnlich aus.
-Führen wir bei der Stack-Maschine einen AST-Unterbäumen aus, so beläßt die Berechung ihr Ergebnis auf dem Stack liegen.
-Bei Register-Maschinen wird das Ergebnis in ein explizit benanntes Register geschrieben und von anderen Befehlen weiter verarbeitet.
+Die Codeerzeugung für beide Maschinentypen sieht sehr ähnlich aus.
+Führen wir bei der Stack-Maschine einen AST-Unterbaum aus, so lässt die Berechnung ihr Ergebnis auf dem Stack liegen.
+Bei Register-Maschinen wird das Ergebnis in ein explizit benanntes Register geschrieben und von anderen Befehlen weiterverarbeitet.
 
 #+begin_src latex
-\begin{frame}{3-Address Code (Quadrupel-Notation) }
+\begin{frame}{3-Adress-Code (Quadrupel-Notation) }
     \bi
     \ii Programm wird als Folge von Quadrupeln dargestellt {
       \bi
@@ -309,7 +309,7 @@ Bei Register-Maschinen wird das Ergebnis in ein explizit benanntes Register gesc
     \ii Nur (un-)bedingte Sprünge, keine Schleifen oder Bedingungen {
       \bi
       \ii Sprachkonstrukte werden mit \texttt{goto}/\texttt{ifgoto} linearisiert
-      \ii 3-Address Code passt perfekt in Basisblock/CFG Struktur
+      \ii 3-Adress-Code passt perfekt in Basisblock/CFG Struktur
       \ei
     }
     \ei
@@ -324,17 +324,17 @@ Bei Register-Maschinen wird das Ergebnis in ein explizit benanntes Register gesc
 
 Für unsere Register-Maschine wählen wir eine *3-Adress-Maschine*, deren Programme wir in *Quadrupel-Notation* aufschreiben.
 Dies bedeutet, dass jeder Befehl einen Operations-Code und maximal drei Operanden adressieren kann.
-Dadurch, dass wir 3 Operanden benennen können, kann eine solche Maschine eine zwei-stellige Operation (wie ~Add~) auszuführen ohne einen ihrerer Quelloperanden als impliziten Zieloperanden zu verwenden.
+Dadurch, dass wir 3 Operanden benennen können, kann eine solche Maschine eine zwei-stellige Operation (wie ~Add~) ausführen ohne einen ihrer Quelloperanden als impliziten Zieloperanden zu verwenden.
 
-Die Operanden können dabei virtuelle Register (== Variablen), literale Konstanten oder Sprungmarken (Labels) sein. Hervorzuheben ist, dass alle Werte eine feste Maschinenwort-Breite haben; ein weiterer Schritt bei der Annäherung an die Funktionalität einer echten Maschine.
+Die Operanden können dabei virtuelle Register (== Variablen), literale Konstanten oder Sprungmarken (Labels) sein. Hervorzuheben ist, dass alle Werte eine feste Maschinenwortbreite haben; ein weiterer Schritt bei der Annäherung an die Funktionalität einer echten Maschine.
 
-Weiterhin beherrscht eine solche 3-Adress Maschine keine Schleifen oder Bedingungen, sondern ausschließlich *bedingte und unbedingte Sprünge*. Diese Beschränkung auf 2 Kontrollfluss-Operationen passt hervorragend auf die Struktur eines Kontrollflussgraph.
-Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC Prozessoren funktionieren, die für einfache Operationen ebenfalls 3 Register als Operanden haben.
+Weiterhin beherrscht eine solche 3-Adress-Maschine keine Schleifen oder Bedingungen, sondern ausschließlich *bedingte und unbedingte Sprünge*. Diese Beschränkung auf 2 Kontrollflussoperationen passt hervorragend auf die Struktur eines Kontrollflussgraphen.
+Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC-Prozessoren funktionieren, die für einfache Operationen ebenfalls 3 Register als Operanden haben.
 
 #+begin_src latex
   \begin{frame}{Für PSÜ: Ein beispielhafter Zwischencode}
     \begin{btBlock}{}
-      Für Vorlesung und Übung entwickeln wir einen Zwischencode auf Basis einer Registermaschine mit unendlich vielen Registern. Dazu schauen wir uns Semantik und Notation an.
+      Für Vorlesung und Übung entwickeln wir einen Zwischencode auf Basis einer Register-Maschine mit unendlich vielen Registern. Dazu schauen wir uns Semantik und Notation an.
     \end{btBlock}
 
     \begin{columns}[t]
@@ -351,7 +351,7 @@ Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC Prozessoren
       \end{column}\hfill
       \begin{column}{0.49\textwidth}\small
         \bii
-        \ii \textbf{Variablen} sind funktions lokal
+        \ii \textbf{Variablen} sind funktionslokal
         \ii Beliebig viele temporäre Variablen
         \ii Alle Werte sind 32-Bit breit 
         \ii Keine Typisierung
@@ -365,7 +365,7 @@ Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC Prozessoren
     \ii Einfache \structure{Operationen} (6 Befehle) {
       \bi
       \ii \ircmd{Assign}: Einer Variable einen Wert zuweisen \hfill\texttt{V := \ircmd{Assign} CV}
-      \ii 4 arithmetrische Operationen: \ircmd{Add}, \ircmd{Sub}, \ircmd{Mul}, \ircmd{Div}  \hfill\texttt{V := \ircmd{Add} CV, CV}
+      \ii 4 arithmetische Operationen: \ircmd{Add}, \ircmd{Sub}, \ircmd{Mul}, \ircmd{Div}  \hfill\texttt{V := \ircmd{Add} CV, CV}
       \ii 1 logische Operation: \ircmd{LessEqual} \hfill\texttt{V := \ircmd{LessEqual} CV, CV}\\
           Falsch: \enquote{0}, Wahr: \enquote{!= 0}
       \ei
@@ -378,18 +378,18 @@ Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC Prozessoren
     \ii \structure{Speichermanipulationen} (3 Befehle) {
       \bi
       \ii \ircmd{Ref}: \hspace{1.2em}\btSetTab Erzeugen einer Referenz          \hfill\texttt{V := \ircmd{Ref} V}
-      \ii \ircmd{Load}: \btUseTab Lesen des addressierten Speicherwortes        \hfill\texttt{V := \ircmd{Load} *V}
+      \ii \ircmd{Load}: \btUseTab Lesen des adressierten Speicherwortes        \hfill\texttt{V := \ircmd{Load} *V}
       \ii \ircmd{Store}: \btUseTab Schreiben eines Wertes an ein Speicherstelle \hfill\texttt{*V := Store CV}
       \ei
     }\medskip
     \ii \structure{Speichermanagement} (3 Befehle) {
       \bi
       \ii \ircmd{StackAlloc}: \btSetTab Speicherallokation im Call-Frame\hfill\texttt{V := StackAlloc C}
-      \ii \ircmd{HeapAlloc}:  \btUseTab Speicherallocation dem Heap\hfill\texttt{V := HeapAlloc C}
+      \ii \ircmd{HeapAlloc}:  \btUseTab Speicherallokation dem Heap\hfill\texttt{V := HeapAlloc C}
       \ii \ircmd{HeapFree}:   \btUseTab Freigabe eines Heap-Objekts\hfill\texttt{HeapFree V}
       \ei
     }\medskip
-    \ii \structure{Funktions-lokale Kontrollflüsse} (2 Befehle) {
+    \ii \structure{Funktionslokale Kontrollflüsse} (2 Befehle) {
       \bi
       \ii \ircmd{Goto}:   Sprung an das gegebene Label \hfill\texttt{\ircmd{Goto} L}
       \ii \ircmd{IfGoto}: Bedingter Sprung   \hfill\texttt{\ircmd{IfGoto CV, L, L}}
@@ -405,16 +405,16 @@ Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC Prozessoren
   \end{frame}
 #+end_src
 
-Um uns die Codeerzeugung im Detail anschauen zu können, wollen wir nun eine *beispielhafte* 3-Address-Maschine mit zugehörigem Zwischencode definieren.
+Um uns die Codeerzeugung im Detail anschauen zu können, wollen wir nun eine *beispielhafte* 3-Adress-Maschine mit zugehörigem Zwischencode definieren.
 Dabei der Funktionsumfang dieser Maschine nicht vollumfänglich, sodass jede beliebige Programmiersprache darauf abgebildet werden kann.
-Insbesondere ist der Umfang der arithmetrischen, logischen und  bit-weisen Operationen sehr eingeschränkt.
+Insbesondere ist der Umfang der arithmetischen, logischen und bit-weisen Operationen sehr eingeschränkt.
 
-Zweck dieser IR-Code-Beschreibung ist es eine Grundlage für die darauf folgende IR-Code-Erzeugung zu legen.
-Weiterhin werden wir genau diesen in der Übung verwenden um ein vollständiges Backend, inklusive einem einfachen Optimierer, zu konstruieren.
+Zweck dieser IR-Code-Beschreibung ist es, eine Grundlage für die darauf folgende IR-Code-Erzeugung zu legen.
+Weiterhin werden wir genau diesen in der Übung verwenden, um ein vollständiges Backend, inklusive einem einfachen Optimierer, zu konstruieren.
 
-Grundlegend ist, wie gesagt, unsere IR-Code-Maschine eine Register-Maschine mit unendlich vielen Registern, die wir im folgenden auch Variablen nennen.
+Grundlegend ist, wie gesagt, unsere IR-Code-Maschine, eine Register-Maschine mit unendlich vielen Registern, die wir im Folgenden auch Variablen nennen.
 Alle Variablen, sowie angegebene Konstanten, sind 32 Bit breit und die Maschine kennt keinerlei Art von Typisierung.
-Es wird Sie also niemand davon abhalten das Ergebnis von ~100 * 200~ im Speicher zu dereferenzieren oder dort eine ~23~ hin zu schreiben.
+Es wird Sie also niemand davon abhalten, das Ergebnis von ~100 * 200~ im Speicher zu dereferenzieren oder dort eine ~23~ hinzuschreiben.
 Auf Ebene des IR-Codes gibt es kein Safety-Netz und wir können uns beliebig in den Fuß schießen.
 Genau wie auf einer echten Maschine.
 
@@ -425,20 +425,20 @@ Auf den Folien sehen Sie bei jeder Operation von welchem Typ die Operanden sein 
 So darf bei der Zuweisungs-Operation (~Assign~) auf der rechten Seite entweder eine Konstante *oder* eine Variable, auf der linken Seite aber nur eine Variable, stehen.
 Der Zuweisungs-Operator verändert ausschließlich die explizit angegebene Variable und es wird keine weitere Adressberechnung durchgeführt.
 
-Bei den Variablen ist ebenfalls wichtig, dass unsere Maschine nur funktion-lokale Variablen kennt.
+Bei den Variablen ist ebenfalls wichtig, dass unsere Maschine nur funktionslokale Variablen kennt.
 Aus dem vorangegangenen Satz lernen wir 2 Dinge:
 
-1. Es gibt keine globalen Variablen![fn::Diese Einschränkung macht unseren IR-Code ungeeignet als Zielplattform für C zu dienen. Jedoch macht es Optimierung und Backend deutlich einfacher, da nicht an jeder Stelle unterschieden werden muss, ob wir gerade eine lokale oder eine globale Variable vor uns haben.]
+1. Es gibt keine globalen Variablen![fn::Diese Einschränkung macht unseren IR-Code ungeeignet, als Zielplattform für C zu dienen. Jedoch macht es Optimierung und Backend deutlich einfacher, da nicht an jeder Stelle unterschieden werden muss, ob wir gerade eine lokale oder eine globale Variable vor uns haben.]
 2. Es gibt Funktionen!
 
 
-Insbesondere der zweite Punkt ist bemerkenswert, da Funktionen ja eigentlich ein starke Abstraktion ist, die normale Prozessoren so nicht kennen.
+Insbesondere der zweite Punkt ist bemerkenswert, da Funktionen ja eigentlich ein starke Abstraktion sind, die normale Prozessoren so nicht kennen.
 Die Entscheidung diesen Teil des IR-Codes auf einer höheren Abstraktionsstufe zu belassen, ist eine sehr bewusste:
 Wir müssen uns an dieser Stelle noch keine Gedanken darum machen, wo unsere lokalen Variablen gespeichert werden, wie wir an unsere Parameter kommen oder wie genau man eine Funktion am Ende aufruft.
 Außerdem können wir jede Funktion für sich übersetzen, optimieren und zu Maschinencode überführen.
 Sie können sich die IR-Funktionen und ihre Funktionsaufrufe wie ein Hochsprachen-Gerüst vorstellen, welches wir mit Befehlen von deutlich niedrigerem Abstraktionsgrad füllen.
 
-Bei den *einfachen Befehlen* beschränken wir uns auf die 4 Grundrechenarten und lassen alle Bit-Weisen Operationen aus. Zwar könnten wir all diese ebenfalls in den Funktionsumfang aufnehmen, würden dadurch jedoch nur wenig Erkenntnis gewinnen, außer dass man an allen Stellen nicht nur zwischen 4 Operationen, sonder zwischen 45 Operationen unterscheiden muss. Zu gunsten der Übersichtlichkeit bleiben wir hier, absichtlich, unvollständig.
+Bei den *einfachen Befehlen* beschränken wir uns auf die 4 Grundrechenarten und lassen alle Bit-weisen Operationen aus. Zwar könnten wir all diese ebenfalls in den Funktionsumfang aufnehmen, würden dadurch jedoch nur wenig Erkenntnis gewinnen, außer dass man an allen Stellen nicht nur zwischen 4 Operationen, sonder zwischen 45 Operationen unterscheiden muss. Zu Gunsten der Übersichtlichkeit bleiben wir hier, absichtlich, unvollständig.
 
 Bei den *logischen Operationen* beschränken wir uns auf das Kleiner-Gleich (~<=~).
 Dies ist tatsächlich keine Einschränkung, da alle anderen Vergleichsoperationen daraus abgeleitet werden können.
@@ -446,24 +446,24 @@ So kann man ein ~a == b~ zu einem ~(a <= b) * (b <= a)~ umformen.
 Die Multiplikation übernimmt an dieser Stelle die Aufgabe des logischen UNDs.
 Auf unserer Maschine sind Wahrheitswerte ~0~ (falsch) oder ~!=0~ (wahr).
 
-Neben der Möglichkeit Werte in Variablen zu schreiben, hat unsere Maschine Befehle zur *Speichermanipulation*:K
+Neben der Möglichkeit Werte in Variablen zu schreiben, hat unsere Maschine Befehle zur *Speichermanipulation*:
 Sie kann Zeiger auf Variablen mit dem ~Ref~-Befehl erzeugen und in einer Ziel-Variable ablegen.
-Der Zeiger-indirekter Zugriff erfolgt dann über den ~Load~ und den ~Store~-Befehl, welche jeweils das adressierte Wort lesen bzw. schreiben.
+Der Zeiger-indirekte Zugriff erfolgt dann über den ~Load~ und den ~Store~-Befehl, welche jeweils das adressierte Wort lesen bzw. schreiben.
 Die Sternchen an beiden Operationen sind reine Notation und Zierde und sollen uns nur anzeigen, welche der beiden Variablen der Zeiger und welche Ziel- bzw. Quellvariable sind.
 
 Bezüglich der Speichermodells definieren wir, dass unsere Maschine einen Wort-Adressierten Speicher hat.
-Es ist einem IR-Programm auch erlaubt einen Zeiger mittels Zeigerarithmetik zu manipulieren, jedoch muss der Zeiger immer innerhalb der Grenzen des gleichen Objekts bleiben.
+Es ist einem IR-Programm auch erlaubt, einen Zeiger mittels Zeigerarithmetik zu manipulieren, jedoch muss der Zeiger immer innerhalb der Grenzen des gleichen Objekts bleiben.
 Dies bedeutet auch, dass eine Referenz auf eine Variable niemals verändert werden kann, da die Variable ja nur ein Wort breit ist.
 Ausschließlich Zeiger auf dynamisch angeforderten Speicher können wohldefiniert verändert werden.
 
-Für das *Speichermanagement* stellen wir drei Befehle zur Verfügung um Objekte dynamisch anzulegen:
-Mit dem ~StackAlloc~ Befehl kann ein Funktions-lokales Objekt mit der angegebenen Größe (in Worten) im Call-Frame allokiert werden.
+Für das *Speichermanagement* stellen wir drei Befehle zur Verfügung, um Objekte dynamisch anzulegen:
+Mit dem ~StackAlloc~ Befehl kann ein funktionslokales Objekt mit der angegebenen Größe (in Worten) im Call-Frame allokiert werden.
 Der Rückgabewert von ~StackAlloc~ ist ein Zeiger auf das erste Wort des neuen Objekts.
-Funktions-lokale Objekte werden automatisch mit dem Verlassen der aktuellen Funktionsinstanz verworfen.
-Anders sieht es mit Heap-allokierten Objekten aus, die mittels ~HeapAlloc~ erstellt und explizit mit ~HeapFree~ wieder frei gegeben werden müssen.
+Funktionslokale Objekte werden automatisch mit dem Verlassen der aktuellen Funktionsinstanz verworfen.
+Anders sieht es mit Heap-allokierten Objekten aus, die mittels ~HeapAlloc~ erstellt und explizit mit ~HeapFree~ wieder freigegeben werden müssen.
 Zu beachten ist hier auch, dass die Größen der allokierten Objekte als Konstanten angegeben werden müssen.
 
-Für die Funktions-lokalen Kontrollflüsse haben wir ~Goto~ (mit einem Label) und ~IfGoto~ (mit einer Bedingung und zwei Labeln).
+Für die funktionslokalen Kontrollflüsse haben wir ~Goto~ (mit einem Label) und ~IfGoto~ (mit einer Bedingung und zwei Labeln).
 Beide Befehle leiten den eingehenden Kontrollfluss sicher an eines der angegeben Ziele um und es gibt kein implizites Durchfallen zum nächsten Befehl.
 Die Bedingung von ~IfGoto~ wird als Wahrheitswert (~0~ oder ~!= 0~) ausgewertet und bei wahr wird das erste Label, bei falsch das zweite Label angesprungen.
 
@@ -479,7 +479,7 @@ Insgesamt hat unsere IR-Maschine 16 Befehle und ist damit sehr übersichtlich.
     \ii \structure{Basisblöcke} {
       \bi
       \ii Geordnete Liste von Operationen
-      \ii Jeder Basisblock hat ein (funktions-lokal) eindeutiges Label  \hfill{\texttt{.BB0}},\ldots
+      \ii Jeder Basisblock hat ein (funktionslokal) eindeutiges Label  \hfill{\texttt{.BB0}},\ldots
       \ii Der letzte Befehl muss ein \ircmd{Goto}, \ircmd{IfGoto}, oder \ircmd{Return} sein.
       \ii[$\Rightarrow$] Maximale Basisblöcke
       \ei
@@ -565,7 +565,7 @@ Insgesamt hat unsere IR-Maschine 16 Befehle und ist damit sehr übersichtlich.
 
 Unser Programm strukturieren wir in Funktionen, die aus mehreren Basisblöcken bestehen.
 Dabei hat jeder Basisblock ein eindeutiges Label und besteht aus einer Sequenz von IR-Befehlen, wobei der letzte Befehl eines jeden Blocks ein ~Goto~, ein ~IfGoto~ oder ein ~Return~ sein muss.
-Durch diese Verpflichtung jeden Block mit einem Sprung zu beenden befreit uns auf Ebene einer Funktion von der Last über implizites Durchfallen und die Reihenfolge der Basisblöcke nachzudenken.
+Die Verpflichtung jeden Block mit einem Sprung zu beenden, befreit uns auf Ebene einer Funktion von der Last über implizites Durchfallen und die Reihenfolge der Basisblöcke nachzudenken.
 
 Daher bestehen Funktionen aus einer ungeordneten Menge von Basisblöcken, von denen einer allerdings der Eingangsblock ist.
 An diesem Eingangsblock beginnt die Ausführung beim Funktionsaufruf.
@@ -590,23 +590,23 @@ Auf den Folien finden Sie noch einen iterativen Fibonacci als Beispiel für eine
   \bii
   \ii Erstelle ein Funktionsobjekt\hspace{1cm}       \btSetTab \siginline{Programm.create\_function}{string}{Function}{%
     \bi
-    \ii Funktionen haben den Namen als Label (\scriptsize\codebox{func.label})
-    \ii Parameter und Variablen werden beim traversieren erstellt\\[2ex]
+    \ii Funktionen haben den Namen als Label (\scriptsize\codebox{func.label}).
+    \ii Parameter und Variablen werden beim traversieren erstellt.\\[2ex]
     \ei
   }
   \ii Erstelle einen Basisblock          \btUseTab \siginline{Function.create\_block}{()}{BasicBlock}
   \ii Erstelle einen Parameter           \btUseTab \siginline{Function.create\_parameter}{name}{Variable}
   \ii Erstelle eine Variable             \btUseTab \siginline{Function.create\_variable}{}{Variable} {
     \bi
-    \ii Variablen und Parameter werden im Funktionsscope verwaltet
-    \ii Der erste erstellte Basisblock wird automatisch zum Eingangsblock\\[2ex]
+    \ii Variablen und Parameter werden im Funktionsscope verwaltet.
+    \ii Der erste erstellte Basisblock wird automatisch zum Eingangsblock.\\[2ex]
     \ei
   }
 
   \ii Hänge eine Operation an            \btUseTab \siginline{BasicBlock.append}{Operation, Operands}{()}{%
     \bi
-    \ii Das Label für den Basisblock wird automatisch von der Funktion vergeben
-    \ii Ein \ircmd{Goto}/\ircmd{IfGoto} schließt den Basisblock ab
+    \ii Das Label für den Basisblock wird automatisch von der Funktion vergeben.
+    \ii Ein \ircmd{Goto}/\ircmd{IfGoto} schließt den Basisblock ab.
     \ei
   }
 
@@ -616,16 +616,16 @@ Auf den Folien finden Sie noch einen iterativen Fibonacci als Beispiel für eine
 #+end_src
 
 Nach der Beschreibung des IR-Codes wollen wir unser eigentliches Ziel definieren:
-Wir möchten aus dem abstrakten Syntaxbaum ein IR-Programm ableiten, welches ein Funktions-Objekt mit Basisblöcken voller Befehle für jede Funktion auf AST-Ebene enthält.
-Dazu werden wir den AST traversieren und sukkzessive IR-Objekte erzeugen und hierarchisch ineinander Schachteln:
-Das Programm enthält mehrere Funktionen; Jede Funktion enthält einen oder mehrere Basisisblöcke; Jeder Basisblock ist eine Sequenz von Befehlen die mit einem Sprungbefehl abgeschlossen wird.
+Wir möchten aus dem abstrakten Syntaxbaum ein IR-Programm ableiten, welches ein Funktionsobjekt mit Basisblöcken voller Befehle für jede Funktion auf AST-Ebene enthält.
+Dazu werden wir den AST traversieren und sukzessive IR-Objekte erzeugen und hierarchisch ineinander schachteln:
+Das Programm enthält mehrere Funktionen; jede Funktion enthält einen oder mehrere Basisblöcke; jeder Basisblock ist eine Sequenz von Befehlen, die mit einem Sprungbefehl abgeschlossen wird.
 Wichtig dabei ist sich immer vor Augen zu halten, dass es Funktionen auf Ebene des ASTs gibt und Funktionen auf Ebene des IRs. Die einen werden zwar auf die anderen abgebildet, jedoch sind es gänzlich unterschiedliche Klassen, die sich keinen Code teilen.
 
-Um diese IR-Objekte zu erzeugen verwenden wir das auf den Folien notierte Programmierschnittstelle.
-So hängt die ~create_block()~-Methode einen Basisblock an die aktuelle Funktion an und gibt uns eine Referenz auf den Block zurück[fn::Erinnern Sie sich daran das Python, welches wir im Folgenden verwenden ein Referenzmodell für Variablen hat.
+Um diese IR-Objekte zu erzeugen, verwenden wir die auf den Folien notierte Programmierschnittstelle.
+So hängt die ~create_block()~-Methode einen Basisblock an die aktuelle Funktion an und gibt uns eine Referenz auf den Block zurück[fn::Erinnern Sie sich daran, dass Python, welches wir im Folgenden verwenden, ein Referenzmodell für Variablen hat.
 Alle Variablen referenzieren also nur Objekte, sie enthalten niemals ein Objekt und es gibt keine expliziten Zeiger.
 Sehr zu meinem Leidwesen....].
-Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können Sie im Übungsübersetzer nachschlagen.
+Sollten Sie bei einer der Funktionen unsicher ob der Semantik sein, so können Sie im Übungsübersetzer nachschlagen.
 
 
 ** Codeerzeugung für Ausdrücke
@@ -634,20 +634,20 @@ Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können S
 :END:
 #+begin_src latex
   \begin{frame}[fragile]{Codeerzeugung für Ausdrücke}
-    \textbf{Erinnerung}: Ausdrücke sind AST-Unterbäume die Werte berechnen.
+    \textbf{Erinnerung}: Ausdrücke sind AST-Unterbäume, die Werte berechnen.
 
     \bi
-    \ii Jeder AST-Knotentyp erzeugt anderen Code {
+    \ii Jeder AST-Knotentyp erzeugt anderen Code. {
       \bi
       \ii Dynamischer Dispatch anhand des Knotentyps \hfill$\Rightarrow$ Visitor-Pattern
-      \ii Fas Ergebnis des Ausdrucks wird in einer temporäre Variable gespeichert. {\\
+      \ii Das Ergebnis des Ausdrucks wird in einer temporäre Variable gespeichert. {\\
         \begin{btBlock}[type=info,text width=0.85\textwidth]{}
-          Wir werden beliebig viele virtuelle Register erzeugen. Die Abbildung auf reale Register ist Aufgabe der Maschinencode-Erzeugung
+          Wir werden beliebig viele virtuelle Register erzeugen. Die Abbildung auf reale Register ist Aufgabe der Maschinencodeerzeugung
         \end{btBlock}
       }
       \ei
     }\medskip
-    \ii<2-> Wer entscheidet wo das Ergebnis des Ausdrucks gespeichert wird? {
+    \ii<2-> Wer entscheidet, wo das Ergebnis des Ausdrucks gespeichert wird? {
       \bi
       \ii \textbf{Bottom-Up}: Codegenerierung des Unterbaums erzeugt die Zielvariable{
         \smallskip
@@ -659,7 +659,7 @@ Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können S
         \hspace{1em}\siginline{rvalue\_Add}{Add, Variable}{()}
         \smallskip
       }
-      \ii Beide Strategien weitgehend equivalent und Mischungen sind möglich
+      \ii Beide Strategien weitgehend äquivalent und Mischungen sind möglich.
       \ei
     }
     \ei
@@ -696,8 +696,8 @@ Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können S
     \ii Explizite Traversierung bei der Codeerzeugung{
       \bi
       \ii Wir verwenden absichtlich keine automatische Traversierung des Baums
-      \ii Generierungs-Funktionn verwenden Referenz auf aktuelle Funktion/Block
-      \ii Sie haben als \textbf{Seiteneffekt} das \structure{emittieren} einzelner Instruktionen
+      \ii Generierungsfunktionen verwenden Referenz auf aktuelle Funktion/Block
+      \ii Sie haben als \textbf{Seiteneffekt} das \structure{Emittieren} einzelner Instruktionen
       \ei
     }
     \ei
@@ -708,24 +708,24 @@ Sollten sie bei einer der Funktionen unsicher ob der Semantik sein, so können S
 Wollen wir nun mit der Codeerzeugung beginnen.
 Und wir beginnen dort, wo es spannend ist:
 Mittendrin bei der Codeerzeugung für Ausdrücke (Expressions).
-Wir nehmen also an, dass wir bereits eine Funktion und einen Basisblock erzeugt haben[fn::Wie wir das konkret tun sehen wir gleich.].
-Unsere Aufgabe ist es IR-Code für einen AST-Unterbaum der einen Wert berechnet zu erzeugen und an den aktuellen Basisblock anzuhängen.
+Wir nehmen also an, dass wir bereits eine Funktion und einen Basisblock erzeugt haben[fn::Wie wir das konkret tun, sehen wir gleich.].
+Unsere Aufgabe ist es, IR-Code für einen AST-Unterbaum, der einen Wert berechnet, zu erzeugen und an den aktuellen Basisblock anzuhängen.
 Allgemein werden wir bei der Codeerzeugung an Basisblöcke immer nur Instruktionen anhängen, niemals irgendwas vorne oder mittendrin einfügen.
 
-Um die Codeerzeugung zu formulieren machen wir, wie bei der semantischen Analyse, wieder Gebrauch vom *Visitor-Pattern* um jeden AST-Typen passend zu behandeln.
-Wir bündeln alle Generierungsfunktionen in einer ~CodeGeneration~-Klasse (siehe Übung) und verwenden doppelten-dynamischen Dispatch um die passende Methode aufzurufen.
-Allerdings verwenden wir nicht nur ein Set an ~visit_*()~-Methoden, sondern gleich drei Verschiedene, je nachdem ob der Unterbaum zu Code für einen L-Wert (~lvalue_*()~), für einen R-Wert (~rvalue_()~), oder ganz ohne Rückggabewert (~visit_*()~) erzeugt werden soll.
+Um die Codeerzeugung zu formulieren, machen wir, wie bei der semantischen Analyse, wieder Gebrauch vom *Visitor-Pattern*, um jeden AST-Typen passend zu behandeln.
+Wir bündeln alle Generierungsfunktionen in einer ~CodeGeneration~-Klasse (siehe Übung) und verwenden doppelten dynamischen Dispatch, um die passende Methode aufzurufen.
+Allerdings verwenden wir nicht nur ein Set an ~visit_*()~-Methoden, sondern gleich drei Verschiedene, je nachdem, ob der Unterbaum zu Code für einen L-Wert (~lvalue_*()~), für einen R-Wert (~rvalue_()~), oder ganz ohne Rückgabewert (~visit_*()~) erzeugt werden soll.
 Auf diese Weise können wir im Code leicht erkennen mit welchem Ziel hier Code generiert wird.
 
 Diesmal verwenden wir das Visitor-Pattern allerdings ohne automatische Traversierung.
 Es gibt also keine Maschinerie (~traversal()~-Funktion), die unsere Visitor-Methoden aufruft, sondern jeder Abstieg zu einem Unterbaum ist explizit im Code vermerkt.
-Dies erlaubt es die Umstände der Unterbaum-Codeerzeugung genau zu kontrollieren (z.B. in welchen Basisblock soll der Code hinein erzeugt werden). Außerdem können wir den Rückgabewert der Visitor-Methoden als Rückkanal zwischen Unterbaum und aktuellem Knoten verwenden.
+Dies erlaubt es, die Umstände der Unterbaum-Codeerzeugung genau zu kontrollieren (z.B. in welchen Basisblock soll der Code hinein erzeugt werden). Außerdem können wir den Rückgabewert der Visitor-Methoden als Rückkanal zwischen Unterbaum und aktuellem Knoten verwenden.
 
 Wie bereits bei der Diskussion um Stack-Maschinen vs.
-Register-Maschnen angedeutet, berechnet der Code für einen Ausdruck einen Wert und speichert ihn in einer Variable.
+Register-Maschinen angedeutet, berechnet der Code für einen Ausdruck einen Wert und speichert ihn in einer Variable.
 Wer erstellt aber die Variable in der das Ergebnis gespeichert wird?
 Erstellt der Aufrufende eine Variable und stellt den Auftrag /"Erzeuge Code für diesen Unterbaum, sodass das Ergebnis in dieser Variable gespeichert ist!"/ (Top-Down) oder erstellt die Generierungsfunktion die Variable selbst und propagiert diese dem Aufrufer zurück (Bottom-Up).
-Es stellt sich heraus, dass beides valide Strategien sind um die Codeerzeugung in einem Übersetzer zu strukturieren.
+Es stellt sich heraus, dass beides valide Strategien sind, um die Codeerzeugung in einem Übersetzer zu strukturieren.
 Es sind sogar Mischungen beider Formen möglich:
 
 #+begin_src python
@@ -738,22 +738,22 @@ Es sind sogar Mischungen beider Formen möglich:
           return dst_var
 #+end_src
 
-In diesem winzigen Ausschnitt, der R-Wert Code für ein konstantes Literal erzeugt[fn::~lvalue_Literal()~ kann es nicht geben. Überlegen Sie sich warum!], wird eine Variable optional Top-Down übergeben. Hat der Aufrufende keine Variable mitgegeben, so erzeugen eine an dieser Stelle. In allen Fällen propagieren wir die Zielvariable als Rückgabewert.
+In diesem winzigen Ausschnitt, der R-Wert-Code für ein konstantes Literal erzeugt[fn::~lvalue_Literal()~ kann es nicht geben. Überlegen Sie sich, warum!], wird eine Variable optional Top-Down übergeben. Hat der Aufrufende keine Variable mitgegeben, so erzeugen wir eine an dieser Stelle. In allen Fällen propagieren wir die Zielvariable als Rückgabewert.
 
 Bereits am Beispiel des Literals sehen wir, dass die aktuelle Funktion und der aktuelle Basisblock als implizite Parameter in der Codeerzeugung verwendet werden.
 Beide Werte speichern wir als Felder in der Codeerzeugungs-Klasse.
-Durch Umsetzen des ~current_block~-Feldes können wir kontrollieren in welchen Basisblock Code für einen Unterbaum erzeugt wird. Davon werden wir bei den Kontrollstrukturen Gebrauch machen.
+Durch Umsetzen des ~current_block~-Feldes können wir kontrollieren, in welchen Basisblock Code für einen Unterbaum erzeugt wird. Davon werden wir bei den Kontrollstrukturen Gebrauch machen.
 
-Bemerkenswert ist auch, dass die Codeerzeugungsmethoden nicht nur implizite Parameter bekommen, sondern das IR-Programm als Seiteneffekt erzeugen. Der Aufruf einer ~rvalue_*()~-Methode liefert eine Variable mit dem Ergebnis *und* erzeugt im aktuellen Basisblock IR-Befehle um diese Variable zu befüllen.
+Bemerkenswert ist auch, dass die Codeerzeugungsmethoden nicht nur implizite Parameter bekommen, sondern das IR-Programm als Seiteneffekt erzeugen. Der Aufruf einer ~rvalue_*()~-Methode liefert eine Variable mit dem Ergebnis *und* erzeugt im aktuellen Basisblock IR-Befehle, um diese Variable zu befüllen.
 
-Auf den Folien sehen wir auch noch die R-Wert Codeerzeugung für den ~Add~-AST Knotentypen:
+Auf den Folien sehen wir auch noch die R-Wert-Codeerzeugung für den ~Add~-AST Knotentypen:
 Diese Methode generiert Code für die Unterbäume auf der linken (~LHS~) und auf der rechten (~RHS~) Seite der Addition, erzeugt eine Zielvariable (Bottom-Up), und hängt eine IR-Add-Instruktion an den aktuellen Basisblock an.
-Durch das Visitor-Pattern kann diese Methode beliebige Unterbäume verarbeiten. Sollten wir vergessen haben eine ~rvalue_*()~-Methode zu implementieren, würde es hier einen Laufzeitfehler geben.
+Durch das Visitor-Pattern kann diese Methode beliebige Unterbäume verarbeiten. Sollten wir vergessen haben, eine ~rvalue_*()~-Methode zu implementieren, würde es hier einen Laufzeitfehler geben.
 
 So unscheinbar die Codeerzeugung für die Addition auch aussieht, so trifft sie jedoch eine weitgehende Entscheidung, die nicht unerwähnt bleiben darf:
-Wir legen uns hier auf eine Ausführungsreihenfolge fest bei der zuerst die linke und dann die rechte Seite ausgewertet wird.
-Zuerst werden sich die Instruktionen des linken Unterbaums im Basisblock, danach die des rechten Basisblocks, wiederfinden.
-Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge der Kindsknoten festlegen, sind es die die *Linearsierung des ASTs* durchführen.
+Wir legen uns hier auf eine Ausführungsreihenfolge fest, bei der zuerst die linke und dann die rechte Seite ausgewertet wird.
+Zuerst werden sich die Instruktionen des linken Unterbaums im Basisblock danach die des rechten Basisblocks wiederfinden.
+Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge der Kindknoten festlegen, sind es, die die *Linearisierung des ASTs* durchführen.
 
 #+begin_src latex
 \begin{frame}[fragile]{Code-Erzeugung für Funktionsaufruf und Zuweisung}
@@ -777,7 +777,7 @@ Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge d
   \ii<2-> \structure{Zuweisung} braucht den L-Wert der linken Seite{
     \bi
     \ii Spezieller Visitor für die linken Seiten liefert Referenz \hfill\codebox{\scriptsize lvalue\_Variable()}
-    \ii Funktioniert immer: Emittieren eines \ircmd{Store} Befehls
+    \ii Funktioniert immer: Emittieren eines \ircmd{Store}-Befehls
     \ii<3-> \advantage{Optimierung}: Sonderfall für Variablen auf der linken Seite macht IR kompakter
     \ei
     \begin{columns}
@@ -805,11 +805,11 @@ Genau diese Stellen in der Codeerzeugung, bei der wir uns auf eine Reihenfolge d
 #+end_src
 
 Im Prinzip sieht die Codeerzeugung für die Berechnung von Ausdrücken gleich aus.
-Zuerst erzeugen wir den R-Wert Code für jeden Unterbaum und speichern das Ergebnis in jeweils einer Variable, bevor wir diese im Knoten-spezifischen Code verarbeiten, der wiederum eine Ergebnisvariable beschreibt.
+Zuerst erzeugen wir den R-Wert Code für jeden Unterbaum und speichern das Ergebnis in jeweils einer Variable, bevor wir diese im knotenspezifischen Code verarbeiten, der wiederum eine Ergebnisvariable beschreibt.
 Zur Laufzeit führt dies dazu, dass die Unterbäume vor dem Elternknoten ausgewertet werden.
 
-Beim *Funktionsaufruf* sehen wir, wie die Querverbindungen, die die semantische Analyse eingefügt hat, bei der Codeerzeugung verwendet wird: Wir sind angehalten Code für den Funktionsaufruf ~call_expr~ zu generieren. An diesem AST-Knoten hängt das Attribut ~callee~, welches im Normalfall nur der Bezeichner der aufgerufenen Funktion ist. In der semantischen Analyse (Namensauflösung) haben wir an diesen Bezeichner eine Querverbindung zur Funktionsdeklaration (~call_expr.callee.decl~) eingefügt.
-Um nun bei der Codeerzeugung von der AST-Funktionsdeklaration zur IR-Funktion zu kommen, hängen wir, während der Codeerzeugung, bevor wir den Funktionskörper besuchen, ein Attribut an die AST-Deklaration:
+Beim *Funktionsaufruf* sehen wir, wie die Querverbindungen, die die semantische Analyse eingefügt hat, bei der Codeerzeugung verwendet wird: Wir sind angehalten, Code für den Funktionsaufruf ~call_expr~ zu generieren. An diesem AST-Knoten hängt das Attribut ~callee~, welches im Normalfall nur der Bezeichner der aufgerufenen Funktion ist. In der semantischen Analyse (Namensauflösung) haben wir an diesen Bezeichner eine Querverbindung zur Funktionsdeklaration (~call_expr.callee.decl~) eingefügt.
+Um nun bei der Codeerzeugung von der AST-Funktionsdeklaration zur IR-Funktion zu kommen, hängen wir während der Codeerzeugung, bevor wir den Funktionskörper besuchen, ein Attribut an die AST-Deklaration:
 
 #+begin_src python
 class CodeGen:
@@ -820,14 +820,14 @@ class CodeGen:
         ...
 #+end_src
 
-Auf diese Weise verwenden wir die Querverbindungen im AST um Informationen während der Codeerzeugung zwischen Deklarations- und Referenzierungsstelle zu transportieren.
+Auf diese Weise verwenden wir die Querverbindungen im AST, um Informationen während der Codeerzeugung zwischen Deklarations- und Referenzierungsstelle zu transportieren.
 In der selben Weise werden wir bei Parameter- und Variablendeklarationen vorgehen.
 
 Eine andere Besonderheit sehen wir beim *Zuweisungsausdruck*.
-Dort verwenden wir den R-Wert-Visitor um die *rechte* Seite auszuwerten und den L-Wert-Visitor um einen Zeiger auf die *linke Seite* zu generieren.
+Dort verwenden wir den R-Wert-Visitor, um die *rechte* Seite auszuwerten und den L-Wert-Visitor, um einen Zeiger auf die *linke Seite* zu generieren.
 Die Zuweisung selbst besteht dann aus einer einzelnen ~Store~-Operation, die den Wert der rechten Seite an die adressierte Speicherstelle der linken Seite schreibt.
 
-Dieses allgemeine Vorgehen (Wert von rechts, Zeiger von links, Store) funktioniert in jeder Situation, egal wie komplex der Ausdruck wir auf der linken Seite ist (z.B.
+Dieses allgemeine Vorgehen (Wert von rechts, Zeiger von links, Store) funktioniert in jeder Situation, egal wie komplex der Ausdruck auf der linken Seite ist (z.B.
 ~*(foo.bar()) := ...~).
 Allerdings erzeugt dieses allgemeine Muster für den Standardfall, bei dem eine lokale Variable auf der linken Seite steht, wenig lesbaren (und vor allem analysierbaren Code).
 Deswegen bauen wir an dieser Stelle einen *Sonderfall* dafür ein, dass eine Variable auf der linken Seite steht und sodann nur ein ~Assign~ emittiert wird.
@@ -854,12 +854,12 @@ Schauen Sie sich ruhig an dieser Stelle den Übungsübersetzer an (~CodeGen.rval
         \end{minipage}
       \end{center}
       \bi
-      \ii Unterfunktionen hängen Operationen \textit{implizit} an den \codebox{\scriptsize current\_block}\\[0.5ex]
-      \ii Invariante: Nach jedem Statement kommt der Kontrollfluss wieder zusammen\\[2ex]
+      \ii Unterfunktionen hängen Operationen \textit{implizit} an den \codebox{\scriptsize current\_block}.\\[0.5ex]
+      \ii Invariante: Nach jedem Statement kommt der Kontrollfluss wieder zusammen.\\[2ex]
       \uncover<handout:2-|2->{\btAnimation[width=0.7\textwidth]{center,1:<-2>,2:<3>,3:<4>,4:<5->}{fig/08-sequencing}}
       \ei
     }
-    \ii<handout:5-|5-> Die Statements etablieren die komplexeren Kontrollflüsse {
+    \ii<handout:5-|5-> Die Statements etablieren die komplexeren Kontrollflüsse. {
       \bi
       \ii Anlegen neuer Basisblöcke und Verbindung über \ircmd{Goto} und \ircmd{IfGoto}
       \ii \textbf{Wichtig}: Ein \texttt{visit()}-Aufruf kann den \texttt{current\_block}-Zeiger umbiegen
@@ -869,23 +869,23 @@ Schauen Sie sich ruhig an dieser Stelle den Übungsübersetzer an (~CodeGen.rval
   \end{frame}
 #+end_src
 
-Nachdem wir Code für alle Ausdrücke abgehandelt haben, gehen wir mit der Codeerzeugung eine Stufe weiter nach Oben und emittieren die Befehle um die Kontrollflussstruktur der Funktion auf IR-Ebene abzubilden.
+Nachdem wir Code für alle Ausdrücke abgehandelt haben, gehen wir mit der Codeerzeugung eine Stufe weiter nach oben und emittieren die Befehle, um die Kontrollflussstruktur der Funktion auf IR-Ebene abzubilden.
 Dazu behandeln wir die AST-Konstrukte zur Sequenzierung, Selektion und Iteration so, dass in der aktuellen IR-Funktion direkt der korrekte Kontrollflussgraph entsteht.
 
 Als erstes betrachten wir die *Sequenzierung* und dort insbesondere die Codeblöcke:
-Aus der vagen Erinnerung an die Vorlesung zu Operationen {{{see(07-sequencing,Sequenzierung)}}}, wissen wir, dass der Sequenzoperator verwendet wird um mehrere Statements in einer festen Reihenfolge auszuführen.
+Aus der vagen Erinnerung an die Vorlesung zu Operationen{{{see(07-sequencing,Sequenzierung)}}}, wissen wir, dass der Sequenzoperator verwendet wird, um mehrere Statements in einer festen Reihenfolge auszuführen.
 Eine solche Statement-Reihung ist im AST in einem Codeblock-Knoten zusammengefasst.
 
-Geht es nun daran Code für diesen Block-Knoten zu generieren, sieht die Erzeugungsmethode denkbar einfach aus, denn sie besucht, in der gegebenen Reihenfolge, alle Statements des Blocks mit der ~visit()~-Funktion (unsere Statements haben keinen Rückggabewert).
-Allerdings steckt der Teufeln im Detail und dieses Vorgehen funktioniert nur wenn wir eine Invariante über die ~visit_*()~ annehmen:
+Geht es nun daran, Code für diesen Block-Knoten zu generieren, sieht die Erzeugungsmethode denkbar einfach aus, denn sie besucht, in der gegebenen Reihenfolge, alle Statements des Blocks mit der ~visit()~-Funktion (unsere Statements haben keinen Rückgabewert).
+Allerdings steckt der Teufeln im Detail und dieses Vorgehen funktioniert nur, wenn wir eine Invariante über die ~visit_*()~ annehmen:
 Wir haben bereits diskutiert, dass die Erzeugungsmethoden als Seiteneffekt IR-Befehle an den aktuellen Block (~current_block~) anhängen.
-Bestehen die besuchten Statements nur aus Ausdrücken so ist auch alles fein, da diese keine neuen Basisblöcke erzeugen wollen.
+Bestehen die besuchten Statements nur aus Ausdrücken, so ist auch alles fein, da diese keine neuen Basisblöcke erzeugen wollen.
 Was machen wir aber mit Statements, die wiederum Kontrollflusskonstrukte, wie eine Selektion, beinhalten?
 Um weiterhin korrekten Code für die Sequenzierung zu generieren, muss jede ~visit_*()~-Methode, die den potentiellen Kontrollfluss aufspaltet (eine Verzweigung im CFG einbaut), diesen an ihrem Ende wieder zusammenführen.
 Technisch gesehen darf der ~current_block~ am Ende zwar auf einen anderen Basisblock zeigen, dieser muss jedoch in Reihe mit dem ersten Block der Sequenzierung ausgeführt werden.
 
-Diese etwas schwammige Bedingung lässt sich noch etwas genauer formulieren: Auf der Folie ist jeder schwarze Punkt eine Stelle im CFG und steht für den Beginn einer Statement-Ausführung. Zwischen jedem dieser Sequenzierungspunkte kann ein beliebig komplexer Kontrollfluss entstehen. Jedoch muss jeder Pfad durch den CFG, der einen Sequenzierungspunkt geht, vorher alle anderen Sequenzierungspunkte besucht haben. Diese Pfad-Eigenschaft heißt *Dominanz-Relation*: Ein Punkt A im CFG dominiert einen anderen B, wenn alle Kontrollflüsse durch B vorher A besucht haben müssen.
-Wir werden die Dominanz-Relation in dieser Vorlesung nicht weiter diskutieren, jedoch sei ihnen gesagt, dass sie eine signifikante Rolle bei fortgeschritteneren Programm-Optimierungen spielt. Die entsprechenden Stichwort hierzu, wenn Sie sich weiter darüber informieren wollen, sind Dominanz-Grenze und Single-Static-Assignment-Form (SSA).
+Diese etwas schwammige Bedingung lässt sich noch etwas genauer formulieren: Auf der Folie ist jeder schwarze Punkt eine Stelle im CFG und steht für den Beginn einer Statement-Ausführung. Zwischen jedem dieser Sequenzierungspunkte kann ein beliebig komplexer Kontrollfluss entstehen. Jedoch muss jeder Pfad durch den CFG, der durch einen Sequenzierungspunkt geht, vorher alle anderen Sequenzierungspunkte besucht haben. Diese Pfad-Eigenschaft heißt *Dominanz-Relation*: Ein Punkt A im CFG dominiert einen anderen B, wenn alle Kontrollflüsse durch B vorher A besucht haben müssen.
+Wir werden die Dominanz-Relation in dieser Vorlesung nicht weiter diskutieren, jedoch sei Ihnen gesagt, dass sie eine signifikante Rolle bei fortgeschritteneren Programm-Optimierungen spielt. Die entsprechenden Stichwort hierzu, wenn Sie sich weiter darüber informieren wollen, sind Dominanz-Grenze und Single-Static-Assignment-Form (SSA).
 
 #+begin_src latex
 \begin{frame}{Kontrollfluss: Selektion}
@@ -907,15 +907,15 @@ Nun erzeugen wir drei neue Basisblöcke:
 
 Den Kontrollfluss spalten wir in BB0 auf, indem wir dort, mit dem Ergebnis der Bedingung einen ~IfGoto~-Befehl anhängen, der entweder zu BB1 oder zu BB2 verzweigt.
 
-Für den *Then-Zweig*, setzen wir den ~current_block~-Zeiger auf BB1 und besuchen den entsprechenden Unterbaum im AST um BB1 mit Befehlen zu füllen.
+Für den *Then-Zweig* setzen wir den ~current_block~-Zeiger auf BB1 und besuchen den entsprechenden Unterbaum im AST, um BB1 mit Befehlen zu füllen.
 Am Ende dieses Besuchs kann es allerdings sein, dass ~current_block~ nicht mehr auf BB1 zeigt, sondern auf einen Block BBn, der allerdings von BB1 dominiert wird.
 Das Bild auf den Folien zeigt also nicht die ganze Wahrheit, sondern nur den vereinfachten Fall, wenn innerhalb von ~ifStmt.then_block~ der Kontrollfluss nicht weiter aufgespalten wird.
-Egal wie, nach dem Besuchen des Then-Zweiges, fügen wir ein ~Goto .BB3~ ein um den Kontrollfluss wieder zusammen zu führen.
+Egal wie, nach dem Besuchen des Then-Zweiges fügen wir ein ~Goto .BB3~ ein, um den Kontrollfluss wieder zusammenzuführen.
 
 In gleicher Weise gehen wir auch beim Else-Zweig vor. Allerdings kann es sein, dass es im AST keinen Else-Unterbaum gibt, wenn der Entwickler keinen angegeben hat. In diesem Fall generieren wir den Else-Zweig dennoch und kümmern uns in der Optimierung darum, diesen überflüssigen Block wieder zu entfernen.
 
-Am Ende der Selektion stellen wir die Sequenzierungs-Invariante wieder her, indem wir den ~current_block~ auf BB3 setzen, welcher im CFG von BB1 dominiert wird.
-Alle Pfade die BB3 erreichen, haben vorher BB1 besucht.
+Am Ende der Selektion stellen wir die Sequenzierungsinvariante wieder her, indem wir den ~current_block~ auf BB3 setzen, welcher im CFG von BB1 dominiert wird.
+Alle Pfade, die BB3 erreichen, haben vorher BB1 besucht.
 
 #+begin_src latex
   \begin{frame}{Kontrollfluss: Iteration}
@@ -925,21 +925,21 @@ Alle Pfade die BB3 erreichen, haben vorher BB1 besucht.
 
 Ziemlich ähnlich sieht es bei Iterationen aus.
 Wir schauen uns an dieser Stelle nur ganz normale ~while~-Schleifen an.
-Zu Beginn erzeugen wir ebenfalls mehrere Basisblöcke um den Kontrollfluss der Schleife abzubilden. 
+Zu Beginn erzeugen wir ebenfalls mehrere Basisblöcke, um den Kontrollfluss der Schleife abzubilden.
 
 Anderes als bei der Selektion spalten wir allerdings die Auswertung der Bedingung in einen eigenen Basisblock (BB1) ab, da dieser nicht nur einmal beim Betreten der Schleife ausgeführt werden soll, sondern vor jedem Schleifendurchgang.
 
-Da wir Code für eine ~while~-Schleife, und keine ~do-while~-Schleife, betreten wir zuerst den Schleifenkopf BB1, in den wir den Code für die Auswertung der Bedingung hinein generieren. Am Ende des Schleifenkopfes prüfen wir, ob eine weitere Iteration durchgeführt werden soll, oder ob wir hinter die Schleife zu BB3 springen.
+Da wir Code für eine ~while~-Schleife, und keine ~do-while~-Schleife, generieren, betreten wir zuerst den Schleifenkopf BB1, in den wir den Code für die Auswertung der Bedingung hinein generieren. Am Ende des Schleifenkopfes prüfen wir, ob eine weitere Iteration durchgeführt werden soll, oder ob wir hinter die Schleife zu BB3 springen.
 
 Zu Generierung des Schleifenkörpers setzen wir ~current_block~ auf BB2 und besuchen den entsprechenden Unterbaum im AST (~whileStmt.body~).
-Wiederum könnte der Kontrollfluss innerhalb des Schleifenkörpers gespalten werden, jedoch ist dieser am Ende wieder eindeutig und wir können einen *Rücksprung zum Schleifenkopf* einfügen um die nächste Runde der Iteration ein zu läuten.
+Wiederum könnte der Kontrollfluss innerhalb des Schleifenkörpers gespalten werden, jedoch ist dieser am Ende wieder eindeutig und wir können einen *Rücksprung zum Schleifenkopf* einfügen, um die nächste Runde der Iteration einzuläuten.
 
-Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wieder her.
+Am Ende der Iteration stellen wir, wie gehabt, die ~current_block~-Invariante wieder her.
 
 #+begin_src latex
   \begin{frame}{Diskussion: Optimierte Codegenerierung}
     \bi
-    \ii Die gezeigte Codeerzeugung generiert \alert{ineffizienten Code} {
+    \ii Die gezeigte Codeerzeugung generiert \alert{ineffizienten Code}. {
       \bi
       \ii Fehlender Else-Teil führt zu einem leeren Else-Block und doppeltem \ircmd{Goto}
       \ii Bottom-Up Auswertung führt zu unnötigem \ircmd{Assign} bei der Zuweisung
@@ -952,9 +952,9 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
       \ii Komplexität erhöht die Fehleranfälligkeit
       \ei
     }\medskip
-    \ii<3-> Wir verlagern die Arbeit in die Optimierungsphase {
+    \ii<3-> Wir verlagern die Arbeit in die Optimierungsphase. {
       \bi
-      \ii \structure{Copy-Propagation} wird unötige Zuweisungen tilgen
+      \ii \structure{Copy-Propagation} wird unnötige Zuweisungen tilgen
       \ii \structure{Constant-Folding} ersetzt Auswertungen mit konstanten Operanden
       \ii \structure{Dead-Code Elimination}: Sprünge auf Sprünge auflösen, tote Blöcke löschen\\[1ex]
       \ii[$\Rightarrow$] Weiterer Vorteil durch diese \textbf{Trennung der Belange}:\\ Optimierungen werden ebenfalls auf den Code des Benutzers angewendet
@@ -967,14 +967,14 @@ Am Ende der Iteration stellen wir, wie gehabt, die ~current_block-Invariante wie
 #+end_src
 
 Wie bereits bei der Selektion, bei der wir leere Basisblöcke für nicht vorhandene Else-Zweige erzeugen, ist die hier präsentierte Codeerzeugung nicht optimal und der generierte IR-Code geht öfters mal einen Umweg.
-Wenn wir mit bloßem Augen auf solchen IR-Code schauen, könnten wir auf die Idee kommen zu sagen, dass wir doch direkt besseren IR-Code erzeugen könnten. Jedoch spricht ein wichtiges Argument gegen eine bessere Coderzeugung: Komplexität.
+Wenn wir mit bloßem Augen auf solchen IR-Code schauen, könnten wir auf die Idee kommen zu sagen, dass wir doch direkt besseren IR-Code erzeugen könnten. Jedoch spricht ein wichtiges Argument gegen eine bessere Codeerzeugung: Komplexität.
 
-Die Aufgabe der Codeerzeugung ist es den AST für eine lineare Maschine zu sequenzieren.
-Alles was wir an zusätzlicher Logik in diesem Übersetzer-Schritt einbauen um besseren IR-Code zu generieren wird die Codeerzeugung verkomplizieren.
+Die Aufgabe der Codeerzeugung ist es, den AST für eine lineare Maschine zu sequenzieren.
+Alles, was wir an zusätzlicher Logik in diesem Übersetzerschritt einbauen, um besseren IR-Code zu generieren, wird die Codeerzeugung verkomplizieren.
 Das eigentliche Ziel der Codeerzeugung wird verwässert und weniger offensichtlich.
-Und wenn eines an einem Übersetzer, bei dem wir erhöhte Ansprüche an die Korrektheit stellen, von Übel ist, so ist es wenig intuitiver Code der mehrerer Zielsetzungen gleichzeitig verfolgt.
+Und wenn eines an einem Übersetzer, bei dem wir erhöhte Ansprüche an die Korrektheit stellen, von Übel ist, so ist es wenig intuitiver, Code der mehrerer Zielsetzungen gleichzeitig verfolgt.
 
-Im Fall des Übersetzers lösen wir das Dilemma, zwischen klarerer Codeerzeugung und einem effizienten Kompilat, dadurch auf, dass wir den informatischen Zaubertrick *Trennung der Belange* anwenden und die Optimierung als weiteren Schritt bei der Übersetzung einführen.
+Im Fall des Übersetzers lösen wir das Dilemma zwischen klarerer Codeerzeugung und einem effizienten Kompilat dadurch auf, dass wir den informatischen Zaubertrick *Trennung der Belange* anwenden und die Optimierung als weiteren Schritt bei der Übersetzung einführen.
 So können wir zuerst ineffizienten Code in sehr klarer Weise generieren, und dennoch ein möglichst effizientes Übersetzungsergebnis bekommen.
 
 Außerdem haben wir einen weiteren Vorteil, der auf den Folien sehr lapidar dargestellt wird:
@@ -994,13 +994,13 @@ int foo() {
 }
 #+end_src
 
-In diesem Stück Beispielcode ist, bei nähererer Betrachtung, ganz klar, dass ~foo()~ immer das Ergebnis 3 liefern wird.
-Eine Codeerzeugung zu erstellen, die dies nebenbei heraus findet ist um Größenordnungen schwieriger, als was ich Ihnen in dieser Vorlesung gezeigt habe.
+In diesem Stück Beispielcode ist, bei näherer Betrachtung, ganz klar, dass ~foo()~ immer das Ergebnis 3 liefern wird.
+Eine Codeerzeugung zu erstellen, die dies nebenbei herausfindet, ist um Größenordnungen schwieriger, als was ich Ihnen in dieser Vorlesung gezeigt habe.
 In der nächsten Vorlesung werde ich mehrere, relativ einfache, Optimierungsroutinen diskutieren, die IR-Code so optimieren, dass am Ende tatsächlich nur ~Return 3~ übrig bleibt.
 
 Anders sieht die Geschichte bei Interpretern aus:
-Dort können wir, um den Start der Ausführung nicht übermäßig zu verzögern, nicht zuerst aufwändige Optimierung vorschalten.
-Daher treffen Codeerzeugungs-Routinen, die eine interpretierte Ausführung zum Ziele haben, andere Abwägungen und führen Coderzeugung und Optimierung deutlich vermischter aus.
+Dort können wir nicht zuerst aufwendige Optimierung vorschalten, um den Start der Ausführung nicht übermäßig zu verzögern.
+Daher treffen Codeerzeugungs-Routinen, die eine interpretierte Ausführung zum Ziel haben, andere Abwägungen und führen Codeerzeugung und -optimierung deutlich vermischter aus.
 
 ** Fallstudie für komplexe Objekte: Records
 :PROPERTIES:
@@ -1010,14 +1010,14 @@ Daher treffen Codeerzeugungs-Routinen, die eine interpretierte Ausführung zum Z
 \dividerframe{Komplexere Objekte\\und\\Operationen}
   \begin{frame}{Komplexere Objekte: Records}
     \begin{btBlock}{Intentionale Unvollständigkeit der Vorlesung}\small
-      Der \advantage{Grundstock der Codeerzeugung} ist gelegt und kann beliebig erweitern werden. Um ihnen einen Einblick zu geben, ohne Sie mit endlosen Erzeugungsregeln zu langweilen, werfe ich nur ein \structure{Schlaglicht auf Records}.
+      Der \advantage{Grundstock der Codeerzeugung} ist gelegt und kann beliebig erweitert werden. Um Ihnen einen Einblick zu geben, ohne Sie mit endlosen Erzeugungsregeln zu langweilen, werfe ich nur ein \structure{Schlaglicht auf Records}.
     \end{btBlock}
 
     \bi
-    \ii<2-> Records haben mehrere benannte und typisierte Felder {
+    \ii<2-> Records haben mehrere benannte und typisierte Felder. {
       \bi
-      \ii Ein Record-Objekt kann größer sein als ein einzelnes Maschinenwort
-      \ii \ALERT{Aber}: Unsere IR-Maschine kann nur 32-Bit Zahlen speichern und verarbeiten
+      \ii Ein Record-Objekt kann größer sein als ein einzelnes Maschinenwort.
+      \ii \ALERT{Aber}: Unsere IR-Maschine kann nur 32-Bit Zahlen speichern und verarbeiten.
       \ei
     }\medskip
     \ii<3-> Wir müssen eine Übersetzung des Sprachkonstrukts vornehmen:{
@@ -1034,21 +1034,21 @@ Daher treffen Codeerzeugungs-Routinen, die eine interpretierte Ausführung zum Z
 #+end_src
 
 Mit den bisher gesehenen Übersetzungsregeln können wir bereits einfache Programme in IR-Code überführen, sofern sie keine komplexen Datenstrukturen beinhalten.
-Nun könnten wir an dieser Stelle für alle möglichen Konstrukte, die in Programmiersprachen vorkommen, und die wir teilweise schon in der Vorlesung behandelt haben, die Übersetzungsregeln im Detail besprechen.
-Aber das würde, so dicht aneinander gereiht eher ermüdend, denn erleuchtend für Sie sein.
-Daher habe ich mich entschieden ein einzelnes Thema heraus zu greifen und an diesem beispielhaft zu demonstrieren, wie wir bei der Codeerzeugung vorgehen.
-Das Thema dem wir uns zuwenden wollen sind *Records*{{{see(03-composite-types,Zusammengesetzte Typen)}}}, da wir an ihnen einer Vielzahl der Abbildungsproblemen begegnen, die auch bei anderen Sprachkonstrukten auftreten.
+Nun könnten wir an dieser Stelle für alle möglichen Konstrukte, die in Programmiersprachen vorkommen und die wir teilweise schon in der Vorlesung behandelt haben, die Übersetzungsregeln im Detail besprechen.
+Aber das würde, so dicht aneinander gereiht, eher ermüdend denn erleuchtend für Sie sein.
+Daher habe ich mich entschieden, ein einzelnes Thema herauszugreifen und an diesem beispielhaft zu demonstrieren, wie wir bei der Codeerzeugung vorgehen.
+Das Thema, dem wir uns zuwenden wollen, sind *Records*{{{see(03-composite-types,Zusammengesetzte Typen)}}}, da wir an ihnen einer Vielzahl der Abbildungsprobleme begegnen, die auch bei anderen Sprachkonstrukten auftreten.
 
-Di *semantische Lücke* der wir bei Record-Datentypen begegnen, lässt sich wie folgt beschreiben:
-Ein Record Typ ist eine geordnete Sequenz von Typ--Name-Paaren, die im Verbund auftreten.
+Die *semantische Lücke*, der wir bei Record-Datentypen begegnen, lässt sich wie folgt beschreiben:
+Ein Record-Typ ist eine geordnete Sequenz von Typ--Name-Paaren, die im Verbund auftreten.
 Wir können auf einzelne Felder eines Record-Objekts lesend bzw. schreibend zugreifen und das gesamte Record-Objekt per Zuweisung oder Funktionsaufruf durch die Gegend schieben.
-Dadurch das Records Verbünde aus mehreren Feldern sind, können Record-Objekte mehr als ein Maschinenwort umfassen.
+Dadurch, dass Records Verbünde aus mehreren Feldern sind, können Record-Objekte mehr als ein Maschinenwort umfassen.
 
-Das Problem ist, das bei unserer IR-Maschine alle Variablen genau ein Maschinenwort (32-Bit) breit sind.
-Ein Variable kann also nicht jedes beliebige Record-Objekt beinhalten.
-Natürlich könnten wir hergehen und unseren IR-Code erweitern um eine möglichst einfache Codeerzeugung zu bekommen, jedoch würde wir damit die Übersetzungsleistung einfach weiter nach hinten ins Backend schieben.
+Das Problem ist, dass bei unserer IR-Maschine alle Variablen genau ein Maschinenwort (32-Bit) breit sind.
+Eine Variable kann also nicht jedes beliebige Record-Objekt beinhalten.
+Natürlich könnten wir hergehen und unseren IR-Code erweitern, um eine möglichst einfache Codeerzeugung zu bekommen, jedoch würden wir damit die Übersetzungsleistung einfach weiter nach hinten ins Backend schieben.
 Außerdem können wir ja nicht für jedes neu erdachte Sprachkonstrukt den IR-Code erweitern, was wiederum eine Anpassung des gesamten Middle- und Backends erforderlich machen würde.
-Anstatt dessen werden wir das Sprachkonstrukt "Record" auf den vorgestellten IR-Code abbilden.
+Stattdessen werden wir das Sprachkonstrukt "Record" auf den vorgestellten IR-Code abbilden.
 Dazu greifen wir vier Teilbereiche an: Abbildung auf das IR-Speichermodell, Zuweisungen von Record-Objekten, Feldzugriffe und Funktionsaufrufe. 
 
 #+begin_src latex
@@ -1058,7 +1058,7 @@ Dazu greifen wir vier Teilbereiche an: Abbildung auf das IR-Speichermodell, Zuwe
     \begin{center}
       \texttt{type(struct bar) = }\typeinline{ = record(("a", int), ("b", foo\_t), ("c", int))}
      \end{center}\medskip
-     \ii<2-> Um dessen Objekte im Speicher abzulegen brauchen wir ein \structure{Datenlayout}{%
+     \ii<2-> Um dessen Objekte im Speicher abzulegen, brauchen wir ein \structure{Datenlayout}{%
     \begin{columns}[t]
       \begin{column}{0.49\textwidth}
         \mbox{\strut}\\
@@ -1082,8 +1082,8 @@ Dazu greifen wir vier Teilbereiche an: Abbildung auf das IR-Speichermodell, Zuwe
         \ii Übersetzer leitet das Layout ab {
           \bi
           \ii<handout:2-|3-> Jeder enthaltende Typ belegt eine gewisse \alert{Anzahl an Bytes} im Speicher.
-          \ii<handout:3-|4-> Berechnung eines \structure{Feld-Offsets}.
-          \ii<handout:4-|5-> Zusätzliche \structure{Alignment}-Bedingungen durch das Einfügen von Lücken.
+          \ii<handout:3-|4-> Berechnung eines \structure{Feld-Offsets}
+          \ii<handout:4-|5-> Zusätzliche \structure{Alignment}-Bedingungen durch das Einfügen von Lücken
           \ii<handout:5-|6-> Es ergibt sich die Größe \textbf{dieses Typs}.
           \ii<handout:6-|7-> Mit dynamische Typen: Tag-Feld
           \ei
@@ -1164,51 +1164,51 @@ Dazu greifen wir vier Teilbereiche an: Abbildung auf das IR-Speichermodell, Zuwe
   #+end_src
 
 Als erstes nehmen wir die Abbildung der Record-Objekte auf das Speichermodell der IR-Maschine vor.
-Dazu bilden wir den strukturierte Record-Typen ab, indem wir festlegen wie die Felder des Records auf den linearen Speicher abgebildet werden. Diese Abbildungsvorschrift, von abstrakten Record-Objekte, auf nebeneinander liegende Speicherzellen, heißt *Datenlayout*.
+Dazu bilden wir den strukturierte Record-Typen ab, indem wir festlegen, wie die Felder des Records auf den linearen Speicher abgebildet werden. Diese Abbildungsvorschrift, von abstrakten Record-Objekte auf nebeneinander liegende Speicherzellen, heißt *Datenlayout*.
 
-Das Datenlayout ist abhängig von Record-Typen und kann von sprachspezifischen und architektonischen Besonderheiten beeinflusst. So gibt der C-Sprachstandard vor, dass Felder beim Datenlayout nicht umgeordnet werden dürfen.
+Das Datenlayout ist abhängig von Record-Typen und kann von sprachspezifischen und architektonischen Besonderheiten beeinflusst werden. So gibt der C-Sprachstandard vor, dass Felder beim Datenlayout nicht umgeordnet werden dürfen.
 
-Als erstes berechnet der Übersetzer wie viel Speicher jedes einzelne Feld des Records benötigen würde, wenn es alleine alloziert wird.
-Enthält unser aktueller Record-Typ wiederum Record-Typen so wird die Berechnung des Datenlayouts rekursiv für den enthaltenen Typen ausgeführt.
+Als erstes berechnet der Übersetzer, wie viel Speicher jedes einzelne Feld des Records benötigen würde, wenn es alleine allokiert wird.
+Enthält unser aktueller Record-Typ wiederum Record-Typen, so wird die Berechnung des Datenlayouts rekursiv für den enthaltenen Typen ausgeführt.
 Beim Beispiel auf den Folien arbeiten wir auf Byte-Granularität, was also nicht 1:1 auf unsere IR-Maschine übertragbar wäre.
 
 Im zweiten Schritt berechnen wir für jedes Feld einen *konstanten Feld-Offset* vom Beginn des Objekts im Speicher.
 Da das Feld ~b~ an zweiter Stelle ist, startet sein Inhalt bei einem Offset von ~4~, was genau der Länge des Feldes ~a~ entspricht.
 
 Vor dem Feld ~c~ fügen wir eine künstliche Lücke ein, da ~b~ mit 5 Bytes irregulär lang ist und ~c~, bei einem kompakten Datenlayout keine durch 4 teilbare Adresse hätte.
-Solches zusätzliche Alignment, meist auf Maschinenwortbreite, führt zwar, durch die entstandenen Lücken, zu einem erhöhten Speicherverbrauch, kann aber den erzeugten Maschinencode oft deutlich beschleunigen. Hintergrund hier ist, dass Speicherzugriffe, die nicht Wort-weise ausgerichtet sind auf vielen Prozessoren langsamer sind[fn::Besonders ekelhaft ist es, wenn ein Zugriff die Grenze zwischen zwei Cachezeilen oder zwei Speicherseiten überschreitet.].
+Solches zusätzliche Alignment, meist auf Maschinenwortbreite, führt zwar durch die entstandenen Lücken zu einem erhöhten Speicherverbrauch, kann aber den erzeugten Maschinencode oft deutlich beschleunigen. Hintergrund hier ist, dass Speicherzugriffe, die nicht Wort-weise ausgerichtet sind, auf vielen Prozessoren langsamer sind[fn::Besonders ekelhaft ist es, wenn ein Zugriff die Grenze zwischen zwei Cachezeilen oder zwei Speicherseiten überschreitet.].
 
 Haben wir jedem Feld einen Offset gegeben, so können wir die Größe für ein Record-Objekt angeben (in diesem Fall 16 Byte).
 Jedes Objekt vom Typen ~struct bar~ wird später nach genau diesem Layout strukturiert sein, sodass jeder Zugriff auf die Felder eines ~struct bar~-Objekts von diesem Layout ausgehen kann.
-Außerdem werden die Informationen über das Datenlayout auch in den Informationen für den Debugger vermerkt, sodass dieser ein solches Objekt aus dem Speicher dekodieren kann und die semantische Zuordnung zwischen Feld und Speicherzelle rückgängig machen.
+Außerdem werden die Informationen über das Datenlayout auch in den Informationen für den Debugger vermerkt, sodass dieser ein solches Objekt aus dem Speicher dekodieren und die semantische Zuordnung zwischen Feld und Speicherzelle rückgängig machen kann.
 
-Wollen wir dynamische Typ-Informationen für unserer Objekte haben, so müssen wir ein zusätzliches Typ-Tag Feld im Datenlayout vorsehen.
-Da diesen Typ-Feld bei allen Objekten am gleichen konstanten Offset zu finden sein muss, gibt es nur die Möglichkeit das Tag-Feld vor dem ersten benutzerdefinierten Feld einzufügen. Alle anderen Felder rücken somit eine Position nach hinten und die Größe unseres Objekts wächst auf 20 Byte an.
+Wollen wir dynamische Typinformationen für unserer Objekte haben, so müssen wir ein zusätzliches Typ-Tag-Feld im Datenlayout vorsehen.
+Da diesen Typ-Feld bei allen Objekten am gleichen konstanten Offset zu finden sein muss, gibt es nur die Möglichkeit, das Tag-Feld vor dem ersten benutzerdefinierten Feld einzufügen. Alle anderen Felder rücken somit eine Position nach hinten und die Größe unseres Objekts wächst auf 20 Byte an.
 
 Bewaffnet mit dem Datenlayout und der Größe des Typen, können wir nun zur Tat schreiten und IR-Code erzeugen.
-Für unsere Beispiel werden wir ein *Wertemodell für Variablen* anstreben, da wir die Records in eine Sprache mit Referenzen einbauen wollen.
+Für unser Beispiel werden wir ein *Wertemodell für Variablen* anstreben, da wir die Records in eine Sprache mit Referenzen einbauen wollen.
 Zur Erinnerung:
 Wertemodell bedeutet, dass eine Variable vom Typ ~struct bar~ ein entsprechendes Objekt enthält und nicht nur eine Referenz darauf (das wäre Referenzmodell).
 Bei Zuweisungen und Funktionsaufrufen wird das Objekt kopiert, und mit dem Ende der Variablen-Lebenszeit endet auch die Lebenszeit des Objekts.
 In unserem Beispiel gibt es nur lokale Variablen und keine dynamische Speicherallokation auf Sprachebene.
 
-Treffen wir bei der Codeerzeugung auf eine Variablendeklaration/definition, so müssen wir, da wir dem Wertemodell folgen, auch ein Objekt vom entsprechenden Typen anlegen.
+Treffen wir bei der Codeerzeugung auf eine Variablendeklaration/-definition, so müssen wir, da wir dem Wertemodell folgen, auch ein Objekt vom entsprechenden Typen anlegen.
 Auf den Folien sehen wir, dass dies für kleine Objekte, die in eine IR-Variable passen sehr einfach ist, und wir dort einfach die Variable bei der aktuellen Funktion (~self.current_function~) anlegen.
 
 Anders sieht das bei Objekten aus, die größer sind als ein Maschinenwort (4 Byte), worunter auch die Record-Objekte Fallen.
-Um diese Fälle abzudecken verwenden wir den IR-Befehl ~StackAlloc~ um das Objekt im aktuellen Call-Frame anzulegen.
-In der angelegten IR-Variable speichern wir nur die Referenz auf das neu-angelegte Objekt.
-Gewissermaßen bilden wir das Wertemodell auf der Sprachebene auf ein Referenzmodell in der IR-Ebene ab. Was dies bedeutet werden wir im folgenden noch sehen.
+Um diese Fälle abzudecken verwenden wir den IR-Befehl ~StackAlloc~, um das Objekt im aktuellen Call-Frame anzulegen.
+In der angelegten IR-Variable speichern wir nur die Referenz auf das neu angelegte Objekt.
+Gewissermaßen bilden wir das Wertemodell auf der Sprachebene auf ein Referenzmodell in der IR-Ebene ab. Was dies bedeutet werden wir im Folgenden noch sehen.
 Wichtig ist aber: eine IR-Variable für ein Record-Objekt enthält nur einen Zeiger!
 
-Wollen wir dynamische Typen haben, ist das Anlegen des Objekts *der* Zeitpunkt um den korrekten dynamischen Typen zu setzen.
+Wollen wir dynamische Typen haben, ist das Anlegen des Objekts *der* Zeitpunkt, um den korrekten dynamischen Typen zu setzen.
 Dies führen wir, wenn gewollt, mit einem einzelnen ~Store~ Befehl durch, der ein konstant gewähltes Typ-Tag in das erste Feld des Objekts schreibt.
 Da wir keine benutzerdefinierten Konstruktoren{{{see(06-init, Geburt von Objekten)}}} anbieten wollen, sind wir an dieser Stelle mit der Codeerzeugung für eine Variablendefinition fertig.
 
 #+begin_src latex
   \begin{frame}[fragile]{Records: Zuweisungen}
     \bi
-    \ii Für die Zuweisung brauchen wir \structure{R- und L-Wert} des Record-Objekts {
+    \ii Für die Zuweisung brauchen wir \structure{R- und L-Wert} des Record-Objekts. {
       \bi
       \ii \textbf{Problem}: Nur Referenz, nicht aber Objekt, passt nicht in eine IR-Variable
       \ii Unsere einfache IR-Sprache erfordert komplexere Codeerzeugung
@@ -1242,7 +1242,7 @@ Da wir keine benutzerdefinierten Konstruktoren{{{see(06-init, Geburt von Objekte
     \bigskip
     \ii<3-> \structure{Zuweisungs}-Operation für größere Objekte (> 4 Bytes){
       \bi
-      \ii Am Zuweisungskonten kommen 2 Zeiger für Quelle, als auch für Ziel an
+      \ii Am Zuweisungsknoten kommen 2 Zeiger für Quelle, als auch für Ziel an
       \ii Verwendung der \texttt{memcpy()}-Hilfsfunktion mit konstanter Größe
       \ei
     }
@@ -1280,10 +1280,10 @@ Da wir keine benutzerdefinierten Konstruktoren{{{see(06-init, Geburt von Objekte
     \end{btBlock}
 
     \bi
-    \ii Wir müssen Record-Objekte in Funktionen und wieder heraus bekommen{%
+    \ii Wir müssen Record-Objekte in Funktionen und wieder herausbekommen.{%
       \bi
-      \ii \textbf{Problem}: Wir können nur 32-Bit Wörter übergeben
-      \ii \structure{Call-by-Value}: Der Aufgerufene soll eine Kopie des Objekts bekommen{
+      \ii \textbf{Problem}: Wir können nur 32-Bit Wörter übergeben.
+      \ii \structure{Call-by-Value}: Der Aufgerufene soll eine Kopie des Objekts bekommen.{
         \begin{columns}
           \hfill\begin{column}{0.70\textwidth}
             \begin{code}[]
@@ -1299,12 +1299,12 @@ Da wir keine benutzerdefinierten Konstruktoren{{{see(06-init, Geburt von Objekte
       }
       \ei
     }\medskip
-    \ii<2-> \textbf{Lösung}: Wir führen ein \structure{Aufrufkonvention} für größere Objekte ein{
+    \ii<2-> \textbf{Lösung}: Wir führen ein \structure{Aufrufkonvention} für größere Objekte ein.{
       \bi
-      \ii Für \structure{Parameter}: \btSetTab Der Aufrufende gibt Zeiger auf Orginalobjekt mit.\\
-      \btUseTab Der Aufgerufene legt sich eine Kopie als lokales Objekt an\\[2ex]
-      \ii Für \structure{Rückgabe}: \btUseTab Aufrufer gibt Zieladdresse als zusätzlichen Parameter mit\\
-      \btUseTab Ausschleusen des Rückggabewerts durch \texttt{memcpy()}
+      \ii Für \structure{Parameter}: \btSetTab Der Aufrufende gibt Zeiger auf Originalobjekt mit.\\
+      \btUseTab Der Aufgerufene legt sich eine Kopie als lokales Objekt an.\\[2ex]
+      \ii Für \structure{Rückgabe}: \btUseTab Aufrufer gibt Zieladresse als zusätzlichen Parameter mit\\
+      \btUseTab Ausschleusen des Rückgabewerts durch \texttt{memcpy()}
       \ei
     }
     \ei
@@ -1376,37 +1376,37 @@ Da wir keine benutzerdefinierten Konstruktoren{{{see(06-init, Geburt von Objekte
 Als erstes, denn wir sind jetzt stolze Besitzer eines Record-Objekts, wollen wir diese herumreichen und umher werfen.
 Dies geschieht an mehreren Stellen:
 Bei einer Zuweisung zu einer Variablen mit einem Record-Typ[fn::Seien Sie sich gewahr, dass eine Variable vom Typ ~struct foo*~ keinen Record-Typ hat, sondern ein Zeiger ist, der auf einen Record verweist.], bei Übergabe eines Record-Objekts an eine Unterfunktion und bei Verwendung eines Records als Rückgabewert.
-Diese drei Stellen werden wir uns im Detail ansehen ansehen.
+Diese drei Stellen werden wir uns im Detail ansehen.
 
 Gemeinsam ist diesen Stellen, dass es zur Kopie von Objekten kommt, da wir einer Wertesemantik folgen.
-Es stellt sich also die Frage: *Von Wo* wird *nach Wo* mit *welchem Mechanismus* kopiert? 
+Es stellt sich also die Frage: *Von wo* wird *nach wo* mit *welchem Mechanismus* kopiert?
 
 Die Frage nach Quelle und Ziel ist die Frage nach dem R-Wert und dem L-Wert einer Variable mit Record-Typ.
-Da wir diese Variablen auf IR-Ebene als Zeiger auf Stackobjekte abbilden und dort, gewissermaßen eine Referenzsemantik verwenden, fallen R- und L-Wert von Record-Objekten zusammen.
+Da wir diese Variablen auf IR-Ebene als Zeiger auf Stackobjekte abbilden und dort gewissermaßen eine Referenzsemantik verwenden, fallen R- und L-Wert von Record-Objekten zusammen.
 In allen Fällen reichen wir einfach den Zeiger auf das Objekt herum.
-Erst der Verwender des R-/L-Wertes entscheidet dann ob er aus dem Speicherbereich ließt oder schreibt.
+Erst der Verwender des R-/L-Wertes entscheidet dann, ob er aus dem Speicherbereich liest oder schreibt.
 
-Um dies in der Codeerzeugung zu implementieren, fügen wir sowohl in der R-Wert- als auch in der L-Wert-Berechnung für Bezeichner den Sonderfall ein, dass wir ein Variable mit Record-Typen vor uns haben. Wie beim Funktionsaufruf verwenden wir die semantischen Querverweise um zur Stelle der Variablendefinition zu kommen (~expr.decl~) und die IR-Variable mit dem Zeiger zu erhalten (~ir_obj~).
+Um dies in der Codeerzeugung zu implementieren, fügen wir sowohl in der R-Wert- als auch in der L-Wert-Berechnung für Bezeichner den Sonderfall ein, dass wir ein Variable mit Record-Typen vor uns haben. Wie beim Funktionsaufruf verwenden wir die semantischen Querverweise, um zur Stelle der Variablendefinition zu kommen (~expr.decl~) und die IR-Variable mit dem Zeiger zu erhalten (~ir_obj~).
 
-Mit dem Wissen, dass bei Objekten, die größer sind als eine einzelnes Maschinenwort, der L- und der R-Wert zusammenfallen, können wir nun auch in der Zuweisungsoperation einen weiteren Sonderfall (neben dem für Zuweisung zu Variablen) einbauen.
+Mit dem Wissen, dass bei Objekten, die größer sind als ein einzelnes Maschinenwort, der L- und der R-Wert zusammenfallen, können wir nun auch in der Zuweisungsoperation einen weiteren Sonderfall (neben dem für Zuweisung zu Variablen) einbauen.
 Um vom Quellobjekt zum Zielobjekt zu kopieren, rufen wir die Laufzeitfunktion ~void *memcpy(void *dest, const void *src, size_t n)~ auf. 
-Die Anzahl der Bytes, die kopiert werden muss ergibt sich aus der Berechnung des Datenlayouts.
+Die Anzahl der Bytes, die kopiert werden müssen, ergibt sich aus der Berechnung des Datenlayouts.
 
 An dieser Stelle sehen wir eine weitere Designentscheidung, die wir für unseren IR-Befehlssatz getroffen haben.
 Anstatt einen eigenen IR-Kopier-Befehl einzuführen, der mehr als 4 Byte kopieren kann, bedienen wir uns einer Laufzeitfunktion.
 Dies ist wiederum eine Entscheidung, die dazu führt, dass wir unseren IR-Code so einfach wie möglich halten können.
 
 
-Bei *Funktionsaufrufen* müssen wir sehr ähnliche Probleme lösen, wie bei der Zuweisung.
+Bei *Funktionsaufrufen* müssen wir sehr ähnliche Probleme lösen wie bei der Zuweisung.
 Da der ~Call~-Befehl nur Maschinenwörter zwischen Aufrufendem (caller) und Aufgerufenem (callee) transportieren kann, bleibt uns nichts anderes übrig, als eine Referenz auf das übergebene Objekt als Parameter zu verwenden.
-Da wir allerdings dem Wertemodell folgen wollen, müssen wir, mittels der IR-Befehle, die *Call-by-Value*[fn::Der Aufgerufen bekommt eine Kopie des Objekts und keine Referenz (was Call-by-Reference wäre).]-Semantik der Sprachebene abbilden. 
-Dazu legen wir eine Aufrufkonvention fest: Zwar bekommt der Aufgerufene einen Zeiger, legt sich aber eine selbständig eine Kopie in seinem Call-Frame an, dann im folgendem anstatt des Parameters verwendet wird.
+Da wir allerdings dem Wertemodell folgen wollen, müssen wir mittels der IR-Befehle die *Call-by-Value*[fn::Der Aufgerufen bekommt eine Kopie des Objekts und keine Referenz (was Call-by-Reference wäre).]-Semantik der Sprachebene abbilden.
+Dazu legen wir eine Aufrufkonvention fest: Zwar bekommt der Aufgerufene einen Zeiger, legt sich aber selbständig eine Kopie in seinem Call-Frame an, die dann im Folgendem anstatt des Parameters verwendet wird.
 
-Im Beispiel übergeben wir ~src~ an die Funktion f als Parameter ~obj~. Diese Funktion legt, in ihrem *Funktionsprolog*, bevor eine Instruktion für den Entwickler ausgeführt wird, ein lokales Objekt an, dessen Zeiger in ~__obj~ gespeichert wird. Ein Aufruf zu ~memcpy()~ erledigt das kopieren der Daten, und fortan wird nur noch ~__obj~ verwendet, wo ~obj~ im AST steht.
+Im Beispiel übergeben wir ~src~ an die Funktion f als Parameter ~obj~. Diese Funktion legt in ihrem *Funktionsprolog*, bevor eine Instruktion für den Entwickler ausgeführt wird, ein lokales Objekt an, dessen Zeiger in ~__obj~ gespeichert wird. Ein Aufruf zu ~memcpy()~ erledigt das kopieren der Daten, und fortan wird nur noch ~__obj~ verwendet, wo ~obj~ im AST steht.
 
-Ein ähnliches Problem haben wir bei der Rückgabe des Objekts. Wiederum wollen wir, auf Sprachebene, das Objekt "by-Value" zurückgeben, können aber nur Zeiger zwischen Caller und Callee austaschen. Da die Lebenszeit des Rückgabewerts länger sein muss als die Laufzeit der Callee-Funktionsinstanz, müssen wir auch Speicher aus dem Call-Frame des Aufrufendem verwenden um das Objekt zu transportieren.
+Ein ähnliches Problem haben wir bei der Rückgabe des Objekts. Wiederum wollen wir auf Sprachebene das Objekt "by-Value" zurückgeben, können aber nur Zeiger zwischen Caller und Callee austauschen. Da die Lebenszeit des Rückgabewerts länger sein muss als die Laufzeit der Callee-Funktionsinstanz, müssen wir auch Speicher aus dem Call-Frame des Aufrufendem verwenden, um das Objekt zu transportieren.
 
-Wir erweitern unsere Aufrufkonvention dahingehend, dass eine Funktion die ein Record-Objekt als Rückgabewert hat, einen zusätzlichen (unsichtbaren) Parameter bekommt, mit dem der Aufrufer eine Zieladresse für die Rückgabe kommuniziert.
+Wir erweitern unsere Aufrufkonvention dahingehend, dass eine Funktion, die ein Record-Objekt als Rückgabewert hat, einen zusätzlichen (unsichtbaren) Parameter bekommt, mit dem der Aufrufer eine Zieladresse für die Rückgabe kommuniziert.
 Bei einem Return-Statement kopiert der Callee seinen Rückgabewert an diese Stelle und führt das eigentliche ~Return~ mit dem Zeiger durch.
 
 Zusammengefasst:
@@ -1503,21 +1503,21 @@ Genau an dieser Stelle sehen wir, dass das Wertemodell für Variablen zu vielen 
 #+end_src
 
 Der letzte Teil der Codeerzeugung für Records ist der, für den wir den ganzen Tanz mit den Records überhaupt erst angefangen haben:
-Wir wollen auf einzelne Felder in einem Record-Objekt zugreifen. Und zwar sowohl lesend, als auch schreibend.
+Wir wollen auf einzelne Felder in einem Record-Objekt zugreifen. Und zwar sowohl lesend als auch schreibend.
 
-Um ein Feld beschreiben zu können verwendet der Entwickler auf Sprachebene eine Zuweisung. 
-Wir haben gesehen, dass die Codeerzeugung der Zuweisung für die linke Seite einen Zeiger als L-Wert berechnet und den zugewiesenen Wert als R-Wert. Also können wir die Frage nach dem Feldzugriff umformulieren und Fragen: Was ist der L-Wert eines Feldzugriffes und was ist sein R-Wert?
+Um ein Feld beschreiben zu können, verwendet der Entwickler auf Sprachebene eine Zuweisung.
+Wir haben gesehen, dass die Codeerzeugung der Zuweisung für die linke Seite einen Zeiger als L-Wert berechnet und den zugewiesenen Wert als R-Wert. Also können wir die Frage nach dem Feldzugriff umformulieren und Fragen: Was ist der L-Wert eines Feldzugriffs und was ist sein R-Wert?
 
-Für den L-Wert müssen wir die Adresse des Feldes berechnen. Diese ergibt sich daraus, dass wir auf die Basisadresse des Objekts den Offset des (statisch benannten) Feldes aus dem Datenlayout addieren. Auf den Folien sehen wir wie dies alles ineinander bei ~lvalue_FieldAccess()~[fn::FieldAccess ist der AST Knotentyp für den Punkt-Operator: "lhs.name"] ineinander greift: 
-Um die Basisaddresse der ~lhs~ zu berechnen brauchen wir den L-Wert des Objekts (also die Adresse des Objekts). Aus dem Feldnamen ~name~ leiten wir, zusammen mit dem Datenlayout das konstante Offset ab und addieren Basisaddresse und konstantem Offset zum L-Wert des Feldes.
+Für den L-Wert müssen wir die Adresse des Feldes berechnen. Diese ergibt sich daraus, dass wir auf die Basisadresse des Objekts den Offset des (statisch benannten) Feldes aus dem Datenlayout addieren. Auf den Folien sehen wir wie dies alles bei ~lvalue_FieldAccess()~[fn::FieldAccess ist der AST Knotentyp für den Punkt-Operator: "lhs.name".] ineinander greift:
+Um die Basisadresse der ~lhs~ zu berechnen, brauchen wir den L-Wert des Objekts (also die Adresse des Objekts). Aus dem Feldnamen ~name~ leiten wir zusammen mit dem Datenlayout das konstante Offset ab und addieren Basisadresse und konstanten Offset zum L-Wert des Feldes.
 
-Wollen wir den R-Wert des Feldes, also seinen Inhalt haben, so ist das relativ einfach:
-Dort rufen wir ~lvalue_FieldAccess()~ auf um die Feld-Adresse zu berechnen und schieben einen ~Load~ Befehl hinterher um das Feld auszulesen.
+Wollen wir den R-Wert des Feldes, also seinen Inhalt, haben, so ist das relativ einfach:
+Dort rufen wir ~lvalue_FieldAccess()~ auf, um die Feld-Adresse zu berechnen und schieben einen ~Load~ Befehl hinterher, um das Feld auszulesen.
 
 #+begin_src latex
   \begin{frame}{Records: Fazit}
     \bi
-    \ii Records und Wertemodell haben nicht gut in unser IR-Modell gepasst {
+    \ii Records und Wertemodell haben nicht gut in unser IR-Modell gepasst. {
       \bi
       \ii Variablen sind nur 32-Bit
       \ii Abbildung des Wertemodell auf Referenzen 
@@ -1525,7 +1525,7 @@ Dort rufen wir ~lvalue_FieldAccess()~ auf um die Feld-Adresse zu berechnen und s
     }\bigskip
     \ii Codeerzeugung verhält sich abhängig vom Typ völlig anders {
       \bi
-      \ii Zuweisungs-Operation bekommt Referenz auf Record-Objekte als R-Wert
+      \ii Zuweisungsoperation bekommt Referenz auf Record-Objekte als R-Wert
       \ii Besondere Aufrufkonvention für Record-Objekte
       \ii Zeiger auf Record-Objekte sind kein Problem (\codebox{\scriptsize \&struct foo})
       \ei
@@ -1543,15 +1543,15 @@ Dort rufen wir ~lvalue_FieldAccess()~ auf um die Feld-Adresse zu berechnen und s
 
 Am Ende möchte ich zu unserem Record-Fallbeispiel für die Codeerzeugung noch einige Bemerkungen machen:
 Eigentlich haben Records nicht besonders gut in unser IR-Modell gepasst.
-Aber zu geschickte Erzeugung von IR-Code und durch Einführung von Konventionen war es uns möglich die zuerst diskutierte Codeerzeugung um ein weiteres Sprachfeature zu erweitern ohne die virtuelle Maschine zu verändern. In einem richtigen Übersetzer hätten wir es uns also gespart sowohl Middle- als auch Backend anzupassen nur weil wir ein neues Feature in der Sprache anbieten wollen.
+Aber zu geschickte Erzeugung von IR-Code und durch Einführung von Konventionen war es uns möglich, die zuerst diskutierte Codeerzeugung um ein weiteres Sprachfeature zu erweitern, ohne die virtuelle Maschine zu verändern. In einem richtigen Übersetzer hätten wir es uns also gespart, sowohl Middle- als auch Backend anzupassen, nur weil wir ein neues Feature in der Sprache anbieten wollen.
 
 Ausschließlich die Verwendung von Laufzeitfunktionen zieht ein gewisses Maß an Fallout hinter sich her.
 Denn, wo kommt den das ~memcpy()~ her?
 Wer fügt die Implementierung in das fertige Programm ein?
-Zu diesem Zwecke kommt ein Übersetzer nicht nur als ein Binärprogramm, welches aus dem Quellcode ein Assemblerprogramm macht, sondern es gibt sogenannte *Run-Time Support Libraries*.
+Zu diesem Zwecke kommt ein Übersetzer nicht nur als ein Binärprogramm, welches aus dem Quellcode ein Assemblerprogramm macht, daher, sondern es gibt sogenannte *Run-Time Support Libraries*.
 In diese Bibliotheken platzieren wir jene Funktionalitäten, die wir bei der Abbildung von komplexeren Sprachkonstrukten auf die einfachen IR-Befehle benötigen.
 
-Bei GCC heißt diese Bibliothek ~libgcc.a~. Ein kurzen Überblick über ihren Inhalt kann man mit dem Tool ~nm~ bekommen[fn::Der Pfad zur libgcc.a kann auf ihrem System anders sein], welches wir in der Vorlesung über Maschinencode noch genauer diskutieren werden:
+Bei GCC heißt diese Bibliothek ~libgcc.a~. Ein kurzen Überblick über ihren Inhalt kann man mit dem Tool ~nm~ bekommen[fn::Der Pfad zur libgcc.a kann auf ihrem System anders sein.], welches wir in der Vorlesung über Maschinencode noch genauer diskutieren werden:
 
 #+begin_example
 $ nm /usr/lib/gcc/x86_64-linux-gnu/9/libgcc.a  | grep bswap
@@ -1561,7 +1561,7 @@ _bswapdi2.o:
 0000000000000000 T __bswapdi2
 #+end_example
 
-In dieser Auflistung sehen wir zwei Funktionen, die GCC verwendet um die Byte-Order innerhalb eines Wortes vertauschen. Eine genaue Auflistung solcher Funktionen findet sich in der [[https://gcc.gnu.org/onlinedocs/gccint/Standard-Names.html][GCC Dokumentation]]. Die äquivalente Implementierung für LLVM wird in der compiler-rt Bibliothek implementiert. Dort finden wir auch die Implementierung für [[https://github.com/llvm-mirror/compiler-rt/blob/master/lib/builtins/bswapsi2.c][~bswapsi2()~]].
+In dieser Auflistung sehen wir zwei Funktionen, die GCC verwendet, um die Byte-Order innerhalb eines Wortes zu vertauschen. Eine genaue Auflistung solcher Funktionen findet sich in der [[https://gcc.gnu.org/onlinedocs/gccint/Standard-Names.html][GCC Dokumentation]]. Die äquivalente Implementierung für LLVM wird in der compiler-rt Bibliothek implementiert. Dort finden wir auch die Implementierung für [[https://github.com/llvm-mirror/compiler-rt/blob/master/lib/builtins/bswapsi2.c][~bswapsi2()~]].
 
 * Zusammenfassung
 

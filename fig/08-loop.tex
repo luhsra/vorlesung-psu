@@ -26,13 +26,13 @@
         \item<2-> Blöcke erstellen {
             \begin{itemize}
             \item BB1: Loop-Header Block
-            \item BB2: Loop Body Block
+            \item BB2: Loop-Body Block
             \item BB3: Sequenzierungsblock
             \end{itemize}
           }
         \item<3-> Eintritt in die Schleife
-        \item<4-> Bedingung generiern\\\texttt{self.rvalue(whileStmt.cond)}
-        \item<5-> Bedingte Kontrollflussverzeigung
+        \item<4-> Bedingung generieren\\\texttt{self.rvalue(whileStmt.cond)}
+        \item<5-> Bedingte Kontrollflussverzweigung
         \item<6-> Loop-Body generieren\\\texttt{self.visit(whileStmt.body)}
         \item<7-> Rücksprungkante
         \item<8-> \texttt{current\_block}-Invariante wiederherstellen
