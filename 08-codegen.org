@@ -57,7 +57,7 @@
 
   \begin{frame}<handout:3>{Einordnung in den Übersetzerbau}
     \btAnimation[width=\textwidth]{1:<-2>,2:<3>}{fig/08-retargable-compiler}%
-    \footnote{Zahlen für Clang (C/C++ Frontend, 700k) und LLVM 9.0 (18 Backends, 1.4M)}
+    \footnote{Zahlen für Clang (C/C++ Frontend, 700k) und LLVM 9.0 (18 Backends, 1,4M)}
 
     \bi
     \ii Die Konstruktion eines Übersetzers ist aufwendig und schwierig!{
@@ -112,7 +112,7 @@ Clang ist das Sprachfrontend für C und C++.
 Es generiert LLVM IR-Code und hat insgesamt einen Umfang von ungefähr 700.000 Zeilen C++-Code.
 Jedoch gibt es noch andere Frontends, die ebenfalls LLVM IR erzeugen:
 Das Frontend für Go hat 91k Codezeilen und für Rust sind es 382k Codezeilen.
-Hätten wir für jede dieser Sprachen die 1.4M Codezeilen neu entwickelt, so würden wir jetzt auf einem Berg von 5.4M Codezeilen sitzen anstatt jetzt 2.6M.
+Hätten wir für jede dieser Sprachen die 1,4M Codezeilen Backend neu entwickelt, so würden wir auf einem Berg von 5,4M Codezeilen sitzen anstatt jetzt 2,6M.
 Natürlich hätten wir auf dem Weg im selben Maße mehr Bugs erzeugt und Entwicklerstunden verbraten.
 Zwischencode spart also nicht nur Geld sondern auch Nerven und ermöglicht schnelle Fortschritte bei der Entwicklung neuer Programmiersprachen.
 
