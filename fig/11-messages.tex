@@ -1,0 +1,24 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[object](arbeiter){Arbeiter};
+    \node[object, right=2 of arbeiter](auto){Auto};
+    \node[object,below=1 of arbeiter](lager){Lager für Teile};
+
+    \draw[->] (arbeiter) -- node[message] {\scriptsize get} (lager);
+    \draw[->] (arbeiter) -- node[message] {\scriptsize assemble} (auto);
+
+    \node[object, left=2 of arbeiter](firma){Firma};
+    \draw[->] (firma) -- node[message] {\scriptsize instruct} (arbeiter);
+    \draw[->] (arbeiter) -- ++(up:1cm) -| node[message,pos=0.25] {\scriptsize requestMoney} (firma);
+    \draw[->] (lager) -| node[message,pos=0.25] {\scriptsize signalEmpty} (firma);
+
+    \node[object,below=0.5 of auto] (object) {\scriptsize Objekt};
+    \node[message,below=0.1 of object] (message) {\scriptsize Nachricht};
+
+    \node[dashed,draw,fit=(object) (message)]{};
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

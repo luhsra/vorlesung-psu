@@ -1,4 +1,5 @@
 \documentclass{lecturefig}
+\usetikzlibrary{through}
 \begin{document}
 \begin{frame}[fragile]
   \begin{tikzpicture}[]
@@ -18,14 +19,78 @@
     \end{scope}
     
     \begin{scope}[on layer=background,every node/.style={
-        operation,font=\ttfamily,minimum width=3cm, right=-2pt of object,visible on=<2>
+        message,font=\ttfamily,minimum width=3cm, right=-5pt of object,visible on=<2>,
       }
       ]
       \node[yshift=8mm] {increment()};
-      \node[yshift=0cm] {getName()};
-      \node[yshift=-8mm] {nextObject()};
+      \node[yshift=0cm] (name) {getName()};
+      \node[yshift=-8mm] (next) {nextObject()};
+    \end{scope}
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[object,align=left,font=\ttfamily,inner ysep=2ex] (object){
+      .a = 23,\\[1ex]
+      .b = "foo",\\[1ex]
+      .c = \&object2
+    };
+
+    \begin{scope}[every node/.style={
+        minimum width=3cm,operation,font=\ttfamily, right=1cm of object,visible on=<1>
+        }
+        ]
+      \node[yshift=8mm] {incrementCounterOfQueue(queue\_t)};
+      \node[yshift=0cm] {getNameOfQueue(queue\_t)};
+      \node[yshift=-8mm] {popObjectFromQueue(queue\_t)};
     \end{scope}
     
-  \end{tikzpicture}
+    \begin{scope}[on layer=background,every node/.style={
+        message,font=\ttfamily,minimum width=3cm, right=-5pt of object,visible on=<2->
+      }
+      ]
+      \node[yshift=8mm] (increment) {increment()};
+      \node[yshift=0cm] (name) {getName()};
+      \node[yshift=-8mm] (next) {nextObject()};
+
+    \end{scope}
+
+    \begin{visible}<2>
+      \draw[ultra thin] (next.south) -- ++(down:1cm) node[below] {Methoden sind Nachrichten};
+      \draw[ultra thin] (object.north west) -- ++(120:1cm) node[anchor=south east] {Felder sind der Zustand};
+    \end{visible}
+
+    \node[yshift=10mm,visible on=<2->] at (increment.west) {\Large\structure{Das Objekt}};
+
+
+    \begin{visible}<3->
+    \node [] at (name.west) [circle through={($(next.south east)+(east:1ex)$)}] (circle) {};
+    \foreach \W/\opt/\name in
+        {-30/safegreen!30/L1,
+          90/luhblue!40/L2,
+          210/srared!40/L3}{
+      \coordinate (@) at ($(circle.\W)+(\W:3.4cm)$);
+      \draw[fill=\opt] (@) --        (circle.\W+60)
+            to[bend left] (circle.\W)
+            to[bend left] (circle.\W-60) -- cycle;
+      \coordinate (\name) at ($(circle.\W)+(\W:1.3cm)$);
+    }
+
+    \node[align=center] at (L2) (L2) {\textbf{Sichtbarkeit}};
+    \node[align=center,xshift=-4pt,yshift=-3pt] at (L1) (L1) {\textbf{Dynamischer}\\\textbf{Dispatch}};
+    \node[align=center] at (L3) (L3) {\textbf{Vererbung}};
+  \end{visible}
+
+
+  \begin{visible}<3>
+    \draw[ultra thin] (L1.east) -- ++(60:1cm) node[align=center,anchor=west,xshift=3mm] {\structure{Spätes Binden}\\Auswahl der Prozedur\\ beim Nachrichtenempfang};
+    \draw[ultra thin] (L2.west) -- ++(180:1cm) node[anchor=east,align=center] {Zugriffsschutz für\\ Methoden und Felder};
+    \draw[ultra thin] (L3.north west) -- ++(120:1cm) node[align=center,anchor=south] {Abstraktion\\von\\Ähnlichem};
+
+  \end{visible}
+
+
+\end{tikzpicture}
 \end{frame}
 \end{document}

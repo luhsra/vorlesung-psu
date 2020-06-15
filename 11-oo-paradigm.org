@@ -384,8 +384,28 @@ Welche Probleme ergeben sich durch rein imperatives Programmieren?
 
 
    \begin{btBlock}<3->[type=alert]{}
-     Die Objekt-Orientierten Objekte sind eine Erweiterung unserer bisherigen Objekte aus Vorlesung "05 - Objekte".
+     Diese (objekt-orientierten) Objekte sind eine Erweiterung unserer bisherigen Objekte aus Vorlesung "06 - Objekte".
    \end{btBlock}
+  \end{frame}
+
+  \begin{frame}{Nachrichten und Objekte}
+    \begin{center}
+      \includegraphics[width=0.7\textwidth]{fig/11-messages}    
+    \end{center}
+
+    \begin{btBlock}{Definition nach Alan Kay (Erfinder von Smalltalk)}
+      \small
+      \be
+      \ii \structure{Messaging}: Objekte kommunizieren durch den Versand von Nachrichten.
+      \ii \structure{Persistenz}: Objekte haben privaten Zustand, auch wenn sie nicht aktiv sind.
+      \ii \structure{Kapselung}: Informationen werden im Objekt verborgen.
+      \ii \structure{Späte Bindung}: Ausgeführte Operation wird spätmöglichst ausgewählt.
+      \ee
+    \end{btBlock}
+  \end{frame}
+
+  \begin{frame}{Konzepte für Objektorientierung}
+    \btAnimation[height=7cm]{range=3-5:<1->,center,padding=1ex}{fig/11-the-object}
   \end{frame}
 #+end_src
 
