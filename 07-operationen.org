@@ -1,6 +1,8 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 07 - Operationen
+#+DATE: [2020-06-08] 
 #+SETUPFILE: setup.org
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/wNjKg
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 
@@ -41,9 +43,7 @@ Effizienz: Seiteneffekte
 
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
-  \begin{frame}
-    \maketitle
-  \end{frame}
+  \maketitleframe
 
   \begin{frame}{Einordnung in die Vorlesung: Operationen}
     \begin{center}
@@ -233,7 +233,7 @@ Verwerfen wir dieses temporäre Objekt, so hat eine seiteneffekt-freie Operation
     \bi
     \ii \structure{Abhängigkeit}: Eine Operationen hängt vom Ergebnis einer anderen ab.{
       \bi
-      \ii Abhängige Operationen müssen zuerst ausgewertet werden.
+      \ii Abhängigkeiten müssen zuerst ausgewertet werden.
       \ii Bei der Auswertungsreihenfolge: keine Abhängigkeiten in die Zukunft
       \ii AST definiert hierarchische Abhängigkeiten zwischen Eltern und Kind
       \ei
@@ -472,7 +472,7 @@ Auf diese Weise werden Sie es schaffen, Neues schneller einzuordnen und schnelle
           \begin{C}
             int a, b;
             void foo() {
-              a = 1; a++; b = (a+=4, a * 3);
+              a= 1; a++; b= (a+=4, a*3);
             } // b == 18
           \end{C}
         \end{code}
@@ -520,7 +520,7 @@ Auf diese Weise werden Sie es schaffen, Neues schneller einzuordnen und schnelle
       \ii Werden in Code-Blöcken bzw. Compound-Statements zusammengefasst
       \ei
     }\medskip
-    \ii<2-> Manche Operationen haben eine Ausdrucks- und eine Statement-Form.\\
+    \ii<2-> Manche Operationen haben eine Statement- und eine Ausdrucks-Form.\\
     C: \codeinline{if (cond) { then_block } else { else_block}}\hfill%
     \codeinline{ cond ? then_expr : else_expr}
 
@@ -912,7 +912,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
       \begin{column}{0.49\textwidth}
         \columntitle{if--then--else}
         \begin{code}[tag=C]
-          \begin{C}
+          \begin{C}[style=smaller]
             if (cond) { /* then-block */ }
             else      { /* else-block */ }
           \end{C}
@@ -923,7 +923,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
         \ii Manchmal auch Postfix-Notation:\\
         \codeinline[style=ruby]{expr if cond} (Ruby)
         \eii
-      
+
       \end{column}\hfill
       \begin{column}<3->{0.49\textwidth}
         \columntitle{Short-Circuit Expression}
@@ -960,7 +960,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
         \ii Lineares Durchlaufen der Paare
         \ii Abbruch bei der ersten erfolgreichen Bedingung
         \eii
-      
+
       \end{column}\hfill
       \begin{column}<4->{0.49\textwidth}
         \columntitle{Switch/Case}
@@ -968,10 +968,10 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
         \begin{code}[tag=\scriptsize Rust]
           \begin{rust}[style=smaller]
             match number {
-               1          => println!("One"),
-               2 | 3 | 5  => println!("Two"),
-               13..=19    => println!("Range"),
-               _          => println!("Def"),
+               1     => println!("One"),
+               2|3|5 => println!("Two"),
+               7..=9 => println!("Range"),
+               _     => println!("Def"),
             }
           \end{rust}
         \end{code}
@@ -984,7 +984,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
       \end{column}
     \end{columns}
 
-  
+
   \end{frame}
 #+end_src
 
@@ -1032,7 +1032,7 @@ Gehen Sie jetzt zu unserer Python Funktion ~ite()~ zurück und versuchen Sie, di
     }\medskip
     \ii<2-> Warum macht das überhaupt Sinn? {
       \bi
-      \ii \texttt{call} hat formt nicht nur den Kontrollfluss, sondern auch den Datenfluss!
+      \ii \texttt{call} formt nicht nur den Kontrollfluss, sondern auch den Datenfluss!
       \ii Argumente \enquote{fließen} in die Call-Operation, Rückgabewerte hinaus\\[1ex]
       \ii Datenfluss trotz seiteneffektfreier Operationen
       \ii[$\Rightarrow$] \texttt{call F1} ist eine \structure{Komplexoperation} (= zusammengesetzte Operation)
@@ -1053,7 +1053,7 @@ Zusammen mit der Parameterisierbarkeit des Funktionsaufrufs kann auch jede Funkt
   def F1(P):
       P += 1
       print "a", P
-      if P <= 0:
+      if P < 3:
           F1(P)
       print "b", P
 
@@ -1226,9 +1226,9 @@ Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~bre
       \begin{column}{0.33\textwidth}
         \begin{code}[tag=C++]
           \begin{CPP}[style=smaller]
-            std::vector<int> numbers;
+            vector<int> nums;
           
-            for (int elem : numbers) {
+            for (int elem : nums) {
               stmt1; stmt2;
             }
           \end{CPP}
@@ -1284,7 +1284,7 @@ Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~bre
   \end{frame}
 
 
-  \begin{frame}[fragile]{Iteratoren und Generatoren}
+  \begin{frame}<beamer:0>[fragile]{Iteratoren und Generatoren}
     \bi
     \ii Aufzählungen können als eigenständige Objekte existieren.{
       \bi
@@ -1305,7 +1305,7 @@ Dabei beendet ein ~continue~ nur die aktuelle Ausführung des Körpers, ein ~bre
       \begin{column}<3->{0.49\textwidth}
         {\centering \structure{Generatoren}\par}\smallskip
         \begin{code}[tag=Python]
-          \lstinputlisting[style=py,linerange=s1-e1]{lst/07-iterator.py}
+          \lstinputlisting[style=py,style=smaller,linerange=s1-e1]{lst/07-iterator.py}
         \end{code}
 
         \bii
@@ -1420,7 +1420,7 @@ Im Anschluss gibt es eine Iteration (Delta) an die noch abschließender Code (Rh
     \end{btBlock}
     \begin{btBlock}{Definition: \structure{Basisblock} (BB)}
       Ein Basisblock ist eine Sequenz von Operationen.\\
-      Einmal gestartet, wird die Sequenz \textbf{immer} komplett abgearbeitet.
+      Die Sequenz \textbf{immer} komplett abgearbeitet.
     \end{btBlock}
     \bi
     \ii<2-> Fakten für Basisblöcke, die aus den Definitionen folgen{
@@ -1562,7 +1562,7 @@ Die Wahl eines gerichteten Graphen als Zwischenrepräsentation unseres Programms
         \ii Nur Sprünge teilen einen BB
         \ii CFG überdeckt nur eine Funktion
         \ii Anwendung: lokalen Optimierungen\\[1ex]
-        \ii[$\Rightarrow$] Der \enquote{normale} CFG
+        \ii[$\Rightarrow$] Der gängige CFG
         \eii
       \end{column}\hfill
       \begin{column}<3|handout:3>{0.49\textwidth}
@@ -1598,7 +1598,7 @@ Beide Arten von Kontrollflussgraphen sind nützlich, haben jedoch eine unterschi
 
 Wenn wir Funktionsaufrufe nicht als Sprünge werten, sondern sagen, dass eine Invokation ein Komplexbefehl ist, dann kommen wir zum *funktionslokalen CFG*.
 Dieser CFG enthält nur den Code einer einzelnen Funktion und er deckt nur diejenigen Kontrollflüsse ab, die im Kontext dieser Funktion stattfinden.
-Daher ist dieser CFG dafür geeignet den Code einer einzelnen Funktion zu erzeugen und zu optimieren. Deswegen ist der funktionslokale CFG auch der normale CFG.
+Daher ist dieser CFG dafür geeignet den Code einer einzelnen Funktion zu erzeugen und zu optimieren. Deswegen ist der funktionslokale CFG auch der gängige CFG.
 
 Wenn wir die Entscheidung treffen, dass eine Invokation ein Sprung ist, erhalten wir den *interprozeduralen CFG* (ICFG).
 Hier verbinden wir die ~call~-Instruktion mit dem Eingangsblock der aufgerufenen Funktion und die ~ret~-Instruktion mit der Rücksprungadresse.

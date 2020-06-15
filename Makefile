@@ -62,6 +62,8 @@ fig/%.pdf: fig/%.dot  Makefile
 09_stamp_page=0
 10_stamp=fig/10-stamp.pdf
 10_stamp_page=0
+11_stamp=fig/10-stamp.pdf
+11_stamp_page=0
 
 
 define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung

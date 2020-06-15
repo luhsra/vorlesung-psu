@@ -60,7 +60,7 @@ Effiziente Programmierer:
     \begin{column}{0.49\textwidth}
       \columntitle{Zwischencode-Maschine}
       \vspace{-1em}
-      \btAnimation[width=0.7\textwidth]{center,raisebox,1:<1->}{10-motivation}
+      \btAnimation[width=0.7\textwidth]{center,raisebox,1:<1->}{fig/10-motivation}
       \bii
       \ii Speicherabstraktion\tikzmark{left-memory}{
         \bi

@@ -4,15 +4,19 @@
 #+MACRO: topic (eval (org-macro-topic $1 $2))
 
 {{{topic(./01-einleitung.org,fig/01-stamp.png)}}}
+-----
 {{{topic(./02-syntax.org,fig/02-stamp.png)}}}
+-----
+
 {{{topic(./03-typen.org,fig/03-stamp.png)}}}
 {{{topic(./04-namen.org,fig/04-stamp.png)}}}
 {{{topic(./05-semantische-analyse.org,fig/05-stamp.png)}}}
+
+-----
 {{{topic(./06-objekte.org,fig/06-stamp.png)}}}
+{{{topic(./07-operationen.org,fig/07-stamp.png)}}}
 
 * COMMENT FIXME
-
-{{{topic(./07-operationen.org,fig/07-stamp.png)}}}
 {{{topic(./08-codegen.org,fig/08-stamp.png)}}}
 {{{topic(./09-optimierung.org,fig/09-stamp.png)}}}
 {{{topic(./10-maschinencode.org,fig/10-stamp.png)}}}

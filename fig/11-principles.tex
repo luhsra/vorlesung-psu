@@ -1,0 +1,67 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[box/.style={
+      minimum height=3ex,minimum width=3ex,draw
+    }]
+    \foreach \n/\x/\o in {%
+      a/safegreen!50/0,%
+      b/srared!50/2,%
+      c/luhblue!40/3,%
+      d/violet!50/4,%
+      e/red!60/5,%
+      f/badbee!40/7%
+    } {
+      \node[box, fill=\x,xshift=\o * 1cm] (\n) {};
+    }
+    \foreach \n/\x/\o in {%
+      g/pink!80/0,%
+      h/luhblue!20/1,%
+      i/orange!80/3,%
+      j/white/5,%
+      k/yellow/7%
+    } {
+      \node[box,fill=\x,xshift=\o * 0.8cm,xshift=3mm,yshift=1cm] (\n) {};
+    }
+
+    \node[anchor=east,yshift=0.35cm,xshift=-0.7cm] (concepts) {Konzepte};
+    
+
+
+    \begin{visible}<2->
+      \node[anchor=east,at=(concepts.east),yshift=2cm] (paradigma) {Paradigmen};
+      \node[right=1 of paradigma,thick,box,fill=safegreen] (p1) {};
+      \node[right=3 of paradigma,thick,box,fill=srared] (p2) {};
+      \node[right=6 of paradigma,thick,box,fill=luhblue] (p3) {};
+
+
+      \draw[->] (g) -- (p1);
+      \draw[->] (h) -- (p1);
+      \draw[->] (b) to[bend right] (p1);
+
+      \draw[->] (i) -- (p2);
+      \draw[->] (d) -- (p2);
+      \draw[->] (j) -- (p2);
+
+
+      \draw[->] (j) -- (p3);
+      \draw[->] (k) -- (p3);
+    \end{visible}
+
+
+    \begin{visible}<3->
+      \node[anchor=east,at=(paradigma.east),yshift=2cm] (languages) {Sprache};
+      \node[right=2 of languages,thick,box,fill=purple] (l1) {};
+      \node[right=6 of languages,thick,box,fill=cyan] (l2) {};
+
+      \draw[->] (p1) -- (l1);
+      \draw[->] (p2) -- (l1);
+      \draw[->] (p3) -- (l2);
+    \end{visible}
+
+    \begin{visible}[on layer=background]<4->
+      \node[fit=(p1) (p2) (l1),fill=badbee!40,label={[align=center]north:Multi-Paradigmen\\Sprache}] {};
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\end{document}
