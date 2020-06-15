@@ -1,0 +1,196 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 11 - Das Objekt-Orientierte Programmierparadigma
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+- Was ist das Grundlegende Problem?
+  - Softare ist Komplex => Kein Problem für die Maschiene
+  - Software Complexity ist ein Problem für Menschen
+  - Zum einen muss es in den Kopf eines einzigen Menschen passen.
+  - Zum anderen braucht man eine gemeinsame Sprache mit seinen Mitentwicklern.
+
+- Was ist ein Programmierparadigma?
+  - https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf
+  - Paradigma: Eine Menge von zusammenhängenden Konzepten die miteinander harmonieren.This chapter is partly based on the book [50], familiarly known as CTM, which givesThis chapter is partly based on the book [50], familiarly known as CTM, which gives
+  - Konzepte sind zu Paradigmen gruppiert.
+  - Sprachen implementieren 1..N Paradigmen. Meistens mehrere
+  - Die Paradigmen helfen dabei das Programm zu strukturieren.
+
+- Das Imperative Paradigma
+  - State + Procedure + Record
+  - State: Benannter Zustand
+  - Procedure:  Sequenzierung von mehreren Befehlen zu einem Ablauf
+  - Record:     Strukturierte Objekte
+
+  => Wie Dekonstruiert man damit ein großes Problem?
+
+- Das Objekt-Orientierte Paradigma
+  - Closures: Prozeduren mit teilweise aus dem Environment gebundenen Variablen
+  - => Instantiierbare Namensräume mit Methoden sind Closures.
+
+  - Was machen Leute damit?
+    Sie Bilden die Strukturen der Realen Welt auf Objekte ab => User
+
+    Design: Class Structure vs. Object Structure
+
+    => Wie dekonstruiert man damit ein großes Problem?
+
+  - Kritik an OO: Es gibt keine Algorithmen ohne Zustand
+
+    The problem with object-oriented languages is they've got all this implicit environment that they carry around with them.
+    You wanted a banana but what you got was a gorilla holding the banana and the entire jungle.
+
+
+
+* Paradigmen und Komplexität
+:PROPERTIES:
+:CUSTOM_ID: 11-einleitung
+:END:
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \maketitleframe
+
+  \begin{frame}{Wiederholung: Die semantische Lücke}
+  \begin{columns}
+    \begin{column}{0.30\textwidth}
+      \begin{center}\small
+        \includegraphics[width=1.5cm]{fig/01-problem}\\\relax
+        [Problem]\\[1ex]
+        \fbox{\parbox{0.8\textwidth}{\centering
+            Hochsprache\\
+            $\Uparrow$\\
+            \structure{Semantische Lücke}\\
+            $\Downarrow$\\
+            CPU-Steuersignale
+          }}\\[1ex]\relax
+        [Ausführung]\\\relax
+m        \includegraphics[width=1.5cm]{fig/01-cpu}
+      \end{center}
+    \end{column}\hfill
+    \begin{column}{0.65\textwidth}
+      Mit unserem Übersetzer haben die semantische Lücke \advantage{überwunden}:
+
+      \begin{center}
+        Source $\rightarrow$ AST $\rightarrow$ IR $\rightarrow$ ASM $\rightarrow$ ELF
+      \end{center}
+
+      \bii
+      \ii Beschreibung des Problems in Hochsprache
+      \ii Schrittweises Absenken der Abstraktion
+      \ii Schichten versprechen wohldefinierte Semantiken.
+      \eii
+
+      \bigskip
+      \pause
+      \ALERT{Aber:} \btSetTab Warum türmen wir überhaupt \\\btUseTab diese semantische Lücke auf?
+
+      \bii
+      \iida Lernkurve: Abstraktionen müssen gelernt werden.
+      \iida Fehleranfällig: Übersetzer können Bugs haben
+      \iida Abstraktionen erzeugen oft einen Overhead
+      \eii
+
+      \OrangeBox{Welchen Nutzen hat die semantische Lücke?}
+    \end{column}
+  \end{columns}
+  \end{frame}
+
+  \begin{frame}{Komplexität und Nicht-Determinismus}
+    \bi
+    \ii Große Systeme haben zwei Dimensionen, die das \structure{Verständnis} erschweren{%
+      \bi
+      \ii \structure{Komplexität}: Anzahl der interagierenden Elemente?
+      \ii \structure{Nicht-Determinismus}: Wie vorhersagbar sind die Interaktionen?
+      \ei
+    }\bigskip
+    \ii<2-> \textbf{Beispiel}: Das gesamte Universum {
+      \bi
+      \ii Viele Elemente (Atome), die  zufällig interagieren (Quantenmechanik)
+      \ii Für das funktionieren des Universums ist das egal.
+      \ii Für unser Verständnis vom Universum ein Problem.
+      \ei
+    }\bigskip
+    \ii<3-> Ein großes Programm als ein großes System.{%
+      \bi
+      \ii Viele Elemente (Daten) interagieren miteinander (abhängige Operationen).
+      \ii Für die Maschine egal. Operationen werden stumpf nacheinander ausgeführt.
+      \ii \structure{Problem Menschen}: Da sie es nicht verstehen, können sie es nicht bauen.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Mensch vs. Maschine}
+    \centering
+    \btAnimation[height=8cm]{range=1-4:<1->}{fig/11-complexity}
+  \end{frame}
+
+  \begin{frame}{Konzepte, Paradigmen, Prinzipien}
+    Damit wir Menschen \textbf{komplexe Systeme} bauen, verstehen und kommunizieren können, brauchen wir Abstraktionen und Strukturen.
+
+    \bigskip
+
+    \bi
+    \ii Sprachen bieten Abstraktionen zum denken und kommunizieren{%
+      \bi
+      \ii \structure{Konzepte}: Welche Abstraktionen kann es überhaupt geben?\\[1ex]
+         Beispiele: Records, Zustand, Prozeduren, Closures, Threads, Nachrichten\\[3ex]
+      \ii \structure{Paradigmen}: Welche Abstraktionen nutze ich in Kombination?\\[1ex]
+      Beispiel: Imperativ  = Records + Zustand + Sequenzierung + Prozeduren\\[3ex]
+      \ii \structure{Prinzipien}: Wie nutze ich die Abstraktionen (ohne Knieschuss)?\\[1ex]
+      Beispiel: Liskovsches Substitutionsprinzip\\
+      \onslide<2>{$\Rightarrow$    Software Engineering}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+
+  \begin{frame}{Hierarchie der Begrifflichkeiten}
+    \centering
+    \btAnimation[width=0.7\textwidth]{range=1-4:<1->}{fig/11-principles}
+  \medskip
+    \bii
+    \ii<2->  Paradigmen bündeln Konzepte zu einem konsiztenten Programmiermodell
+    \ii<3-> Es gibt \ALERT<3->{viel mehr} Sprachen als Paradigmen
+    \ii<4-> Die meisten Sprachen bedienen mehr als ein Paradigma.\\[1ex]
+    Oft: Ein Paradigma für \structure{Grobstruktur} + Ein Paradigma für die \structure{Feinstruktur}
+    \eii
+  \end{frame}
+#+end_src
+
+* Das imperative Programmierparadigma
+
+Was war das Problem?
+
+Was ist das Paradigma? 
+
+Welche Konzepte brauchen wir für Imperatives Programmieren?
+
+Welche Probleme ergeben sich durch rein imperatives Programmieren?
+
+* Das objekt-orientierte Programmierparadigma
+
+Was ist das Paradigma?
+
+Welches Konzept brauchen wir zusätzlich dazu?
+
+Wie schlägt sich dieses Konzept technisch nieder?
+
+Welche Kritikpunkte wurden an OO angebracht?
+
+* Zusammenfassung
+
+
