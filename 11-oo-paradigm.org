@@ -173,6 +173,94 @@ m        \includegraphics[width=1.5cm]{fig/01-cpu}
 
 * Das imperative Programmierparadigma
 
+#+begin_src latex
+  %%ONLY%%
+  \dividerframe{Das Imperative Paradigma}
+
+  \begin{frame}{In the Beginning,\ldots}
+    \btAnimation[width=\textwidth]{range=1-2:<1->}{fig/11-organization}
+
+    \medskip
+    \bi
+    \ii   \ldots all data was unstructured and all operations were floating.{
+      \bi
+      \ii[+=] \structure{Records}: Daten werden zu Datenstrukturen zusammengefasst.
+      \ii[+=]\structure{Sequenzierung}: Befehle nacheinander ausführen. Ergebnisse weitergegeben.
+      \ei
+    }\medskip
+    \ii Beispiel: Reverse Polish Notation (wie in PostFix) {
+      \bi
+      \ii Von Links nach rechts ausführen, Impliziter Stack für die Berechnung
+      \ii \texttt{1 3 + 5 4 - *} == \texttt{(1 + 3) * (5 - 4)}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Kontrollfluss und Prozeduren}
+    \begin{columns}
+      \begin{column}{0.35\textwidth}
+        \btAnimation[width=\textwidth]{range=1-3:<1->}{fig/11-prozeduren}
+      \end{column}\hfill
+      \begin{column}{0.58\textwidth}
+        \bi
+        \ii<2-> Komplexe Abläufe als Kontrollfluss {
+          \bi
+          \ii[+=] \structure{Selection}: Endlich können wir eine Operation auch mal auslassen.\\[1ex]
+          \ii[+=] \structure{Iteration}: Endlich können wir eine Operation mehrfach ausführen ohne sie doppelt zu notieren.
+          \ei
+        }\medskip
+        \ii<3-> \textbf{Wiederverwendung} durch \structure{Prozeduren} {
+          \bi
+          \ii Operationen werden ein Verbund und bekommen einen Namen.
+          \ii Parameter und Rückgabewerte
+          \ii[+=] \structure{Invokation}: Starte die Ausführung des Operationsverbundes.
+          \ei
+        }
+        \ei
+        \bigskip
+        \scriptsize (Beinahe) Synonyme: Funktionen, Prozedur, Routinen
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}[fragile]{Entwurfs-Prinzip: Prozedurale Abstraktion}
+    \bi
+    \ii Prozeduren sind eine \ALERT{technische Einrichtung} der Sprache{
+      \bi
+      \ii Gibt uns das grundlegende Prinzip der Code-Wiederverwendung.
+      \ii Die Sprache schreibt \textbf{nicht} vor, wie diese zu Verwenden sind.
+      \begin{columns}
+        \hfill
+        \begin{column}{0.4\textwidth}
+          \begin{code}[]
+            \begin{py}
+              def step3():
+                 step1()
+                 doIntermediateStep()
+                 step2()
+            \end{py}
+          \end{code}        
+        \end{column}\hfill\mbox{}
+      \end{columns}
+      \ei
+    }\bigskip
+    \ii<2-> \structure{Prozedurale Abstraktion}: Zerlegung des Problems als in Teilprobleme{
+      \bi
+      \ii Aufteilung des Codes anhand \textbf{problemspezifischer Grenzen}
+      \ii Eine Funktionalität $\rightarrow$ Eine Prozedur
+      \ii Implementierung der Funktionalität wird hinter dem Funktionsnamen versteckt und kann problemlos ausgetauscht werden (z.B. Bugfix).
+      \ei
+      \begin{code}[]
+        \begin{CPP}
+          char *strstr(const char *haystack, const char* needle);
+        \end{CPP}
+      \end{code}
+    }
+    \ei
+  \end{frame}
+#+end_src
+
 Was war das Problem?
 
 Was ist das Paradigma? 

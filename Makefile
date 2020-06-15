@@ -42,6 +42,9 @@ fig/%.pdf: fig/%.dot  Makefile
 	@${MAKE} build
 	dot -Tpdf $< > $@
 
+fig/%.pdf: fig/%.svg bin/svgfig
+	bin/svgfig $<
+
 01_stamp=fig/01-t-diagram.pdf
 01_stamp_page=5
 02_stamp=fig/02-grammar.pdf
