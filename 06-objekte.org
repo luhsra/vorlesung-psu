@@ -589,9 +589,9 @@ Besonders interessant ist hier das ~memset(..., 0, ...)~, welches die automatisc
           \begin{code}[]
             \begin{CPP}[style=smaller]
               class bounded_ptr {
-                int *data;
+                uint8_t *data;
                 unsigned length;
-                int *ptr;
+                uint8_t *ptr;
 
                 bounded_ptr(unsigned len) {
                   data   = malloc(len);
@@ -599,7 +599,7 @@ Besonders interessant ist hier das ~memset(..., 0, ...)~, welches die automatisc
                   ptr    = &data[0];
                 }
 
-                void set(int val) {
+                void set(uint8_t val) {
                   ,*ptr = val;
                 }
                 ...
@@ -640,7 +640,7 @@ Wenn sie das Objekt allerdings verändern, müssen sie dafür Sorgen, dass die I
 Während die Operation ausgeführt wird, dürfen die Invarianten kurzzeitig verletzt werden[fn::Denken Sie an dieser Stelle darüber nach, wie Nebenläufigkeit und semantische Invarianten zusammenspielen und alles kompliziert machen. Überlegen Sie sich auch wie ~synchronized~ das Problem auf Java-Sprachebene löst.].
 
 Das Beispiel auf den Folien zeigt eine Art Array, für welches der Konstruktor genügend Speicher allokiert, die Länge des Arrays abspeichert und ~ptr~ auf das erste Array-Element zeigen lässt.
-Diese drei Operationen im Konstruktor etablieren die aufgelisteten Invarianten, auf diese sich dann auch die Funktion ~void set(int)~ verlässt, wenn sie blind den Zeigern ~ptr~ dereferenziert und den übergebenen Parameter in das entsprechende Array-Element speichert.
+Diese drei Operationen im Konstruktor etablieren die aufgelisteten Invarianten, auf diese sich dann auch die Funktion ~void set(uint8_t)~ verlässt, wenn sie blind den Zeigern ~ptr~ dereferenziert und den übergebenen Parameter in das entsprechende Array-Element speichert.
 
 Wenn Sie selbst eine Klasse definieren, überlegen Sie sich, welche Invarianten gelten sollten. *All* ihre Konstruktoren sollten das Objekt so hinterlassen, dass diese Invarianten erfüllt sind.
 Jede Methode darf sich dann auf diese Invarianten verlassen, muss aber das Objekt so valide hinterlassen, wie es vorgefunden wurde.
