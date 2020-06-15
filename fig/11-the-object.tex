@@ -1,0 +1,31 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[object,align=left,font=\ttfamily,inner ysep=2ex] (object){
+      .a = 23,\\[1ex]
+      .b = "foo",\\[1ex]
+      .c = \&object2
+    };
+
+    \begin{scope}[every node/.style={
+        minimum width=3cm,operation,font=\ttfamily, right=1cm of object,visible on=<1>
+        }
+        ]
+      \node[yshift=8mm] {incrementCounterOfQueue(queue\_t)};
+      \node[yshift=0cm] {getNameOfQueue(queue\_t)};
+      \node[yshift=-8mm] {popObjectFromQueue(queue\_t)};
+    \end{scope}
+    
+    \begin{scope}[on layer=background,every node/.style={
+        operation,font=\ttfamily,minimum width=3cm, right=-2pt of object,visible on=<2>
+      }
+      ]
+      \node[yshift=8mm] {increment()};
+      \node[yshift=0cm] {getName()};
+      \node[yshift=-8mm] {nextObject()};
+    \end{scope}
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}

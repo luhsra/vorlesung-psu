@@ -329,6 +329,66 @@ Welche Probleme ergeben sich durch rein imperatives Programmieren?
 
 * Das objekt-orientierte Programmierparadigma
 
+
+#+begin_src latex
+  \dividerframe{Das objektorientierte\\Programmierparadigma}
+
+  \begin{frame}{Probleme imperativen Programmierens}
+    \btAnimation[width=0.6\textwidth]{1:<1->,center,padding=1ex}{fig/11-the-object}
+    \bi
+    \ii Imperativ: \textbf{Betonung} der Operationen bei \ALERT{Vernachlässigung} der Daten{%
+      \bi
+      \ii \alert{Codeduplikation}, da Funktionen sind strikt an ihre Datentypen gekoppelt.
+      \ii \alert{Keine Kontrolle}, da programmweiter Zugriff auf Datenstrukturen möglich
+      \ii \alert{Leicht unübersichtlich}, da kaum bis keine Hierarchie der Funktionen.
+      \ei
+      $\Rightarrow$ Erfordert Disziplin und geistige Kapazität vom Entwickler.
+    }
+    \ii Besonders problematisch bei großen Softwareprojekten {
+      \bi
+      \ii Wartung von dupliziertem Code macht N-fachen Aufwand.
+      \ii Viele Entwickler arbeiten an der gleichen Quellcodebasis.
+      \ii Prozedurale Abstraktion bietet nur eine Ebene von Abstraktion.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{\enquote{Objekte} als zentraler Begriff}
+    \OrangeBox{Menschen denken eher in Objekten (Nomen) als in Aktionen (verben)}
+    \begin{columns}
+      \begin{column}{0.33\textwidth}
+        \begin{btBlock}{Prozedural}
+          Fahrrad waschen\\
+          Apfel waschen
+        \end{btBlock}
+      \end{column}\hfill
+      \begin{column}{0.33\textwidth}
+        \begin{btBlock}{Objekt-Orientiert}
+        Fahrrad \btSetTab waschen\\
+        \btUseTab fahren
+      \end{btBlock}
+      \end{column}
+    \end{columns}
+    \medskip
+    \bi
+    \ii<2-> Entwurf entlang von Objekten spiegelt menschliche Erfahrungswelten {
+      \bi
+      \ii Eine Fabrik besteht aus: Hallen, Arbeitern, Maschienen, einem Gelände.
+      \ii All diese Entitäten haben (veränderliche) \structure{Eigenschaften}.
+      \ii Entitäten \structure{interagieren miteinander} anstatt verarbeitet zu werden:\\
+      Arbeiter motiert Reifen $\Rightarrow$ montieren(reifen, by=arbeiter)
+      \ei
+    }
+     \ei
+
+
+   \begin{btBlock}<3->[type=alert]{}
+     Die Objekt-Orientierten Objekte sind eine Erweiterung unserer bisherigen Objekte aus Vorlesung "05 - Objekte".
+   \end{btBlock}
+  \end{frame}
+#+end_src
+
 Was ist das Paradigma?
 
 Welches Konzept brauchen wir zusätzlich dazu?
