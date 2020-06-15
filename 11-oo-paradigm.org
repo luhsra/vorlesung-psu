@@ -174,7 +174,6 @@ m        \includegraphics[width=1.5cm]{fig/01-cpu}
 * Das imperative Programmierparadigma
 
 #+begin_src latex
-  %%ONLY%%
   \dividerframe{Das Imperative Paradigma}
 
   \begin{frame}{In the Beginning,\ldots}
@@ -184,11 +183,11 @@ m        \includegraphics[width=1.5cm]{fig/01-cpu}
     \bi
     \ii   \ldots all data was unstructured and all operations were floating.{
       \bi
-      \ii[+=] \structure{Records}: Daten werden zu Datenstrukturen zusammengefasst.
-      \ii[+=]\structure{Sequenzierung}: Befehle nacheinander ausführen. Ergebnisse weitergegeben.
+      \ii<2->[+=] \structure{Records}: Daten werden zu Datenstrukturen zusammengefasst.
+      \ii<2->[+=]\structure{Sequenzierung}: Befehle nacheinander ausführen. Ergebnisse weitergegeben.
       \ei
     }\medskip
-    \ii Beispiel: Reverse Polish Notation (wie in PostFix) {
+    \ii<2-> Beispiel: Reverse Polish Notation (wie in PostFix) {
       \bi
       \ii Von Links nach rechts ausführen, Impliziter Stack für die Berechnung
       \ii \texttt{1 3 + 5 4 - *} == \texttt{(1 + 3) * (5 - 4)}
@@ -219,7 +218,9 @@ m        \includegraphics[width=1.5cm]{fig/01-cpu}
         }
         \ei
         \bigskip
-        \scriptsize (Beinahe) Synonyme: Funktionen, Prozedur, Routinen
+        \onslide<3->{
+          \scriptsize (Beinahe) Synonyme: Funktionen, Prozedur, Routinen
+        }
       \end{column}
     \end{columns}
   \end{frame}
@@ -258,6 +259,63 @@ m        \includegraphics[width=1.5cm]{fig/01-cpu}
       \end{code}
     }
     \ei
+  \end{frame}
+
+  \begin{frame}{Benannter und veränderlicher Zustand}
+    \begin{columns}
+      \begin{column}{0.25\textwidth}
+        \btAnimation[width=\textwidth]{range=1-3:<1->,3:<4->}{fig/11-state}
+      \end{column}\hfill
+      \begin{column}{0.65\textwidth}
+        \bi
+        \ii<2-> Eingaben und (Zwischen-)ergebnisse speichern{%
+          \bi
+          \ii Speicherzellen mit symbolischem Namen
+          \ii Objekte werden an diese Namen gebunden
+          \ii Späterer Zugriff über das Symbol
+          \ei
+        }\medskip
+        \ii<3-> \structure{Veränderlicher Zustand} ist ein eigenes Konzept{%
+          \bi
+          \ii += \structure{Variablen} und \structure{Zuweisung}
+          \ii Gebundene Namen können neu gebunden  werden.
+          \ii Flexibler Datenfluss und Schleifen mit Auswirkung
+          \ei
+        }\medskip
+        \ii<4-> Variablen sind Quelle unendlich vieler \ALERT{Bugs} {
+          \bi
+          \ii Variablen sind ein Seitenkanal zu den Parametern
+          \ii Funktionsverhalten kann überraschend werden
+          \ii Zustand kann inkonsistent werden.
+          \ei
+        }
+        \ei
+
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}{Das imperatives Programmierparadigma}
+    \begin{center}
+      \includegraphics[width=0.6\textwidth]{fig/11-procedural-paradigma.pdf}
+    \end{center}
+
+    \bi
+    \ii Das \structure{imperative Programmierparadigma} umfasst mehrere Konzepte{
+      \bi
+      \ii Operationen: Sequenzierung, Konstrolstrukturen, Prozeduren
+      \ii Daten: Strukturierte Daten, benannter und veränderlicher Zustand
+      \ii Beispiele für rein imperative Sprachen: Fortran, COBOL, PL/I, C, Pascal
+      \ei
+    }\medskip
+    \ii Imperatives Programmieren ist oft das Paradigma \structure{\enquote{im Kleinen}}{
+      \bi
+      \ii Starke Kontrolle des Programmierers über die Ausführung (\ALERT{--}, \advantage{+})
+      \ii Java, Rust, C++ bieten alle das imperative Paradigma an.
+      \ei
+    }
+    \ei
+  
   \end{frame}
 #+end_src
 
