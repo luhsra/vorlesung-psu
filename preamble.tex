@@ -16,11 +16,26 @@
 \usepackage{multirow}
 \usepackage{pgffor}
 
-%\usepackage[utf8]{inputenc}
-%\usepackage[T1]{fontenc}
-
-\usepackage{lmodern}
-\usepackage[scaled=0.85]{beramono}
+\usepackage{iftex}
+\ifluatex
+  \usepackage{lmodern}
+  \usepackage[no-math]{fontspec}
+  % VeraMono ist viel schmaller als Beramono
+  \setmonofont{VeraMono}[
+     Extension       = .ttf,
+     BoldFont        = *-Bold,
+     ItalicFont      = *-Italic,
+     BoldItalicFont  = *-Bold-Italic,
+     Scale           = MatchLowercase,
+  ]
+  \usepackage{pifont}
+\else
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{helvet}
+  \usepackage{pifont}
+  \usepackage[scaled=0.85]{beramono}
+\fi
 
 % Section Title and Block Number
 \newcommand{\psuSectionStart}[2]{

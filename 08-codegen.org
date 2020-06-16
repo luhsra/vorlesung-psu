@@ -174,7 +174,7 @@ So hat der Rust-Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch
       \end{tikzpicture}
     \end{center}
   
-    \begin{columns}
+    \begin{columns}[t]
       \begin{column}{0.49\textwidth}
         \columntitle{Stack-Maschine}
         \bii
@@ -186,14 +186,14 @@ So hat der Rust-Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch
 
         \begin{code}
           \begin{onlyenv}<handout:1|1>
-          \begin{codetext}
+          \begin{codetext}[style=smaller]
             push 3
             push 4
             add     // = push(pop() + pop())
           \end{codetext}
           \end{onlyenv}
           \begin{onlyenv}<handout:2-|2->
-          \begin{codetext}
+          \begin{codetext}[style=smaller]
             // code(Op1) ->  1 Element am Stack
             // code(Op2) ->  1 Element am Stack
             add     // = push(pop() + pop())
@@ -214,14 +214,14 @@ So hat der Rust-Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch
           \begin{codetext}
             r0 = 3
             r1 = 4
-            r2 = add r1, r2
+            r3 = add r1, r2
           \end{codetext}
           \end{onlyenv}
           \begin{onlyenv}<handout:2-|2->
           \begin{codetext}
             // r1 = code(Op1)
             // r2 = code(Op2)
-            r2 = add r1, r2
+            r3 = add r1, r2
           \end{codetext}
           \end{onlyenv}
         \end{code}
@@ -500,7 +500,7 @@ Insgesamt hat unsere IR-Maschine 16 Befehle und ist damit sehr übersichtlich.
     \begin{columns}[t]
       \begin{column}{0.49\textwidth}
         \begin{code}
-        \begin{py}
+        \begin{py}[style=smaller]
           class BasicBlock:
               def __init__(self, label):
                   self.label = label
@@ -510,7 +510,7 @@ Insgesamt hat unsere IR-Maschine 16 Befehle und ist damit sehr übersichtlich.
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \begin{code}
-        \begin{py}
+        \begin{py}[style=smaller]
           class Function:
               def __init__(self, label):
                   self.label = label
@@ -588,7 +588,7 @@ Auf den Folien finden Sie noch einen iterativen Fibonacci als Beispiel für eine
 
   \bigskip
   \bii
-  \ii Erstelle ein Funktionsobjekt\hspace{1cm}       \btSetTab \siginline{Programm.create\_function}{string}{Function}{%
+  \ii Erstelle ein Funktionsobjekt\hspace{9mm}       \btSetTab \siginline{Programm.create\_function}{string}{Function}{%
     \bi
     \ii Funktionen haben den Namen als Label (\scriptsize\codebox{func.label}).
     \ii Parameter und Variablen werden beim traversieren erstellt.\\[2ex]
@@ -603,7 +603,7 @@ Auf den Folien finden Sie noch einen iterativen Fibonacci als Beispiel für eine
     \ei
   }
 
-  \ii Hänge eine Operation an            \btUseTab \siginline{BasicBlock.append}{Operation, Operands}{()}{%
+  \ii Hänge eine Operation an            \btUseTab \siginline{BasicBlock.append}{Operation, Operands*}{()}{%
     \bi
     \ii Das Label für den Basisblock wird automatisch von der Funktion vergeben.
     \ii Ein \ircmd{Goto}/\ircmd{IfGoto} schließt den Basisblock ab.
@@ -1056,13 +1056,13 @@ Dazu greifen wir vier Teilbereiche an: Abbildung auf das IR-Speichermodell, Zuwe
     \bi
     \ii \textbf{Erinnerung (Record)}: Geordnete Sequenz von Paaren (Name, Typ)\\\medskip
     \begin{center}
-      \texttt{type(struct bar) = }\typeinline{ = record(("a", int), ("b", foo\_t), ("c", int))}
+      \texttt{type(struct foo) = }\typeinline{ = record(("a", int), ("b", foo\_t), ("c", int))}
      \end{center}\medskip
      \ii<2-> Um dessen Objekte im Speicher abzulegen, brauchen wir ein \structure{Datenlayout}{%
     \begin{columns}[t]
       \begin{column}{0.49\textwidth}
         \mbox{\strut}\\
-        \texttt{layout(struct bar) = }\\[1ex]
+        \texttt{layout(struct foo) = }\\[1ex]
         {\small
         \begin{tabular}{lrrr}\toprule
           Name & \uncover<handout:3-|4->{Offset} & Typ    & \uncover<handout:2-:3->{Länge} \\\midrule
@@ -1074,7 +1074,7 @@ Dazu greifen wir vier Teilbereiche an: Abbildung auf das IR-Speichermodell, Zuwe
         \end{tabular}
         }
       
-        \only<handout:5-|6->{\mbox{}\\[2ex]\texttt{sizeof(struct bar) = } \alt<handout:5|6>{16}{20}}
+        \only<handout:5-|6->{\mbox{}\\[2ex]\texttt{sizeof(struct foo) = } \alt<handout:5|6>{16}{20}}
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \vspace{-1em}
@@ -1126,10 +1126,10 @@ Dazu greifen wir vier Teilbereiche an: Abbildung auf das IR-Speichermodell, Zuwe
                 # IR-Variable 
                 var = cf.create_variable(decl.name)
                 decl.ir_obj = var
-
                 # ggf. Objekt am Stack anlegen
-                if decl.Type.sizeof > 4:
-                  bb.append(StackAlloc, var, sizeof)
+                size = self.sizeof(decl.Type)
+                if size > 4:
+                  bb.append(StackAlloc, var, size)
                     if self.dynamic_types:
                        bb.append(Store, var,
                                  decl.Type.tag)
@@ -1179,7 +1179,7 @@ Vor dem Feld ~c~ fügen wir eine künstliche Lücke ein, da ~b~ mit 5 Bytes irre
 Solches zusätzliche Alignment, meist auf Maschinenwortbreite, führt zwar durch die entstandenen Lücken zu einem erhöhten Speicherverbrauch, kann aber den erzeugten Maschinencode oft deutlich beschleunigen. Hintergrund hier ist, dass Speicherzugriffe, die nicht Wort-weise ausgerichtet sind, auf vielen Prozessoren langsamer sind[fn::Besonders ekelhaft ist es, wenn ein Zugriff die Grenze zwischen zwei Cachezeilen oder zwei Speicherseiten überschreitet.].
 
 Haben wir jedem Feld einen Offset gegeben, so können wir die Größe für ein Record-Objekt angeben (in diesem Fall 16 Byte).
-Jedes Objekt vom Typen ~struct bar~ wird später nach genau diesem Layout strukturiert sein, sodass jeder Zugriff auf die Felder eines ~struct bar~-Objekts von diesem Layout ausgehen kann.
+Jedes Objekt vom Typen ~struct foo~ wird später nach genau diesem Layout strukturiert sein, sodass jeder Zugriff auf die Felder eines ~struct foo~-Objekts von diesem Layout ausgehen kann.
 Außerdem werden die Informationen über das Datenlayout auch in den Informationen für den Debugger vermerkt, sodass dieser ein solches Objekt aus dem Speicher dekodieren und die semantische Zuordnung zwischen Feld und Speicherzelle rückgängig machen kann.
 
 Wollen wir dynamische Typinformationen für unserer Objekte haben, so müssen wir ein zusätzliches Typ-Tag-Feld im Datenlayout vorsehen.
@@ -1188,7 +1188,7 @@ Da diesen Typ-Feld bei allen Objekten am gleichen konstanten Offset zu finden se
 Bewaffnet mit dem Datenlayout und der Größe des Typen, können wir nun zur Tat schreiten und IR-Code erzeugen.
 Für unser Beispiel werden wir ein *Wertemodell für Variablen* anstreben, da wir die Records in eine Sprache mit Referenzen einbauen wollen.
 Zur Erinnerung:
-Wertemodell bedeutet, dass eine Variable vom Typ ~struct bar~ ein entsprechendes Objekt enthält und nicht nur eine Referenz darauf (das wäre Referenzmodell).
+Wertemodell bedeutet, dass eine Variable vom Typ ~struct foo~ ein entsprechendes Objekt enthält und nicht nur eine Referenz darauf (das wäre Referenzmodell).
 Bei Zuweisungen und Funktionsaufrufen wird das Objekt kopiert, und mit dem Ende der Variablen-Lebenszeit endet auch die Lebenszeit des Objekts.
 In unserem Beispiel gibt es nur lokale Variablen und keine dynamische Speicherallokation auf Sprachebene.
 
@@ -1359,9 +1359,9 @@ Da wir keine benutzerdefinierten Konstruktoren{{{see(06-init, Geburt von Objekte
                 <BB: BB0> {
                   // Prologue
                   __obj := StackAlloc 16
-                  t0  := Call memcpy, __obj, obj
+                  t0  := Call memcpy, __obj, obj, 16
                   // Function Return
-                  t1  := Call memcpy, __ret, __obj
+                  t1  := Call memcpy, __ret, __obj, 16
                   Return __ret
                 }
               }
