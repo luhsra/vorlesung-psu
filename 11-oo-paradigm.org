@@ -460,6 +460,198 @@ Welches Konzept brauchen wir zusätzlich dazu?
 
 Wie schlägt sich dieses Konzept technisch nieder?
 
+** Prototyp-basierte Objektorientierung
+#+begin_src latex
+\dividerframe{Prototypen}
+  \begin{frame}{Objekt-Orientierung ohne Klassen}
+    \begin{btBlock}{}
+      Da Sie alle OO auf Basis von Klassen zur Genüge kennen, werden wir eine andere Art der OO Programmierung betrachten.
+    \end{btBlock}
+    \medskip
+    \bi
+    \ii Javascript kennt \ALERT{keine Klassen} und ist \ADVANTAGE{dennoch} Objekt-Orientiert{
+      \bi \def\C{\bgroup\textcolor{safegreen}\checkmark\egroup}
+      \ii Javascript-Objekt haben Felder (\C) gebundene Methoden (\C)
+      \ii Methoden werden erst beim Aufruf aufgelößt (\C)
+      \ii Informationen können mittels lexikalischem Scoping verborgen (\C) werden
+      \ei
+    }\medskip
+    \ii JavaScript verwendet \structure{Prototypen-basierte Vererbung}{
+      \bi
+      \ii Flexibler, Erweiterbarer, und Mächtiger als klassenbasierte Vererbung
+      \ii Hohe Dynamik, die besonders für eine Skriptsprache geeignet ist
+      \ii Wenige Sprachmechanismen, aber ein gewisser Zoo an syntaktischem Zucker
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{JavaScript: Die Prototypen Kette}
+    \begin{columns}
+      \hfill
+      \begin{column}{0.49\textwidth}
+        \begin{code}[]
+          \begin{JS}
+            var obj = { a: 23 };
+            obj.zz = 42;
+            [obj.a, obj["a"], obj["zz"]];
+            // => [23, 23, 42]
+          \end{JS}
+        \end{code}
+      \end{column}\hfill
+    \end{columns}
+
+    \bi
+    \ii JavaScript-Objekte sind \emph{\enquote{bags} of properties}{
+      \bi
+      \ii Zugriff über \texttt{[]} und den Punktoperator
+      \ii Recordtyp und Abbildungstyp fallen zusammen
+      \ii Properties können zu einem Objekt hinzugefügt werden
+      \ei
+    }\medskip
+    \ii<2-> Die \texttt{\_\_proto\_\_}-Property: Fallback für den Property-Zugriff{
+      \bi
+      \ii Situation: Ein Objekt hat die geforderte Property nicht
+      \ii Die Suche wird beim Prototypen, der in \texttt{\_\_proto\_\_} referenziert ist, fortgesetzt.
+      \ii Es entsteht die \structure{Prototypen-Kette}, die bei \texttt{\{\}} endet.
+      \ei\smallskip
+      \btAnimation[width=0.9\textwidth]{1:<1-2>,2:<3>,center,padding}{fig/11-prototypes}
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{JavaScript: Property-Lookup und \texttt{this}}
+    \bi
+    \ii Prototypen-Kette implementiert dynamischen und hierarchischen Lookup{%
+      \bi
+      \ii Objekt in der Kettenmitte erweitern $\rightarrow$ Alle Kinder werden erweitert
+      \ii Speichereffizient, aber mit hohen Lookup-Kosten verbunden.
+      \ei
+    }\medskip
+    \ii<2-> JavaScript bindet den Namen \structure{\texttt{this}} an das aktuelle Objekt{
+      \bi
+      \ii Properties können auf Funktionen verweisen.
+      \ii Property als Funktion aufrufen $\Rightarrow$ Objekt wird an \texttt{this} gebunden
+      \ei
+    }
+    \ei
+    \begin{columns}<2->
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=JavaScript]
+          \begin{JS}[]
+            var obj = {
+              prop: 37,
+              f: function() {
+                return this.prop;
+              }
+            };
+            var ff = obj.f;
+          \end{JS}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \bii
+        \ii Aufruf der Funktion als Property\\
+            \codeinline{obj.f()} $\Rightarrow$ \codeinline{37}\\[2ex]
+        \ii Aufruf der \enquote{blanken} Funktion\\
+            \codeinline{ff()} $\Rightarrow$ \codeinline{undefined}
+        \eii
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}[t,fragile]{JavaScript: Funktionen als Konstruktoren}
+    \bi
+    \ii \textbf{Alle} Funktionen können als Konstruktoren verwendet werden{
+      \bi
+      \ii Das Schlüsselwort \structure{\texttt{new}} ruft Funktion im Kontext eines neuen Objekts auf.
+      \ii Jede Funktion hat eine \structure{\texttt{.prototype}}-Property, die als \texttt{\_\_proto\_\_} gesetzt wird.
+      \ei
+    }
+    \ei
+
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \begin{code}[]
+          \begin{JS}
+            function Foo(name) {
+              this.name = name;
+            }
+          \end{JS}
+          \begin{onlyenv}<2->
+          \vspace{1em}
+          \begin{JS}
+            var obj = new Foo("alice");
+          \end{JS}
+        \end{onlyenv}%
+        \begin{onlyenv}<3->\vspace{1em}
+            \begin{JS}
+            Foo.prototype.getLength = \
+              function() {
+                return this.name.length;
+              };
+
+            obj.getLength() // => 5
+          \end{JS}
+        \end{onlyenv}
+      \end{code}%
+      \begin{onlyenv}<2>
+        \begin{center}
+          dies ist äquivalent zu
+        \end{center}
+        \begin{code}
+          \begin{JS}<3->
+            var obj = {
+              __proto__: Foo.prototype
+            }
+            // Aufruf mit this == obj
+            obj.constructor("alice");
+          \end{JS}
+        \end{code}
+      \end{onlyenv}
+
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}\centering
+        \btAnimation[width=2.7cm]{raisebox,range=1-3:<1->,3:<4>}{fig/11-js-constructors}
+      \end{column}
+    \end{columns}
+    \bi
+    \ii<4-> Modernes JavaScript bietet \structure{\texttt{class}} und \structure{\texttt{extends}} als syntaktischen Zucker
+    \ei
+  \end{frame}
+
+  \begin{frame}{Prototypen-basierte Objektorientierung}
+    \bi
+    \ii Objekte erben alle Eigenschaft ihrer Prototypen {
+      \bi
+      \ii JavaScript: Dynamischer Lookup entlang der Prototypen-Kette
+      \ii Konstruktion der Prototypen-Hierarchie mittels \structure{\texttt{new}}
+      \ii Sieht aus wie klonen, ist aber effizienter.
+      \ei
+    }\medskip
+    \ii Alle Objekte sind \structure{gleichberechtig} und können Prototypen werden {
+      \bi
+      \ii JavaScript: \texttt{obj.\_\_proto\_\_} zeigt wieder auf ein Objekt
+      \ii Es entsteht ein Baum von Objekten die Prototypen füreinander sind.
+      \ii Die Wurzel des Baums ist das leere Objekt: \texttt{\{\}}
+      \ei
+    }\medskip
+    \ii Veränderung eines Prototypen ändert alle abgeleiteten Objekte {
+      \bi
+      \ii JavaScript: Eingebaute Klassen können erweitert werden (discouraged)
+      \ii \codebox{Array.prototype.forEach = function(...) \{ ... \}}
+      \ii Alle Objekte können jetzt \texttt{forEach}: \codebox{[2,3,4].forEach(...)}
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
+
+** Kritikpunkte am Objekt-Orientierten Paradigma
+#+begin_src latex
+\dividerframe{Kritik}
+#+end_src
 Welche Kritikpunkte wurden an OO angebracht?
 
 * Zusammenfassung

@@ -1,0 +1,41 @@
+\documentclass{lecturefig}
+\input{fig/06-common.sty}
+\input{fig/11-common.sty}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture,
+    object with elements/.append style={
+      font=\scriptsize,minimum width=2.7cm,
+    },
+    ]
+    \def\dot#1{%
+      \tikz[remember picture]\node[circle,minimum width=0cm,inner sep=1.5pt,fill=black](#1){};%
+    }
+
+    \node[object with elements] (func) {
+      Foo\nodepart{two}
+      code = ...\\
+      prototype = \dot{prototype-ref}
+    };
+
+    \node[object with elements,below=0.5 of func] (prototype) {
+      Foo.prototype
+      \nodepart{two}
+      constructor: Foo\tikzmark{A}\\
+      \strut\only<3->{getLength: \textit{f}}
+    };
+    \draw[->](prototype-ref) -- (prototype-ref|-prototype.north);
+    \draw[->] (pic cs:A)++(2pt,3pt) -- ++(east:5mm) |- (func.text east);
+
+    \begin{visible}<2->
+      \node[object with elements,below=0.5 of prototype] (obj) {
+        obj
+        \nodepart{two}
+        \_\_proto\_\_: \dot{proto-ref}\\
+        name: "alice"
+      };
+      \draw[->](proto-ref) -- ++(east:3mm) coordinate(@) -- (@|-prototype.south);
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\end{document}

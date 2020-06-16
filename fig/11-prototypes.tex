@@ -1,0 +1,50 @@
+\documentclass{lecturefig}
+\input{fig/06-common.sty}
+\input{fig/11-common.sty}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture,
+    R/.style={
+      right=12mm of #1.north east , anchor=north west,
+    },
+    object with elements/.append style={
+      font=\scriptsize,minimum width=2.7cm,
+    },
+    ]
+    \def\access{\only<2>{\bfseries\color{srared}}}
+    \node[object with elements] (obj1) {obj1\nodepart{two}
+      \access \_\_proto\_\_: obj2\tikzmark{A}\\
+      a: 23\\
+      b: 42
+    };
+    
+    \node[object with elements, R=obj1] (obj2) {obj2\nodepart{two}
+      \access \_\_proto\_\_: base\tikzmark{B}\\
+      x: 1\\
+      z: 2
+    };
+
+    \node[object with elements, R=obj2] (obj3) {obj3\nodepart{two}
+      \_\_proto\_\_: base\tikzmark{C}\\
+      \access MM: 100,
+    };
+
+    \node[object with elements, R=obj3] (base) {base\nodepart{two}
+      \_\_proto\_\_: null
+    };
+
+    \begin{scope}[every path/.style={thick,->}]
+      \draw[onslide=<2>{ultra thick,srared}] (pic cs:A)++(2pt,3pt) -- (obj2.text west);
+      \draw[onslide=<2>{ultra thick,srared}] (pic cs:B)++(2pt,3pt) -- (obj3.text west);
+      \draw[] (pic cs:C)++(2pt,3pt) -- (base.text west);
+    \end{scope}
+
+
+    \begin{visible}<2->
+      \node[operation, left=of obj1.text west] (operation) {obj1.MM};
+      \node[object, below=of operation] (result) {100};
+      \draw[double,->] (operation) -- (result);
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\end{document}
