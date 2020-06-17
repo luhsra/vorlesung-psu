@@ -76,7 +76,7 @@
             CPU-Steuersignale
           }}\\[1ex]\relax
         [Ausführung]\\\relax
-m        \includegraphics[width=1.5cm]{fig/01-cpu}
+        \includegraphics[width=1.5cm]{fig/01-cpu}
       \end{center}
     \end{column}\hfill
     \begin{column}{0.65\textwidth}
@@ -343,8 +343,8 @@ Welche Probleme ergeben sich durch rein imperatives Programmieren?
       \ii \alert{Leicht unübersichtlich}, da kaum bis keine Hierarchie der Funktionen.
       \ei
       $\Rightarrow$ Erfordert Disziplin und geistige Kapazität vom Entwickler.
-    }
-    \ii Besonders problematisch bei großen Softwareprojekten {
+    }\medskip
+    \ii<2-> Besonders problematisch bei \textbf{großen Softwareprojekten} {
       \bi
       \ii Wartung von dupliziertem Code macht N-fachen Aufwand.
       \ii Viele Entwickler arbeiten an der gleichen Quellcodebasis.
@@ -655,8 +655,7 @@ Wie schlägt sich dieses Konzept technisch nieder?
 
 ** Kritikpunkte am Objekt-Orientierten Paradigma
 #+begin_src latex
-  %%ONLY%%
-  \dividerframe{Kritik}
+  \dividerframe{Kritik am Objektorientierten Entwurf}
 
   \begin{frame}[fragile]{Konzentration auf Objekte}
     \bi
@@ -800,4 +799,39 @@ Warum würde man Nouns über Verben präferieren? Das hat negative Auswirkungen
 
 * Zusammenfassung
 
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+    \bi
+    \ii Programmierparadigmen sind Sammlungen von Sprachkonzepten {
+      \bi
+      \ii Ausweiten der Semantischen Lücke macht eine Sprache \alert{nicht mächtiger},\\
+          aber den Code leichter \advantage{verständlicher}.
+      \ii Paradigmen werden durch Software-Enginnering Prinzipien diszipliniert.
+      \ei
+    }
+    \ii Das imperative Programmierparadigma {
+      \bi
+      \ii Sequentielles Abarbeiten von Operationen, die den Zustand verändern.
+      \ii Strikte Vorgabe, wie eine Aufgabe durch zu führen ist.
+      \ii Prozedurale Abstraktion zerlegt das Problem entlang von Aufgaben
+      \ei
+    }
+    \ii Das objekt-orientierte Programmierparadigma {
+      \bi
+      \ii \structure{Interagierende Objekte} sollen die reale Welt abbilden
+      \ii Objekte senden \structure{Nachrichten} bzw. rufen sich ihre Methoden gegenseitig auf
+      \ii Prototypen erlauben \structure{klassenlose Objektorientierung}
+      \ei
+    }
+    \ii Objekt-Orientierung hat ebenfalls \alert{Probleme} {
+      \bi
+      \ii Funktionen werden immer von Objekten dominiert.
+      \ii Globaler Kontext nur über statische Methoden/Attribute
+      \ii Designpatterns müssen konzeptionelle Schwächen ausgleichen
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+#+end_src
 
