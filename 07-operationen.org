@@ -1,6 +1,6 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 07 - Operationen
-#+DATE: [2020-06-08] 
+#+DATE: [2020-06-09] 
 #+SETUPFILE: setup.org
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/wNjKg
 #+INCLUDE: export-prologue.org

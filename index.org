@@ -17,6 +17,10 @@
 {{{topic(./07-operationen.org,fig/07-stamp.png)}}}
 {{{topic(./08-codegen.org,fig/08-stamp.png)}}}
 
+-----
+
+{{{topic(./09-optimierung.org,fig/09-stamp.png)}}}
+
 * COMMENT FIXME
 
 {{{topic(./09-optimierung.org,fig/09-stamp.png)}}}

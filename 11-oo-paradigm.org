@@ -409,12 +409,12 @@ Welche Probleme ergeben sich durch rein imperatives Programmieren?
   \end{frame}
 
 
-  \begin{frame}[fragile]{Die Methode: Die zentrale Erweiterung}
+  \begin{frame}[fragile]{Die Methode als die zentrale Erweiterung}
     \bi
     \ii Methoden haben einen \structure{Ausführungskontext} mit dem Objekt{
       \bi
       \ii Objekt wird implizites Argument der Methode.
-      \ii Felder des Objekts sind im Methodenrumpf sichtbar.
+      \ii Attribute des Objekts sind im Methodenrumpf sichtbar.
       \ii Methode ist eine \structure{Closure}! (Siehe \enquote{03 - Namen})
       \ei
     }
@@ -454,6 +454,10 @@ Welche Probleme ergeben sich durch rein imperatives Programmieren?
   \end{frame}
 #+end_src
 
+FIXME: Die letzte Folie hier ist wenig informativ. Da muss eine Graphik für Closures her!
+
+FIXME: Noch eine Folie dahiner für die drei Konzepte: Encapsulation, Polymorphie und 
+
 Was ist das Paradigma?
 
 Welches Konzept brauchen wir zusätzlich dazu?
@@ -471,7 +475,7 @@ Wie schlägt sich dieses Konzept technisch nieder?
     \bi
     \ii Javascript kennt \ALERT{keine Klassen} und ist \ADVANTAGE{dennoch} Objekt-Orientiert{
       \bi \def\C{\bgroup\textcolor{safegreen}\checkmark\egroup}
-      \ii Javascript-Objekt haben Felder (\C) gebundene Methoden (\C)
+      \ii Javascript-Objekt haben Attribute (\C) gebundene Methoden (\C)
       \ii Methoden werden erst beim Aufruf aufgelößt (\C)
       \ii Informationen können mittels lexikalischem Scoping verborgen (\C) werden
       \ei
@@ -509,9 +513,9 @@ Wie schlägt sich dieses Konzept technisch nieder?
       \ii Properties können zu einem Objekt hinzugefügt werden
       \ei
     }\medskip
-    \ii<2-> Die \texttt{\_\_proto\_\_}-Property: Fallback für den Property-Zugriff{
+    \ii<2-> \texttt{\_\_proto\_\_}: Fallback für die Suche nach Attributen{
       \bi
-      \ii Situation: Ein Objekt hat die geforderte Property nicht
+      \ii Situation: Ein Objekt hat das geforderte Attribut nicht
       \ii Die Suche wird beim Prototypen, der in \texttt{\_\_proto\_\_} referenziert ist, fortgesetzt.
       \ii Es entsteht die \structure{Prototypen-Kette}, die bei \texttt{\{\}} endet.
       \ei\smallskip
@@ -520,18 +524,18 @@ Wie schlägt sich dieses Konzept technisch nieder?
     \ei
   \end{frame}
 
-  \begin{frame}[fragile]{JavaScript: Property-Lookup und \texttt{this}}
+  \begin{frame}[fragile]{JavaScript: Attribut-Lookup und \texttt{this}}
     \bi
     \ii Prototypen-Kette implementiert dynamischen und hierarchischen Lookup{%
       \bi
       \ii Objekt in der Kettenmitte erweitern $\rightarrow$ Alle Kinder werden erweitert
-      \ii Speichereffizient, aber mit hohen Lookup-Kosten verbunden.
+      \ii Speichereffizient, aber mit höhreren Lookup-Kosten verbunden.
       \ei
     }\medskip
     \ii<2-> JavaScript bindet den Namen \structure{\texttt{this}} an das aktuelle Objekt{
       \bi
-      \ii Properties können auf Funktionen verweisen.
-      \ii Property als Funktion aufrufen $\Rightarrow$ Objekt wird an \texttt{this} gebunden
+      \ii Attribute können auf Funktionen verweisen.
+      \ii Objekt-Attribut als Funktion aufrufen $\Rightarrow$ \texttt{this} wird das Objekt gebunden
       \ei
     }
     \ei
@@ -551,7 +555,7 @@ Wie schlägt sich dieses Konzept technisch nieder?
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \bii
-        \ii Aufruf der Funktion als Property\\
+        \ii Aufruf der Funktion als Attribut\\
             \codeinline{obj.f()} $\Rightarrow$ \codeinline{37}\\[2ex]
         \ii Aufruf der \enquote{blanken} Funktion\\
             \codeinline{ff()} $\Rightarrow$ \codeinline{undefined}
@@ -565,7 +569,7 @@ Wie schlägt sich dieses Konzept technisch nieder?
     \ii \textbf{Alle} Funktionen können als Konstruktoren verwendet werden{
       \bi
       \ii Das Schlüsselwort \structure{\texttt{new}} ruft Funktion im Kontext eines neuen Objekts auf.
-      \ii Jede Funktion hat eine \structure{\texttt{.prototype}}-Property, die als \texttt{\_\_proto\_\_} gesetzt wird.
+      \ii Jede Funktion hat eine \structure{\texttt{.prototype}}-Attribut, die als \texttt{\_\_proto\_\_} gesetzt wird.
       \ei
     }
     \ei
@@ -631,14 +635,15 @@ Wie schlägt sich dieses Konzept technisch nieder?
     }\medskip
     \ii Alle Objekte sind \structure{gleichberechtig} und können Prototypen werden {
       \bi
+      \ii Keine Unterscheidung zwischen Objekten und Klassen.
       \ii JavaScript: \texttt{obj.\_\_proto\_\_} zeigt wieder auf ein Objekt
       \ii Es entsteht ein Baum von Objekten die Prototypen füreinander sind.
       \ii Die Wurzel des Baums ist das leere Objekt: \texttt{\{\}}
       \ei
     }\medskip
-    \ii Veränderung eines Prototypen ändert alle abgeleiteten Objekte {
+    \ii Veränderung eines Prototypen ändert alle erbenden Objekte {
       \bi
-      \ii JavaScript: Eingebaute Klassen können erweitert werden (discouraged)
+      \ii JavaScript: Eingebaute Objekte können erweitert werden (discouraged)
       \ii \codebox{Array.prototype.forEach = function(...) \{ ... \}}
       \ii Alle Objekte können jetzt \texttt{forEach}: \codebox{[2,3,4].forEach(...)}
       \ei
@@ -650,9 +655,148 @@ Wie schlägt sich dieses Konzept technisch nieder?
 
 ** Kritikpunkte am Objekt-Orientierten Paradigma
 #+begin_src latex
-\dividerframe{Kritik}
+  %%ONLY%%
+  \dividerframe{Kritik}
+
+  \begin{frame}[fragile]{Konzentration auf Objekte}
+    \bi
+    \ii Objekt-orientierte Entwurfsmethoden fokussieren Objekte {%
+      \bi
+      \ii \structure{Verb/Nomen-Analyse} von Use-Case Beschreibungen\\[1ex]
+          Alle Nomen werden Klassen/Objekte.\hspace{1em} Alle Verben werden Methoden.\\[2ex]
+     \ii Arbeiter (Nomen) montiert (verb) Reifen (Nomen) an Auto (Nomen).\\[2ex]
+          \begin{center}
+          \begin{tikzpicture}
+            \node[rectangle split, rectangle split parts=2,draw] {%
+              Arbeiter
+              \nodepart{two}%
+              void montieren(Reifen, Auto)
+            };
+          \end{tikzpicture}
+        \end{center}
+        \ei
+      }\bigskip
+      \ii<2-> \ALERT{Kritik}: Objekt-Orientierung vernachlässigt Verben {\\[1ex]
+        \begin{displayquote}[Steve Yegge, Execution in the Kingdom of Nouns][\hfill]
+          Object Oriented Programming puts the Nouns \alert{first and foremost}. Why would you go to such lengths to put one part of speech on \textbf{a pedestal}? Why should one kind of concept take precedence over another? It's not as if OOP has suddenly made verbs \alert{less important} in the way we actually think.
+        \end{displayquote}
+      }
+      \ei
+    
+    \overlayboxHBOX
+    \begin{overlaybox}<3->[draw=srared,ultra thick]
+      \includegraphics[height=5cm]{fig/11-hund}
+    \end{overlaybox}
+  \end{frame}
+
+  \begin{frame}[fragile]{Konzeptionell: Verben kommen nie allein!}
+    \bi
+    \ii Nicht jede Funktionalität kann einem Objekt zugeordnet werden. {
+      \bi
+      \ii Zu welchem Objekt gehört der Algorithmus \textbf{größter gemeinsamer Teiler}?
+      \ii Methode von \texttt{AlgorithmManager}-Klasse?  Unterschiedliche Instanzen?
+      \ii Gehört sie zur Klasse \texttt{int}? Hat \texttt{BigInt} eine eigene \texttt{gcd()} Methode?
+      \ii[$\Rightarrow$] \textbf{\enquote{Lösung}}: Nicht-instantiierte Klassen die nur statische Methoden beinhalten\\[1ex]
+      \begin{center}
+        \codebox{void java.lang.Math.sin(double a);}
+      \end{center}
+      \ei
+    }\bigskip
+    \ii<2-> Wir können keine blanken Funktion herumreichen {
+      \bi
+      \ii Callback-Funktionen müssen immer von einem Objekt \enquote{bewacht} werden
+      \ii[$\Rightarrow$] Leere Objekte die nur eine Methode \enquote{\texttt{execute()/run()/do()}} haben{
+        \begin{center}
+          \codebox{void java.lang.Runnable.run();}
+        \end{center}
+      }\medskip
+      \ii \structure{Designpatterns} um diese Schwäche zu umschiffen: Command, Strategy, Proxy
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Konzeptionell: Daten kommen nie alleine!}
+    \bi
+    \ii Von manchen Klassen kann es nur eine Instanz geben {
+      \bi
+      \ii Manche Entitäten sollten in einem Programm nur einmal existieren.
+      \ii Beispiel: Managerobjekt, dass \textbf{alleinige} Kontrolle über einen Aspekt hat.
+      \ii \structure{Designpattern}: Singleton (nur möglich durch statische Attribute)
+      \ei
+    }\bigskip
+    \ii<2-> Strikte Objektorientierung kennt keinen \structure{globalen Kontext} {
+      \bi
+      \ii An welchem Objekt würde eine globale Variable hängen? 
+      \ii Globale Variablen erlauben globale Konfiguration des Programmverhaltens\\[1ex]
+      \ii[$\Rightarrow$] Durchschleifen von Kontext-Objekten mit Programmoptionen\\[2ex]{
+        \hspace{1cm}%
+        \btSetTab\codebox{void app.grep.Searcher.search(ProgramContext);}\\
+        \btUseTab\codebox{void app.grep.Searcher.iterateDirectory(ProgramContext, Directory);}\\
+        \btUseTab\codebox{void app.grep.Searcher.processFile(ProgramContext, String);}\\
+          \btUseTab\codebox{void app.grep.Searcher.searchLine(ProgramContext, String);}\\
+      }\medskip
+      \ii \structure{Designpatterns}, die dieses Problem beheben: Registry, ServiceLocator\\
+      \hfill\scriptsize(Beides Singletons)
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{\enquote{Objektorientierung ist ineffizient!}}
+    \bi
+    \ii OO-Entwurfsprinzipien verleitet Probleme zu feinschichtig zu zerlegen{\\[1ex]
+      \begin{center}
+        \includegraphics[page=1,height=1.8cm]{fig/11-call-hierarchy}\hspace{2cm}
+        \includegraphics[page=2,height=1.8cm]{fig/11-call-hierarchy}
+      \end{center}
+
+      \bi
+      \ii Verteilung der Verantwortlichkeit auf viele Objekte
+      \ii Unübersichtlicher Kontrollfluss zwischen den einzelnen Methoden
+      \ii Viele Methodenaufrufe zwischen den Schichten.
+      \ei
+    }\medskip
+    \ii<2-> Hohe Kosten für den einzelnen  Methodenaufrufe{
+      \bi
+      \ii \structure{Späte Bindung}: Dynamic Dispatch wählt Methode zur Laufzeit auf
+      \ii \structure{this}: Der implizite durchgeschleifte Parameter ist nicht umsonst.
+      \ei
+      \medskip
+      \begin{displayquote}[Joe Armstrong, Erlang Erfinder][\\\hfill]\small
+        The problem with object-oriented languages is they've got all this implicit environment that they carry around with them. You wanted a banana but what you got was a gorilla holding the banana and the entire jungle.
+      \end{displayquote}
+    }
+    \ei
+  
+    \overlayboxHBOX
+    \begin{overlaybox}<3->[draw=srared,ultra thick]
+      \includegraphics[height=8cm]{fig/11-callstack}
+    \end{overlaybox}
+  \end{frame}
 #+end_src
 Welche Kritikpunkte wurden an OO angebracht?
+
+Warum würde man Nouns über Verben präferieren? Das hat negative Auswirkungen
+
+- Nicht jede Funktion kann einer/m Klasse/Objekt zugeordnet weden
+  - Von welchem Objekt ist GCD ein Methode? Wem muss ich eine Nachricht schicken um den größten gemeinsamen Teiler auszurechnen
+  - Fallback über statische Funktionen in nicht-instantiierten Klassen (Math.sin())
+  - Das Objekt-Modell passt einfach nicht auf alles
+- Reine Klassenbasierte-Objektorientierung erlaubt keinen globalen Zustand
+  - Man müsste ein globales Kontext-Objekt überall mit hin durch reichen.
+  - Idee geht leider bei Libraries kaputt, da das Kontext-Objekt nicht beliebig erweiterbar ist.
+  - Quick-Fix: Das Singleton Entwurfsmuster. Geht aber nur mit statischen Attributen
+
+- Ineffizienzen
+  - Funktionen kommen immer mit einem Kontext 
+
+    Joe Armstrong (Erlang Inventor): "The problem with object-oriented languages 
+       is they've got all this implicit environment that they carry around with them.
+       You wanted a banana but what you got was a gorilla holding the banana and the entire jungle."
+
+- Kreis-Elipse Problem
+  => Vererbungshierarchie ist manchmal nicht eindeutig bestimmbar
 
 * Zusammenfassung
 

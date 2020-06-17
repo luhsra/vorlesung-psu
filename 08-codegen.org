@@ -2,6 +2,8 @@
 #+SUBTITLE: 08 - Zwischencodeerzeugung
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
+#+DATE: [2020-06-16]
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/Rkzlk
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 
 #+NAME: topic
@@ -36,9 +38,7 @@
 
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
-  \begin{frame}
-    \maketitle
-  \end{frame}
+  \maketitleframe
 
   \begin{frame}{Einordnung in die Vorlesung: Zwischencodeerzeugung}
     \begin{center}

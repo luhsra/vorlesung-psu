@@ -137,7 +137,7 @@
 %****************************************************************
 %** tikz stuff
 \usepackage{tikz}
-\usetikzlibrary{tikzmark,arrows,fit,calc,positioning,sra}
+\usetikzlibrary{tikzmark,arrows,fit,calc,positioning,sra,shapes.multipart}
 \usepackage{pgfkeys}
 \tikzset{
   >=latex',
@@ -280,6 +280,8 @@
 \newenvironment<>{visible}[1][]{\begin{scope}[visible on=#2,#1]}{\end{scope}}
 
 \newsavebox{\@overlaybox}
+\def\@overlayboxType{\vbox}
+\def\overlayboxHBOX{\let\@overlayboxType=\hbox}
 \newenvironment<>{overlaybox}[1][]{%
   % We set the overlay tikz node in the next shipout routine.
   % Thereby, we do not produce a \leavemode after the lrbox
@@ -293,7 +295,7 @@
     }%
   }%
   % Produce the @conclusionoverlay
-  \setbox\@overlaybox=\vbox\bgroup%
+  \setbox\@overlaybox=\@overlayboxType\bgroup%
 }{%
   \egroup%
   \global\setbox\@overlaybox=\copy\@overlaybox\relax%

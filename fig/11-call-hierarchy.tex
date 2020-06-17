@@ -1,0 +1,49 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    object/.append style={minimum width=1.5cm},
+    operation/.append style={minimum width=1.5cm},
+    message/.append style={minimum width=1.5cm,minimum height=2ex}
+    ]
+    \node[object] (a) {\strut};
+    \node[object,below=0.2 of a] (b) {\strut};
+    \node[object,below=0.2 of b] (c) {\strut};
+
+    \begin{pgfonlayer}{background}
+      \node[message,xshift=-4pt,anchor=west] at (a.east) (A) {};
+      \node[message,xshift=-4pt,anchor=west] at (b.east) (B) {};
+      \node[message,xshift=-4pt,anchor=west] at (c.east) (C) {};
+    \end{pgfonlayer}
+    \draw[->] (A) -- (B);
+    \draw[->] (B) -- (C);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    operation/.append style={minimum width=3cm},
+    object/.append style={minimum width=4ex,minimum height=2ex}
+    ]
+    \node[operation] (a) {\strut};
+    \node[operation,below=0 of a] (b) {\strut};
+    \node[operation,below=0 of b] (c) {\strut};
+
+    \node[object,xshift=-2.5ex] at (a) (A1) {};
+    \node[object,xshift=2.5ex] at (a) (A2) {};
+
+    \node[object] at (b) (B) {};
+
+    \node[object,xshift=-2.5ex] at (c) (C1) {};
+    \node[object,xshift=2.5ex] at (c) (C2) {};
+
+    \draw[->] (A1) -- (B);
+    \draw[->] (A2) -- (B);
+
+    \draw[->] (B) -- (C2);
+    \draw[->] (B) -- (C1);
+    \draw[->] (A1) to[bend right] (C1);
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
