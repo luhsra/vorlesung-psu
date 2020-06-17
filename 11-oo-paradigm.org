@@ -413,45 +413,24 @@ Welche Probleme ergeben sich durch rein imperatives Programmieren?
     \bi
     \ii Methoden haben einen \structure{Ausführungskontext} mit dem Objekt{
       \bi
-      \ii Objekt wird implizites Argument der Methode.
-      \ii Attribute des Objekts sind im Methodenrumpf sichtbar.
-      \ii Methode ist eine \structure{Closure}! (Siehe \enquote{03 - Namen})
+      \ii Objekt auf der die Methode aufgerufen wird, wird sichtbar.
+      \ii Objektattribute sind in der Methode zugreifbar.
+      \ii Methode ist eine Closure! (Siehe \enquote{03 - Namen})
+      \ei
+    }\medskip
+    \ii \structure{Closure}: Eine Funktion die einen Ausführungskontext mitbringt\\ {
+      \bgroup\btAnimation[width=0.8\textwidth]{1:<1-2>,2:<3>,3:<4>,center,padding}{fig/11-closure}\egroup
+      \bi
+      \ii Funktionen werden \textbf{immer} in einem Kontext ausgeführt.
+      \ii Bei C sind nur die Argumente und die globalen Variablen enthalten
+      \ii Bei Closures sind zusätzliche Objekte an Namen gebunden (z.B. \structure{\texttt{this}})
       \ei
     }
     \ei
-
-    \begin{columns}<2->
-      \hfill
-      \begin{column}{0.6\textwidth}
-    \begin{code}[tag=Python3]
-      \begin{py}
-        class C:
-            def increment(self, arg): ...
-            def getName(self):        ...
-          
-        obj = C()
-      \end{py}
-    \end{code}
-      
-      \end{column}\hfill
-    \end{columns}
-
-  
-    \bii
-    \ii<3-> \codeinline{obj.increment} $\Rightarrow$ \codeinline{<bound method C.increment of <C instance at 0x7f...>>}{
-      \bi
-      \ii \codeinline{obj.increment.__func__} $\Rightarrow$ \codeinline{<function increment>}
-      \ii \codeinline{obj.increment.__self__} $\Rightarrow$ \codeinline{<C instance at 0x7f...>}
-      \ei
-    }\medskip
-    \ii<4-> \codeinline{C.increment} $\Rightarrow$ \codeinline{<unbound method C.increment>} {
-      \bi
-      \ii \codeinline{C.increment.__func__} $\Rightarrow$ \codeinline{<function increment>}
-      \ii \codeinline{C.increment.__get__(obj)} $\Rightarrow$ \codeinline{<bound method ...>}
-      \ei
-    }
-    \eii
   \end{frame}
+
+
+  %%ONLY%%
 #+end_src
 
 FIXME: Die letzte Folie hier ist wenig informativ. Da muss eine Graphik für Closures her!

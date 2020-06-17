@@ -1,0 +1,61 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[remember picture]
+    \newcommand{\inline}[2][]{%
+      \tikz[baseline]\node[anchor=base,#1]{\mathstrut #2};%
+    }
+
+    \node[] (message) {
+      \inline[message]{obj.method}
+    };
+
+
+    \node[below=7mm of message.south west,anchor=north west] (invoke) {%
+      \inline[message]{obj.method}{\Large(}\inline[object]{arg}{\Large)}
+    };
+
+    \node[above=0 of message] {\structure{Abstrakte Sicht}};
+    \draw[->] (message) -- node[right]{invoke} (message|-invoke.north);
+        
+
+    \begin{visible}<2->
+    \node[right=2 of message] (tuple) {
+      {\Large(}\inline[object]{obj}, \inline[operation]{method}{\Large )}
+    };
+
+    \node[below=7mm of tuple.south west,anchor=north west] (call) {
+      \inline[operation]{method}{\Large(}\inline[object]{obj}, \inline[object]{arg}{\Large)}
+    };
+
+    \draw[->] (tuple) -- node[right]{invoke} (tuple|-call.north);
+    
+    \node[above=0 of tuple]  (L) {\structure{Technische Sicht}};
+
+    \coordinate(@) at ($(invoke.east)!0.5!(call.west)$);
+    \draw (@|-L.north) -- (@|-call.south);
+  \end{visible}
+
+    \begin{visible}<3->
+    \node[right=2 of tuple.north east,anchor=north west,font=\scriptsize\ttfamily,align=left,draw] (struct) {
+      struct bound\_method\_t \{\\
+      \ \ func\_t code;\\
+      \ \ void*\ \  obj; \\
+      \};
+    };
+
+
+    \node[anchor=west,font=\ttfamily,align=left,draw] at (call.east-|struct.west) (code) {
+      m.code(m.obj, arg);
+    };
+
+    \node[above=0 of struct]  {\structure{Implementierung}};
+    \coordinate(@) at ($(call.east)!0.5!(code.west)$);
+    \draw (@|-L.north) -- (@|-call.south);
+  \end{visible}
+
+
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}
