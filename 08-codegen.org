@@ -591,7 +591,7 @@ Auf den Folien finden Sie noch einen iterativen Fibonacci als Beispiel für eine
   \ii Erstelle ein Funktionsobjekt\hspace{9mm}       \btSetTab \siginline{Programm.create\_function}{string}{Function}{%
     \bi
     \ii Funktionen haben den Namen als Label (\scriptsize\codebox{func.label}).
-    \ii Parameter und Variablen werden beim traversieren erstellt.\\[2ex]
+    \ii Parameter und Variablen werden beim Traversieren erstellt.\\[2ex]
     \ei
   }
   \ii Erstelle einen Basisblock          \btUseTab \siginline{Function.create\_block}{()}{BasicBlock}
