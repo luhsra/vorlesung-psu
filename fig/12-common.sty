@@ -1,0 +1,25 @@
+\newcommand{\SIG}[4][\scriptsize]{%
+  #1#2\hspace{1ex}\texttt{::}\hspace{1ex}#3\hspace{1ex}$\mapsto$\hspace{1ex}#4%
+}
+
+\tikzset{
+  function cylinder/.style={
+    shape=cylinder,
+    draw,
+    shape aspect=0.5,
+    cylinder uses custom fill,
+    minimum width=1cm,
+    cylinder end fill=violet!40!black!70!white,
+    cylinder body fill=violet!35,
+  },
+  procedure cylinder/.style={
+    function cylinder,
+    cylinder end fill=luhblue!40!black!70!white,
+    cylinder body fill=luhblue!35,
+  },
+  state block/.style={
+    draw,
+    shape=tape,
+    fill=badbee!50,
+  }
+}

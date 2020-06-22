@@ -430,7 +430,6 @@ Welche Probleme ergeben sich durch rein imperatives Programmieren?
   \end{frame}
 
 
-  %%ONLY%%
 #+end_src
 
 FIXME: Die letzte Folie hier ist wenig informativ. Da muss eine Graphik für Closures her!

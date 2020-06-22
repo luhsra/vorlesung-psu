@@ -1,0 +1,119 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 12 - Das Funktionale Programmierparadigma
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+* Gedanken zu dieser Vorlesung                                     :noexport:
+- Was war überhaupt das Problem?
+  - Der Zustand von Programmen wird unübersichtlich
+  - Alles interagiert irgendwie wie allem anderen
+
+- Einordnung in die anderen Paradigmen
+
+* Freiheit von Seiteneffekten
+:PROPERTIES:
+:CUSTOM_ID: 12-einleitung
+:END:
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \maketitleframe
+
+  \begin{frame}{Probleme, Probleme, Probleme,\ldots}
+    \bi
+    \ii Kleine Programme sind \advantage{einfach}, Große Softwareprojekte sind \alert{schwer}.{
+      \bi
+      \ii Viele EntwicklerInnen, Viele Standorte, Viele Zeitzonen
+      \ii Riesige Codebasis und \structure{interagierende Komponenten}
+      \ii Viele Prozeduren (Algorithmen) und viele Objekte (Daten)
+      \ei
+    }
+    \pause 
+    \begin{center}
+    \includegraphics[width=3.5cm]{fig/12-brain}
+  \end{center}
+
+    \ii Begrenzte geistitge Kapazität: \structure{Veränderlicher Zustand} sieht man nicht {
+      \bi
+      \ii[$\leftrightarrow$] Ausführung von Code ist meist sequentiell und lokal
+      \ii Der aktuelle Zustand ist \textbf{Akkumulation aller Änderungen}
+      \ii Ohne Einhaltung von Invarianten leicht \alert{unübersichtlich}
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Funktionen: Prozeduren mit Scheuklappen}
+    \mbox{}\hspace{-1.5em}\OrangeBox{(Reine) funktionale Programmierung erhöht die Lokalität von Änderungen}
+
+    \bi
+    \ii \structure{Rein Funktional}: Prozeduren werden zu mathematischen Funktionen {
+      \bi
+      \ii Das Ergebnis einer (echte) Funktion hängt nur von ihren Parametern ab.
+      \ii Kein Seitenkanal über den globaler Zustand.
+      \ii Funktionsausführung hat \ADVANTAGE{keine Seiteneffekte}!
+      \ei
+    }
+
+    \begin{center}
+      \includegraphics[width=4cm,page=2]{fig/12-function}\hspace{1.5cm}%
+      \includegraphics[width=4cm,page=1]{fig/12-function}
+    \end{center}
+
+    \bigskip
+
+
+    \ii<2> Mischformen mit veränderlichem Zustand \hfill\emph{functional style}{
+      \bi
+      \ii Rein funktionale Programmierung ist auch schwierig
+      \ii Viele Programmiersprachen haben \structure{funktionale Elemente}
+      \ei
+    }
+    \ei
+
+  \end{frame}
+
+  \begin{frame}{Verhältnis zu anderen Programmierparadigmen}
+    \btAnimation[width=\textwidth]{range=1-3:<1->,center,padding}{fig/12-functional}
+  \end{frame}
+
+  \begin{frame}{Direkte Folgen von Seiteneffektfreiheit}
+    \bi
+    \ii Einige Sprachkonzepte werden sinnlos\ldots {
+      \bi
+      \ii Wiederbeschreibbare \structure{Variablen} sind veränderlicher Zustand  \hfill $\Rightarrow$ \ALERT{Verboten}
+      \ii Veränderbare Objekte wären veränderlicher Zustand                      \hfill $\Rightarrow$ \ALERT{Verboten}
+      \ii \structure{Schleifen}iterationen kommunizieren über ihre Seiteneffekte \hfill $\Rightarrow$ \ALERT{Sinnlos}
+      \ii Sequenzierte \structure{Statements} haben keinen Rückgabewert          \hfill $\Rightarrow$ \ALERT{Sinnlos}
+      \ei
+    }\medskip
+    \ii<2-> Andere Sprachkonzepte gewinnen an Wichtigkeit! {
+      \bi
+      \ii \structure{Immutable Objekte}: \btSetTab Werte- und Referenzmodell fallen zusammen!
+      \ii \structure{Ausdrücke}:  \btUseTab Jede Operation braucht einen Rückgabewert!
+      \ii \structure{Rekursion}:  \btUseTab Wiederholte Ausführungen nur durch Rekursion!
+      \ii \structure{Funktionen}: \btUseTab Funktionsaufrufe modelieren abhängigkeiten Operationen!
+      \ei
+    }\medskip
+    \ii<3-> Weitere wichtige Fragen, die direkt aufkommen! {
+      \bi
+      \ii Wie soll man so bitte übersichtlich programmieren?!
+      \ii Wie kann das bitte nicht ineffizient sein?!
+      \ii Wie soll ich Ein- und Ausgabe machen?!
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
+* Funktionen als Bürger erster Klasse

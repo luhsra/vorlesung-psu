@@ -1,0 +1,20 @@
+\documentclass{lecturefig}
+
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[alt=<1>{function cylinder}{procedure cylinder}] (f) {\SIG{\alt<1>{f}{p}}{A}{B}};
+
+    \node[left=0.5 of f] (a) {a};
+    \node[right=0.5 of f] (b) {b};
+    \draw[->](a) --(f.west);
+    \draw[<-](b) --($(f.before top)!0.5!(f.after top)$);
+
+    \begin{visible}<2>
+      \node[state block,above=0.5 of f](state){state};
+      \draw[->](state.-60) -- (state.-60|-f.north);
+      \draw[<-](state.-120) -- (state.-120|-f.north);
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\end{document}

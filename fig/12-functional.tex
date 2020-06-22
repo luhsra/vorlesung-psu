@@ -1,0 +1,71 @@
+\documentclass{lecturefig}
+\usepackage{ulem}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    concept/.style={
+      draw=safeblue,thick,align=center,minimum width=3cm,
+      fill=safeblue!20
+    },
+    paradigm/.style={
+      draw=safegreen,thick,align=center,minimum width=4cm,
+      fill=safegreen!20
+    },
+    add/.style={
+      circle,draw=safegreen,thick,inner sep=1.5pt,fill=safegreen!30
+    },
+    ]
+    \node[concept](seq)  {Sequentielle\\Ausführung};
+
+    \node[concept,below=of seq](proc) {
+      \only<3>{\color{gray}\sout}{Prozeduren}\\
+      \only<3>{Funktionen}
+    };
+
+    \node[concept,right=of seq](records)  {Komplexe\\Datentypen};
+
+    \node[concept,below=of records](state) {
+      \only<3>{\color{gray}\sout}{Veränderlicher}\\
+      Zustand
+    };
+
+    \begin{visible}<2->
+    \node[concept,yshift=-2cm] at($(proc.south east)!0.5!(state.south west)$)
+       (closure)
+       {Closure\\\strut{\scriptsize(\alt<2>{Methode}{Funktion})}};
+    
+    \draw[->] (proc)  |- node[pos=0.25,add]{+} (closure.west);
+    \draw[->] (state) |- node[pos=0.25,add]{+} (closure.east);
+  \end{visible}
+
+
+     
+    \draw[->,onslide=<3>{gray}] (proc) to[bend left] node[above]{\scriptsize \only<3>{\sout}{schreibt}} (state);
+    \draw[->] (proc) to[bend right] node[below]{\scriptsize liest} (state);
+
+
+    \draw[->] (seq) -- node[left,font=\footnotesize,align=center]{besteht\\aus}(proc);
+    \draw[->] (records) -- node[right,font=\footnotesize,align=center]{strukturiert}(state);
+
+
+    \node[paradigm,left=1.5of seq,onslide=<2->{opacity=0.3}] (imperativ) {
+      Das Imperative\\Paradigma
+    };
+    \node[paradigm,below=of imperativ,onslide=<1>{invisible},onslide=<3>{opacity=0.3}] (oo) {
+      Das Objekt-Orientierte\\Paradigma
+    };
+    \node[paradigm,below=of oo,visible on=<3>] (functional) {
+      Das Funktionale\\Paradigma
+    };
+
+    \node[above=0.2 of imperativ] (L-paradigm) {\structure{\Large Paradigmen}};
+    \node[] at (L-paradigm -| closure.north)   {\structure{\Large Konzepte}};
+
+    
+    \coordinate(@) at ($(imperativ.east)!0.5!(seq.west)$);
+    \draw (@|-L-paradigm.north) -- (@|-closure.south);
+      
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}
