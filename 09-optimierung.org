@@ -34,9 +34,7 @@
 
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
-  \begin{frame}
-    \maketitle
-  \end{frame}
+  \maketitleframe
 
   \begin{frame}{Einordnung in die Vorlesung: Optimierung}
     \begin{center}
@@ -512,7 +510,7 @@ Dies werden wir uns nun genauer anschauen.
       \bi
       \ii Wir müssten genau wissen, auf welche Objekte ein Zeiger verweisen kann.
       \ii Dies erfordert aufwendige, teils inter-prozedurale, Analysen.
-      \ii Beim geringste Zweifel über die Alias-Relation, \textbf{wirft der Optimierer hin}.
+      \ii Beim geringsten Zweifel über die Alias-Relation \textbf{wirft der Optimierer hin}.
       \ei
     }\medskip
     \ii<3-> Einfache Heuristik für unsere Wertepropagation {
@@ -716,9 +714,9 @@ Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die W
     \bi
     \ii \structure{Voraussetzungen} für die Terminierung des Worklist-Algorithmus{
       \bi
-      \ii Init+Merge+Transform muss Knotenzustände \alert{strikt monoton} ändern
+      \ii Init+Merge+Transform muss Knotenzustände \alert{monoton} ändern
       \ii Beliebte Datenstrukturen für die Zustand: Bitvektoren, Mengen
-      \ii Beispiel für eine strikt-monotone : {
+      \ii Beispiel für eine monotone Zustands-Transformationen: {
         \bi
         \ii \texttt{init()}: \hspace{2cm}\btSetTab Generiere eine leere Bitvektoren
         \ii \texttt{merge()}: \btUseTab Bit-weises ODER
@@ -727,13 +725,13 @@ Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die W
       }
       \ei
     }\medskip
-    \ii Verschiedene Geschmacksrichtungen {
+    \ii<2-> Verschiedene Geschmacksrichtungen {
       \bi
       \ii \structure{Vorwärts-Analyse}: Zustände werden in Richtung der CFG-Kanten propagiert
       \ii \structure{Rückwärts-Analyse}: Zustände werden entgegen der CFG-Kanten propagiert
       \ei
     }\medskip
-    \ii \structure{Wertepropagation} als Fixpunktanalyse {
+    \ii<3-> \structure{Wertepropagation} als Fixpunktanalyse {
       \bi
       \ii Initialisierung mit leeren Äquivalenzmengen
       \ii Transformation wie gehabt mit \texttt{CVP(BasicBlock, Equivalences)}
@@ -746,11 +744,11 @@ Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die W
 
 Wollen wir einen solchen Fixpunktalgorithmus als Datenflussanalyse verwenden, so müssen wir darauf achten, dass dieses Verfahren auch wirklich terminiert.
 Was würde passieren, wenn sich zwei Blöcke immer im Wechsel die Eingangszustände so manipulieren würden, dass der andere noch einmal in die Worklist kommt?
-Um dies zu vermeiden, muss die Kombination aus den Zustands-Initialisierung, Zustands-Merge und transformation *strikt monoton* sein.
-Dies bedeutet, dass jeder ausgeführte Schritt uns näher an den Fixpunkt bringt, niemals jedoch wieder weiter entfernt.
+Um dies zu vermeiden, muss die Kombination aus den Zustands-Initialisierung, Zustands-Merge und transformation *monoton* sein.
+Dies bedeutet, dass jeder ausgeführte Schritt uns näher an den Fixpunkt bringt oder im aktuellen Zustand verweilt, niemals jedoch wieder weiter entfernt.
 Auf diese Weise können wir garantieren, dass wir in endlich vielen Schritten einen Fixpunkt erreichen werden.
 
-Ein Beispiel (nicht CVP) für eine solche strikt monotone Kombination wäre:
+Ein Beispiel (nicht CVP) für eine solche monotone Kombination wäre:
 Wir verwenden Bitvektoren als Zustände und starten mit gleich langen Bitvektoren die an jeder Stelle 0 sind.
 Jede Transformation kann einzelne Bits nur setzen, aber niemals löschen.
 Die Vereinigung zweier Zustände ist das bit-weise ODER (bei dem auch niemals eine 1 gelöscht wird).
@@ -917,7 +915,7 @@ Wir räumen diesen aber nicht an dieser Stelle weg, sonder überlassen das Wegr�
         }\medskip
         \ii<handout:2-|2-> \textbf{Hinweis}: Verschmelzen hier unmöglich {
           \bi
-          \ii BB3 hat mehrere Vorgänger
+          \ii BB2 hat mehrere Vorgänger
           \ii Verschmelzen würde BB-Bedingung verletzen
           \ei
         }\medskip
