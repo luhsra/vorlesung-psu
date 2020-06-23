@@ -351,7 +351,7 @@ Dies bedeutet, dass die Ausführung der ursprünglichen Instruktion und die Ausf
 Dazu betrachten wir nicht nur die Art der Instruktion, sondern auch die Werte der Operanden, insbesondere wenn diese *Konstanten* sind.
 
 Bei der *Konstantenfaltung* sucht die Analyse nach Instruktionen, die ausschließlich konstante Quelloperanden haben und die keine Seiteneffekte, neben dem beschreiben ihres Zieloperanden, haben.
-Insbesondere umfasst dies arithmetische, logische und bit-weise Befehle, sowie bedingte Sprünge mit konstanter Sprungbedingung.
+Insbesondere umfasst dies arithmetische, logische und bitweise Befehle, sowie bedingte Sprünge mit konstanter Sprungbedingung.
 Da wir die Semantik eines jeden IR-Befehls genau definiert haben und die Quelloperanden konstant sind, können wir den Befehl bereits im Übersetzer ausführen.
 Dieses Vorziehen der Ausführung ist deshalb möglich, weil der Befehl zur Laufzeit immer das selbe, konstante, Ergebnis liefern wird.
 Unsere Analyse liefert uns also eine statische Voraussage über das dynamische Verhalten des Programms.
@@ -441,7 +441,7 @@ So kann im Beispiel die Verwendung von ~t1~ durch die Konstante ~2~ ersetzt werd
 
 
 Genau das ist die Zielsetzung der *Konstantenpropagation*:
-Wir möchten statisch bekannte Werte, über Instruktionsgrenzen hinweg durch das IR-Programm durch propagieren.
+Wir möchten statisch bekannte Werte über Instruktionsgrenzen hinweg durch das IR-Programm durch propagieren.
 Dabei müssen wir uns aber nicht nur auf konstante Werte beschränken, sondern wir können auch sogenannte "Kopien" mit der *Kopiepropagation* (Copy-Propagation) durchschleifen.
 Zusammengefasst nennt man diese Art der Optimierung im Englischen daher Copy-Value-Propagation (CVP).
 
@@ -458,7 +458,7 @@ Eine Äquivalenzmenge ist eine Menge von Variablen und Konstanten, die einen Gü
 Da wir die Mengen anhand der Äquivalenz-Relation[fn::Die Äquivalenz-Relation ist transitiv!] bilden, gilt auch, dass jede Variable und jeder Wert zu einem Zeitpunkt nur in einer einzigen Äquivalenzmenge sein kann.
 Anders ausgedrückt: Die Menge der zeitgleich gültigen Äquivalenzmengen *partitioniert* die Menge aller Variablen und Werte, wobei ein-elementige Äquivalenzmengen auftreten können (und auch die Regel sind).
 
-Zu Zeitpunkt der Gültigkeit können wir einen Quelloperanden, wenn dieser in einer Äquivalenzmenge ist, durch jedes andere Element der Äquivalenzmenge ersetzen.
+Zum Zeitpunkt der Gültigkeit können wir einen Quelloperanden, wenn dieser in einer Äquivalenzmenge ist, durch jedes andere Element der Äquivalenzmenge ersetzen.
 Bevorzugt werden wir natürlich Variablen durch Konstanten ersetzen, aber auch die Ersetzung von temporären Variablen durch benutzerdefinierte Variablen ist sinnvoll.
 Es stellt sich nur noch die Frage:
 Welche Regeln verwenden wir, um die Äquivalenzmengen zu erzeugen und zu aktualisieren?
@@ -471,12 +471,12 @@ Beim fortschreiten der CVP schieben wir die Menge der Äquivalenzmengen *vorwär
 
 
 Die wichtigste Aktualisierungsregel für die CVP ist die für den ~Assign~-Befehl.
-Denn mit einer Zuweisung entsteht, hinter der Zuweisung, eine Äquivalenz zwischen der rechten und der linken Seite.
-Ist die keine der beiden Seiten teil einer größeren Äquivalenzmenge, so sind wir damit fertig eine zwei-elementige Äquivalenzmenge aus linker und rechter Seite zu erzeugen.
+Denn mit einer Zuweisung entsteht (hinter der Zuweisung) eine Äquivalenz zwischen der rechten und der linken Seite.
+Ist keine der beiden Seiten Teil einer größeren Äquivalenzmenge, so sind wir damit fertig, eine zwei-elementige Äquivalenzmenge aus linker und rechter Seite zu erzeugen.
 Ist die rechte Seite bereits Element einer Äquivalenzmenge, so wird die linke Seite der Zuweisung dieser größeren Äquivalenzmenge zugeschlagen.
 
 Besondere Vorsicht müssen wir nur walten lassen, wenn die linke Seite einer Zuweisung bereits Teil einer Äquivalenzmenge ist.
-Da die linke Seite mit der Zuweisung überschrieben wird, müssen wir diese vorher aus ihrer Äquivalenzmenge löschen, bevor die neue Äquivalenz postulieren.
+Da die linke Seite mit der Zuweisung überschrieben wird, müssen wir diese vorher aus ihrer Äquivalenzmenge löschen, bevor wir die neue Äquivalenz postulieren.
 Dies gilt auch für alle anderen IR-Befehle, die eine Variable schreiben: Die Zielvariable muss aus allen Äquivalenzmengen entfernt werden (siehe ~x := Add x, y~), bevor neue Äquivalenzen etabliert werden.
 
 Im Beispiel sehen wir auch, dass Ersetzungen und Modifikation der Äquivalenzmengen verschränkt durchgeführt werden (~y := Assign x~).
@@ -485,9 +485,9 @@ Für jeden einzelnen Befehl ist dabei die Reihenfolge:
 Dies entspricht der Reihenfolge in der Ausführung:
 Zuerst werden Quelloperanden gelesen, bevor die Zieloperanden mit den berechneten Werten überschrieben werden.
 
-Besonders spannend bei der Aktualisierung der Äquivalenzmengen, sind solche Instruktionen, die einen Seiteneffekt haben.
-Dazu zählt, insbesondere der ~Store~ und der ~Call~ Befehl.
-Beide könnten direkt, oder indirekt dazu führen, dass zwei Variablen nicht mehr äquivalent sind, obwohl sie nicht als Operand im IR-Programm vorkommen.
+Besonders spannend bei der Aktualisierung der Äquivalenzmengen sind solche Instruktionen, die einen Seiteneffekt haben.
+Dazu zählt, insbesondere der ~Store~- und der ~Call~-Befehl.
+Beide könnten direkt oder indirekt dazu führen, dass zwei Variablen nicht mehr äquivalent sind, obwohl sie nicht als Operand im IR-Programm vorkommen.
 Dies werden wir uns nun genauer anschauen.
 
 #+begin_src latex
@@ -532,7 +532,7 @@ Dies werden wir uns nun genauer anschauen.
 #+end_src
 
 Das *größte Problem* für die CVP-Optimierung sind *Zeiger*.
-Zeiger sind deswegen blöd, weil durch einen ~Store~-Befehl eine Zuweisung zu einer Variable erfolgen könnte, die im Befehl nicht als Operand vermerkt ist [fn::Was ja auch ziemlich genau der Zweck der Store-Instruktion ist, Variablen daten-abhängig zu modifizieren.].
+Zeiger sind deswegen blöd, weil durch einen ~Store~-Befehl eine Zuweisung zu einer Variable erfolgen könnte, die im Befehl nicht als Operand vermerkt ist [fn::Was ja auch ziemlich genau der Zweck der Store-Instruktion ist: Variablen datenabhängig zu modifizieren.].
 Da wir bei jeder Zuweisung und bei jedem Schreiben eines Zieloperanden die Äquivalenzmengen aktualisieren müssten, haben wir beim ~Store~ ein Problem.
 Indirekt bekommen wir bei ~Call~ das gleiche Problem, da die aufgerufene Funktion ein solche Speichermanipulation durchführen könnte.
 
@@ -542,18 +542,18 @@ Allerdings müssten wir dazu *ganz sicher wissen*, dass ~ptr~ auf ~y~ zeigt.
 Sind wir uns dessen nicht ganz sicher, ist das Aktualisieren der Äquivalenzmengen deutlich komplizierter.
 
 Das Problem, was die CVP mit Zeigern hat, haben auch andere Optimierungsroutinen und wir nennen es das *Alias-Problem für Zeiger*.
-Da Zeiger Werte sind, die durch das Programm hindurch propagieren, ist es schwierig, bis unmöglich, festzustellen auf welche Objekte ein Zeiger an einer gewissen Stelle zeigt/zeigen kann.
-Im Allgemeinen ist das Alias-Problem sogar *unentscheidbar* und ein Übersetzer kann nur sichere Unterapproximation angeben, die durch aufwändige interprozedurale Analysen mühsam berechnet werden müssen.
+Da Zeiger Werte sind, die durch das Programm hindurch propagieren, ist es schwierig bis unmöglich, festzustellen, auf welche Objekte ein Zeiger an einer gewissen Stelle zeigt/zeigen kann.
+Im Allgemeinen ist das Alias-Problem sogar *unentscheidbar* und ein Übersetzer kann nur sichere Unterapproximation angeben, die durch aufwendige interprozedurale Analysen mühsam berechnet werden müssen.
 
 
 In dieser Vorlesung lassen wir die Alias-Analyse weg und bedienen uns für die zwei kritischen Befehle bei der CVP einer sehr konservativen Heuristik:
 Wir werfen bei jedem ~Store~ und bei jedem ~Call~ alle Äquivalenzmengen weg und starten wieder von vorne.
 Die gesamte CVP-Analyse finden Sie im Übungsübersetzer.
 
-Was wir aber aus der Kenntnis um das Alias-Problem lernen können, ohne eine Lösung dafür zu haben, ist, dass Zeiger für den Optimierer problematisch sind.
-Insbesondere, wenn Sie wild mit Zeigern herumrechnen und kuriose Zeiger-Magie machen wird der Optimierer aussteigen und ihre Funktion teilweise oder gänzlich unoptimiert zurück lassen.
+Was wir aber aus der Kenntnis über das Alias-Problem lernen können, ohne eine Lösung dafür zu haben, ist, dass Zeiger für den Optimierer problematisch sind.
+Insbesondere, wenn Sie wild mit Zeigern herumrechnen und kuriose Zeigermagie machen, wird der Optimierer aussteigen und Ihre Funktion teilweise oder gänzlich unoptimiert zurücklassen.
 Wenn Sie also Gedacht haben "Ah, hier hab ich einen wirklich guten Trick mit Zeigern gefunden", so kann dies am Ende, für die Performance, gänzlich nach hinten losgehen.
-Daher, und auch aus einer Vielzahl an anderen Gründen:
+Daher und auch aus einer Vielzahl an anderen Gründen:
 Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer, "optimierten Code" zu schreiben.
 
 ** Funktionsweite Optimierungen
@@ -594,22 +594,22 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
 #+end_src
 
 Bisher haben wir die CVP-Optimierung nur für einen einzelnen Basisblock durchgeführt.
-Wir haben jeden Basisblock einer Funktion genommen und der CVP diesen Block, in Isolation, mit der Bitte um Verbesserung, gegeben.
+Wir haben jeden Basisblock einer Funktion genommen und der CVP diesen Block, in Isolation, mit der Bitte um Verbesserung gegeben.
 Dieses Vorgehen ist deswegen der Startpunkt der CVP, weil der Kontrollfluss innerhalb eines Basisblocks sehr einfach und genau definiert ist:
 Von Oben, nach Unten.
-Für jeden Befehl ist klar, welcher Befehl vorher und welcher Befehl hinter her ausgeführt wird.
+Für jeden Befehl ist klar, welcher Befehl vorher und welcher Befehl hinterher ausgeführt wird.
 Entlang dieses linearen Kontrollflusses ist ganz genau klar, wohin wir die Äquivalenzmengen propagieren müssen.
-Wollen wir die Konstanten- und Kopiepropagation auf die Ebene einer ganzen Funktion heben, müssen wir aber auch damit umgehen können wenn der CFG sich aufspaltet oder wieder zusammen kommt.
+Wollen wir die Konstanten- und Kopiepropagation auf die Ebene einer ganzen Funktion heben, müssen wir aber auch damit umgehen können, wenn der CFG sich aufspaltet oder wieder zusammenkommt.
 
-Grundlegend für die funktions-weite CVP-Optimierung ist, dass die Berechnung der Äquivalenzmengen eine *Datenflussanalyse* ist.
-Der Datenfluss beschreibt wie Werte zwischen Variablen und Operationen durch das Programm "fließen" und welche Werte mit welchen anderen Werten verechnet werden.
+Grundlegend für die funktionsweite CVP-Optimierung ist, dass die Berechnung der Äquivalenzmengen eine *Datenflussanalyse* ist.
+Der Datenfluss beschreibt, wie Werte zwischen Variablen und Operationen durch das Programm "fließen" und welche Werte mit welchen anderen Werten verrechnet werden.
 Gewissermaßen gibt es neben dem Kontrollflussgraphen, der die Befehle einer Funktion ordnet, auch noch einen Datenflussgraphen, der die Variablen einer Funktion miteinander verbindet.
 Datenfluss und Kontrollfluss sind eng aneinander gekoppelt und bedingen sich auch gegenseitig:
-Der Kontrollfluss gibt vor welche Instruktionen Operanden verrechnen und Bedingungen an Sprüngen bestimmen wohin der Kontrollfluss geht.
+Der Kontrollfluss gibt vor, welche Instruktionen Operanden verrechnen und Bedingungen an Sprüngen bestimmen, wohin der Kontrollfluss geht.
 Vereinigt sich der Kontrollflussgraph an einem Basisblock wieder, so fließen auch die Datenflüsse aus allen Vorgängerblöcken an dieser Stelle zusammen.
 
 Um die CVP auf ganze Funktionen anzuwenden, verwenden wir das bisher gezeigte Verfahren für einen einzelnen Basisblock (~CVP(BasicBlock)~) als eine Transformationsfunktion für Mengen von Äquivalenzmengen (~Equivalences~).
-Wir nehmen also eine Äquivalenzmengen-menge und einen Basisblock und fragen:
+Wir nehmen also eine Äquivalenzmengen-Menge und einen Basisblock und fragen:
 Welche Äquivalenzen gelten nach diesem Basisblock, wenn dies die Äquivalenzen davor sind.
 Bewaffnet mit dieser ~CVP(BasicBlock, Equivalences) -> Equivalences~ Funktion können wir Äquivalenzmengen entlang der Kontrollflusskanten propagieren lassen.
 Wir führen die CVP für alle Blöcke dann solange aus, bis sich nichts mehr ändert und wir einen *Fixpunkt* erreicht haben.
@@ -651,14 +651,14 @@ Die Basisblock-übergreifende CVP wird also zu einer *Fixpunkt-Iteration*, die w
   \end{frame}
 #+end_src
 
-Um die CVP auf die Funktions-Ebene zu heben, schauen wir uns ganz generell an, wie Datenflussanalysen als Fixpunktiterationen auf dem Kontrollflussgraphen formuliert werden können.
+Um die CVP auf die Funktionsebene zu heben, schauen wir uns ganz generell an, wie Datenflussanalysen als Fixpunktiterationen auf dem Kontrollflussgraphen formuliert werden können.
 Also, einen Schritt zurück:
 Wir wollen eine Datenflussanalyse auf einer Funktion durchführen, die Wissen über den Zustand von Variablen berechnen soll.
 Dieser Zustand wird durch IR-Befehle manipuliert.
-Im Beispiel der CVP ist der Zustand für den wir uns interessieren die Menge der Äquivalenzmengen zu gewissen Zeitpunkten. 
+Im Beispiel der CVP ist der Zustand, für den wir uns interessieren, die Menge der Äquivalenzmengen zu gewissen Zeitpunkten.
 
-Für eine Fixpunktanalyse auf einem Kontrollflussgraphen brauchen wir 3 Funktionen und einen Datentypen.
-Der Datentyp ~d~ beschreibt den Zustand für den wir uns interessieren.
+Für eine Fixpunktanalyse auf einem Kontrollflussgraphen brauchen wir drei Funktionen und einen Datentypen.
+Der Datentyp ~d~ beschreibt den Zustand, für den wir uns interessieren.
 Die erste Funktion initialisiert einen leeren Zustand, der minimal wenig Wissen beinhaltet.
 Im CVP-Beispiel ist der minimale Zustand die leere Äquivalenzmengen-Menge.
 
@@ -667,14 +667,14 @@ Die Transformationsfunktion fängt ein, welche Auswirkung ein Basisblock auf ein
 Im CVP-Beispiel beginnt die Propagation der Mengen dann nicht mit der leeren Menge, sondern mit der gegebenen Menge.
 
 Die zweite Funktion, die wir wiederholt aufrufen werden, ist die Zustands-Merge-Funktion ~M()~.
-Diese Funktion hat mehrere Zustande als Parameter und berechnet die Verschmelzung dieser Eingangszustände.
-Da jeder Eingangs-Zustand eine gewisse Wissensbasis darstellt, verechnet ~M()~ seine Eingabeparameter dahingehend, dass der Ausgangszustand das kombinierte Wissen darstellt.
-Im CVP-Beispiel werden wir eine Äquivalenzmengen-Menge berechnen die nur solche Variablen (und Konstanten) als äquivalent postuliert, die in allen Eingabezuständen äquivalent waren.
+Diese Funktion hat mehrere Zustände als Parameter und berechnet die Verschmelzung dieser Eingangszustände.
+Da jeder Eingangszustand eine gewisse Wissensbasis darstellt, verrechnet ~M()~ seine Eingabeparameter dahingehend, dass der Ausgangszustand das kombinierte Wissen darstellt.
+Im CVP-Beispiel werden wir eine Äquivalenzmengen-Menge berechnen, die nur solche Variablen (und Konstanten) als äquivalent postuliert, die in allen Eingabezuständen äquivalent waren.
 Keine Sorge, ich mache in einer Minute ein konkretes Beispiel hierzu.
 
 Das Vorgehen der Fixpunktiteration ist dann wie folgt:
 Wir legen auf jede Kante des Kontrollflussgraphen einen initialen leeren Zustand.
-Wir nehmen uns dann, wiederholt, einen Basisblock B heraus, kombinieren alle Zustände die auf eingehenden Kanten von B liegen mittels ~M()~.
+Wir nehmen uns dann, wiederholt, einen Basisblock B heraus und kombinieren alle Zustände, die auf eingehenden Kanten von B liegen mittels ~M()~.
 Den kombinierten Zustand schieben wir durch ~T()~ und legen das Ergebnis auf die Ausgangskanten von B.
 Verändert sich dadurch der Zustand auf einer Kante, so führen wir den Vorgang für diesen Nachfolgeblock noch einmal aus.
 Diese Iteration führen wir solange durch, bis sich kein Zustand auf einer Kante mehr ändert.
@@ -694,20 +694,20 @@ Wir haben einen Fixpunkt erreicht.
 #+end_src
 
 Schauen wir uns den Code für einen solchen Fixpunktalgorithmus einmal genauer an.
-Was sie hier auf der Folie sehen ist ein *Worklist-Algorithmus*, der parametrisiert verschiedene Datenflussanalysen durchführen kann.
-Dieser Vorgehen heißt deswegen Worklist-Algorithmus, weil wir in einer Liste (~worklist~) speichern für welche Blöcke wir das Verfahren nocheinmal anwenden müssen.
+Was Sie hier auf der Folie sehen, ist ein *Worklist-Algorithmus*, der parametrisiert verschiedene Datenflussanalysen durchführen kann.
+Dieser Vorgehen heißt deswegen Worklist-Algorithmus, weil wir in einer Liste (~worklist~) speichern, für welche Blöcke wir das Verfahren noch einmal anwenden müssen.
 
-Parametrisiert ist die Funktion ~fixpoint()~ mit den 3 Funktionen (Initialisieren, Zustands-Merge und Transformation), sowie mit dem CFG auf dem gearbeitet werden soll.
+Parametrisiert ist die Funktion ~fixpoint()~ mit den drei Funktionen (Initialisieren, Zustands-Merge und Transformation) sowie mit dem CFG, auf dem gearbeitet werden soll.
 
 Als erstes legen wir uns ein Dictionary ~states~ an, um den Ausgangszustand für jeden Knoten des Graphen zu speichern.
 Dies ist der Zustand, den ein Knoten ~node~ an seine Nachfolger propagiert. Wir initialisieren dieses Dictionary mit leeren Zuständen.
 
-Der Algorithmus läuft dann solange, bis ~worklist~ leer gelaufen ist.
-In jedem Schleifendurchgang nehmen wir uns ein Element aus der Worklist und arbeiten dieses Ab.
+Der Algorithmus läuft dann solange bis ~worklist~ leer gelaufen ist.
+In jedem Schleifendurchgang nehmen wir uns ein Element aus der Worklist und arbeiten dieses ab.
 Zuerst werden alle Zustände der Vorgänger in ~d_ins~ gesammelt und mittels ~merge(d_ins)~ in ~d_in~ kombiniert.
 Diesen kombinierten Zustand schieben wir durch ~transform(node, d_in)~.
 Ist das Ergebnis der Transformation gleich dem bisherigen Ausgangszustand des Knotens, ist nichts zu tun.
-Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die Worklist, da deren Ausgangszustand sich ja da durch ändern könnte, dass einer ihrer Eingänge sich geändert hat.
+Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die Worklist, da deren Ausgangszustand sich ja dadurch ändern könnte, dass einer ihrer Eingänge sich geändert hat.
 
 #+begin_src latex
 \begin{frame}[t]{Fixpunktiteration als Datenflussanalyse}
@@ -719,7 +719,7 @@ Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die W
       \ii Beispiel für eine monotone Zustands-Transformationen: {
         \bi
         \ii \texttt{init()}: \hspace{2cm}\btSetTab Generiere eine leere Bitvektoren
-        \ii \texttt{merge()}: \btUseTab Bit-weises ODER
+        \ii \texttt{merge()}: \btUseTab Bitweises ODER
         \ii \texttt{transform()}: \btUseTab Bits werden gesetzt
         \ei
       }
@@ -744,19 +744,19 @@ Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die W
 
 Wollen wir einen solchen Fixpunktalgorithmus als Datenflussanalyse verwenden, so müssen wir darauf achten, dass dieses Verfahren auch wirklich terminiert.
 Was würde passieren, wenn sich zwei Blöcke immer im Wechsel die Eingangszustände so manipulieren würden, dass der andere noch einmal in die Worklist kommt?
-Um dies zu vermeiden, muss die Kombination aus den Zustands-Initialisierung, Zustands-Merge und transformation *monoton* sein.
+Um dies zu vermeiden, muss die Kombination aus den Zustandsinitialisierung, Zustands-Merge und Transformation *monoton* sein.
 Dies bedeutet, dass jeder ausgeführte Schritt uns näher an den Fixpunkt bringt oder im aktuellen Zustand verweilt, niemals jedoch wieder weiter entfernt.
 Auf diese Weise können wir garantieren, dass wir in endlich vielen Schritten einen Fixpunkt erreichen werden.
 
 Ein Beispiel (nicht CVP) für eine solche monotone Kombination wäre:
-Wir verwenden Bitvektoren als Zustände und starten mit gleich langen Bitvektoren die an jeder Stelle 0 sind.
+Wir verwenden Bitvektoren als Zustände und starten mit gleich langen Bitvektoren, die an jeder Stelle 0 sind.
 Jede Transformation kann einzelne Bits nur setzen, aber niemals löschen.
-Die Vereinigung zweier Zustände ist das bit-weise ODER (bei dem auch niemals eine 1 gelöscht wird).
+Die Vereinigung zweier Zustände ist das bitweise ODER (bei dem auch niemals eine 1 gelöscht wird).
 Eine solche Datenflussanalyse wird immer einen Fixpunkt in einem Worklist-Algorithmus finden.
 
-Wir haben bisher die Datenflussanalyse nur als Vorwärts-Analyse verwendet, da wir die Zustände nur entlang der Kontrollflusskanten propagiert haben.
+Wir haben bisher die Datenflussanalyse nur als Vorwärtsanalyse verwendet, da wir die Zustände nur entlang der Kontrollflusskanten propagiert haben.
 Aber es gibt auch eine Rückwärtsanalyse, bei der man genau umgekehrt vorgeht und Zustände entgegen der Kontrollflusskanten propagiert.
-Während man bei Vorwärtsanalyse gewissermaßen propagiert was Basisblock an Daten erzeugt, kann man bei der Rückwärtsanalyse zurück-propagieren, was ein Basisblock benötigt.
+Während man bei Vorwärtsanalyse gewissermaßen propagiert, was Basisblock an Daten erzeugt, kann man bei der Rückwärtsanalyse zurückpropagieren, was ein Basisblock benötigt.
 Aber damit wollen wir uns hier nicht weiter beschäftigen.
 
 
@@ -806,39 +806,39 @@ Aber damit wollen wir uns hier nicht weiter beschäftigen.
   \end{frame}
 #+end_src
 
-Wenden wir das ganze doch, um es plastischer zu machen einmal auf die CVP-Analyse an.
-Auf der Folie sehen sie die Basisblöcke (Blau), sowie Eingangs- und Ausgangszustand.
-Ich zeige hier beide Zustände um zu verdeutlichen, welchen Einfluss die Transformationsfunktion hat.
-Im konkreten muss man bei der CVP, die eine Vorwärts-Analyse ist, nur den Ausgangszustand speichern[fn::Bei einer Rückwärtsanalyse muss man den Eingangszustand speichern.], wie wir das auch im Codebeispiel getan haben.
-Außerdem zeigt jede Folie den aktuellen Zustand der Worklist, alle noch zu abzuarbeitenden Knoten (rote Sternchen), sowie den aktuell bearbeiteten Knoten (roter Rahmen).
+Wenden wir das ganze doch an einmal auf die CVP-Analyse an, um es plastischer zu machen.
+Auf der Folie sehen Sie die Basisblöcke (Blau) sowie Eingangs- und Ausgangszustand.
+Ich zeige hier beide Zustände, um zu verdeutlichen, welchen Einfluss die Transformationsfunktion hat.
+Im Konkreten muss man bei der CVP, die eine Vorwärtsanalyse ist, nur den Ausgangszustand speichern[fn::Bei einer Rückwärtsanalyse muss man den Eingangszustand speichern.], wie wir das auch im Codebeispiel getan haben.
+Außerdem zeigt jede Folie den aktuellen Zustand der Worklist, alle noch abzuarbeitenden Knoten (rote Sternchen), sowie den aktuell bearbeiteten Knoten (roter Rahmen).
 
-Wir beginnen damit alles zu initialiserieren:
+Wir beginnen damit alles zu initialisieren:
 Alle Zustände sind zunächst leere Äquivalenzmengen-Mengen und alle Basisblöcke sollen wenigstens einmal bearbeitet werden und kommen daher in die Worklist.
-Zuerst bearbeiten wir BB0, welcher zwei Äquivalenzen etabliert die an die Nachfolger BB1 und BB2 propagiert werden. Wir fügen beide Nachfolger nicht noch einmal in die Worklist, da sie dort schon vertreten sind und ganz sicher noch einmal bearbeitet werden.
+Zuerst bearbeiten wir BB0, welcher zwei Äquivalenzen etabliert, die an die Nachfolger BB1 und BB2 propagiert werden. Wir fügen beide Nachfolger nicht noch einmal in die Worklist ein, da sie dort schon vertreten sind und ganz sicher noch einmal bearbeitet werden.
 
 Der Knoten BB1 hat nur einen Vorgänger, was den Zustands-Merge trivial macht.
-Die beiden Instruktionen in BB1 werden beim transformieren modifiziert und der Ausgabezustand enthält mehr Äquivalenzen als der Eingabezustand. BB3 würde in die Liste kommen, ist dort aber bereits vorhanden.
+Die beiden Instruktionen in BB1 werden beim Transformieren modifiziert und der Ausgabezustand enthält mehr Äquivalenzen als der Eingabezustand. BB3 würde in die Liste kommen, ist dort aber bereits vorhanden.
 
 Als nächsten bearbeiten wir (aus didaktischen Gründen) BB3, da die Reihenfolge in der Worklist nicht festgelegt ist.
 BB3 hat jetzt zwei Vorgänger, sodass wir deren Zustände vereinigen müssen.
 Für BB1 ist der Zustand schon durch Transformation entstanden, bei BB2 ist es noch der initiale Zustand.
-Für die CVP, müssen wir beim Zustands-Merge wie folgt vorgehen:
+Für die CVP müssen wir beim Zustands-Merge wie folgt vorgehen:
 Im kombinierten Zustand dürfen zwei Werte (Variablen oder Konstanten) nur genau dann in einer Äquivalenzmenge sein, wenn diese in allen eingehenden Zuständen auch äquivalent sind.
 Etwas veranschaulicht gesprochen:
 Wenn die Variable A im einen Vorgänger den Wert 2 erhalten hat, im anderen Vorgänger aber den Wert 3, können wir nichts mehr über den Wert der Variable sagen.
-Im Falle von BB3, kombinieren wir etwas mit der leeren Äquivalenzmengen-Menge, was zwingend auch die leere Äquivalenzmengen-Menge sein muss.
+Im Falle von BB3 kombinieren wir etwas mit der leeren Äquivalenzmengen-Menge, was zwingend auch die leere Äquivalenzmengen-Menge sein muss.
 
 Jetzt führen wir endlich BB2 aus, was wiederum Äquivalenz erzeugt und BB3 wieder in die Worklist katapultiert. 
 
 Beim zweiten Besuch von BB3 sieht die Situation vom Mergen schon ganz anders aus:
-Die Äquivalenz ~{a, 2}~ hat sich über beide Pfade der Fallsunterscheidung hindurchpropagiert und bleibt für BB3 erhalten.
-Zusätzlich kommt hinzu, dass ~b~ und ~x~ in beiden Pfaden so gesetzt wird, dass sie den geleichen Wert haben:
-Links herum haben beide den Wert 3, recht herum haben beide den Wert 4.
+Die Äquivalenz ~{a, 2}~ hat sich über beide Pfade der Fallunterscheidung hindurch propagiert und bleibt für BB3 erhalten.
+Zusätzlich kommt hinzu, dass ~b~ und ~x~ in beiden Pfaden so gesetzt werden, dass sie den gleichen Wert haben:
+Linksherum haben beide den Wert 3, rechtsherum haben beide den Wert 4.
 In jedem Fall haben beide Variablen aber den gleichen R-Wert.
 
 Jetzt wird BB0 noch einmal ausgeführt, aber da wir eine leere Menge in den Eingangsblock propagieren, ändert sich hier nichts mehr und wir sind fertig und haben einen Fixpunkt erreicht.
 
-Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen etwas fummelig ist, weswegen ich das Vorgehen hier nicht genauer darlegen möchte. Die Intuition ist, das man gemeinsamen Teilmengen für Äquivalenzmengen aus unterschiedlichen Vorgängern bildet, die sich teilweise überschneiden. Das ganze geht sogar ziemlich effizient, wenn man eine [[https://de.wikipedia.org/wiki/Union-Find-Struktur][Union-Find Datenstruktur]] verwendet. Und weil ich diese Union-Find Strukturen so schön finde, möchte ich hier auch eine Lanze dafür brechen: Schauen Sie sich diese Datenstruktur an, sie ist wirklich wundervoll elegant.
+Sagen möchte ich noch, dass der Code zum Äquivalenzmengen-Mengen Vereinigen etwas fummelig ist, weswegen ich das Vorgehen hier nicht genauer darlegen möchte. Die Intuition ist, das man gemeinsamen Teilmengen für Äquivalenzmengen aus unterschiedlichen Vorgängern bildet, die sich teilweise überschneiden. Das ganze geht sogar ziemlich effizient, wenn man eine [[https://de.wikipedia.org/wiki/Union-Find-Struktur][Union-Find Datenstruktur]] verwendet. Und weil ich diese Union-Find Strukturen so schön finde, möchte ich hier auch eine Lanze dafür brechen: Schauen Sie sich diese Datenstruktur an, sie ist wirklich wundervoll elegant.
 
 ** Optimierung des Kontrollflusses
 :PROPERTIES:
@@ -886,16 +886,16 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
   \end{frame}
 #+end_src
 
-Nachdem wir uns mit der CVP-Optimierung ziemlich lange aufgehalten haben, kommen jetzt einige deutlich leichter zu verstehende Optimierungen.
-Diese Arbeiten auf der Ebene des Kontrollflussgraphen und haben zum Ziel unnötige Sprünge und Basisblöcke zu entfernen. Lehnen Sie sich also zurück und genießen Sie wie Kanten umgebogen werden und Blöcke verschwinden.
+Nachdem wir uns mit der CVP-Optimierung ziemlich lange aufgehalten haben, kommen jetzt einige deutlich einfacher zu verstehende Optimierungen.
+Diese Arbeiten auf der Ebene des Kontrollflussgraphen und haben zum Ziel, unnötige Sprünge und Basisblöcke zu entfernen. Lehnen Sie sich also zurück und genießen Sie, wie Kanten umgebogen werden und Blöcke verschwinden.
 
 Als erstes wollen wir Basisblöcke *verschmelzen*, die eh immer direkt hintereinander ausgeführt werden.
-Der Sprung vom ersten zum zweiten Block ist also absolut überflüssig. Als zusätzlich Bedingung machen wir aber, dass der zweite Block auch wirklich nur vom ersten Block aus angesprungen werden kann. Der erste Block soll also nur einen Nachfolger, der zweite nur einen Vorgänger haben.
+Der Sprung vom ersten zum zweiten Block ist also absolut überflüssig. Als zusätzliche Bedingung machen wir aber, dass der zweite Block auch wirklich nur vom ersten Block aus angesprungen werden kann. Der erste Block soll also nur einen Nachfolger und der zweite nur einen Vorgänger haben.
 
 Als Transformation löschen wir das ~Goto~ aus dem ersten Block und kopieren alle Instruktionen in den ersten Block hinein. Dies hat zur Folge, dass der erste Block nicht mehr den zweiten Block als Nachfolger hat, sondern die Nachfolger seines Nachfolgers. 
 
 Der zweite Block kann nun auch niemals mehr angesprungen werden und ist daher *Tod*.
-Wir räumen diesen aber nicht an dieser Stelle weg, sonder überlassen das Wegräumen von toten Blöcken einer anderen Optimierung, die sich dann auch darum kümmert tote Basisblöcke zu entfernen, die durch Konstantenfaltung von ~IfGoto~ Befehlen enstehen können.
+Wir räumen diesen aber nicht an dieser Stelle weg, sonder überlassen das Wegräumen von toten Blöcken einer anderen Optimierung, die sich dann auch darum kümmert, tote Basisblöcke zu entfernen, die durch Konstantenfaltung von ~IfGoto~ Befehlen entstehen können.
 
 #+begin_src latex
   \begin{frame}{Elimination von unbedingten Doppelsprüngen}
@@ -941,24 +941,24 @@ Wir räumen diesen aber nicht an dieser Stelle weg, sonder überlassen das Wegr�
 
 #+end_src
 
-Die zweite CFG-Optimierung soll Sprünge entfernen, die nur auf Sprünge springen; Doppelsprünge.
-Unsere Codeerzeugung{{{see(08-codegen-control-flow,Codeerzeugung für Kontrollflusskonstrukte)}}} provoziert solche Situationen, da sie für jede Bedingung einen Else-Block anlegt auch wenn es auf Quellcodeebene keinen Else-Zweig gab.
+Die zweite CFG-Optimierung soll Sprünge entfernen, die nur auf Sprünge springen: Doppelsprünge.
+Unsere Codeerzeugung{{{see(08-codegen-control-flow,Codeerzeugung für Kontrollflusskonstrukte)}}} provoziert solche Situationen, da sie für jede Bedingung einen Else-Block anlegt, auch wenn es auf Quellcodeebene keinen Else-Zweig gab.
 Diese Sprünge sind offensichtlich unnötig, da sie immer das gleiche machen. In gewisser Weise sind diese Situationen auch konstante Operationen, allerdings auf der Ebene des Kontrollflusses und nicht, wie bei der Konstantenfaltung, auf der Ebene des Datenflusses.
 
-Bemerkenswert ist, das solche Doppelsprünge nicht in allen Fällen durch die, bereits diskutierte, Blockverschmelzung abgedeckt ist.
-Besehen sie sich das Beispiel und BB2:
+Bemerkenswert ist, dass solche Doppelsprünge nicht in allen Fällen durch die bereits diskutierte Blockverschmelzung abgedeckt sind.
+Besehen Sie sich das Beispiel und BB2:
 In Rückrichtung können wir BB2 nicht verschmelzen, da es mehrere Vorgänger hat.
 In Vorwärtsrichtung können wir BB2 nicht mit BB3 verschmelzen, da dieser selbst auch mehrere Vorgänger hat.
 Zwar würde das Verschmelzen in beiden Fällen kein Problem darstellen, da BB2 selbst keine Instruktionen hat, aber wir müssten dafür bei der Verschmelzungsoptimierung einen Sonderfall für leere Blöcke einbauen.
-Besser ist es eine separate Optimierungsroutine zu bauen, die spezifisch auf Doppesprünge abstellt.
+Besser ist es, eine separate Optimierungsroutine zu bauen, die spezifisch auf Doppelsprünge abstellt.
 
 Die *Analyse* für diese Optimierung ist relativ einfach:
-Wir suchen alle Basisblöcke ~x~ die genau ein ~Goto~ enthalten.
+Wir suchen alle Basisblöcke ~x~, die genau ein ~Goto~ enthalten.
 Damit ist bereits sichergestellt, dass der Block nur einen Nachfolger (~y~) hat.
 
 Die *Transformation* sieht dann so aus, dass wir in der ganzen Funktion nach Labeln suchen, die auf den Block ~x~ zeigen.
 Egal ob diese in einem ~Goto~ oder einem ~IfGoto~ vorkommen.
-Einschränken können wir diese Suche, indem wir dem Kontrollflussgraphen rückwärts zu den Vorgängern von ~x~ gehen.
+Einschränken können wir diese Suche, indem wir im Kontrollflussgraphen rückwärts zu den Vorgängern von ~x~ gehen.
 In den gefunden Sprüngen ersetzen wir das ~x~-Label durch das ~y~-Label.
 Wiederum überlassen wir das Aufräumen des toten Basisblocks der nun folgenden Dead-Block-Elimination.
 
@@ -1002,23 +1002,23 @@ Die restlichen beiden Optimierungen beschäftigen sich mit dem Aufräumen von ü
 Zuerst wollen wir, mittels der *Dead-Block-Elimination*, tote Basisblöcke entfernen.
 
 Ein Basisblock ist tot, wenn es keine Möglichkeit mehr gibt ihn zu betreten, er also in keinem Kontrollfluss vorkommen kann.
-Ganz im Allgemeinen ist die Frage, ob ein Basisblock wirklich tot ist gleichbedeutend mit dem *Halteproblem*.
+Ganz im Allgemeinen ist die Frage, ob ein Basisblock wirklich tot ist, gleichbedeutend mit dem *Halteproblem*.
 Stellen Sie sich ein if-Statement mit sehr komplexer Bedingung vor, die von Nutzereingaben abhängig ist.
-Es ist für den Übersetzer schwierig, bis unmöglich, heraus zu finden, ob diese Bedingung jemals wahr wird und der bedingte Block jemals ausgeführt wird oder ob dieser tot ist.
+Es ist für den Übersetzer schwierig bis unmöglich, herauszufinden, ob diese Bedingung jemals wahr wird und der bedingte Block jemals ausgeführt wird oder ob dieser tot ist.
 Wir begnügen uns bei der Dead-Code-Elimination daher mit einer *sicheren Unterapproximation*:
-Nur wenn wir garantieren können, dass der Block tot ist entfernen wir ihn.
+Nur wenn wir garantieren können, dass der Block tot ist, entfernen wir ihn.
 
 Unsere Unterapproximation ist denkbar einfach:
 Wird ein Block niemals angesprungen und ist er nicht der Eingangsblock der Funktion, so ist er sicher tot und kann entfernt werden.
 Wir suchen also in der *Analyse* nach Blöcken, die keinen Vorgänger im CFG haben und nicht der Eingangsblock sind.
 
-Zusätzlich müssen wir darauf achten, dass es keinen Zeiger gibt, der auf diesen Basisblock gibt.
-Zwar ist es in unserer IR-Maschine unmöglich Referenzen auf Label zu erzeugen, aber das gilt im Allgemeinen nicht für alle IR-Sprachen.
-Erlaubt eine IR-Maschine ~ptr := Reference ..BB3~ zu schreiben und Variablen anstatt von statischen Labeln zu verwenden (~Goto ptr~), so müssen wir noch vorsichtiger sein. In diesem Fall würden wir alle Blöcke für die eine Referenz erzeugt wurde auch als *nicht-tot* markieren.
+Zusätzlich müssen wir darauf achten, dass es keinen Zeiger gibt, der auf diesen Basisblock zeigt.
+Zwar ist es in unserer IR-Maschine unmöglich, Referenzen auf Label zu erzeugen, aber das gilt im Allgemeinen nicht für alle IR-Sprachen.
+Erlaubt eine IR-Maschine ~ptr := Reference ..BB3~ zu schreiben und Variablen anstatt von statischen Labeln zu verwenden (~Goto ptr~), so müssen wir noch vorsichtiger sein. In diesem Fall würden wir alle Blöcke, für die eine Referenz erzeugt wurde, auch als *nicht-tot* markieren.
 
 Die *Transformation* ist dann relativ einfach: Wir entfernen den toten Block und alle CFG-Kanten, die von ihm ausgehen, aus der Funktion. 
 
-Bemerkenswert ist, dass das entfernen eines toten Blockes dazu führen kann, dass andere Optimierungen wieder möglich werden.
+Bemerkenswert ist, dass das Entfernen eines toten Blockes dazu führen kann, dass andere Optimierungen wieder möglich werden.
 So verlangt Verschmelzung, dass der zweite Block nur einen Vorgänger hat.
 Hat der zweite Block allerdings tote Vorgänger, so kann deren Entfernung eine Verschmelzung ermöglichen.
 
@@ -1064,19 +1064,20 @@ Eine Instruktion ist dann tot, wenn ihr Ergebnis oder ihre Seiteneffekte nicht b
 Insbesondere die CVP-Optimierung in Verbindung mit der Konstantenfaltung führt dazu, dass Ergebnisse vorberechnet und durch das Programm propagiert werden.
 Hierdurch verbleiben in den Basisblöcken viele IR-Befehle, die einer Variable einen Wert zuweisen, der niemals ausgelesen wird. Wir können uns diese Zuweisungen also auch getrost sparen.
 
-Wie bei der Suche nach toten Blöcken müssen wir uns einer Heuristik bedienen um tote Instruktionen zu finden.
-Wir ziehen das ganze daher von Seiten der Variablen auf und suchen nach zunächst nach toten Variablen, die niemals gelesen werden und niemals gelesen werden können.
+Wie bei der Suche nach toten Blöcken müssen wir uns einer Heuristik bedienen, um tote Instruktionen zu finden.
+Wir ziehen das Ganze daher von Seiten der Variablen auf und suchen nach zunächst nach toten Variablen, die niemals gelesen werden und auch niemals gelesen werden können.
+
 In der *Analyse* finden wir alle Variablen, die an keiner Stelle in der Funktion als Quelloperand auftreten und daher nie gelesen werden.
-Inbesondere ist darauf zu achten, dass ~Reference var~ eine Variable als gelesen markiert, da der erzeugte Zeiger dazu führen könnte dass eine Variable unbemerkt gelesen wird. Wieder kommt das Alias Problem zum Vorschein.
+Insbesondere ist darauf zu achten, dass ~Reference var~ eine Variable als gelesen markiert, da der erzeugte Zeiger dazu führen könnte, dass eine Variable unbemerkt gelesen wird. Wieder kommt das Alias-Problem zum Vorschein.
 
 Die *Transformation* entfernt dann alle Instruktionen, die eine tote Variable als Zieloperanden haben.
-Ausgenommen hier von sind ~Call~-Instruktionen, da diese einen Seiteneffekt haben, den wir auf der Funktions-lokalen Ebene nicht überblicken können.
+Ausgenommen hier von sind ~Call~-Instruktionen, da diese einen Seiteneffekt haben, den wir auf der funktionslokalen Ebene nicht überblicken können.
 Nachdem die toten Instruktionen entfernt wurden, können auch die toten Variablen aus der IR-Funktion gelöscht werden.
 
 Zusammen fallen die Entfernung toter Blöcke und die Entfernung toter Instruktionen in den Bereich der *Dead-Code-Elimination*.
 In dieser Klasse von Optimierungen werden Programmteile entfernt, die niemals ausgeführt werden oder deren Ergebnis eh ignoriert wird.
-In dieser Klasse gibt es noch präzisere Optimierungen, die ich hier aber, aufgrund der Kürze der Zeit nicht erklären kann.
-Jedoch können Sie einmal für sich überlegen wie eine Datenflussanalyse in Rückrichtung arbeiten würde, die Werte erkennt die nicht in den Return-Wert einfließen.
+In dieser Klasse gibt es noch präzisere Optimierungen, die ich hier aber aufgrund der Kürze der Zeit nicht erklären kann.
+Jedoch können Sie einmal für sich überlegen, wie eine Datenflussanalyse in Rückrichtung arbeiten würde, die Werte erkennt, die nicht in den Return-Wert einfließen.
 
 * Optimierung im größeren Zusammenhang
 :PROPERTIES:
@@ -1160,27 +1161,27 @@ Jedoch können Sie einmal für sich überlegen wie eine Datenflussanalyse in Rü
   \end{frame}
 #+end_src
 
-In dieser Vorlesung haben wir sechs verschiedene Optimierungsroutinen kennen gelernt, die alle auf der Granularität von einzelnen Funktionen anwendbar sind.
-Allerdings haben wir noch nicht darüber gesprochen wie diese Optimierungsroutinen im Übersetzer angeordnet sind und ausgeführt werden.
-Eine Möglichkeit ist die Optimierungen zu sortieren und diese Sequenz einmal ab zu arbeiten.
+In dieser Vorlesung haben wir sechs verschiedene Optimierungsroutinen kennengelernt, die alle auf der Granularität von einzelnen Funktionen anwendbar sind.
+Allerdings haben wir noch nicht darüber gesprochen, wie diese Optimierungsroutinen im Übersetzer angeordnet sind und ausgeführt werden.
+Eine Möglichkeit ist, die Optimierungen zu sortieren und diese Sequenz einmal abzuarbeiten.
 Allerdings würde sich bei diesem Vorgehen die Frage stellen, welche Reihenfolge das beste Optimierungsergebnis liefert.
-Außerdem haben wir gesehen, dass manche Optimierungen andere Optimierungen erst möglich macht.
-Zeichnet man ein Diagramm, bei dem man mit Pfeilen ausdrückt welche Optimierung welche andere Möglich machen könnte (siehe Folie), so kommt man schnell dahin zu Erkennen, dass es hier zyklische Abhängigkeiten zwischen den Optimierungen gibt.
+Außerdem haben wir gesehen, dass manche Optimierungen andere Optimierungen erst möglich machen.
+Zeichnet man ein Diagramm, bei dem man mit Pfeilen ausdrückt, welche Optimierung welche andere Möglich machen könnte (siehe Folie), so kommt man schnell dahin zu Erkennen, dass es hier zyklische Abhängigkeiten zwischen den Optimierungen gibt.
 Dies bedeutet, dass keine lineare Optimierungssequenz jemals das bestmögliche Ergebnis liefern kann; Optimierungen sollten also mehrfach ausgeführt werden.
 
-Ein Möglichkeit die einzelnen Optimierungsroutinen zu komponieren ist es eine Fixpunkt-Iteration zu unternehmen.
-Dazu bekommt jede Routine einen Rückgabewert, der anzeigt ob Sie eine Änderung an der IR-Funktion vorgenommen hat.
-Nun führen wir alle Optimierungen solange aus, bis keine Routine eine Änderung mehr vorgenommen hat.
-Natürlich gibt es noch klügere Methoden diese Komposition vorzunehmen, zum Beispiel indem man den Abhängigkeitsgraphen beachtet, aber für einen möglichst einfachen Übersetzer ist die naive Fixpunktiteration eine gute Möglichkeit die Optimierungsroutinen wiederholt auf einer Funktion auszuführen.
+Ein Möglichkeit die einzelnen Optimierungsroutinen zu komponieren ist es, eine Fixpunkt-Iteration zu unternehmen.
+Dazu bekommt jede Routine einen Rückgabewert, der anzeigt ob, sie eine Änderung an der IR-Funktion vorgenommen hat.
+Nun führen wir alle Optimierungen solange aus, bis keine Routine mehr eine Änderung vorgenommen hat.
+Natürlich gibt es noch klügere Methoden diese Komposition vorzunehmen, zum Beispiel indem man den Abhängigkeitsgraphen beachtet, aber für einen möglichst einfachen Übersetzer ist die naive Fixpunktiteration eine gute Möglichkeit, die Optimierungsroutinen wiederholt auf einer Funktion auszuführen.
 
 Damit endet unsere Betrachtung der Optimierungsphase in Übersetzern.
-Ich hoffe ihnen zumindest einen Einblick darin gegeben zu haben, welches Potential Optimierungen haben und wie stark sie die Effizient von Programmen steigern können.
-Haben Sie vertrauen darin, dass ihr Übersetzer Optimierungen durchführt und schreiben Sie lieber Code der verständlich ist und halten Sie Abstand von Code der "Optimierung" durch übermäßige Komplexität vortäuscht. Wildes rumfuchteln mit Zeigern mag beeindruckend aussehen, aber die dadurch entstehende Verschlimmerung des Alias-Problems kann in der Gesamtbilanz sogar negativ ausfallen.
+Ich hoffe Ihnen zumindest einen Einblick darin gegeben zu haben, welches Potential Optimierungen haben und wie stark sie die Effizient von Programmen steigern können.
+Haben Sie vertrauen darin, dass Ihr Übersetzer Optimierungen durchführt und schreiben Sie lieber Code, der verständlich ist und halten Sie Abstand von Code, der "Optimierung" durch übermäßige Komplexität vortäuscht. Wildes rumfuchteln mit Zeigern mag beeindruckend aussehen, aber die dadurch entstehende Verschlimmerung des Alias-Problems kann in der Gesamtbilanz sogar negativ ausfallen.
 
 Auf der letzten Folie habe ich noch einige Meilensteine der optimierenden Übersetzer aufgelistet.
-Insbesondere sollte ihnen dabei auffallen, dass dieses Gebiet bereits sehr lange aktiv beforscht wird, aber auch dass die Forschung daran keineswegs schon abgeschlossen ist.
+Insbesondere sollte Ihnen dabei auffallen, dass dieses Gebiet bereits sehr lange aktiv beforscht wird, aber auch dass die Forschung daran keineswegs schon abgeschlossen ist.
 So ist die hier länglich diskutierte Datenflussanalyse schon 1973 vorgestellt worden, jedoch habe ich mich beim Design des Zwischencode von LLVM inspirieren lassen.
-Aufwändigere Programmoptimierungen erfordern sowohl ein solides mathematisches Modell um korrekte Analysen durch zu führen, als auch ein gutes Verständnis von Hardware und Systemsoftware um Optimierungspotentiale richtig zu bewerten. 
+Aufwendigere Programmoptimierungen erfordern sowohl ein solides mathematisches Modell, um korrekte Analysen durchzuführen, als auch ein gutes Verständnis von Hardware und Systemsoftware, um Optimierungspotentiale richtig zu bewerten.
 
 * Zusammenfassung
 #+begin_src latex
