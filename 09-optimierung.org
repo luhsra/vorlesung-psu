@@ -501,21 +501,21 @@ Dies werden wir uns nun genauer anschauen.
 
 
     \bi
-    \ii Das Problem sind Zeiger, die unsere IR-Variablen \alert{verändern könnten} {
+    \ii Das Problem sind Zeiger, die unsere IR-Variablen \alert{verändern könnten}. {
       \bi
-      \ii Wenn \texttt{ptr} auf \texttt{y} zeigt, kann sich \texttt{y} ändern, ohne explizit Operand zu sein
-      \ii Im Funktions-lokalen Scope, wissen wir nicht was \texttt{func()} mit \texttt{ptr} macht.
-      \ii Die \ircmd{Store}-Instruktion könnte \texttt{y} auf 3 setzen
+      \ii Wenn \texttt{ptr} auf \texttt{y} zeigt, kann sich \texttt{y} ändern, ohne explizit Operand zu sein.
+      \ii Im Funktions-lokalen Scope wissen wir nicht, was \texttt{func()} mit \texttt{ptr} macht.
+      \ii Die \ircmd{Store}-Instruktion könnte \texttt{y} auf 3 setzen.
       \ei
     }\medskip
-    \ii<2-> Dies ist das \structure{Alias-Problem} für Zeiger {
+    \ii<2-> Dies ist das \structure{Alias-Problem} für Zeiger. {
       \bi
-      \ii Wir müssten genau wissen auf welche Objekte ein Zeiger verweisen kann
+      \ii Wir müssten genau wissen, auf welche Objekte ein Zeiger verweisen kann.
       \ii Dies erfordert aufwendige, teils inter-prozedurale, Analysen.
-      \ii Beim geringste Zweifel über die Alias-Relation, \textbf{wirft der Optimierer hin}
+      \ii Beim geringste Zweifel über die Alias-Relation, \textbf{wirft der Optimierer hin}.
       \ei
     }\medskip
-    \ii<3-> Einfache Heursitik für die unsere Wertepropagation {
+    \ii<3-> Einfache Heuristik für unsere Wertepropagation {
       \bi
       \ii Bei jedem \ircmd{Store} und bei jedem \ircmd{Call} werfen wir die Äquivalenzmengen weg. Better safe, than sorry.
       \ei
@@ -566,7 +566,7 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
   \dividerframe{Funktionsweite Optimierungen}
 
   \begin{frame}{Wertepropagation über Basisblockgrenzen}
-    \textbf{Bisher}: Wertepropagation (CVP) innerhalb eines Basisblocks.
+    \textbf{Bisher}: Wertepropagation (CVP) innerhalb eines Basisblocks
 
     \begin{center}
       \strut\alt<handout:1|1>{
@@ -579,15 +579,15 @@ Programmieren Sie verständlich und versuchen Sie nicht, im vorauseilendem Eifer
     \bi
     \ii Wertepropagation ist eine \structure{Datenflussanalyse}{
       \bi
-      \ii Wir verfolgen wie Datenwerte entlang des Kontrollflusses \enquote{fließen}
-      \ii In einem Basisblock ist der Kontrollfluss determiniert linear
-      \ii Die CVP propagiert eine Äquivalenzmenge durch einen Block
+      \ii Wir verfolgen, wie Datenwerte entlang des Kontrollflusses \enquote{fließen}.
+      \ii In einem Basisblock ist der Kontrollfluss determiniert linear.
+      \ii Die CVP propagiert eine Äquivalenzmenge durch einen Block.
       \ei
     }\medskip
-    \ii<handout:2-|2-> Wir wollen die CVP auf eine ganze Funktion anweden {
+    \ii<handout:2-|2-> Wir wollen die CVP auf eine ganze Funktion anwenden. {
       \bi
-      \ii Blöcke werden zu Transformator-Funktionen für Äquivalenzmengen
-      \ii Äquivalenzmengen \enquote{fließen} entlang der Kontrollflusskanten
+      \ii Blöcke werden zu Transformator-Funktionen für Äquivalenzmengen.
+      \ii Äquivalenzmengen \enquote{fließen} entlang der Kontrollflusskanten.
       \ii Fixpunkt-Iteration bis keine Änderungen mehr auftreten
       \ei
     }
@@ -712,9 +712,9 @@ Ist das Ergebnis der Transformation gleich dem bisherigen Ausgangszustand des Kn
 Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die Worklist, da deren Ausgangszustand sich ja da durch ändern könnte, dass einer ihrer Eingänge sich geändert hat.
 
 #+begin_src latex
-\begin{frame}[t]{Fixpunkiteration als Datenflussanalyse}
+\begin{frame}[t]{Fixpunktiteration als Datenflussanalyse}
     \bi
-    \ii \structure{Vorraussetzungen} für die Terminierung des Worklist-Algorithmus{
+    \ii \structure{Voraussetzungen} für die Terminierung des Worklist-Algorithmus{
       \bi
       \ii Init+Merge+Transform muss Knotenzustände \alert{strikt monoton} ändern
       \ii Beliebte Datenstrukturen für die Zustand: Bitvektoren, Mengen
@@ -737,7 +737,7 @@ Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die W
       \bi
       \ii Initialisierung mit leeren Äquivalenzmengen
       \ii Transformation wie gehabt mit \texttt{CVP(BasicBlock, Equivalences)}
-      \ii Merge: \btSetTab Zwei Werte sind genau dann äquivalent,\\\btUseTab Wenn sie in allen Eingabemenge äquivalent sind.
+      \ii Merge: \btSetTab Zwei Werte sind genau dann äquivalent,\\\btUseTab wenn sie in allen Eingabemenge äquivalent sind.
       \ei
     }
     \ei
@@ -857,11 +857,11 @@ Sagen möchte ich noch, dass der Code um Äquivalenzmengen-Mengen zu vereinigen 
       \end{column}\hfill
       \begin{column}{0.6\textwidth}
         \bii
-        \ii \textbf{Problem}: Sprung zu BB1 ist überflüssig.{
+        \ii \textbf{Problem}: Sprung zu BB1 ist überflüssig{
           \bi
           \ii BB0 hat genau einen Nachfolger
           \ii BB1 hat genau einen Vorgänger
-          \ii[$\Rightarrow$] Verschmelze beide BB0 und BB1
+          \ii[$\Rightarrow$] Verschmelze BB0 und BB1
           \ei
         }\medskip
         \ii<handout:2-|2-> \textbf{Analyse}: Finde Block-Paar (x, y), sodass...{
@@ -912,13 +912,13 @@ Wir räumen diesen aber nicht an dieser Stelle weg, sonder überlassen das Wegr�
           \bi
           \ii BB2 enthält \textbf{nur} ein \ircmd{Goto}
           \ii Jeder Sprung zu BB2 ist ein Sprung zu BB3
-          \ii[$\Rightarrow$] \textbf{Ziel}: Vermeide reundante Sprünge
+          \ii[$\Rightarrow$] \textbf{Ziel}: Vermeide redundante Sprünge
           \ei
         }\medskip
         \ii<handout:2-|2-> \textbf{Hinweis}: Verschmelzen hier unmöglich {
           \bi
           \ii BB3 hat mehrere Vorgänger
-          \ii Verschmelzen würde BB Bedingung verletzen
+          \ii Verschmelzen würde BB-Bedingung verletzen
           \ei
         }\medskip
         \ii<handout:3-|3-> \textbf{Analyse}: Finde Block x sodass\ldots{
@@ -978,7 +978,7 @@ Wiederum überlassen wir das Aufräumen des toten Basisblocks der nun folgenden 
         \ii \textbf{Problem}: Optimierungen hinterlassen Müll{
           \bi
           \ii Aufräumen von totem Code zentralisieren
-          \ii Blöcke die nie angesprungen werden
+          \ii Blöcke, die nie angesprungen werden
           \ei
         }\medskip
         \ii<handout:2-|2-> \textbf{Analyse}: Finde tote Blöcke{
@@ -1046,7 +1046,7 @@ Hat der zweite Block allerdings tote Vorgänger, so kann deren Entfernung eine V
     \ii<handout:8-|8-> \textbf{Analyse}: Finde alle lokalen Variablen, die \advantage{nie gelesen werden}{
       \bi
       \ii \alert{Vorsicht}: Zeiger können Variablen indirekt lesen (Alias-Problem)
-      \ii \advantage{Heuristik}: Markiere alle Variablen deren Addresse berechnet wird als \enquote{gelesen}
+      \ii \advantage{Heuristik}: Markiere alle Variablen, deren Adresse berechnet wird, als \enquote{gelesen}
       \ei
     }
     \ii<handout:9-|9-> \textbf{Transformation}: Entferne niemals gelesene lokale Variable x {
@@ -1188,15 +1188,15 @@ Aufwändigere Programmoptimierungen erfordern sowohl ein solides mathematisches 
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
-    \ii Optimierungen nur die \structure{nicht-funktionalen Programmeigenschaften} {
+    \ii Optimierungen nur von \structure{nicht-funktionalen Programmeigenschaften} {
       \bi
-      \ii Aus Sicht der Sprache bleibt das \structure{beobachtbare Verhalten} gleich
-      \ii Verschiedene Optimierungsziele, wobei es meist um \structure{Ausführungszeit}  geht
+      \ii Aus Sicht der Sprache bleibt das \structure{beobachtbare Verhalten} gleich.
+      \ii Verschiedene Optimierungsziele, wobei es meist um \structure{Ausführungszeit} geht
       \ei
     }\medskip
-    \ii Optimierungen sind immer zweigeteilte Übersetzungsschritte {
+    \ii Optimierungen sind immer zweigeteilte Übersetzungsschritte. {
       \bi
-      \ii \structure{Analyse} des Programms berechnet Informationen, die wir brauchen um zu entscheiden \textbf{ob und wie} eine Optimierung angewendet wird.
+      \ii \structure{Analyse} des Programms berechnet Informationen, die wir brauchen, um zu entscheiden, \textbf{ob und wie} eine Optimierung angewendet wird.
       \ii \structure{Transformation} der Zwischenrepräsentation des Programms setzt die Optimierung durch.
       \ei
     }\medskip

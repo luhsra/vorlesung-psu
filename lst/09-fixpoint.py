@@ -5,7 +5,7 @@
 # init():      Initialer Zustand für Node
 # merge():     Zustands-Merge-Funktion
 # transform(): Block-Transformation Funktion
-# graph:       Der Graph den wir bearbeiten wollen
+# graph:       Der Graph, den wir bearbeiten wollen
 def fixpoint(init, merge, transform, graph):
 #e0
 #s1
@@ -15,11 +15,11 @@ def fixpoint(init, merge, transform, graph):
 #e1
 #s2
     worklist = list(graph.nodes)   # Worklist-Algorithmus: Laufe solange, bis
-    while worklist != []:          # die Worklist leer ist. Zu Beginn, besuchen
+    while worklist != []:          # die Worklist leer ist. Zu Beginn besuchen
         node = worklist.pop()      # wir jeden Knoten.
 #e2
 #s3
-        d_ins = []                            # In jedem Schritt, sammeln wir die
+        d_ins = []                            # In jedem Schritt sammeln wir die
         for pred in graph.predecessors[node]: # Zustände der Vorgängerknoten ein
             d_ins.append(states[pred])        # und kombinieren diese mit der
         d_in = merge(d_ins)                   # Zustands-Merge Funktion merge()
@@ -31,7 +31,7 @@ def fixpoint(init, merge, transform, graph):
 #e4
 #s5
         states[node] = d_out                 # Ändert sich der Zustand eines 
-        for succ in graph.successors[node]:  # Knotens werden alle Folge-Knoten 
+        for succ in graph.successors[node]:  # Knotens, werden alle Folge-Knoten
             worklist.append(succ)            # noch einmal besucht.
 #e5
     return states
