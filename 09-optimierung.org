@@ -43,11 +43,11 @@
       \includegraphics[page=7,width=0.9\linewidth]{fig/01-overview-small}
     \end{center}
     \bi
-    \ii \structure{Hadwareunabhängige Optimierung} auf dem Zwischencode {
+    \ii \structure{Hardwareunabhängige Optimierung} auf dem Zwischencode {
       \bi
-      \ii IR-Code wurde \alert{ohne Rücksicht} auf die effizienzte Ausführbarkeit erstellt.
-      \ii \structure{Effektive Entwickler}: Welche Arbeiten kann er dem Optimierer überlassen.
-      \ii \structure{Effiziente Entwickler}: Wie lege ich dem Optimierer keine Steine in den Weg.
+      \ii IR-Code wurde \alert{ohne Rücksicht} auf die effiziente Ausführbarkeit erstellt.
+      \ii \structure{Effektive Entwickler}: Welche Arbeiten kann er dem Optimierer überlassen?
+      \ii \structure{Effiziente Entwickler}: Wie lege ich dem Optimierer keine Steine in den Weg?
       \ei
     }
     \ei
@@ -64,7 +64,7 @@
           \lstinputlisting[style=lzero]{lst/09-example.l0}
         \end{code}
       
-        Bei genauer Betrachtung, sehen wir, dass dieses Programm \ALERT{immer 0} zurück geben wird.
+        Bei genauer Betrachtung sehen wir, dass dieses Programm \ALERT{immer 0} zurückgeben wird.
 
         \bigskip
         \uncover<handout:2|2>{Dafür wird echt viel gerechnet!}
@@ -78,7 +78,7 @@
         \medskip
         \be
         \ii {Konstante Auswertung} {
-          \\[0.5ex]\enquote{Bekanntes Vorrausberechnen}\\[0.5ex]
+          \\[0.5ex]\enquote{Bekanntes Vorausberechnen}\\[0.5ex]
           \bi
           \ii<handout:4-|4-> Arithmetische Berechnungen
           \ii<handout:5-|5-> Konstante Sprungbedingungen
@@ -106,31 +106,31 @@
   \end{frame}
 #+end_src
 
-In der letzten Vorlesung haben wir den abstrakten Sytntaxbaum zu einem IR-Programm übersetzt.
-Dabei haben wir den AST linearisiert und uns auf eine Ausführungsreihenfolge von Befehlen fest gelegt.
-Bei diesem Prozess der Codeerzeugung haben wir darauf verzichtet super performanten und effizienten Zwischencode zu erzeugen, der, beispielweise, minimal viele virtuelle Register verwendet.
-Ich habe ganz absichtlich eine Trennung der Belange von Codeerzeugung und Optimierung vorgenommen um die Prinzipien des einen Bereichs nicht mit Prinzipien des anderen Bereichs zu vermengen.
+In der letzten Vorlesung haben wir den abstrakten Syntaxbaum zu einem IR-Programm übersetzt.
+Dabei haben wir den AST linearisiert und uns auf eine Ausführungsreihenfolge von Befehlen festgelegt.
+Bei diesem Prozess der Codeerzeugung haben wir darauf verzichtet, super performanten und effizienten Zwischencode zu erzeugen, der beispielweise minimal viele virtuelle Register verwendet.
+Ich habe ganz absichtlich eine Trennung der Belange von Codeerzeugung und Optimierung vorgenommen, um die Prinzipien des einen Bereichs nicht mit Prinzipien des anderen Bereichs zu vermengen.
 In dieser Vorlesung wollen wir einen kurzen Blick auf den Bereich der Optimierung werfen.
 
-Dazu will ich als erstes den Umfang den wir hier, aufgrund der Kürze der Zeit, gleich einmal einschränken:
+Dazu will ich als erstes den Umfang aufgrund der Kürze der Zeit gleich einmal einschränken:
 Ganz generell ist die Optimierung von Programmen ein breites und altes Feld.
 Optimierungen können im Übersetzer in jedem Zwischenschritt durchgeführt werden.
-Der Übersetzer kann bereits beim Parsen Ausdrücke die ein konstantes Ergebnis liefern (~2+3~) durch das Ergebnis (~5~) ersetzen[fn::GCC tut dies, Clang nicht. Daher ist Clang leichter für Source-to-Source Transformationen anwendbar.]. Aber auch der Zwischencode oder der bereits erstelle Assembler können optimiert werden. 
+Der Übersetzer kann bereits beim Parsen Ausdrücke, die ein konstantes Ergebnis liefern (~2+3~), durch das Ergebnis (~5~) ersetzen[fn::GCC tut dies, Clang nicht. Daher ist Clang einfacher für Source-to-Source-Transformationen anwendbar.]. Aber auch der Zwischencode oder der bereits erstellte Assembler können optimiert werden. 
 So breit können wir dieses Thema einfach nicht besprechen und ich werde mich daher auf einige relativ einfache Optimierungen auf der IR-Ebene konzentrieren. 
-Jedoch werden Sie dennoch einen Eindruck und, hoffentlich, eine gewisse Intuition bekommen, welche Fähigkeiten ein Übersetzer haben *kann* und wie Sie, als Entwickler, diesen Mechanismen möglichst wenig im Weg stehen.
+Jedoch werden Sie dennoch einen Eindruck und hoffentlich eine gewisse Intuition bekommen, welche Fähigkeiten ein Übersetzer haben *kann* und wie Sie, als Entwickler, diesen Mechanismen möglichst wenig im Weg stehen.
 
 Als einleitendes Beispiel sehen Sie auf den Folien eine Funktion, die auf sehr komplizierte Art und Weise die Zahl 0 berechnet.
 Immer.
 Die gezeigte ~main()~-Funktion wird immer damit Enden, dass die Variable ~a~ den Wert 0 hat.
-Prüfen Sie es nach, verfolgen Sie den Kontrollfluss, es wird immer 0 dabei heraus kommen.
+Prüfen Sie es nach, verfolgen Sie den Kontrollfluss, es wird immer 0 dabei herauskommen.
 Wenn wir uns aber den Kontrollflussgraphen anschauen, den die Codeerzeugung produziert hat, so spiegelt sich darin genau die Struktur wieder, die der Entwickler notiert hat.
 
-Geben wir dieses IR-Programm an den Optimierer, so wendet dieser eine Reihe von Optimierungsroutinen an, die zum Ziel haben die Anzahl der ausgeführten IR-Befehle zu verringern.
-Jede der im Beispiel aufgeführten Routinen, werden wir in dieser Vorlesung besprechen und Sie finden im Übersetzer der Übung eine beispielhafte Implementierung.
-Daher können Sie sich an dieser Stelle zurück lehnen und das Schauspiel genießen, wie Instruktionen sich verändern und verschwinden, und wie Blöcke und Kanten verschoben, verschmolzen und weggeräumt werden.
+Geben wir dieses IR-Programm an den Optimierer, so wendet dieser eine Reihe von Optimierungsroutinen an, die zum Ziel haben, die Anzahl der ausgeführten IR-Befehle zu verringern.
+Jede der im Beispiel aufgeführten Routinen werden wir in dieser Vorlesung besprechen und Sie finden im Übersetzer der Übung eine beispielhafte Implementierung.
+Daher können Sie sich an dieser Stelle zurücklehnen und das Schauspiel genießen, wie Instruktionen sich verändern und verschwinden, und wie Blöcke und Kanten verschoben, verschmolzen und weggeräumt werden.
 Wie wunderschön:
 Eine Programm, das ein Programm verkürzt, ganz ohne menschliches Zutun und ohne dabei seine Semantik zu verändern.
-Die Kontrollflussgraphen auf den Folien sind im übrigen Echt und stammen aus dem Übungsübersetzer.
+Die Kontrollflussgraphen auf den Folien sind im übrigen echt und stammen aus dem Übungsübersetzer.
 
 * Voraussetzungen und Ziele
 :PROPERTIES:
@@ -138,7 +138,7 @@ Die Kontrollflussgraphen auf den Folien sind im übrigen Echt und stammen aus de
 :END:
 
 #+begin_src latex
-  \dividerframe{Ziele und Vorraussetzungen\\der Optimierung}
+  \dividerframe{Ziele und Voraussetzungen\\der Optimierung}
 
   \begin{frame}{Ziele bei IR-Level Optimierung}
     \begin{btBlock}[type=example]{Allgemeine Optimierungsziele}
@@ -149,13 +149,13 @@ Die Kontrollflussgraphen auf den Folien sind im übrigen Echt und stammen aus de
     \ii Nicht-Funktionale Eigenschaften nach denen wir optimieren {
       \bi
       \ii \structure{Ausführungszeit}: Abbildung auf weniger oder schnellere Instruktionen
-      \ii \structure{Programmgröße}: Veringerung der Binärgröße (eingebettete Systeme)
+      \ii \structure{Programmgröße}: Verringerung der Binärgröße (eingebettete Systeme)
       \ii \structure{Energieverbrauch}: Verlängerung der Batterielaufzeit
       \ei
     }\medskip
     \ii<2-> Auf der Hardware-unabhängigen IR-Ebene fehlt das \alert{Kostenmodell}{
       \bi
-      \ii Wir wissen nicht wie schnell, groß, oder Energie-hungrig einzelne Instruktionen auf der Zielplattform sein werden.
+      \ii Wir wissen nicht, wie schnell, groß oder Energie-hungrig einzelne Instruktionen auf der Zielplattform sein werden.
       \ii \structure{Heuristik}: \enquote{Speicherzugriffe und Sprünge sind teuer.}
       \medskip
       \ii<3->[$\Rightarrow$] Generelle Reduktion der Anzahl der Instruktionen und Basisblöcke
@@ -167,37 +167,37 @@ Die Kontrollflussgraphen auf den Folien sind im übrigen Echt und stammen aus de
 #+end_src
 
 Bevor wir zu einzelnen Optimierungsroutinen kommen, müssen wir genauer definieren, was die Ziele und Mittel sind, die ein Optimierer hat und die er einsetzen darf.
-Das Ziel muss klar sein, genauso wie die Werkzeuge die angewendet und die nicht angewendet werden dürfen.
+Das Ziel muss klar sein, genauso wie die Werkzeuge, die angewendet und die nicht angewendet werden dürfen.
 
-Unser Startpunkt bei dieser Überlegung ist, wie immer im Übersetzerbau, der Entwickler und seine *Intention*. Verändern wir das Programm so, dass es nicht mehr dieser Intention entspricht, werden wir kein großes Glück in die Welt bringen. Die Art und Weise, wie diese Intention notiert wurde, ist der Programmtext der nach den semantischen Regeln der Sprache zu Papier (oder eher zu Datei) gebracht wurde. Der Entwickler bedient der Regeln der Sprache und formuliert sein Programm entlang der Garantien, welche die Sprache bietet. 
+Unser Startpunkt bei dieser Überlegung ist, wie immer im Übersetzerbau, der Entwickler und seine *Intention*. Verändern wir das Programm so, dass es nicht mehr dieser Intention entspricht, werden wir kein großes Glück in die Welt bringen. Die Art und Weise, wie diese Intention notiert wurde, ist der Programmtext, der nach den semantischen Regeln der Sprache zu Papier (oder eher zu Datei) gebracht wurde. Der Entwickler bedient sich der Regeln der Sprache und formuliert sein Programm entlang der Garantien, welche die Sprache bietet.
 
-Eine Verletzung einer solche Regel würde Sie wirklich unglücklich machen. Ein Beispiel hierzu: Jede Programmiersprache verspricht, dass Sie jenen Wert aus einer Variable wieder auslesen können, den Sie bei der letzten Zuweisung hinein geschrieben haben. Würde beim wieder auslesen ein anderer Wert herauskommen, wären Sie *maximal überrascht*[fn::Das Prinzip der *minimalen Überraschung* ist ein wichtiges Prinzip in der Informatik. Da in den abstrakt konstruierten Gedankengebäuden alles möglich ist, jedes Verhalten codierbar ist, ist es wichtig sich diesem Prinzip unterzuordnen. Überraschen Sie weder ihr zukünftiges Ich noch andere!]. Etwas formaler ausgedrückt würden wir sagen, dass ein Optimierer das Programm nur so verändern darf, dass seine erwartete Funktionalität, die von den Sprachregeln, hoch und heilig, versprochen wurden, unberührt bleiben. 
+Eine Verletzung einer solche Regel würde Sie wirklich unglücklich machen. Ein Beispiel hierzu: Jede Programmiersprache verspricht, dass Sie jenen Wert aus einer Variable wieder auslesen können, den Sie bei der letzten Zuweisung hinein geschrieben haben. Würde beim Wiederauslesen ein anderer Wert herauskommen, wären Sie *maximal überrascht*[fn::Das Prinzip der *minimalen Überraschung* ist ein wichtiges Prinzip in der Informatik. Da in den abstrakt konstruierten Gedankengebäuden alles möglich ist, jedes Verhalten codierbar ist, ist es wichtig, sich diesem Prinzip unterzuordnen. Überraschen Sie weder Ihr zukünftiges Ich noch andere!]. Etwas formaler ausgedrückt würden wir sagen, dass ein Optimierer das Programm nur so verändern darf, dass seine erwartete Funktionalität, die von den Sprachregeln hoch und heilig versprochen wurden, unberührt bleiben.
 
 Aber wozu das alles?
-Was bedeutet es ein Programm "besser" zu machen?
-Um dies zu verstehen müssen wir uns die *nicht-funktionalen Eigenschaften* des Programms anschauen.
+Was bedeutet es, ein Programm "besser" zu machen?
+Um dies zu verstehen, müssen wir uns die *nicht-funktionalen Eigenschaften* des Programms anschauen.
 Nicht-funktional bedeutet, dass diese Eigenschaften nicht Teil des Zweckes des Programm sind.
-Selbst wenn die nicht-funktionalen Eigenschaften sehr sehr schlecht sind, könnten wir es benutzen um einen gewissen Zweck zu verfolgen.
-Jedoch würde es vielleicht sehr lange dauern[fn::Hundertausend Jahre], viel Energie benötigen[fn::Mehrere Sonnen], oder viel Speicherplatz belegen[fn::Aller jemals hergestellte RAM].
+Selbst wenn die nicht-funktionalen Eigenschaften sehr sehr schlecht sind, könnten wir es benutzen, um einen gewissen Zweck zu verfolgen.
+Jedoch würde es vielleicht sehr lange dauern[fn::Hunderttausend Jahre], viel Energie benötigen[fn::Mehrere Sonnen], oder viel Speicherplatz belegen[fn::Aller jemals hergestellte RAM].
 
-Da ein Programm eine Vielzahl an nicht-funktionalen Eigenschaften hat, gibt es auch eine Vielzahl an unterschiedlichen *Optimierierungszielen*.
+Da ein Programm eine Vielzahl an nicht-funktionalen Eigenschaften hat, gibt es auch eine Vielzahl an unterschiedlichen *Optimierungszielen*.
 Sie könnten sich vom Übersetzer wünschen, dass er das Programm dahingehend transformiert, dass es möglichst schnell ist (Ausführungszeit).
-Sie könnten aber auch ein möglichst kleines Programm haben wollen, was gerade noch in ihren Mikrocontroller passt (Programmgröße).
-Manche dieser Optimierungziele gehen Hand in Hand und weisen eine Korrelation auf.
+Sie könnten aber auch ein möglichst kleines Programm haben wollen, was gerade noch in Ihren Mikrocontroller passt (Programmgröße).
+Manche dieser Optimierungsziele gehen Hand in Hand und weisen eine Korrelation auf.
 So ist Energieverbrauch und Ausführungszeit häufig (aber nicht immer!) stark miteinander korreliert. Manchmal ist diese Korrelation aber auch invers, wie dies bei Programmgröße und Ausführungszeit der Fall sein kann.
-Daher ist es wichtig sich *vorher* zu überlegen, was die Eigenschaft ist die man optimieren will.
+Daher ist es wichtig, sich *vorher* zu überlegen, was die Eigenschaft ist, die man optimieren will.
 
-Um bei dieser Verbesserung wirklich eine Verbesserung und keine Verschlimmbesserung durchzuführen benötigt man eine Idee davon welche statische Änderung am Programmtext welche dynamische Änderungen zur Laufzeit bewirkt:
-"Sollte ich jene Instruktion durch diese andere Instruktion ersetzen um das Programm schneller zu machen, oder benötigt die neue Instruktion mehr Takte?"
-Um solche Fragen beantworten zu können braucht man eigentlich ein detailiertes *Kostenmodell* für die konkrete Zielplattform.
+Um bei dieser Verbesserung wirklich eine Verbesserung und keine Verschlimmbesserung durchzuführen, benötigt man eine Idee davon, welche statische Änderung am Programmtext welche dynamische Änderungen zur Laufzeit bewirkt:
+"Sollte ich jene Instruktion durch diese andere Instruktion ersetzen, um das Programm schneller zu machen, oder benötigt die neue Instruktion mehr Takte?"
+Um solche Fragen beantworten zu können, braucht man eigentlich ein detailliertes *Kostenmodell* für die konkrete Zielplattform.
 Allerdings gibt es häufig ein solches Modell für den einen Prozessor, der in einer gewissen Generation aus einer bestimmten Herstellungscharge kommt, nicht.
-Daher greifen Übersetzer normalerweise auf gröbere Heuristiken zurück um Optimierungsentscheidungen zu treffen.
-Beispielsweise sind solche Heursitiken, dass Speicherzugriffe zu vermeiden sind und das Sprünge negative Auswirkungen auf das Pipelining haben.
+Daher greifen Übersetzer normalerweise auf gröbere Heuristiken zurück, um Optimierungsentscheidungen zu treffen.
+Beispielsweise sind solche Heuristiken, dass Speicherzugriffe zu vermeiden sind und das Sprünge negative Auswirkungen auf das Pipelining haben.
 
 Für unser Vorhaben, das Optimieren auf IR-Ebene, gibt es noch ein weiteres Problem.
-Denn wir wissen bei IR-Optimierungen ja garnicht für welche Prozessorarchitektur das Progamm am Ende zu Assembler übersetzt wird.
+Denn wir wissen bei IR-Optimierungen ja gar nicht, für welche Prozessorarchitektur das Programm am Ende zu Assembler übersetzt wird.
 Wir müssen also noch allgemeiner das Programm "besser" machen.
-Daher werden wir versuchen ganz generell das Programm kleiner zu machen (weniger Instruktionen, weniger Basisblöcke) und Instruktionen zu vermeiden die in jedem Fall teurer in der Ausführung sind (weniger Sprünge).
+Daher werden wir versuchen,das Programm ganz generell kleiner zu machen (weniger Instruktionen, weniger Basisblöcke) und Instruktionen zu vermeiden, die in jedem Fall teurer in der Ausführung sind (weniger Sprünge).
 
 #+begin_src latex
 \begin{frame}{Wiederholung (1. Vorlesung): Korrekte Übersetzung}
@@ -205,7 +205,7 @@ Daher werden wir versuchen ganz generell das Programm kleiner zu machen (weniger
     \ii Die Programmiersprache definiert die \alert{beobachtbaren} Zustände. {
       \bi
       \ii Ein- und Ausgabe ist immer beobachtbar, oft aber auch Teile des Speichers
-      \ii Bei C: Nur das Schreiben von globalen Variablen, nicht aber von lokalen.
+      \ii Bei C: Nur das Schreiben von globalen Variablen, nicht aber von lokalen
       \ei
     }\bigskip
     \ii Ein \advantage{korrekter} Übersetzer erhält alle beobachtbaren Zustände.{
@@ -215,9 +215,9 @@ Daher werden wir versuchen ganz generell das Programm kleiner zu machen (weniger
       }
       \ei
     }\bigskip
-    \ii[$\Rightarrow$] Funktionen \advantage{dürfen verändert werden}, solange sie außen gleich aussehen {
+    \ii[$\Rightarrow$] Funktionen \advantage{dürfen verändert werden}, solange sie außen gleich aussehen. {
       \bi
-      \ii Im IR-Code: lokalen und temporären Variablen sind nicht sichtbar
+      \ii Im IR-Code: lokale und temporäre Variablen sind nicht sichtbar
       \ii Von Außen sichtbar sind: \ircmd{Store}, \ircmd{Call}, \ircmd{Return}
       \ei
     }
@@ -225,13 +225,13 @@ Daher werden wir versuchen ganz generell das Programm kleiner zu machen (weniger
   \end{frame}
 #+end_src  
 
-In der erstem Vorlesung habe ich bereits darüber gesprochen, das eine korrekte Übersetzung die *beobachtbaren Zustände* eines Programms nicht verändern darf. Diese beobachtbaren Zustände sind genau jenes, vom Entwickler, erwartete Verhalten. Wie das Programm diese beobachtbaren Zustände generiert ist aber im Grunde egal.
+In der erstem Vorlesung habe ich bereits darüber gesprochen, das eine korrekte Übersetzung die *beobachtbaren Zustände* eines Programms nicht verändern darf. Diese beobachtbaren Zustände sind genau jenes vom Entwickler erwartete Verhalten. Wie das Programm diese beobachtbaren Zustände generiert, ist aber im Grunde egal.
 
-Für unser Vorhaben, die Optimierung auf IR-Ebene, gibt es erstmal nur zwei Dinge die für ein Programm beobachtbar sind, weil sie Daten aus dem Programm an die Außenwelt transportieren können: Der Rückgabewert der ~main()~-Funktion und schreibende Speicherzugriffe.
+Für unser Vorhaben, die Optimierung auf IR-Ebene, gibt es erst mal nur zwei Dinge, die für ein Programm beobachtbar sind, weil sie Daten aus dem Programm an die Außenwelt transportieren können: Der Rückgabewert der ~main()~-Funktion und schreibende Speicherzugriffe.
 Lassen wir es zusätzlich zu, dass unser Programm Ausgabe machen kann (indem es einen Systemaufruf absetzt), so wären auch diese beobachtbar.
 
 Diese minimale Definition von beobachtbar (Rückgabewert, Schreibzugriffe, Systemaufrufe) ist allerdings nur dann von nutzen, wenn wir das gesamte Programm (== alle Funktionen) auf einmal optimieren.
-Allerdings ist eine so weitreichende Optimierung meist viel zu umfassend um handhabbar zu sein, weswegen wir die Optimierung einzelner Funktionen in Isolation anstreben.
+Allerdings ist eine so weitreichende Optimierung meist viel zu umfassend, um handhabbar zu sein, weswegen wir die Optimierung einzelner Funktionen in Isolation anstreben.
 In diesem Fall müssen wir die beobachtbaren Zustände strenger definieren:
 Betrachten wir das Verhalten einer einzelnen Funktion, so können wir (von Außen), den Rückgabewert der Funktion (~Return~), die getätigten Schreibzugriffe (~Store~), und der Aufruf weiterer Funktionen (~Call~) beobachten.
 
@@ -245,13 +245,13 @@ Würden wir zwei Kontrollflüsse, einmal vom optimierten Programm und einmal vom
     \bi
     \ii Optimierung besteht immer aus \textbf{zwei Schritten} {
       \bi
-      \ii \structure{Analyse} des Programms generiert Wissen anhand dessen wir entscheiden können, ob wie \alert{eine Optimierung anwenden dürfen}.
+      \ii \structure{Analyse} des Programms generiert Wissen, anhand dessen wir entscheiden können, ob wir \alert{eine Optimierung anwenden dürfen}.
       \ii \structure{Transformation} in ein semantisch äquivalentes, aber \enquote{besseres} Programm.
       \ei
     }\medskip
     \ii Optimierungen analysieren und transformieren \textbf{Programmausschnitte} {
       \bi
-      \ii Wie groß ist der Ausschnitt über den wir wissen extrahieren?
+      \ii Wie groß ist der Ausschnitt, über den wir wissen extrahieren?
       \ii Instruktionen, einzelne Basisblöcke, eine ganze Funktion, eine Aufrufhierarchie, mehrere interagierende Threads
       \ei
     }
@@ -259,9 +259,9 @@ Würden wir zwei Kontrollflüsse, einmal vom optimierten Programm und einmal vom
   \end{frame}
 #+end_src
 
-Im Allgemeinen zerfallen alle Optimierungenroutinen in zwei Schritte:
-Bei der *Analyse* finden der Übersetzer berechnet der Übersetzer alle, für diese Optimierung relevanten, Informationen aus dem Programm.
-Aufgrund dieser Wissensbasis wird dann entschieden ob die intendierte Optimierung auf den vorliegende Programmabschnitt überhaupt anwendbar ist, oder ob eine Optimierung das beobachtbare Verhalten verändern würde.
+Im Allgemeinen zerfallen alle Optimierungsroutinen in zwei Schritte:
+Bei der *Analyse* berechnet der Übersetzer alle für diese Optimierung relevanten Informationen aus dem Programm.
+Aufgrund dieser Wissensbasis wird dann entschieden, ob die intendierte Optimierung auf den vorliegende Programmabschnitt überhaupt anwendbar ist, oder ob eine Optimierung das beobachtbare Verhalten verändern würde.
 Ist die Entscheidung getroffen, dass optimiert werden soll, geht es zur *Transformation* des Programms. Dabei wird das IR-Programm, unter zur Hilfenahme der extrahierten Informationen, modifiziert.
 
 Auf den Folien kann man beide Phasen deutlich getrennt voneinander sehen:
@@ -270,14 +270,14 @@ Für das ~Add~ können keinen solchen Fakt generieren.
 Aufgrund dieses Wissens tauscht die Transformation das ~IfGoto~ durch ein entsprechendes ~Goto~ aus, lässt aber das ~Add~ völlig unverändert.
 Von den beobachtbaren Zuständen kann sich das Programm nicht geändert haben.
 
-Wie groß die Abschnitte sind die wir analysieren bzw. transformieren hängt von der Optimierung ab.
-Für manche Optimierungen genügt es auf eine einzelne Instruktion zu blicken und genau diese Instruktion zu modifizieren.
-Für andere Optimierungen müssen wir die ganze Funktion analysieren um herauszufinden, dass wir einzelne Instruktionen verändern dürfen. Aber Transformationen können auch Basisblöcke und Kontrollflusskanten verändern.
+Wie groß die Abschnitte sind, die wir analysieren bzw. transformieren, hängt von der Optimierung ab.
+Für manche Optimierungen genügt es, auf eine einzelne Instruktion zu blicken und genau diese Instruktion zu modifizieren.
+Für andere Optimierungen müssen wir die ganze Funktion analysieren, um herauszufinden, dass wir einzelne Instruktionen verändern dürfen. Aber Transformationen können auch Basisblöcke und Kontrollflusskanten verändern.
 
 * Optimierungen
 In diesem Unterkapitel werden wir uns sechs verschiedene Optimierungsroutinen für den Zwischencode ansehen, den wir in der letzten Vorlesung definiert haben.
-Dabei werden wir Techniken kennen lernen, deren grundlegenden Arbeitsweisen auch bei anderen  Optimierungen zum Einsatz kommen.
-Die besprochenen Themen sind so sortiert, dass wir bei der Optimierung kleiner Einheiten (Instruktionen) zu den größeren Strukturen (Funktionen) im IR-Programm kommen.
+Dabei werden wir Techniken kennenlernen, deren grundlegenden Arbeitsweisen auch bei anderen Optimierungen zum Einsatz kommen.
+Die besprochenen Themen sind so sortiert, dass wir von der Optimierung kleiner Einheiten (Instruktionen) zu den größeren Strukturen (Funktionen) im IR-Programm kommen.
 Jedoch bleiben wir in dieser Vorlesung immer auf der Funktions-lokalen Ebene und betrachten keine Optimierungen, die über Funktionsgrenzen hinweg operieren.
 
 ** Instruktions- und Block-lokale Optimierungen
@@ -289,7 +289,7 @@ Jedoch bleiben wir in dieser Vorlesung immer auf der Funktions-lokalen Ebene und
 \dividerframe{Lokale Optimierungen}
 
   \begin{frame}{Algebraische Identitäten}
-    \OrangeBox{Ersetzung von Instruktionen durch algebraisch-äquivalente Instruktionen}
+    \OrangeBox{Ersetzung von Instruktionen durch algebraisch äquivalente Instruktionen}
 
     \bi
     \ii<1-> \structure{Konstantenfaltung} ist eine Instruktions-lokale Optimierung\\[1ex]{
@@ -299,7 +299,7 @@ Jedoch bleiben wir in dieser Vorlesung immer auf der Funktions-lokalen Ebene und
       \ii Sprach-Semantik muss erhalten (32-Bit Programm vs. 64-Bit Übersetzer)
       \ei
     }\medskip
-    \ii<2-> \structure{Strength-Reduction} veringert die Ausdruckstärke einer Instruktion\\[1ex]{
+    \ii<2-> \structure{Strength-Reduction} verringert die Ausdrucksstärke einer Instruktion\\[1ex]{
       \hfill\fbox{\texttt{a := \ircmd{Mul} x, 2}}\hfill$\Rightarrow$\hfill\fbox{\texttt{a := Add x, x}}\hfill\mbox{}\\[1ex]
       \bi
       \ii Arithmetische Operationen haben unterschiedliche theoretische Komplexitäten
@@ -316,7 +316,7 @@ Jedoch bleiben wir in dieser Vorlesung immer auf der Funktions-lokalen Ebene und
     \ei
   \end{frame}
 
-  \begin{frame}[fragile]{Algebraische Identitäten: Einige Ersetzugsmuster}
+  \begin{frame}[fragile]{Algebraische Identitäten: Einige Ersetzungsmuster}
     \def\Var#1{\colorbox{safegreen!40}{#1}}
     \def\Const#1{\colorbox{badbee!40}{#1}}
     \def\Label#1{\colorbox{luhblue!40}{#1}}
@@ -345,39 +345,39 @@ Jedoch bleiben wir in dieser Vorlesung immer auf der Funktions-lokalen Ebene und
 #+end_src
 
 Die erste Optimierungsroutine analysiert einen IR-Befehl nach dem anderen und ersetzt diesen, falls es möglich ist, durch einen Befehl, der später effizienter ausgeführt werden kann.
-Zwar haben wir auf der Ebene des IR-Codes kein Wissen darüber wie lange die einzelnen Befehle schlussendlich tatsächlich brauchen werden, aber wir stützen uns auf Heuristiken und grobe Verhältnisse, die für die viele Prozessorarchitekturen stimmen.
-Zusätzlich ermöglichen diese Instruktions-lokalen Optimierungen weitere, nachgelagerte, Optimierungsschritte; dazu aber erst später mehr.
+Zwar haben wir auf der Ebene des IR-Codes kein Wissen darüber, wie lange die einzelnen Befehle schlussendlich tatsächlich brauchen werden, aber wir stützen uns auf Heuristiken und grobe Verhältnisse, die für viele Prozessorarchitekturen stimmen.
+Zusätzlich ermöglichen diese Instruktions-lokalen Optimierungen weitere nachgelagerte Optimierungsschritte; dazu aber erst später mehr.
 
-Die Kernidee dieser Familie von Optimierungen ist Instruktionen zu ersetzen durch Instruktionen die *algebraisch Äquivalent* sind.
+Die Kernidee dieser Familie von Optimierungen ist Instruktionen zu ersetzen durch Instruktionen, die *algebraisch Äquivalent* sind.
 Dies bedeutet, dass die Ausführung der ursprünglichen Instruktion und die Ausführung der Ersetzung genau den gleichen nummerische Wert liefern.
 Dazu betrachten wir nicht nur die Art der Instruktion, sondern auch die Werte der Operanden, insbesondere wenn diese *Konstanten* sind.
 
-Bei der *Konstantenfaltung* sucht die Analyse nach Instruktionen die ausschließlich konstante Quelloperanden haben und die keine Seiteneffekte, neben dem beschreiben ihres Zieloperanden, haben.
+Bei der *Konstantenfaltung* sucht die Analyse nach Instruktionen, die ausschließlich konstante Quelloperanden haben und die keine Seiteneffekte, neben dem beschreiben ihres Zieloperanden, haben.
 Insbesondere umfasst dies arithmetische, logische und bit-weise Befehle, sowie bedingte Sprünge mit konstanter Sprungbedingung.
 Da wir die Semantik eines jeden IR-Befehls genau definiert haben und die Quelloperanden konstant sind, können wir den Befehl bereits im Übersetzer ausführen.
-Dieses Vorziehen der Ausführung ist deshalb möglich, weil der Befehl zur Laufzeit immer das gleiche, konstante, Ergebnis liefern wird.
+Dieses Vorziehen der Ausführung ist deshalb möglich, weil der Befehl zur Laufzeit immer das selbe, konstante, Ergebnis liefern wird.
 Unsere Analyse liefert uns also eine statische Voraussage über das dynamische Verhalten des Programms.
 Die Transformation bei der Konstantenfaltung besteht dann darin, den Befehl durch eine einfache Zuweisung mit einem konstanten Operanden zu ersetzen.
-Wichtig bei der Berechnung des Ergebnisses ist, dass wir darauf achten die selbe Rechnung im Übersetzer zu durchzuführen, wie diese später, insbesondere an den Rändern des Wertebereichs, auch geschehen würde.
+Wichtig bei der Berechnung des Ergebnisses ist, dass wir darauf achten, die selbe Rechnung im Übersetzer zu durchzuführen, wie diese später, insbesondere an den Rändern des Wertebereichs, auch geschehen würde.
 
 Möglich ist diese Ersetzung, weil wir eine algebraische Identität ausnützen: Der Ausdruck ~1+2~ und ~3~ sind algebraisch äquivalent, obwohl er strukturell unterschiedlich ist.
 Diese Idee lässt sich teilweise auch dann anwenden, wenn nicht alle Argumente konstant sind.
 
-Bei der *Strength-Reduction* ist das Ziel Operationen, die komplexitäts-theoretisch aufwändiger sind durch weniger komplexe Befehle zu ersetzen.
-Informationstheoretisch ist, beispielsweise, eine Multiplikation teurer als eine Addition, die wiederum teurer ist als ein Bit-Shift.
+Bei der *Strength-Reduction* ist das Ziel Operationen, die komplexitäts-theoretisch aufwendiger sind durch weniger komplexe Befehle zu ersetzen.
+Informationstheoretisch ist beispielsweise eine Multiplikation teurer als eine Addition, die wiederum teurer ist als ein Bit-Shift.
 Diese Hierarchie der arithmetischen Operationen können wir mit der Komplexitätstheorie begründen:
 Bei der Addition wissen wir, dass eine Addition einer N-stelligen Binärzahl in N sequentiellen Bitmanipulationen (Volladdierer) durchgeführt werden kann; addieren also in O(N) geht.
-Die Multiplikation dagegen ist deutlich aufwändiger und die effizienteren Multiplikationsalgorithmen{{{wikipedia_en(Schönhage–Strassen_algorithm)}}} haben eine höhere Schranke.
+Die Multiplikation dagegen ist deutlich aufwendiger und die effizienteren Multiplikationsalgorithmen{{{wikipedia_en(Schönhage–Strassen_algorithm)}}} haben eine höhere Schranke.
 Dieser Unterschied in der Komplexität findet sich ebenfalls in der Hardware wieder; ein Addierwerk braucht deutlich weniger Gatter als eine Multiplikationsschaltung.
 Daher lohnt es sich Multiplikationen durch Additionen, und Additionen durch Bit-Shifts zu ersetzen, wo auch immer dies möglich ist.
 
-Konkret sucht die *Strength-Reduction* nach Operationen bei denen einige der Quelloperanden konstant sind.
+Konkret sucht die *Strength-Reduction* nach Operationen, bei denen einige der Quelloperanden konstant sind.
 So ist die Multiplikation einer Variable mit der Zahl 2 äquivalent zur Addition mit Variable mit sich selbst. Noch einfacher wäre hier ein Links-Shift um eine Stelle, aber unser IR weißt leider kein ~LShift~ Kommando auf.
-Häufig haben Strength-Reduction Optimierungen die Nebenbedingung dass die Konstante eine Zweierpotenz ist oder ein andere Zusätzliche Bedingung erfüllt.
+Häufig haben Strength-Reduction Optimierungen die Nebenbedingung, dass die Konstante eine Zweierpotenz ist oder ein andere zusätzliche Bedingung erfüllt.
 
 Sehr ähnlich zur Strength-Reduction ist die Erkennung von *Null-Operationen*, bei denen die Quelloperanden unverändert durchgeschleift werden, oder sich vollständig auslöschen. So ist die Addition mit der Zahl 0 oder die Multiplikation mit der Zahl 1 eine Null-Operationen. Aber auch die Subtraktion einer Zahl mit sich selbst führt dazu, dass das Ergebnis im Vorhinein bekannt ist.
 
-Technisch funktionieren diese Optimierungen mit algebraischen Identitäten so, dass die Analyse nach gewissen Mustern sucht (Farbige Kästen auf der Folie), weitere Bedingungen prüft, und dann die Ersetzung durchführt. 
+Technisch funktionieren diese Optimierungen mit algebraischen Identitäten so, dass die Analyse nach gewissen Mustern sucht (farbige Kästen auf der Folie), weitere Bedingungen prüft, und dann die Ersetzung durchführt.
 
 Besonders hervorzuheben bei der Tabelle mit den Ersetzungsmustern ist das Muster für ~IfGoto~:
 Wenn die Sprungbedingung eine Konstante ist, so können wir das ~IfGoto~ durch ein entsprechendes ~Goto~ ersetzen.
@@ -392,7 +392,7 @@ Speichert die CFG-Datenstruktur die Nachfolger eines Blockes, und berechnet dies
       \end{column}\hfill
       \begin{column}{0.60\textwidth}
         \begin{btBlock}{}\small
-          Durch die einfache Codeerzeugung und bei der Optimierung enstehen konstante oder redundante Zuweisungen.
+          Durch die einfache Codeerzeugung und bei der Optimierung entstehen konstante oder redundante Zuweisungen.
         \end{btBlock}
       \end{column}
     \end{columns}
@@ -411,7 +411,7 @@ Speichert die CFG-Datenstruktur die Nachfolger eines Blockes, und berechnet dies
       \ii Iteration über die Instruktionen eines BBs, Mitführen von Äquivalenzmengen
       \ii Zuweisungen etablieren eine neue Äquivalenz zwischen LHS und RHS
       \ii Andere Schreibzugriffe, die eine Variable verändern, löschen Äquivalenzen
-      \ii Bei Lesezugriffen, wird die Äquivalenzliste befragt und ggf. ersetzt.
+      \ii Bei Lesezugriffen wird die Äquivalenzliste befragt und ggf. ersetzt.
       \ei
     }
     \ei
@@ -436,40 +436,40 @@ Speichert die CFG-Datenstruktur die Nachfolger eines Blockes, und berechnet dies
   \end{frame}
  #+end_src
 
-Durch die Ersetzung der Null-Operationen, und insbesondere durch die Konstantenfaltung, kommt es dazu, dass im Zwischencode viele Zuweisungen geschenen, die eine konstante rechte Seite haben.
+Durch die Ersetzung der Null-Operationen, und insbesondere durch die Konstantenfaltung, kommt es dazu, dass im Zwischencode viele Zuweisungen geschehen, die eine konstante rechte Seite haben.
 Direkt nach der Zuweisung ist der Wert der Zielvariable also statisch bekannt.
 Daher liegt der Gedanke nahe, die zukünftigen Verwendungen dieser Variable direkt durch die Konstante zu ersetzen.
 So kann im Beispiel die Verwendung von ~t1~ durch die Konstante ~2~ ersetzt werden.
 
 
 Genau das ist die Zielsetzung der *Konstantenpropagation*:
-Wir möchten statisch bekannte Werte, über Instruktionsgrenzen hinweg, durch das IR-Programm durch propagieren.
-Dabei müssen wir uns aber nicht nur konstante Werte beschränken, sondern wir können auch sogenannte "Kopien" mit der *Kopiepropagation* (Copy-Propagation) durchschleifen.
+Wir möchten statisch bekannte Werte, über Instruktionsgrenzen hinweg durch das IR-Programm durch propagieren.
+Dabei müssen wir uns aber nicht nur auf konstante Werte beschränken, sondern wir können auch sogenannte "Kopien" mit der *Kopiepropagation* (Copy-Propagation) durchschleifen.
 Zusammengefasst nennt man diese Art der Optimierung im Englischen daher Copy-Value-Propagation (CVP).
 
-Bei der CVP gehen wir, in Richtung des Kontrollflusses, durch das Programm und ersetzen *Quelloperanden durch Konstanten oder Werte*, die an dieser Stelle garantiert den gleichen Wert haben.
+Bei der CVP gehen wir in Richtung des Kontrollflusses durch das Programm und ersetzen *Quelloperanden durch Konstanten oder Werte*, die an dieser Stelle garantiert den gleichen Wert haben.
 Dabei müssen wir aber vorsichtig vorgehen, um nur Ersetzungen vorzunehmen, die immer und garantiert immer äquivalent sind.
-Dazu führen wir, während der Optimierung, darüber Buch welche Variablen und Konstanten vor jeder einzelnen Instruktion äquivalent sind.
+Dazu führen wir während der Optimierung darüber Buch, welche Variablen und Konstanten vor jeder einzelnen Instruktion äquivalent sind.
 Mit jeder Instruktion aktualisieren wir unsere Äquivalenzmengen und fahren mit der nachfolgenden Instruktion fort.
-Bei dieser Optimierung kann Analyse (Aktualisierung der Äquivalenzmengen) und Transformation (Ersetzung der Quelloperanden) verschränkt durchgeführt werden.
+Bei dieser Optimierung können Analyse (Aktualisierung der Äquivalenzmengen) und Transformation (Ersetzung der Quelloperanden) verschränkt durchgeführt werden.
 
 Zunächst schauen wir uns aber die CVP für einen einzelnen Basisblock an.
 Später weiten wir diese Optimierung auf eine ganze Funktion aus, indem wir Äquivalenzmengen über Basisblöcke hinweg propagieren.
 Aber zuerst müssen wir definieren, was eine *Äquivalenzmenge* ist:
 Eine Äquivalenzmenge ist eine Menge von Variablen und Konstanten, die einen Gültigkeitszeitpunkt hat. Zu diesem Zeitpunkt haben alle Elemente den gleichen  R-Wert.
-Da wir die Mengen anhand der Äquivalenz-Relation[fn::Die Äquivalenz-Relation ist transitiv!] bilden gilt auch dass jede Variable und jeder Wert zu einem Zeitpunkt nur in einer einzigen Äquivalenzmenge sein kann.
-Anders ausgegdrückt: Die Menge der zeitgleich gültigen Äquivalenzmengen *partitioniert* die Menge aller Variablen und Werte, wobei ein-elementige Äquivalenzmengen auftreten können (und auch die Regel sind).
+Da wir die Mengen anhand der Äquivalenz-Relation[fn::Die Äquivalenz-Relation ist transitiv!] bilden, gilt auch, dass jede Variable und jeder Wert zu einem Zeitpunkt nur in einer einzigen Äquivalenzmenge sein kann.
+Anders ausgedrückt: Die Menge der zeitgleich gültigen Äquivalenzmengen *partitioniert* die Menge aller Variablen und Werte, wobei ein-elementige Äquivalenzmengen auftreten können (und auch die Regel sind).
 
 Zu Zeitpunkt der Gültigkeit können wir einen Quelloperanden, wenn dieser in einer Äquivalenzmenge ist, durch jedes andere Element der Äquivalenzmenge ersetzen.
 Bevorzugt werden wir natürlich Variablen durch Konstanten ersetzen, aber auch die Ersetzung von temporären Variablen durch benutzerdefinierte Variablen ist sinnvoll.
 Es stellt sich nur noch die Frage:
-Welche Regeln verwenden wir um die Äquivalenzmengen zu erzeugen und zu aktualisieren?
+Welche Regeln verwenden wir, um die Äquivalenzmengen zu erzeugen und zu aktualisieren?
 Betrachten Sie sich hierzu die Folie.
 
 Für einen einzelnen Basisblock starten wir ohne jegliches Wissen über irgendwelche Äquivalenzen.
 Wir nehmen an, dass alle Variablen unbekannte Werte haben und keine Variable äquivalent zu einer anderen ist.
 Durch diese konservative Annahme sind wir zum Beginn der Optimierung in einem sicheren Zustand.
-Beim fortschreiten der CVP, schieben wir die Menge der Äquivalenzmengen *vorwärts durch den Basisblock* und wenden verschiedene Aktualisierungsregeln abhängig von den IR-Befehlen an.
+Beim fortschreiten der CVP schieben wir die Menge der Äquivalenzmengen *vorwärts durch den Basisblock* und wenden verschiedene Aktualisierungsregeln abhängig von den IR-Befehlen an.
 
 
 Die wichtigste Aktualisierungsregel für die CVP ist die für den ~Assign~-Befehl.

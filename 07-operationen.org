@@ -114,9 +114,9 @@ An der Schnittstelle hat jede Operation *Quelloperanden* und *Zieloperanden*, au
 in welche die verarbeiteten Daten fließen.
 Da in unserem Modell alle Informationen in Objekt gespeichert werden, sind die Operanden Objekte, welche Daten liefern bzw.
 aufnehmen.
-Wenn es so aussieht, als würden Daten direkt zwischen zwei Operationen fließen, wie dies auf den Folien zwischen Addition und Zuweisung der Fall ist, so ist eigentlich ein implizites *temporäres Objekt* zwischengeschaltet, welches wir nur (normalerweise) der Übersichtlichkeit halber weg lassen. 
+Wenn es so aussieht, als würden Daten direkt zwischen zwei Operationen fließen, wie dies auf den Folien zwischen Addition und Zuweisung der Fall ist, so ist eigentlich ein implizites *temporäres Objekt* zwischengeschaltet, welches wir nur (normalerweise) der Übersichtlichkeit halber weglassen.
 
-Das Verhalten einer Operation zu fassen ist deutlich schwieriger als ihre Schnittstelle zu beschreiben.
+Das Verhalten einer Operation zu fassen, ist deutlich schwieriger als ihre Schnittstelle zu beschreiben.
 Eine Möglichkeit ist es, eine Abbildungsvorschrift anzugeben, welche die Eingabedaten auf die gewünschte Ausgabe abbildet.
 Im Beispiel beschreiben wir die 32-Bit Addition so:
 Die Addition wertet zuerst ihre beiden Quelloperanden (LHS, RHS) aus, um an die darin enthaltenen Informationen (L, R) zu kommen.
