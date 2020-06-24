@@ -350,6 +350,193 @@
     \end{frame}
 #+end_src
 
+
+#+begin_src latex
+  \dividerframe{Funktionales Programmieren}
+
+  \begin{frame}[fragile]{Funktionen als Argumente}
+    \begin{btBlock}{}
+      Obwohl Python keine rein(!) funktionale Programmiersprache ist, werde ich die Beispiele, soweit es geht, als Python Code zeigen.
+    \end{btBlock}
+    \bigskip
+
+    \bi
+    \ii Funktionen höherer Ordnung können \structure{Auswertungsstrategien} abstrahieren{%
+      \bi
+      \ii \enquote{Äußere} Funktion steuert die Auswertung, die Übergebene macht die Arbeit.
+      \ii Die übergebene Funktion kann mehrfach und mit unterschiedlichen Parametern aufgerufen werden. Die Ergebnisse können kombiniert werden.
+      \ii Die Auswertestrategie ist parametrisierbar und wird so \advantage{wiederverwendbar}!{\\\medskip
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{code}[]
+            \begin{py}
+              def outer(fn, arr):
+                  return fn(arr[0]) + fn(arr[1])
+
+                  outer(innerA, [23, 42]) # => 6500
+                  outer(innerB, [23, 42]) # => -65
+            \end{py}
+          \end{code}
+        \end{column}\hfill
+        \begin{column}{0.49\textwidth}
+          \begin{code}[]
+            \begin{py}
+              def innerA(x):
+                  return x * 100
+                
+              def innerB(x):
+                  return x * -1
+            \end{py}
+          \end{code}
+        \end{column}
+      \end{columns}
+    }\medskip
+    \ii Wir hatten dies bereits bei \texttt{traverse()} und \texttt{fixpoint()} benutzt.
+    \ei
+    }\medskip
+
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{$\lambda$/Lambda: Anonyme Funktionen}
+    \bi
+    \ii Bei funktionaler Programmierung braucht man ständig kleine Funktionen{%
+      \bi
+      \ii Entfernte Funktionsdefinition an anderer Stelle zerstört die Code-Lokalität
+      \ii Außerdem ist es aufwändig sich ständig neue Funktionsnamen auszudenken
+      \ei
+    }\medskip
+    \begin{center}
+      \uncover<2->{\includegraphics[page=1,width=0.6\textwidth]{fig/12-lambda}}
+    \end{center}
+    \ii<2-> \textbf{Lösung}: \structure{Lambda-Ausdrücke} erzeugen ein Funktionsobjekt ohne Namen{
+      \bi
+      \ii Inspiriert vom, aber nicht immer äquivalent zum, Lambda-Kalkül
+      \ii Bestandteile: Parameterliste und \textbf{ein} Ausdruck
+      \ii Funktionsobjekt kann später aufgerufen werden
+      \ei
+    }
+    \ei
+    \begin{columns}<2->
+      \begin{column}{0.65\textwidth}
+        \begin{code}[]
+          \begin{py}
+            outer(lambda x: x * 100, [23,42]) # => 6500
+            outer(lambda x: x * -1,  [23,42]) # => -65          
+          \end{py}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}{0.31\textwidth}
+        \begin{code}[]
+          \begin{py}
+            add = lambda x, y: x+y
+            add(1,2) # => 3      
+          \end{py}
+        \end{code}
+      \end{column}\hfill\mbox{}
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}{Beispiel: Listenmanipulationen}
+    \bi
+    \ii Listen sind die funktionale \enquote{Brot-und-Butter} Datenstruktur{
+      \bi
+      \ii Funktionen höherer Ordnung bieten standardisierte Auswertungsstrategien
+      \ii Diese Funktionen ersetzen teilweise iterative Sprachelemente
+      \ei
+    }
+    \ei
+
+    \medskip
+    \begin{columns}[t]
+      \begin{column}<2->{0.32\textwidth}
+        \includegraphics[width=\textwidth,page=1]{fig/12-list-manipulation}
+      
+        \medskip
+        { \small
+          \codebox{map()} bildet jedes Element mit Hilfe der übergebenen Funktion ab und konstruiert daraus eine neue Ergebnisliste.}
+
+      \end{column}\hfill
+      \begin{column}<3->{0.32\textwidth}
+        \includegraphics[width=\textwidth,page=2]{fig/12-list-manipulation}
+
+
+        \medskip
+        { \small
+          \codebox{filter()} prüft jedes Element mittels einem Prädikat und konstruiert eine Liste \enquote{erfolgreichen} Elementen.}
+
+      \end{column}\hfill
+      \begin{column}<4->{0.32\textwidth}
+        \includegraphics[width=\textwidth,page=3]{fig/12-list-manipulation}
+
+        \medskip
+        { \small
+          \codebox{reduce()} reduziert eine Liste zu einem Wert indem die übergebene Funktion als Infixoperator angewendet wird.}
+      \end{column}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}[fragile]{Komposition von Funktionen}
+
+    \bi
+    \ii \structure{Funktionskomposition} ist die Hintereinanderausführung von Funktionen{
+      \bi
+      \ii Aus zwei Funktionsobjekten kreieren wir ein neues Funktionsobjekt
+      \ii Die neue Funktion wendet beide Funktionen in Reihe an.\\
+          Das Ergebnis der ersten wird zur Eingabe der zweiten.
+      \ii Rückgabetypen und Parametertypen müssen zueinander passen
+      \ei
+    }
+    \ei
+
+    \begin{center}
+      \includegraphics[page=1,width=0.8\textwidth]{fig/12-composition}
+    \end{center}
+
+  \begin{columns}
+    \begin{column}{0.49\textwidth}
+      \begin{code}[tag=Python]
+        \begin{py}
+          def inc(x):
+             return x + 1
+
+          def compose(f, g):
+             return lambda x: f(g(x))
+           
+          x = compose(inc, inc)
+          x(0) # => 2
+        \end{py}
+      \end{code}
+    \end{column}\hfill
+    \begin{column}{0.49\textwidth}
+      \begin{code}[tag=Haskell]
+        \begin{haskell}
+          inc = \x -> x +1
+          x   = x . x
+        
+          x(0) # => 2
+        \end{haskell}
+      \end{code}
+    
+      Haskell bietet Komposition sogar als \structure{Infixoperator} \enquote{.}, angelehnt an $f \circ g$:
+    \end{column}
+  \end{columns}
+
+
+  \end{frame}
+
+  \begin{frame}{Partielle Anwendung von Funktionen}
+  
+  \end{frame}
+
+
+  \begin{frame}{Beispiel: Eine Verarbeitungskette}
+  
+  \end{frame}
+
+
+#+end_src
 * Monaden
 
 * Zusammenfassung
