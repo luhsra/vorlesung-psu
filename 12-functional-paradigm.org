@@ -116,4 +116,194 @@
   \end{frame}
 #+end_src
 
+* Aufzählungstypen und Pattern Matching
+
+#+begin_src latex
+  \dividerframe{Unveränderliche\\Datentypen}
+
+  \begin{frame}[fragile]{Typen für funktionale Programmierung}
+    \begin{btBlock}[type=alert]{}
+      Viele Datentypen sind darauf ausgelegt, dass ihre Objekte während ihrer Lebenszeit verändert werden. Das haben wir leider \ALERT{verboten}!
+    \end{btBlock}
+
+    \bi
+    \ii Objekte werden nur initialisiert, aber nie verändert. {
+      \bi
+      \ii Jede Referenz erlaubt nur das Lesen des Objekts
+      \ii "Modifikation" nur über partielle Kopie und parametrisierte Konstruktoren
+      \ii Effizienz: Übersetzer kann viele dieser Kopie durch Optimierungen entfernen
+      \ei
+
+      \begin{center}
+        \begin{minipage}{0.7\linewidth}
+          \begin{code}[tag=Pseudocode]
+            \begin{lzero}
+              func add(a : Point, b : Point) : Point {
+                return new Point(a.x+b.x, a.y+b.y);
+              }
+            \end{lzero}
+          \end{code}
+        \end{minipage}
+      \end{center}
+    }
+    \ii<2-> Bei hierarchisch verzeigerte Datentypen funktioniert das besonders gut {
+      \bi
+      \ii \structure{Einfach verkettete Listen}: Vorne anhängen ist leicht
+      \ii \structure{Bäume}: Unterbäume können bei einem Knotenupdate übernommen werden
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{Update und Modifikation von Listen}
+    \btAnimation[width=0.8\textwidth]{range=1-3:<1->,3:<4->,center,padding=2ex}{fig/12-trees}
+  
+    \bi
+    \ii Funktionale Programmierung arbeitet viel mit einfach verketteten Listen{%
+      \bi
+      \ii<2-> \structure{Vorne anhängen} erfordert keine Änderung der vorhandenen Listenelemente
+      \ii<2-> \structure{Gebundene Namen} bleiben valide und verändern ihren Wert nicht.
+      \ii<3-> \structure{Updates} erfordert Elementkopien bis zur Änderungsstelle
+      \ei
+    }\medskip
+    \ii<4-> Einfach verkettete Listen sind eine \ALERT{rekursive} Datenstruktur\\
+     $\Rightarrow$ Passt hervorragend zur rekursiven Struktur funktionaler Programme.
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Aufzählungstypen mit Nutzlast}
+    \OrangeBox{\textbf{Problem:} Wir wollen viele Objekte erzeugen und wieder zerlegen}
+    \medskip
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \begin{code}[tag=Rust]
+          \begin{onlyenv}<1>
+            \begin{rust}
+              enum PointKind {
+                XY,
+                XYZ,
+              };
+            \end{rust}
+          \end{onlyenv}%
+          \begin{onlyenv}<2->
+            \begin{rust}
+              enum Point {
+                XY(i32, i32),
+                XYZ(i32, i32, i32)
+              };
+            \end{rust}
+          \end{onlyenv}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}<3->{0.49\textwidth}
+        \begin{code}[tag=Rust]
+          \begin{rust}[style=highlighting]
+            @4fn handle(p : Point);@
+            let p1 = @3Point::XY@ (0, 3);
+            let p2 = @3Point::XYZ@(0, 3, 0)
+            @4handle(p1); handle(p2);@
+          \end{rust}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii Funktionale Sprachen bieten Aufzählungstypen (\structure{enum}) \only<2->{mit Nutzlast} {
+      \bi
+      \ii Endliche (aufzählbare) Anzahl an Varianten
+      \ii<2-> Jeder Variante kann unterschiedliche Felder mit sich führen.
+      \ii<3-> Aufzählungsname wird Konstruktor.
+      \ii<4-> Tagged variante Records (\structure{union}) sind typsicher und polymorph
+      \ei
+    }
+    \ii<5-> Rekursiv generisch-polymorphe typsichere Aufzählungstypen {
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+           \begin{code}[tag=Haskell]
+             \begin{haskell}
+               data Tree t = Leaf T
+                           | Node (Tree t) (Tree t)
+               freeTree :: Tree Char
+               freeTree = Node
+                            (Node
+                               (Leaf 'X')
+                               (Leaf 'Y'))
+                            (Leaf 'Z')
+             \end{haskell}
+           \end{code}        
+        \end{column}\hfill
+        \begin{column}{0.49\textwidth}
+          \begin{tikzpicture}[
+            level distance=10mm,
+            every node/.style={draw, font=\scriptsize}
+            ]
+            
+            \node (r){Node}
+              child { node {Node}
+                child { node (x) {Leaf 'X'}}
+                child { node {Leaf 'Y'}}}
+              child { node (z){Leaf 'Z'}};
+
+            \node[fit=(r) (x) (z),draw, dashed,
+                  pin={[align=center]0:Tree Char\\==\\Ein Baum\\aus Char}] {};
+          \end{tikzpicture}
+        \end{column}
+      \end{columns}
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Destructuring Bind und Pattern Matching}
+    \OrangeBox{Deklaration und Konstruktion von Aufzählungsobjekten ist sehr kompakt.}
+    \bi
+    \ii<2-> \structure{Destructuring Bind}: Zerlegen eines Objekts in seine Einzelteile {
+      \bi
+      \ii Muster mit der gleichen Struktur aber freien Namen
+      \ii Objekt wird auf dieses Muster aufgeteilt
+      \ii Freie Namen werden werden an die zerlegten Subobjekte gebunden
+      \ei
+      \medskip
+      \begin{columns}
+        \begin{column}{0.49\textwidth}
+          \begin{code}[tag=Rust]
+            \begin{rust}
+              struct ObjT { a : i32, b : i32 }
+              let ObjT {a: y0, b: y1} = obj;
+            
+              let (x0, x1) = (1, 2);
+            \end{rust}
+          \end{code}
+        \end{column}\hfill
+        \begin{column}<3->{0.49\textwidth}
+          \begin{code}[tag=Rust]
+            \begin{rust}
+              let norm = match p1 {
+                Point::XYZ(x,y,z) => x+y+z,
+                Point::XY (x,y)   => x+y,
+              }
+            \end{rust}
+          \end{code}
+        \end{column}
+      \end{columns}
+    }\medskip
+    \ii<3-> \structure{Pattern Matching}: Selektionsoperation mittels Destructuring Bind{
+      \bi
+      \ii Ähnlich, aber mächtiger wie ein switch-case in C
+      \ii Vergleich eines Objekts gegen mehrere Muster und Destructuring Bind
+      \ii Der entsprechende Arm wird mit den gebundenen Namen ausgeführt
+      \ii Semantische Analyse kann prüfen ob alle Fälle abgedeckt sind
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
 * Funktionen als Bürger erster Klasse
+
+#+begin_src latex
+\dividerframe{Funktionen als \\Bürger erster Klasse}
+#+end_src
+
+* Monaden
+
+* Zusammenfassung
