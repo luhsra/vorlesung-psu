@@ -301,7 +301,53 @@
 * Funktionen als Bürger erster Klasse
 
 #+begin_src latex
-\dividerframe{Funktionen als \\Bürger erster Klasse}
+  \dividerframe{Funktionen als \\Bürger erster Klasse}
+
+  \begin{frame}{Funktionen erster und höherer Ordnung}
+    \btAnimation[width=0.7\textwidth]{range=1-3:<1->,center,padding}{fig/12-function-universe.pdf}
+
+    \bi
+    \ii \textbf{Bisher:} Wir hatten hauptsächlich \structure{Funktionen erster Ordnung} {
+      \bi
+      \ii Funktionen und Objekte sind zwei getrennte Universen
+      \ii<2-> Funktionsanwendung kombiniert eine Funktion und mehrere Objekte\\[2ex]
+      \ii<2->[$\Rightarrow$] Definition: Funktion erster Ordnung hat nur passive Objekte als Argument
+      \ei
+    }
+    \medskip
+    \ii<3-> \structure{Funktionen höhrerer Ordnung} haben Funktionen als Parameter{
+      \bi
+      \ii Viele Imperative Sprachen bieten bereits Funktionszeiger
+      \ii \ALERT{Aber:} Funktionen sind immer noch nicht wirklich gleichberechtigt! 
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}{First-Class Functions}
+    \begin{center}
+      \btAnimation[width=0.65\textwidth]{range=4-5:<1-end>}{fig/12-function-universe.pdf}
+    \end{center}
+
+
+    \bi
+    \ii Im funktionalen Paradigma sind Funktionen wirklich gleichberechtigt {
+      \bi
+      \ii Keine kategorieller Unterschied zwischen Funktionen und Objekten
+      \ii<2-> Funktionen können Argument \textbf{und} Rückggabewert sein!
+      \ei
+    }\medskip
+    \ii<3-> Funktionen sind \ADVANTAGE{WIRKLICH} gleichberechtigt! {
+      \bi
+      \ii Funktionen können während der Laufzeit neu erzeugt werden.
+      \ii Funktionen können komponiert und partiell angewendet werden.
+      \ei
+    }
+    \ei
+
+    \uncover<4->{\Large $\Rightarrow$ \btSetTab Im funktionale Paradigma werden die\\
+                            \btUseTab algorithmischen Aspekte einer Sprache gestärkt!}
+    \end{frame}
 #+end_src
 
 * Monaden
