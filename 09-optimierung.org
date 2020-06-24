@@ -1,6 +1,8 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 09 - Optimierung
 #+SETUPFILE: setup.org
+#+DATE: [2020-06-23]
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/wDZBj
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 
