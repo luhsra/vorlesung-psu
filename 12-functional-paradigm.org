@@ -629,7 +629,6 @@ FIXME: Vorteile Seiteneffektfreier ausführung
 
 #+begin_src latex
   \dividerframe{Funktionale\\Ein-/Ausgabe}
-  %%ONLY%%
 
   \begin{frame}{Keine Seiteneffekte $\rightarrow$ Keine Schokolade}
     \bi
@@ -741,3 +740,34 @@ FIXME: Vorteile Seiteneffektfreier ausführung
 
 
 * Zusammenfassung
+#+begin_src latex
+  \begin{frame}{Zusammenfassung}
+    \bi
+    \ii \structure{Veränderlicher Zustand} ist problematisch in großen Softwareprojekten{
+      \bi
+      \ii Viele Prozeduren interagiern mit und verändern eine Vielzahl an Objekten
+      \ii Zustand ist am Quellcode nicht sichtbar und daher unübersichtlich
+      \ei
+    }\medskip
+    \ii Das (rein) \structure{funktionale Paradigma} verzichtet auf veränderlichen Zustand{%
+      \bi
+      \ii Variablen können nur einmal an ein Objekt gebunden werden
+      \ii Listen und Aufzählungstypen mit Nutzlast sind nützliche Datentypen
+      \ei
+    }\medskip
+    \ii Seiteneffektfreie Funktionen werden \structure{Bürger erster Klasse}{
+      \bi
+      \ii Funktionsobjekte sind als Argumente und Rückgabewerte gleichberechtigt
+      \ii Komposition, Partielle Applikation und Listenfunktionen
+      \ei
+    }\medskip
+    \ii \structure{Ein- und Ausgabe} kann nicht Seiteneffektfrei sein {
+      \bi
+      \ii Der funktionale Programmierstil ist erlaubt veränderlichen Zustand
+      \ii Rein funktionale Sprachen transformieren die Welt über \structure{Monaden} 
+      \ei
+    }
+    \ei
+
+  \end{frame}
+#+end_src
