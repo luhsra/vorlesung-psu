@@ -1,0 +1,53 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[circle,inner sep=-0.9ex](globe){\includegraphics[width=1cm]{fig/12-globe}};
+    \node[procedure cylinder,right=0.5 of globe,minimum height=5cm](monad){I/O Monade};
+    \node[circle,inner sep=-0.9ex,right=0.5 of monad](globe2){\includegraphics[width=1cm]{fig/12-globe}};
+
+    \draw[->] (globe) -- (monad);
+    \draw[->] (monad) -- (globe2);
+
+    \begin{visible}<2->
+    \node[function cylinder,below=1.5 of monad.west,anchor=west,xshift=1em] (f) {f()};
+    \node[function cylinder,right=0.4 of f] (g) {g()};
+    \node[function cylinder,right=0.4 of g] (h) {h()};
+
+    \foreach \x in {f,g,h}{
+      \coordinate (\x-out) at ($(\x.before top)!0.5!(\x.after top)$);
+    }
+
+    \draw[->] (monad.before bottom) to[out=-90,in=180] (f.west);
+    \draw[->] (h.west|-monad.south) to[out=-90,in=160] (h.160);
+
+    \draw[->] (h-out) to[out=0,in=-90] ($(monad.after top)+(west:3pt)$);
+
+    \draw[->] (f-out)+(down:1pt) -- (g.185);
+    \draw[->] (g-out)+(down:1pt) -- (h.185);
+
+    \draw[->] (f-out)+(up:2pt) to[out=0,in=-90] (f.east|-monad.south);
+
+    \begin{pgfonlayer}{background}
+      \node[fit=(f) (g) (h),fill=gray!50,inner xsep=1em,
+            label={[align=center,font=\scriptsize]east:Monadisch\\komponiert\\\tiny(kann IO)}] (monad-compose){};
+    \end{pgfonlayer}
+  \end{visible}
+  
+  \begin{visible}<3->
+    \node[function cylinder,below= 0.5 of g,xshift=-1cm] (a) {a()};
+    \node[function cylinder,right=-0.2 of a] (b) {b()};
+    \node[function cylinder,right=-0.2 of b] (c){c()};
+
+    \draw[dashed] (c.before top) -- (g.after top);
+    \draw[dashed] (a.after bottom) -- (g.before bottom);
+
+    \begin{pgfonlayer}{background}
+      \node[fill=safegreen!50,fit=(a),width as=monad-compose,below=0.2 of monad-compose,
+            label={[align=center,font=\scriptsize]east:Ohne\\Seiteneffekte}] {};
+    \end{pgfonlayer}
+  \end{visible}
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

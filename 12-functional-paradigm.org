@@ -350,7 +350,6 @@
     \end{frame}
 #+end_src
 
-
 #+begin_src latex
   \dividerframe{Funktionales Programmieren}
 
@@ -621,8 +620,124 @@
     \end{center}
   \end{frame}
 
-
 #+end_src
-* Monaden
+
+#+begin_src latex
+FIXME: Vorteile Seiteneffektfreier ausführung
+#+end_src
+* Funktionale Ein-/Ausgabe
+
+#+begin_src latex
+  \dividerframe{Funktionale\\Ein-/Ausgabe}
+  %%ONLY%%
+
+  \begin{frame}{Keine Seiteneffekte $\rightarrow$ Keine Schokolade}
+    \bi
+    \ii \textbf{Erinnerung}: Im rein-funktionalen Paradigma gibt es keine Seiteneffekte{%
+      \bi
+      \ii Kein veränderlicher Zustand, keine Variablen, ausschließlich \structure{pure Funktionen}
+      \ii[$\Rightarrow$] Jegliche Art der Ein- oder Ausgabe sind verbotene Seiteneffekte
+      \ii[$\Rightarrow$] Keine Terminalausgabe, keine Dateisystem, kein Netzwerk
+      \ei
+    }
+    \ei
+  
+    \begin{center}
+      \OrangeBox{Wie soll man damit nützliche Programme schreiben?}
+    \end{center}
+
+    \bi
+    \ii<2-> \structure{Functional-Style Programming} als Funktionales Paradigma Light{
+      \bi
+      \ii Programmierstil der funktionale Elemente in anderen Sprachen verwendet
+      \ii Komposition, partielle Applikation, oder \texttt{map()} geht auch mit Seiteneffekten
+      \ii Trennung des Programs in Funktionen mit und ohne Seiteneffekte\\[2ex]
+      \ii[$\Rightarrow$] Ein effektiver Entwickler setzt Seiteneffekte gezielt ein
+      \ei
+    }\medskip
+    \ii<3-> Funktionale Elemente verbreiten sich unter den Sprachen {
+      \bi
+      \ii Skriptsprachen haben meist funktionale Aspekte (Python, Ruby, Lua,\ldots)
+      \ii Die Tendenz bei übersetzten Sprachen geht auch zu funktionalen Elementen.
+      \ei
+    }
+    \ei
+  \end{frame}
+
+
+  \begin{frame}{Und bei rein funktionalen Sprachen?}
+    \bi
+    \ii Nur wenige Sprachen verbieten Seiteneffekte völlig{
+      \bi
+      \ii \structure{Haskell} ist das prominenteste Beispiel
+      \ii Es gibt noch weitere Forschungssprachen: Clean, Mercury\\[1ex]
+      \ei
+    }\medskip
+    \ii<2-> In Haskell wird I/O über die  \structure{I/O Monade} gesteuert{\medskip
+      \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \btAnimation[width=\textwidth]{1:<1-2>,range=2-3:<3-end>,center,padding}{fig/12-haskell-io}
+        \end{column}\hfill
+        \begin{column}{0.38\textwidth}
+          \bi
+          \ii \textbf{Intuition}: Die I/O Monade transformiert das Universum
+          \ii<3-> Sie steuert die Ausführung monadisch-komponierter Funktionen
+          \ii<3-> Ruft Funktionen mit Welt-Informationen auf und koppelt Ergebnisse zurück
+          \ii<4-> Unten in der Aufrufhierarchie sind nur pure Funktionen
+          \ei
+        \end{column}
+      \end{columns}
+
+    }
+    \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{I/O Monade in Haskell}
+    \begin{columns}
+      \begin{column}{0.49\textwidth}
+        \begin{code}
+          \begin{haskell}
+            printUpCase :: String -> IO ()
+            printUpCase l = putStrLn (upCase l)
+
+            main :: IO ()
+            main = (getLine >>= printUpCase)
+                   >> main          
+          \end{haskell}
+        \end{code}
+
+      \end{column}\hfill
+      \begin{column}<2->{0.49\textwidth}
+        \begin{code}[]
+          \begin{haskell}
+            main = do
+                l <- getLine
+                putStrLn (upCase l)
+                main
+          \end{haskell}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+    \bi
+    \ii Die I/O  Monade ist \enquote{magisch} im Haskell Universum {
+      \bi
+      \ii Im Programm komponiert man nur Funktionen zusammen (\texttt{>>}, \texttt{>>=})
+      \ii Virtuelle Haskell-Maschine entimmt das Monadenobjekt \texttt{main} und führt es aus.
+      \ii<2-> \structure{Synaktischer Zucker} erleichtert die Monadenkomposition
+      \ei
+    }\medskip
+    \ii<3-> Monaden sind ein allgemeineres und mächtigeres Konzept{
+      \bi
+      \ii Monaden sind ein Konzept aus der \structure{Kategorientheorie}
+      \ii Monaden kapsel Strategien zur Auswertereihenfolge und zum Datenflusss
+      \ii Es gibt viele spannende Monadentypen: Maybe, State, Writer
+      \ii Wir können und werden keine davon hier besprechen\ldots
+      \ei
+    }
+    \ei
+  \end{frame}
+#+end_src
+
 
 * Zusammenfassung
