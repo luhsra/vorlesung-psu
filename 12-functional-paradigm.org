@@ -494,7 +494,7 @@
       \includegraphics[page=1,width=0.8\textwidth]{fig/12-composition}
     \end{center}
 
-  \begin{columns}
+  \begin{columns}<2->
     \begin{column}{0.49\textwidth}
       \begin{code}[tag=Python]
         \begin{py}
@@ -513,7 +513,7 @@
       \begin{code}[tag=Haskell]
         \begin{haskell}
           inc = \x -> x +1
-          x   = x . x
+          x   = inc . inc
         
           x(0) # => 2
         \end{haskell}
@@ -526,13 +526,99 @@
 
   \end{frame}
 
-  \begin{frame}{Partielle Anwendung von Funktionen}
-  
+  \begin{frame}[fragile]{Partielle Anwendung von Funktionen}
+    \bi
+    \ii \structure{Partielle Anwendung} bindet einige Parameter einer Funktion{
+      \bi
+      \ii \textbf{Beobachtung}: Funktionen brauchen all ihre Parameter zur Ausführung
+      \ii \textbf{Idee}: Wir könnten einige Parameter mit bekannten Argumenten vorbelegen
+      \ii Erzeugen eines Funktionsobjekts mit geringerer Stelligkeit
+      \ei
+    }
+    \ei
+
+    \begin{center}
+      \includegraphics[page=1,width=0.8\textwidth]{fig/12-partial}
+    \end{center}
+
+    \begin{columns}<2->
+    \begin{column}{0.49\textwidth}
+      \begin{code}[tag=Python]
+        \begin{py}
+          def add(a,b):
+             return a + b
+
+          def partial(f, *a0):
+             return lambda *a1: f(*(a0+a1))
+           
+          inc = partial(add, 1)
+          inc(0) # => 1
+        \end{py}
+      \end{code}
+    \end{column}\hfill
+    \begin{column}{0.49\textwidth}
+      \begin{code}[tag=Haskell]
+        \begin{haskell}
+          add :: Int -> (Int -> Int)
+          add a b = a + b
+
+          inc = (add 1)
+          inc(1) -- => 2
+        \end{haskell}
+      \end{code}
+    
+      Haskell bietet \structure{Currying}, wo jede Funktion standardmäßig partiell anwendbar ist.
+    \end{column}
+  \end{columns}
   \end{frame}
 
+  \begin{frame}[t,fragile]{Beispiel: Eine Verarbeitungskette}
+    \begin{columns}
+      \begin{column}{0.25\textwidth}
+        \btAnimation[width=0.9\textwidth]{1:<1-3>,range=2-4:<4->}{fig/12-points}
+      \end{column}\hfill
+      \begin{column}{0.74\textwidth}
+        \textbf{Aufgabe}: Gegeben eine 2 dimensionale Punktwolke, finden Sie innerhalb des Einheitskreises die größte Distanz, die ein Punkt zum Ursprung hat.
 
-  \begin{frame}{Beispiel: Eine Verarbeitungskette}
-  
+        \begin{code}[]
+          \begin{py}
+            points = [(-0.3,0.4),  (-0.3, -0.2),
+                      (0.6,-0.4),  (1, 1)]
+          \end{py}
+        \end{code}
+
+      \end{column}
+    \end{columns}
+    \begin{columns}
+      \begin{column}<2->{0.4\textwidth}
+        \begin{code}[]\ttfamily\footnotesize
+          \def\I{\mbox{\hspace{2ex}}}%
+          def norm(N, point): ...\\
+          \uncover<6->{maxD = \textbackslash}\\
+           \I\uncover<6->{reduce(max,}\\
+           \I\I\uncover<5->{filter(lambda d: d <= 1.0,}\\
+           \I\I\I\uncover<4->{map(}\uncover<3->{partial(norm, 2)}\uncover<4->{,}\\
+           \I\I\I\I\uncover<4->{points)}\uncover<5->{)}\uncover<6->{)}\\
+       \end{code}
+      \end{column}\hfill
+      \begin{column}{0.59\textwidth}
+        \bii
+        \ii<2-> Generische Normierungsfunktion $\|\cdot\|_N$
+        \ii<3-> Die Distanz zum Ursprung ist die 2-Norm
+        \ii<4-> Bilde jeden Punkt auf seine Distanz ab
+        \ii<5-> Filtere Distanzen die $\le 1$ sind
+        \ii<6-> Reduziere Distanzen zur maximalen Distanz
+        \eii
+
+      \end{column}
+    \end{columns}
+    \medskip
+
+
+
+    \begin{center}
+      \uncover<2->{\btAnimation[height=2cm]{1:<1-2>,range=2-5:<3->}{fig/12-point-pipeline}}
+    \end{center}
   \end{frame}
 
 

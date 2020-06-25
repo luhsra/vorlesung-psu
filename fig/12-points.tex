@@ -1,0 +1,38 @@
+\documentclass{lecturefig}
+\usepackage{dataref}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    exec/.code={%
+      \expandafter\tikzset\expandafter{#1}%
+    }
+    ]
+    \draw (-2.2, 0) -- (2.2,0);
+    \draw (0, -2.2) -- (0,2.2);
+
+    \foreach \w in {0,90,180,270} {
+      \draw (\w:2cm) -- +(\w+90:2pt) -- +(\w-90:2pt);
+    }
+
+
+    \foreach \x/\y/\style in {%
+      -0.3/0.4/onslide=<4->{gray!40,fill=gray!40},%
+      -0.3/-0.2/onslide=<4->{gray!40,fill=gray!40},%
+      0.6/-0.4/onslide=<4->{safegreen,thick},%
+      1/1/onslide=<3->{gray!40,fill=gray!40}%
+    }{
+      \node[circle,anchor=center,fill=black,inner sep=1.2pt,exec=\style] at (2*\x, 2*\y) {};
+
+      \begin{visible}<2->
+      \draw[ultra thin,exec=\style] (0,0)
+            -- node[sloped,inner sep=1.5pt,below]{\tiny \drefcalc{sqrt(\x*\x + \y*\y)}}
+            (2*\x, 2*\y);
+          \end{visible}
+
+    }
+    \begin{visible}<2->
+      \node [circle, minimum width=4cm,inner sep=0,draw,label={[inner sep=4pt,rotate=45]120:\scriptsize $\le1$}]{};
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\end{document}

@@ -1,0 +1,42 @@
+\documentclass{lecturefig}
+\input{fig/11-common.sty}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \begin{visible}<3->
+    \node[function cylinder,minimum width=0.7cm,] (map) {map()};
+  \end{visible}
+
+    \node[object,left=0.5 of map,minimum size=1em,pin=-100:\tiny List(Point)] (seq) {points};
+
+
+  \begin{visible}<2->
+    \node[function cylinder,minimum width=0.7cm,,below=0.5 of map,xshift=-2ex] (norm) {\scriptsize $x \rightarrow \| x\|_2$};
+  \end{visible}
+  \begin{visible}<3->
+    \draw[->] (norm.after bottom) to[out=90,in=180] (map.190);
+    \draw[->] (seq) to[out=0,in=180] (map.175);
+  \end{visible}
+    
+  \begin{visible}<4->
+    \node[function cylinder,minimum width=0.7cm,,right=1.2of map] (filter) {filter()};
+    \draw[->] (map) to[out=0,in=180] node[above,sloped] {\tiny List(Float)} (filter.175);
+    
+    \node[function cylinder,minimum width=0.7cm,,below=0.5 of filter,xshift=-2ex] (pred) {\scriptsize $d \rightarrow d \le 1$};
+    \draw[->] (pred.after bottom) to[out=90,in=180] (filter.190);
+  \end{visible}
+
+  \begin{visible}<5->
+    \node[function cylinder,minimum width=0.7cm,,right=1.2of filter] (reduce) {reduce()};
+    \draw[->] (filter) to[out=0,in=180] node[above,sloped] {\tiny List(Float)}  (reduce.175);
+
+    \node[function cylinder,minimum width=0.7cm,,below=0.5 of reduce,xshift=-2ex] (act) {max()};
+    \draw[->] (act.after bottom) to[out=90,in=180] (reduce.190);
+
+    \node[object,right=0.5 of reduce,minimum size=1em,pin=-90:\tiny Float] (result) {maxD};
+    \draw[->] (reduce) -- (result);
+  \end{visible}
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}

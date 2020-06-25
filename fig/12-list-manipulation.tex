@@ -1,0 +1,50 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \def\shape#1{\tikz[baseline]\node[anchor=south,draw,minimum size=1.3ex,inner sep=0,#1]{};}
+    \node[function cylinder](map) {map()};
+
+    \node[left=of map](seq){[\shape{}, \shape{}, \shape{}]};
+    \node[right=0.5 of map](output){[\shape{circle}, \shape{circle}, \shape{circle}]};
+
+    \node[function cylinder,below=0.5 of seq,minimum width=0](func) {\shape{} $\rightarrow$ \shape{circle}};
+
+    \draw[->] (seq) --(map);
+    \draw[->] (map) --(output);
+    \draw[->] (func) to[out=0,in=190] (map);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \def\shape#1{\tikz[baseline]\node[anchor=south,draw,minimum size=1.3ex,inner sep=0,#1]{};}
+    \node[function cylinder](filter) {filter()};
+
+    \node[left=of filter](seq){[\shape{fill=safegreen}, \shape{fill=srared}, \shape{fill=safegreen}]};
+    \node[right=0.5 of filter](output){[\shape{fill=safegreen}, \shape{fill=safegreen}]};
+
+    \node[function cylinder,below=0.5 of seq,minimum width=0](func) {\shape{} $\rightarrow$ \texttt{bool}};
+
+    \draw[->] (seq) --(filter);
+    \draw[->] (filter) --(output);
+    \draw[->] (func) to[out=0,in=190] (filter);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \def\shape#1{\tikz[baseline]\node[anchor=south,draw,minimum size=1.3ex,inner sep=0,#1]{};}
+    \node[function cylinder](reduce) {reduce()};
+
+    \node[left=1.5 of reduce](seq){[1, 2, 3, 4]};
+    \node[right=0.5 of reduce](output){10};
+
+    \node[function cylinder,below=0.5 of seq,minimum width=0](func) {\texttt{int,int} $\rightarrow$ \texttt{int}};
+
+    \draw[->] (seq) --(reduce);
+    \draw[->] (reduce) --(output);
+    \draw[->] (func) to[out=0,in=190] (reduce);
+  \end{tikzpicture}
+\end{frame}
+\end{document}

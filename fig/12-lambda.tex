@@ -1,0 +1,16 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[
+    code/.style={font=\ttfamily},
+    ]
+    \node[code](a){\strut\structure{lambda}};
+    \node[code,draw=srared, right=0 of a,
+    pin={[black]-90:Parameter}](b){\strut p1,p2,p3};
+    \node[code,right=0 of b,inner xsep=0](c){\strut:\ \ };
+    \node[code,draw=srared,right=0 of c, pin={[black]-90: Ein Ausdruck}](d){\strut p1 * p2 + p3};
+
+    
+  \end{tikzpicture}
+\end{frame}
+\end{document}

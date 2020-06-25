@@ -1,0 +1,46 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[N/.style={
+      draw,minimum width=1.5cm,minimum height=8mm,
+      fill=badbee!40,
+    },
+    Name/.style={
+      font=\scriptsize\bfseries,
+      draw,
+    },
+    ]
+    \node[N,alt=<-2>{fill=safegreen!40}{},visible on=<2->] (a) {1};
+    \node[N,right=of a] (b) {2};
+    \node[N,right=of b] (c) {3};
+    \node[N,right=of c] (d) {4};
+
+    \node[Name,above=0.5 of b] (x) {let x};
+    \draw[->,densely dashed] (x) -- (b);
+    \draw[->] (b) -- (c);
+    \draw[->] (c) -- (d);
+
+    
+    \begin{visible}<2->
+      \node[Name,above=0.5 of a] (y) {let y};
+      \draw[->,densely dashed] (y) -- (a);
+      \draw[->] (a) -- (b);
+    \end{visible}
+
+    \begin{visible}<3->
+      \node[N,fill=safegreen!40,below=0.5 of b] (bb) {2};
+      \node[N,fill=safegreen!40,below=0.5 of c] (cc) {8};
+      \node[Name,left=of bb] (xx) {let x'};
+      \draw[->,densely dashed] (xx) -- (bb);
+      \draw[->] (bb) -- (cc);
+      \draw[->] (cc) -- (d);
+
+      \draw[->,double] (c) -- node[left]{\tiny update} (cc);
+    \end{visible}
+
+
+
+
+  \end{tikzpicture}
+\end{frame}
+\end{document}

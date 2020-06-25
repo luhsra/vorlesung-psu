@@ -1,0 +1,30 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[function cylinder] (partial) {partial()};
+
+    \node[function cylinder,minimum width=0,yshift=5mm,left=0.5 of partial] (f1) {int,float$\rightarrow$int};
+    \node[object,minimum width=0,yshift=-5mm,left=0.5 of partial] (f2) {23};
+
+    \node[function cylinder,minimum width=0,right=1.7 of partial] (ff1) {int,float$\rightarrow$int};
+    \node[object,left=0.3 of ff1,yshift=1em] (val) {\scriptsize 23};
+    \draw[->](val) to[out=-90,in=177] (ff1);
+
+
+    \begin{pgfonlayer}{background}
+      \node[fit=(ff1)(val),function cylinder,
+            cylinder end fill=violet!40!black!40!white,
+            cylinder body fill=violet!20,
+      ](ff){};
+      \draw[->](ff.190) to[out=0,in=187] (ff1);
+    \end{pgfonlayer}
+    \draw[->](partial) -- (ff);
+    \draw[->](f1) to[out=0,in=180] (partial.170);
+    \draw[->](f2) to[out=0,in=180] (partial.190);
+
+
+    \draw[decorate,decoration={brace,amplitude=5pt}] (ff.after top) -- node[below,yshift=-5pt] {float$\rightarrow$int} (ff.before bottom);
+  \end{tikzpicture}
+\end{frame}
+\end{document}

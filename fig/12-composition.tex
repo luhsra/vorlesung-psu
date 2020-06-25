@@ -1,0 +1,28 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[function cylinder] (compose) {compose()};
+
+    \node[function cylinder,minimum width=0,yshift=5mm,left=of compose] (f1) {str$\rightarrow$int};
+    \node[function cylinder,minimum width=0,yshift=-5mm,left=of compose] (f2) {int$\rightarrow$float};
+
+    \node[function cylinder,minimum width=0,right=of compose] (ff1) {str$\rightarrow$int};
+    \node[function cylinder,minimum width=0,anchor=west] at ($(ff1.before top)!0.5!(ff1.after top)$) (ff2) {int$\rightarrow$float};
+
+    \begin{pgfonlayer}{background}
+      \node[fit=(ff1) (ff2),function cylinder,
+            cylinder end fill=violet!40!black!40!white,
+            cylinder body fill=violet!20,
+      ](ff){};
+
+    \end{pgfonlayer}
+    \draw[->](compose) -- (ff);
+    \draw[->](f1) to[out=0,in=180] (compose.170);
+    \draw[->](f2) to[out=0,in=180] (compose.190);
+
+
+    \draw[decorate,decoration={brace,amplitude=5pt}] (ff.after top) -- node[below,yshift=-5pt] {str$\rightarrow$float} (ff.before bottom);
+  \end{tikzpicture}
+\end{frame}
+\end{document}
