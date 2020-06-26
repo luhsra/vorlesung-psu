@@ -48,7 +48,7 @@ Effiziente Programmierer:
     \ii Zwischencode der virtuellen Maschine auf eine \structure{reale Maschine} abbilden{%
       \bi
       \ii Verbleibende \alert{semantische Lücken}: Funktionsaufrufe, lokale Variablen, Befehle
-      \ii Application Binary Interface (ABI), Registervergabe, Binärformat (ELF),
+      \ii Application Binary Interface (ABI), Registervergabe, Binärformat (ELF)
       \ei
     }
     \ei
@@ -71,7 +71,7 @@ Effiziente Programmierer:
       \ii Befehle \tikzmark{left-befehle}{
         \bi
         \ii Meist 3-Adress-Befehle
-        \ii \ircmd{Call}: Beliebige Argumentzahl
+        \ii \ircmd{Call}: Beliebige Argumentanzahl
         \ei
       }
       \ii Speicherung des Programms\tikzmark{left-program} {
@@ -113,7 +113,7 @@ Effiziente Programmierer:
           \OP c9\B%
           \OP c3\B%
         \end{minipage}
-      }{\\[1ex]\scriptsize (Keine Sorge. Wir gehen nur bis Assembler)}
+      }{\\[1ex]\scriptsize (Keine Sorge, wir gehen nur bis Assembler)}
       \medskip
       \bii
           \ii \tikzmark{right-memory}Speicherabstraktion {
@@ -124,7 +124,7 @@ Effiziente Programmierer:
       }\medskip
       \ii \tikzmark{right-befehle}Befehle {
         \bi
-        \ii 2 Operanden, Zeitgleich Quelle+Ziel
+        \ii 2 Operanden, zeitgleich Quelle+Ziel
         \ii \ircmd{call} transportiert keine Argumente
         \ii Verschiedene Adressierungsmodi
         \ii Komplexe Befehle (CISC)
@@ -161,10 +161,10 @@ Aber es fehlt noch ein letzter Schritt:
 Wir müssen von der Ebene des Zwischencodes zu Ebene der real existierenden Maschine kommen.
 Und da gibt es noch einige Unterschiede:
 Wo die IR-Maschine beliebig viele Register hat, hat der Prozessor nur eine endliche Anzahl derer.
-Wo die IR-Maschine Funktionsaufrufe mit Paramterübergabe beherscht, gibt es auf dem physikalische-existierenden Prozessor nur einen ~call~-Befehl, der mehr ein Sprung auf Steroiden ist.
+Wo die IR-Maschine Funktionsaufrufe mit Parameterübergabe beherrscht, gibt es auf dem physikalische-existierenden Prozessor nur einen ~call~-Befehl, der mehr ein Sprung auf Steroiden ist.
 Wo die IR-Maschine unspezifiziert ist wie das Programm startet, müssen wir für die Ausführungsplattform ein passendes Binärformat erzeugen.
 All diese verbleibenden Aspekte werden wir in die Vorlesung thematisieren.
-Damit vollenden wir unsere Reise zur Schließung der semantischen Lücke, einer Reise man als 10.000 Abstraktionsebenen unter der der Entwicklungsumgebung bezeichen könnte.
+Damit vollenden wir unsere Reise zur Schließung der semantischen Lücke, einer Reise, die man als 10.000 Abstraktionsebenen unter der Entwicklungsumgebung bezeichnen könnte.
 
 Als Zielplattform, anhand derer wir die Maschinencodeerzeugung diskutieren werden, habe ich die IA-32 (32-Bit Intel Architektur) gewählt.
 Nicht weil diese besonders hübsch oder zugänglich ist, sondern weil sie ein seit 40 Jahren stabiles Prozessorinterface bietet.
@@ -183,7 +183,7 @@ Wir haben uns den Zwischencode so definiert, dass die meisten Befehle 3 Operande
 Auf IA-32 haben wir diesen Luxus nicht, dort haben Befehle in der Regel 2 Operanden, wovon ein Operand eine doppelte Rolle hat und sowohl Quell- als auch Zieloperand ist.
 Außerdem haben wir auf der IR-Ebene den ~Call~ Befehl, der nicht nur eine Funktion aufruft, sondern auch, nebenbei, eine beliebige Anzahl an Argumenten als Parameter an die neue Funktionsinstanz übergeben kann, wo sie dann wie lokale Variablen verwendet werden können.
 Das ist sehr schickt, aber es unterstützt keine reale Maschine.
-Das Attribut bei dem Sie stutzig werden müssen ist "beliebige Anzahl", denn nichts auf einer realen Maschine hat eine beliebige Anzahl; immer gibt es irgendeine Art von oberen Schranke[fn::Am Ende besteht die Maschine eben doch aus einer endlichen Anzahl von Atomen, die nur eine endliche Anzahl von Taktzyklen betriebn werden kann, bevor Elektromigration alle Gates und Leitungen aufgefressen hat.
+Das Attribut bei dem Sie stutzig werden müssen ist "beliebige Anzahl", denn nichts auf einer realen Maschine hat eine beliebige Anzahl; immer gibt es irgendeine Art von oberen Schranke[fn::Am Ende besteht die Maschine eben doch aus einer endlichen Anzahl von Atomen, die nur eine endliche Anzahl von Taktzyklen betrieben werden kann, bevor Elektromigration alle Gates und Leitungen aufgefressen hat.
 [[https://de.wikipedia.org/wiki/Memento_mori][Oh Memento Mori]]!].
 Auch hier brauchen wir für jeden IR-Befehl eine Abbildung auf einen IA-32-Befehl.
 
@@ -215,7 +215,7 @@ Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließ
     }\medskip
     \ii<2-> Für die reale Maschine müssen wir einige \textbf{Entscheidungen} treffen:{%
       \bi
-      \ii \structure{Daten-Layout}: Welches Datum liegt an welcher Stelle?
+      \ii \structure{Datenlayout}: Welches Datum liegt an welcher Stelle?
       \ii \structure{Verantwortung}: Wer legt den Call-Frame an und füllt ihn mit Daten?
       \ii \structure{Invarianten}: \btSetTab Welche Teile des Maschinenzustandes bleiben über einen\\
                                    \btUseTab Funktionsaufruf hinweg erhalten?\\[1ex]
@@ -226,10 +226,10 @@ Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließ
   \end{frame}
 
   \begin{frame}[fragile]{Aufrufkonventionen}
-    \begin{btBlock}{Definition:  Die Aufuf\textbf{konvention} bestimmt,\ldots}
+    \begin{btBlock}{Definition:  Die Aufruf\textbf{konvention} bestimmt,\ldots}
       \ldots wie \structure{Argumente} an Funktionen übergeben werden und\\
       \ldots welche Teile des \structure{Maschinenzustands} der Callee erhalten muss und\\
-      \ldots wo der Caller den \structure{Rückggabewert} auslesen kann.
+      \ldots wo der Caller den \structure{Rückgabewert} auslesen kann.
     \end{btBlock}
 
     \bi
@@ -243,8 +243,8 @@ Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließ
       \bi
       \ii Callee legt Call-Frame auf dem Stack an und räumt ihn wieder weg
       \ii Argumente werden von \textbf{rechts-nach-links} auf den Stack gelegt
-      \ii Rückggabewerte: \btSetTab \texttt{\%eax} für \lstinline[style=C]{int}, \texttt{\%st0} für \lstinline[style=C]{double}\\
-                          \btUseTab Größere Argumente/Rückggabewerte: Wie in Vorlesung 8
+      \ii Rückgabewerte: \btSetTab \texttt{\%eax} für \lstinline[style=C]{int}, \texttt{\%st0} für \lstinline[style=C]{double}\\
+                          \btUseTab Größere Argumente/Rückgabewerte wie in Vorlesung 8
       \ii \structure{Callee-saved Register}: \texttt{\%esp, \%ebp, \%ebx, \%esi, \%edi}
       \ei
     }
@@ -265,7 +265,7 @@ Zusätzlich wird im Call-Frame auch noch eine Rücksprungadresse gespeichert, di
 Mit der Rückkehr kann, über den Rückgabewert, ein zweiter Datenfluss (R) stattfinden.
 
 Zentral bei der Abbildung auf die Maschine ist der Call-Frame. Für diesen stellt sich die Frage nach dem Datenlayout. Ähnlich wie bei Record-Typen müssen wir uns auf ein konkretes Abbild im Speicher festlegen. Nur so können wir die Verwendung von symbolischen Namen effizient auf die Zeiger-basierte Adressierung der Maschine abbilden. Darüber hinaus müssen wir die Entscheidung über den Besitzer{{{see(06-ownership,Besitz von Objekten)}}} des Call-Frames treffen: Wer erzeugt den Call-Frame und wer löscht ihn wieder? Caller oder Callee? 
-Außerdem müssen wir uns darauf festlegen, was der Callee am Maschinenezustand überhaupt verändern darf. Darf der Callee den gesamten Speicher mit Nullen überschreiben (eher nicht nützlich), oder darf der Caller annehmen das einige Teile des Maschinenzustands unverändert bleiben.
+Außerdem müssen wir uns darauf festlegen, was der Callee am Maschinenzustand überhaupt verändern darf. Darf der Callee den gesamten Speicher mit Nullen überschreiben (eher nicht nützlich), oder darf der Caller annehmen das einige Teile des Maschinenzustands unverändert bleiben.
 
 Wie sie bereits sehen, ich spreche hier häufig davon, dass wir uns festlegen müssen.
 Diese Entscheidungen, die wir bei der Abbildung von Funktionsaufrufen und dem Call-Frame machen, sind nicht zwingend, sondern es sind Designentscheidungen.
@@ -290,11 +290,11 @@ Dies funktioniert sogar, wenn wir den Übersetzer auf mehreren Quelldateien ausf
 Aber eine Aufrufkonvention fördert auch die Kompatibilität zwischen verschiedenen Übersetzern, und sogar zwischen unterschiedlichen Programmiersprachen.
 So ist die Aufrufkonvention für C Funktionen auf den meisten Plattformen die Lingua Franca um Funktionen aus anderen Programmiersprachen aufzurufen.
 
-Als Beispiel werden wir uns im Folgenden der System-V Aufrufkonvetion für C auf der IA-32 Plattform beschäftigen.
+Als Beispiel werden wir uns im Folgenden der System-V Aufrufkonvention für C auf der IA-32 Plattform beschäftigen.
 Diese können Sie genauer im [[http://www.sco.com/developers/devspecs/abi386-4.pdf][Spezifikationsdokument]] ab Seite 35 ganz genau nachlesen.
 Keine Angst, die Spezifikation ist sehr klar und, wenn Sie mit dieser Vorlesungseinheit durch sind, gut zu verstehen.
 Bei dieser Konvention werden die Argumente von rechts nach links auf den Stack gelegt, was dazu führt dass das erste Argument zu oberst auf dem Stack liegt. Wir werden gleich sehen, welchen Vorteil diese Entscheidung bei Funktionen mit einer variablen Anzahl an Argumenten hat (z.B. ~printf()~). 
-Außerdem regelt die Aufrufkonvention das Rückgabewerte von Typ ~int~ in ~%eax~ und Fliesskommazahlen in ~%st0~ gespeichert werden.
+Außerdem regelt die Aufrufkonvention das Rückgabewerte von Typ ~int~ in ~%eax~ und Fließkommazahlen in ~%st0~ gespeichert werden.
 Bezüglich des unveränderten Maschinenzustands regelt die System-V Aufrufkonvention, dass fünf Register (~%esp, %ebp, %ebx, %esi, %edi~) nach einem Funktionsaufruf den gleichen Zustand haben müssen, wie vor dem Funktionsaufruf. Die *Callee-saved Register* werden vom Callee gespeichert und am Ende wieder hergestellt.
 
 Da Konventionen nur Konventionen sind, gibt es natürlich verschiedene Aufrufkonventionen [fn::siehe [[https://xkcd.com/927/][xkcd: Competing Standard]]]. So verwendet Windows, im gleichen Programm, für normale Funktionsaufrufe die fastcall-Konvention für normale Funktionsaufrufe und die Pascal-Konvention für Systemaufruf.
@@ -318,7 +318,7 @@ Da Konventionen nur Konventionen sind, gibt es natürlich verschiedene Aufrufkon
         \columntitle{Aufrufsequenz}
 
         \bi\ii[]\be
-        \ii<handout:2-|2-> Argumente von \textbf{rechts nach links} ermöglicht Funktionen mit variabler Argumentenzahl {
+        \ii<handout:2-|2-> Argumente von \textbf{rechts nach links} ermöglicht Funktionen mit variabler Argumentanzahl {
           \bi
           \ii \texttt{\texttt{push arg2}; \only<3->{\texttt{push arg1}; }\only<4->{\texttt{push arg0};}}
           \ei
@@ -338,7 +338,7 @@ Da Konventionen nur Konventionen sind, gibt es natürlich verschiedene Aufrufkon
           \ii sub x, \%esp
           \ei
         }
-        \ii<handout:8-|8-> Return: in umgekehrter Reihenfolge
+        \ii<handout:8-|8-> Return in umgekehrter Reihenfolge
         \ee\ei
       \end{column}
     \end{columns}
@@ -373,12 +373,12 @@ relativ zum Stackzeiger gespeichert ist.
 Da mit diesem ersten Argument ~format~ gespeichert ist, wie viele Argumente noch zu erwarten sind, kann die Implementierung die restlichen Offsets dynamisch berechnen.
 Wenn sie diesen Mechanismus noch genauer verstehen möchten, schauen Sie sich die Manpage [[https://linux.die.net/man/3/va_arg][va_arg(3)]] an.
 
-Nachdem die Argumente auf dem Stack liegen wird der Maschinenbefehl ~call~ ausgefürt, der die Rücksprungadresse auf den Stack legt und den Kontrollfluss zum Callee umleitet.
+Nachdem die Argumente auf dem Stack liegen wird der Maschinenbefehl ~call~ ausgeführt, der die Rücksprungadresse auf den Stack legt und den Kontrollfluss zum Callee umleitet.
 Durch die Rücksprungadresse können wir später den Kontrollfluss des Callers wieder aufnehmen.
 
 Da die Kontrolle über die Maschine nun beim Callee liegt, kann dieser den Rest des Call-Frames anlegen indem der Stackpointer noch weiter nach unten verschoben wird.
 In diesem Zwischenbereich (gelb) werden dann die lokalen Variablen abgelegt.
-Wie Sie sehen habe ich in der Animation keine feste Größe für diesen Bereich angegeben sondern erstmal die Zahl ~x~.
+Wie Sie sehen habe ich in der Animation keine feste Größe für diesen Bereich angegeben sondern erst mal die Zahl ~x~.
 Solange eine Funktion nur lokale Variablen hat, aber niemals eine dynamische Stackallokation (~StackAlloc~) durchführt, ist der gelbe Bereich von bekannter Größe und die Zahl ~x~ eine Konstante. In diesem Fall können wir weiterhin über einen konstanten Stackzeiger-Offset auf die Argumente zugreifen. Hätte unsere Funktion beispielsweise 3 lokale Variablen a 4 Byte, würden wir mit ~24(%esp)~ an ~arg2~ kommen.
 
 Problematisch wird es, wenn der gelbe Bereich von unbekannter Größe ist.
@@ -403,16 +403,16 @@ Dieser entfernt dann wieder die Parameter vom Stack und fährt mit seinem Kontro
       \ii Spart Speicherzugriffe  beim Funktionsaufruf 
       \ei
     }\bigskip
-    \ii<2-> \textbf{Trade-Off} zwischen Caller-save/Callee-save Register Mengen {
+    \ii<2-> \textbf{Trade-Off} zwischen Caller-save/Callee-save Registermengen {
       \bi
-      \ii Wenige Caller-save Register: Wenig unnötige Register-Sicherungen
+      \ii Wenige Caller-save Register: wenig unnötige Registersicherungen
       \ii Wenige Callee-save Register: Blattfunktionen können in Registern arbeiten
       \ei
     }\bigskip
     \ii<3-> Zusätzliche Parameter liefern Aufrufkontext {
       \bi
       \ii \textbf{thiscall}: In C++ wird der this-Zeiger in \texttt{\%ecx} übergeben
-      \ii Zieladresse für Rückgabe-Objekte im  0. Parameter
+      \ii Zieladresse für Rückgabeobjekte im  0. Parameter
       \ei
     }
     \ei
@@ -430,14 +430,14 @@ Das grundlegende Problem ist, dass der Caller nicht weiß welche Register der Ca
 Deshalb suchen Aufrufkonventionen nach einem Trade-Off zwischen keine Callee-save Register und ausschließlich Callee-save Registern, der diese gegenseitige Nicht-Kennen ausgleicht. Meist kümmert sich sowohl Caller als auch Callee um etwa die Sicherung des halben Registersatzes.
 
 Der dritte Aspekt der ebenfalls in Aufrufkonventionen geregelt ist, sind zusätzliche, nicht sichtbare Register.
-So wird beim thiscall (C++) der Zeiger auf das Objekt auf dem eine Methode ausgeführt werden soll im Register ~%ecx~ übergeben. Über solche zusätzlichen Argumente haben wir allerdings schon im Kapitel zur Coderzeugung ausführlich geredet{{{see(08-codegen-records, Coderzeugung für Records)}}}.
+So wird beim thiscall (C++) der Zeiger auf das Objekt auf dem eine Methode ausgeführt werden soll im Register ~%ecx~ übergeben. Über solche zusätzlichen Argumente haben wir allerdings schon im Kapitel zur Codeerzeugung ausführlich geredet{{{see(08-codegen-records, Codeerzeugung für Records)}}}.
 
 #+begin_src latex
   \begin{frame}[fragile]{Lokale Variablen}
     \begin{btBlock}{Die Welt am Beginn einer Funktion\hfill Parameter: \checkmark}\small
       \begin{columns}
         \begin{column}{0.7\textwidth}
-          Nachdem Sicherung des \alert{alten Basiszeigers}, sind die Parameter mit einem \structure{konstanten, positiven Offset} zum \advantage{neuen Basiszeiger} adressierbar. \end{column}\hfill \hspace{-3ex}\begin{column}{0.3\textwidth}\ttfamily bar:\\ \ \alert{push \%ebp}\\ \ \advantage{mov \%esp, \%ebp}\\ \ mov \structure{8(\%ebp)}, \%eax \end{column} \end{columns} \end{btBlock}
+          Nach der Sicherung des \alert{alten Basiszeigers}, sind die Parameter mit einem \structure{konstanten, positiven Offset} zum \advantage{neuen Basiszeiger} adressierbar. \end{column}\hfill \hspace{-3ex}\begin{column}{0.3\textwidth}\ttfamily bar:\\ \ \alert{push \%ebp}\\ \ \advantage{mov \%esp, \%ebp}\\ \ mov \structure{8(\%ebp)}, \%eax \end{column} \end{columns} \end{btBlock}
 
     \bi
     \ii<2-> Unendlicher virtueller Registersatz (IR) vs. endlicher realer Registersatz{
@@ -456,10 +456,10 @@ So wird beim thiscall (C++) der Zeiger auf das Objekt auf dem eine Methode ausge
           \end{column}\hfill
         \end{columns}\mbox{}\\[1ex]
       }
-      \ii Variablen-Slots werden relativ zum Basiszeiger adressiert
+      \ii Variablenslots werden relativ zum Basiszeiger adressiert
       \ei
     }\medskip
-    \ii<3-> Komplexer: Colokation von Variablen in Slots + kluge \structure{Registerallokation}
+    \ii<3-> Komplexer: Colocation von Variablen in Slots + kluge \structure{Registerallokation}
     \ei
   \end{frame}
 
@@ -509,7 +509,7 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
     \begin{columns}[t]
       \begin{column}{0.49\textwidth}
         \begin{btBlock}{\hfill Befehlsauswahl\tikzmark{A}\hfill\mbox{}}
-          Wähle für jeden IR-Befehl eine einzelne oder einer Sequenz aus Maschinenbefehlen aus.        
+          Wähle für jeden IR-Befehl eine einzelne oder eine Sequenz aus Maschinenbefehlen aus.
         \end{btBlock}
 
         \bii
@@ -517,7 +517,7 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
           \enquote{AMD64 kennt 36 \texttt{mov}-Varianten}\\[1ex]
           \bi
           \ii Unterschiedliche Programmgröße
-          \ii Unterschiedlich Laufzeit
+          \ii Unterschiedliche Laufzeit
           \ii Unterschiedlicher Energieverbrauch
           \ei
         }\medskip
@@ -527,7 +527,7 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \begin{btBlock}{\hfill\tikzmark{B}Registerallokation\hfill\mbox{}}
-          Bestimme in welchen Abschnitten eine IR-Variable in ihrem Slot oder in einem CPU Register lebt.
+          Bestimme, in welchen Abschnitten eine IR-Variable in ihrem Slot oder in einem CPU Register lebt.
         \end{btBlock}
 
         \bii
@@ -574,18 +574,18 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
 #+end_src
 
 Nachdem durch die Aufrufkonvention und die Abbildung von IR-Variablen auf Stack-Slots klar ist wie das Datenlayout für einen Call-Frame aussieht, geht es nun darum die IR-Befehl als Maschinenbefehle zu codieren.
-Dazu müssen zwei Entscheidungen getroffen werden: Bei der *Befehlsauswahl* wird für einen IR-Befehl ein einzelner oder eine Sequenz von Maschinenbefehlen ausgewählt. Bei der *Registerallokation* entscheiden wir zu welchem Zeitpunkt eine Variable in ihrem Slot lebt und wann sie in einem CPU Register zu finden ist. Haben wir beide Probleme gelößt können wir die Maschinenbefehle, zusammen mit den passenden Registeroperanden als Assembler raus schreiben und sind fertig mit der Übersetzung. Also eigentlich ganz einfach, wären da nicht zwei NP-Vollständige Probleme.
+Dazu müssen zwei Entscheidungen getroffen werden: Bei der *Befehlsauswahl* wird für einen IR-Befehl ein einzelner oder eine Sequenz von Maschinenbefehlen ausgewählt. Bei der *Registerallokation* entscheiden wir zu welchem Zeitpunkt eine Variable in ihrem Slot lebt und wann sie in einem CPU Register zu finden ist. Haben wir beide Probleme gelöst können wir die Maschinenbefehle, zusammen mit den passenden Registeroperanden als Assembler raus schreiben und sind fertig mit der Übersetzung. Also eigentlich ganz einfach, wären da nicht zwei NP-Vollständige Probleme.
 
 Zum einen ist die Befehlsauswahl nicht so einfach:
 Viele Prozessoren, insbesondere CISC-Architekturen, haben viele Varianten eines einzelnen Befehls, die sich alle, mehr oder weniger stark, in ihrer Semantik und in ihren nicht-funktionalen Eigenschaften unterscheiden.
 So kennt die AMD64 Architektur 36 verschiedene Varianten von ~mov~, die im Assembler alle mit dem ~mov~-Opcode notiert werden.
-Außerdem ist nicht für jeden IR-Befehl 1:1 Abbildung möglich, sondern es wird eine 1:N Abbildung auf Maschinenebefehle benötigt um die geforderte Funktionalität umzusetzen.
+Außerdem ist nicht für jeden IR-Befehl 1:1 Abbildung möglich, sondern es wird eine 1:N Abbildung auf Maschinenbefehle benötigt um die geforderte Funktionalität umzusetzen.
 Das ganze wird noch schlimmer, weil die Betrachtung mehrerer IR-Befehle in einer M:N Weise zu besseren Übersetzungsergebnissen führt.
 Alles in allem hat sich herausgestellt, dass eine optimale Befehlsauswahl ein NP-vollständiges Problem ist.
 
 Zum anderen ist auch die Registerallokation ein Problem:
 Die Entscheidung welche Variable zu welchem Zeitpunkt in welchem Register lebt hat zum einen massive Auswirkungen auf die Performance des Programms.
-Dies rührt daher, dass Zugriffe auf den Speicher viel, viel langsamer sind als auf Register[fn::siehe: [[https://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.htmlttps://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.html][Your computer is already a distributed system. Why isn't your OS?]]][fn::Zugriffszeiten von [[https://stackoverflow.com/questions/4087280/approximate-cost-to-access-various-caches-and-main-memory#4087315][Stackoverflow]].]
+Dies rührt daher, dass Zugriffe auf den Speicher viel, viel langsamer sind als auf Register[fn::siehe: [[https://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.html][Your computer is already a distributed system. Why isn't your OS?]]][fn::Zugriffszeiten von [[https://stackoverflow.com/a/4087315][Stackoverflow]].]
 Daher kostet jeder Transfer zwischen Stack-Slot und Register richtig viel Zeit und wir möchten davon, während der Laufzeit, möglichst wenige Slot-Register-Transfers haben.
 Aber Registerallokation ist auch ein kompliziertes Problem, wenn man Variablen über Basisblockgrenzen hinweg im Register halten will.
 Erwartet der Code eines Basisblocks, zum Beispiel, eine Variable in einen bestimmtem Register, so müssen alle Vorgängerblöcke dafür sorgen, dass die Variable auch tatsächlich in diesem Register geladen ist.
@@ -618,7 +618,7 @@ Außerdem gibt es auch noch Befehle, die als Seiteneffekt den Inhalt von Registe
     }\medskip
     \ii \structure{Registerallokation}: Spilling {
       \bi
-      \ii<handout:5-|5-> \structure{Spilling}: Variable-Wert aus einem Register in den Speicher schreiben.\\[1ex]
+      \ii<handout:5-|5-> \structure{Spilling}: Variablenwert aus einem Register in den Speicher schreiben.\\[1ex]
       \ii<handout:5-|5-> Variablen immer neuladen
       \ii<handout:5-|5-> Ergebnisse direkt spillen
       \ii<handout:6-|6-> Jede Variable hat einen Speicher-Slot
@@ -656,8 +656,8 @@ Außerdem gibt es auch noch Befehle, die als Seiteneffekt den Inhalt von Registe
         \begin{column}{0.75\textwidth}
           \btUseExtraItemSep[-\smallskipamount]\vspace{-1em}%
           \bi
-          \ii Bereits in Registern vorgeladene Variablen werden veworfen
-          \ii Hauptteil des Programs macht nur noch Spilling
+          \ii In Registern vorgeladene Variablen werden verworfen
+          \ii Hauptteil des Programms macht nur noch Spilling
           \ii Speicherzugriffe sind, trotz Cache, langsamer
           \ei
         \end{column}\hfill
@@ -752,12 +752,12 @@ Zusätzlich gibt es noch eine Reihe von Anweisungen welcher IR-Operand in welche
 Für jedes Auftreten des IR-Befehls im IR-Programm instantiieren wir das Makro und verbinden die Anweisungen an den Ein- und Ausgängen mit den konkreten Operanden.
 Die Instantiierung des Makros übergeben wir dann an die Registerallokation, die dafür sorgen muss, dass für jeden Platzhalter ein Register ausgewählt wird, die aktuellen Variablen-Werte in den Register landen, und das Ergebnis im Zieloperanden landet.
 
-Die einfachste Variante einer Registerallokation ist ein Spilling-Register-Allocator.
+Die einfachste Variante einer Registerallokation ist ein Spilling-Registerallokator.
 Bei dieser Art der Registerallokation betrachten wir immer nur einen einzigen Befehl:
 Vor dem Befehl laden wir alle Variablen frisch aus ihrem fix-zugeordneten Stack-Slot in ein Register.
 Nachdem die Befehlssequenz abgearbeitet ist, wird das Ergebnis sofort wieder in einen Slot zurückgeschrieben.
 Dieses direkte Zurückschreiben führt dazu, dass eine Variable nur für die Dauer einer einzige Instruktion in einem Register lebt.
-Es gibt keinerlei Probleme, dass es über Kontrollflüsse hinweg zu irgendwelchen Inkonsistenzen kommen kann oder wir vergessen irgendeinen Wert zurückzuschreiben. Schick. Schick aber ineffzient.
+Es gibt keinerlei Probleme, dass es über Kontrollflüsse hinweg zu irgendwelchen Inkonsistenzen kommen kann oder wir vergessen irgendeinen Wert zurückzuschreiben. Schick. Schick aber ineffizient.
 
 *Ineffizienz* ist genau das Problem dieser minimalen Maschinencodeerzeugung.
 An (mindestens) drei Stellen wird das Potential der Maschine nicht voll ausgenützt:
@@ -767,7 +767,7 @@ Viel klüger wäre es nur das aus dem Speicher zu laden, was nicht schon im Regi
 
 Das zweite Problem ist, dass die starren Makros komplexere Fähigkeiten der CPU nicht ausnützen können.
 Insbesondere bei CISC Maschinen kann ein einzelner Befehl eine sehr komplexe Semantik haben.
-Auf den Folien sehen Sie eine Adressberechnung für ein Array, dass einmal naive aus drei Makros zusammegesetzt wurde, und einmal der passende IA-32 Befehl, der in einem Rutsch ~%eax+8*%ebx~ rechnet und dereferenziert.
+Auf den Folien sehen Sie eine Adressberechnung für ein Array, dass einmal naive aus drei Makros zusammengesetzt wurde, und einmal der passende IA-32 Befehl, der in einem Rutsch ~%eax+8*%ebx~ rechnet und dereferenziert.
 Die Besonderheiten der Prozessor-Architektur werden also nicht vollständig ausgenützt.
 
 In eine ähnliche Richtung, aber unterschiedlich davon, ist das dritte Problem der Minimallösung:
@@ -779,20 +779,20 @@ Dieses Problem kann man so zusammenfassen, dass die Besonderheiten der Prozessor
 Für all diese Teilaspekte gibt es Methoden die Maschinencodeerzeugung zu verbessern:
 Zum einen kann man bei der Registerallokation mehr als nur einen Befehl auf einmal betrachten und so eine *globalere Registerallokation* durchführen.
 Durch dieses größere Wissen wird die Allokation zwar aufwändiger, das Ergebnis aber um Größenordnungen besser.
-Um die Prozessorarchitektur auszunützen, haben moderne Übersetzer einen *Peephole-Optimizer*, der immer eine fixe Anzahl an Assemblerinstruktionen (z.B. 3 aufeinanderfolgende Befehle) gegen ein Muster-Datenbank vergleicht und durch effizentere Schnipsel ersetzt.
+Um die Prozessorarchitektur auszunützen, haben moderne Übersetzer einen *Peephole-Optimizer*, der immer eine fixe Anzahl an Assemblerinstruktionen (z.B. 3 aufeinanderfolgende Befehle) gegen ein Muster-Datenbank vergleicht und durch effizientere Schnipsel ersetzt.
 Um die mikroarchitekturellen Besonderheiten auszunützen kann die *Instruktion-Selection* Assemblerbefehle so umordnen, dass immer noch die gleiche Berechnung durchgeführt wird, aber möglichst viele Instruktionen im Windschatten anderer verdeckt werden.
 
-Im Folgendenen greifen wir uns den Aspekt der Registervergabe heraus und diskutieren einen Registerallokator, der nicht so sehr unter Amnesie leidet und sich, über den Verlauf eines einzelnen Basisblocks hinweg, merkt, welche Variablen bereits in den  Registersatz transferiert wurden.
+Im Folgenden greifen wir uns den Aspekt der Registervergabe heraus und diskutieren einen Registerallokator, der nicht so sehr unter Amnesie leidet und sich, über den Verlauf eines einzelnen Basisblocks hinweg, merkt, welche Variablen bereits in den  Registersatz transferiert wurden.
 
 #+begin_src latex
   \begin{frame}[fragile]{Ein Registerallokator mit Gedächtnis}
     \OrangeBox{Die Minimallösung vergisst nach jeder Instruktion alles.}
     \medskip
     \bi
-    \ii \textbf{Idee}: Der Registersatz ist \structure{Cache} für die Speicher-Variablen-Slots{
+    \ii \textbf{Idee}: Der Registersatz ist \structure{Cache} für die Speicher-Variablenslots{
       \bi
       \ii Bereits in Register geladene Variablen sollen wiederverwendet werden
-      \ii Veränderte Variablen werden erst verzögert zurück geschrieben
+      \ii Veränderte Variablen werden erst verzögert zurückgeschrieben
       \ii Variablen \structure{leben} in ihrem Slot \textbf{oder} in einem Register
       \ei
     }\medskip
@@ -830,12 +830,12 @@ Im Folgendenen greifen wir uns den Aspekt der Registervergabe heraus und diskuti
     \ii Allokieren eines leeren Registers: \codeinline[style=py]{def alloc_register(reg=None)}{
       \bi
       \ii Wenn kein Register vorgegeben wird, wählt der Allokator eines aus
-      \ii Noch ungesicherte Ergebnisse werden ggf. in den Variablen-Slot gespeichert
+      \ii Noch ungesicherte Ergebnisse werden ggf. in den Variablenslot gespeichert
       \ei
     }\medskip
     \ii Lade Variable nach Register: \codeinline[style=py]{def load(src, dst_reg=None, modify=False)}{%
       \bi
-      \ii Sorgt dafür dass \texttt{src} in einem Register vorliegt
+      \ii Sorgt dafür, dass \texttt{src} in einem Register vorliegt
       \ii Mit \texttt{dst\_reg} können wir ein spezifisches Register verlangen
       \ii Mit \texttt{modify} zeigen wir an, ob wir das Register verändern werden
       \ei
@@ -854,7 +854,7 @@ Im Folgendenen greifen wir uns den Aspekt der Registervergabe heraus und diskuti
 Zuerst müssen wir die Weltsicht dieses Allokators grundlegend erklären:
 Dieser Allokator mit Gedächtnis sieht den Registersatz als eine Art schnelle Zwischenspeicher (Cache) für die Slots der Variablen im Speicher an.
 Der Allokator geht einen Basisblock, Instruktion für Instruktion, von oben nach unten, durch und merkt sich währenddessen welche Werte bereits im Cache liegen und welche in den Registersatz geladen werden müssen.
-Für letztere werden dann Load-Befehle emitiert um den Cache zu füllen.
+Für letztere werden dann Load-Befehle emittiert um den Cache zu füllen.
 Außerdem schreibt der Allokator die Werte aus den Registern nicht sofort zurück, wie das bei der Minimallösung der Fall war, sondern erst verzögert (lazy spilling).
 In den Worten der Veranstaltung "Grundlagen der Rechnerarchitektur" verwendet dieser Allokator den Registersatz als einen vollassoziativen Cache mit Write-Back Strategie.
 Wenn ihnen dieser Satz Probleme bereitet, gehen Sie noch einmal zu ihren GRA Unterlagen zurück und lesen Sie dort nach, was damit gemeint ist.
@@ -870,7 +870,7 @@ emittiert wird.
 Am Ende kommuniziert die Makrosequenz, dass die Zielvariable (~instr.dst~) in ~reg_rhs~ zu finden ist.
 
 Um die Integration von Makroexpansion und Registerallokator vollends zu verstehen, schauen wir uns die API des Registerallokators an.
-In einer funktionalen Hiearchie ist der Registerallokator vollständig abhängig von der Makroexpansion.
+In einer funktionalen Hierarchie ist der Registerallokator vollständig abhängig von der Makroexpansion.
 Dies bedeutet, dass die Registerallokation niemals von alleine tätig wird, sondern er an neuralgischen Stellen aufgerufen wird um Variablen zu laden bzw.
 ihm die Chance gibt sich mit der Maschinencodeerzeugung zu synchronisieren.
 
@@ -885,11 +885,11 @@ Ohne diese Nebenbedingung darf der Allokator sich das Register frei aussuchen.
   \begin{frame}{Zustand des Allokators}
     \btAnimation[width=0.6\textwidth]{center, padding, range=1-2:<1->}{fig/10-allocator}
     \bi
-    \ii Während seiner Arbeit, trackt der Allokator den Registerzustand{
+    \ii Während seiner Arbeit trackt der Allokator den Registerzustand{
       \bi
-      \ii \texttt{free}:  Wurde das Register für die aktuelle Instruktion schon benuzt?
+      \ii \texttt{free}:  Wurde das Register für die aktuelle Instruktion schon benutzt?
       \ii \texttt{value}: Welche Variable lebt aktuell in diesem Register?
-      \ii \texttt{dirty}: Muss der Wert noch in den Slot zurück geschrieben werden?
+      \ii \texttt{dirty}: Muss der Wert noch in den Slot zurückgeschrieben werden?
       \ei
     }\medskip
     \ii<handout:2-|2-> \textbf{Beispielbelegung} {
@@ -936,9 +936,9 @@ Gehen wir nun die drei wichtigen API-Befehle (~alloc_register()~, ~load()~ und ~
       \bi
       \ii<4-> Leere Register erzeugen keine Folgekosten                     \hfill (Kosten: 0 \texttt{mov})
       \ii<5-> Wert-Neuladen für saubere, aber belegte Register    \hfill (Kosten: 1 \texttt{mov})\\
-              Wissen um aktuellen Wert wird gelöscht \\[1ex]
+              Wissen über aktuellen Wert wird gelöscht \\[1ex]
       \ii<7-> Spilling und Wert-Neuladen für dreckige Register              \hfill (Kosten: 2 \texttt{mov})\\
-              Der Allokator emitiert direkt einen Spill-Befehl für das Register
+              Der Allokator emittiert direkt einen Spill-Befehl für das Register
       \ei
     }
     \ei
@@ -967,10 +967,10 @@ Der teuerste Fall tritt ein, wenn wir ein Register heraus geben, das einen noch 
   \begin{frame}<\slideselection>[fragile]{\texttt{write(src\_reg, dst)}}
     \uncover<2->{\btAnimation[width=0.6\textwidth]{center, padding, 8:<1-2>, 9:<3>, 10:<4-5>,11:<6->}{fig/10-allocator}}
     \bi
-    \ii Befehlsauswahl hat Befehle emitiert die \texttt{src\_reg} beschrieben haben{
+    \ii Befehlsauswahl hat Befehle emittiert, die \texttt{src\_reg} beschrieben haben{
       \bi
       \ii Registerinhalt soll in Zukunft als \texttt{dst}-Variable verfügbar sein
-      \ii Verzögertes Rausschreiben der Variable in ihren Speicher-Slot
+      \ii Verzögertes Herausschreiben der Variable in ihren Speicherslot
       \ei
     }\medskip
     \ii<2-> \textbf{Beispiel}: Zuweisung zwischen zwei Variablen \hfill \texttt{b := \ircmd{Assign} a}\\{
@@ -994,7 +994,7 @@ Der teuerste Fall tritt ein, wenn wir ein Register heraus geben, das einen noch 
           \vspace{-1em}%
           \bi
           \ii<6-> \texttt{write()} setzt nur \texttt{value} und \texttt{dirty}\\[-1ex]
-          \ii<6-> \codeinline[style=asm,style=smaller]{mov %ebx, -12(%ebx)} geschiet später
+          \ii<6-> \codeinline[style=asm,style=smaller]{mov %ebx, -12(%ebx)} geschieht später
           \ei
 
         \end{column}
@@ -1053,10 +1053,10 @@ Neben diesen vier Fällen gibt es noch einige Sonderfälle, wenn der Aufrufer vo
 #+begin_src latex
   \begin{frame}{Besondere Situationen für den Allokator}
     \bi
-    \ii \structure{Datenflüsse} die die Grenzen der Basisblöcke überschreiten{
+    \ii \structure{Datenflüsse}, die die Grenzen der Basisblöcke überschreiten{
       \bi
       \ii Basisblock-Übergreifende Registervergabe ist \alert{viel schwieriger}
-      \ii Werte müssten in allen Vorgängern in den gleichen Registern sein\\[1ex]
+      \ii Werte müssten in allen Vorgängern in den selben Registern sein\\[1ex]
       \ii[$\Rightarrow$] Wir starten jeden Basisblock mit einem leeren Zustand
       \ei
     }\medskip
@@ -1069,9 +1069,9 @@ Neben diesen vier Fällen gibt es noch einige Sonderfälle, wenn der Aufrufer vo
     }\medskip
     \ii<3-> \structure{Speicheroperationen} haben wieder ein \textbf{Alias-Problem}{
       \bi
-      \ii Wir wissen nicht ob der gelesene/geschriebene Zeiger auf eine Variable zeigt
-      \ii \ircmd{Store} könnte Register-Werte invalidieren, \ircmd{Load} könnte alte Werte lesen\\[1ex]
-      \ii[$\Rightarrow$] Wir sichern/invalidieren Register, die jemals referenzierte Variablen enthält.\\
+      \ii Wir wissen nicht, ob der gelesene/geschriebene Zeiger auf eine Variable zeigt
+      \ii \ircmd{Store} könnte Registerwerte invalidieren, \ircmd{Load} könnte alte Werte lesen\\[1ex]
+      \ii[$\Rightarrow$] Wir sichern/invalidieren Register, die jemals referenzierte Variablen enthalten\\
           \hfill      \texttt{ptr := \ircmd{Reference} var}
       \ei
     }
@@ -1113,9 +1113,9 @@ Unser Cache wurde also "hintenrum" invalidiert.
 Um dieses Problem zu behandeln, werfen wir bei jedem ~Store~ alle Variablen aus unserer Buchhaltung für die irgendwo in der Funktion eine Referenz erzeugt worden ist. Auf diese Weise verhindern wir, dass wir aus einem Register einen veralteten Wert für gültig halten.
 
 Trotz aller dieser konservativen Annahmen, und das häufig wegwerfen des Allokator-Zustandes hat unser verbesserter Allokator bereits einen erheblichen Einfluss auf die Performance von Programmen.
-Um ihnen dies zu verdeutlichen habe ich einen interativen Fibonacci einmal mit der Minimallösung und einmal mit der verbesserten Registervergabe übersetzt.
+Um ihnen dies zu verdeutlichen habe ich einen iterativen Fibonacci einmal mit der Minimallösung und einmal mit der verbesserten Registervergabe übersetzt.
 Dabei kommt bereits ein gewaltige Verbesserung von 36 Prozent heraus und unser Übungsübersetzer kommt in die Region von ~gcc~, wenn dieser ohne Optimierungen gestartet wird.
-Allerdings sehen Sie auch, dass GCC noch einiges aus einem solchen interativen Fibonacci heraus holt.
+Allerdings sehen Sie auch, dass GCC noch einiges aus einem solchen iterativen Fibonacci herausholt.
 Diese Verbesserungen stammen sogar hauptsächlich aus der Registervergabe, da die innere Schleife der Fibonacci-Berechnung gänzlich in Registern stattfinden kann und ohne Speicheroperationen auskommt.
 
 * Programme und Prozesse
@@ -1127,8 +1127,8 @@ Diese Verbesserungen stammen sogar hauptsächlich aus der Registervergabe, da di
 
   \begin{frame}{Übersicht des restlichen Übersetzungsvorgang}
     \begin{btBlock}{}\small
-      In den letzten 10 Vorlesungen haben wir gelernt aus Quellcode Assembler zu machen.
-      Daraus muss noch ein \structure{Programm} erzeugt werden, dass als \structure{Prozess} gestartet und ausgeführt wird.
+      In den letzten 10 Vorlesungen haben wir gelernt, aus Quellcode Assembler zu machen.
+      Daraus muss noch ein \structure{Programm} erzeugt werden, das als \structure{Prozess} gestartet und ausgeführt werden kann.
     \end{btBlock}
 
     \btAnimation[width=\textwidth]{range=1-4:<1->}{fig/10-linking-overview}
@@ -1137,9 +1137,9 @@ Diese Verbesserungen stammen sogar hauptsächlich aus der Registervergabe, da di
     \bi
     \ii<2-> Aber da ist noch mehr\ldots {
       \bi
-      \ii \structure{Seperate Übersetzung} ermöglicht inkrementelles neuübersetzen
+      \ii \structure{Seperate Übersetzung} ermöglicht inkrementelles Neuübersetzen
       \ii<handout:3-|3-> Der \structure{Loader} bringt die Binärdatei in den Prozessspeicher
-      \ii<handout:4-|4-> \structure{Gemeinsame Bibliotheken} erlauben es Binärcode zu sharen
+      \ii<handout:4-|4-> \structure{Gemeinsame Bibliotheken} erlauben es, Binärcode zu teilen
       \ei
     }
     \ei
@@ -1148,17 +1148,17 @@ Diese Verbesserungen stammen sogar hauptsächlich aus der Registervergabe, da di
 
   \begin{frame}{Das Executable and Linkable Format (ELF)}
     \bi
-    \ii ELF ist \textbf{das} \structure{Datiformat} für übersetzten Programmcode unter Linux{
+    \ii ELF ist \textbf{das} \structure{Dateiformat} für übersetzten Programmcode unter Linux{
       \bi
       \ii Objektdateien, Bibliotheken  und Binärprogramme werden als ELF gespeichert
       \ii Andere Plattformen haben ähnliche Formate: Mach-O (Mac), PE (Windows)
-      \ii Es gibt viele \advantage{Tools} um ELF-Dateien zu inspizieren und zu verarbeiten
+      \ii Es gibt viele \advantage{Tools}, um ELF-Dateien zu inspizieren und zu verarbeiten
       \ei
     }\medskip
-    \ii ELFs speichern Code/Daten zusammen mit anderen Meta-Daten{
+    \ii ELFs speichern Code/Daten zusammen mit anderen Metadaten{
       \bi
-      \ii \texttt{readelf -a ELF} liefert eine Übersicht über die Metadaten.
-      \ii Meta-Daten werden im Link-Prozess ergänzt und festgelegt.
+      \ii \texttt{readelf -a ELF} liefert eine Übersicht über die Metadaten
+      \ii Metadaten werden im Link-Prozess ergänzt und festgelegt
       \ei
     }
     \ii Ein ELF beinhaltet zwei Sichten auf Programmdaten {
@@ -1194,7 +1194,7 @@ Daher müssen wir noch kurz besprechen, was nach dem Übersetzer kommt um ein vo
 Diskutieren werden wir diesen weiteren Lebenslauf unseres Programms anhand es ELF-Dateiformats, welches unter Linux verwendet wird um bereits übersetzte Programme und Programmfragmente so speichern und welche auch die Basis für die Ausführung eines Programms im Rahmen eines Prozesses darstellt[fn::Sollte ihnen der Unterschied zwischen Programm und Prozess nicht klar sein, schauen Sie sich noch einmal die zugehörigen Folien in der Veranstaltung "Grundlagen der Betriebssysteme" an.].
 ELF ist also der zentrale Angelpunkt um binär-codierten Maschinencode zu speichern und zur Ausführung zu bringen.
 
-ELF ist auch eng verbunden mit der *separaten Übersetzung* von Quellcodedateien. Dabei wird der Übersetzer für mehrere Quelldateien separat aufgerufen, mit dem Zwischenschritt über den Assembler, ein Objekt-Datei erstellt. Diese Objektdateien, die bereits Binärdaten enthalten und dem ELF-Format entrsprechen, werden dann vom *Linker* zu ein großen ELF-Datei zusammengebunden. Dabei werden symbolische Referenzen zwischen den Objektdateien aufgelöst, sodass es möglich ist eine Funktion, die in einer anderen Objekt-Datei definiert ist, aufzurufen.
+ELF ist auch eng verbunden mit der *separaten Übersetzung* von Quellcodedateien. Dabei wird der Übersetzer für mehrere Quelldateien separat aufgerufen, mit dem Zwischenschritt über den Assembler, ein Objekt-Datei erstellt. Diese Objektdateien, die bereits Binärdaten enthalten und dem ELF-Format entsprechen, werden dann vom *Linker* zu ein großen ELF-Datei zusammengebunden. Dabei werden symbolische Referenzen zwischen den Objektdateien aufgelöst, sodass es möglich ist eine Funktion, die in einer anderen Objekt-Datei definiert ist, aufzurufen.
 
 Ebenfalls spielt das ELF-Format eine zentrale Rolle für die gemeinsame Verwendung von Bibliotheken.
 Durch diese "Shared Libraries" kann Binärcode in mehreren Programmen und Prozessen verwenden werden, ohne ihn mehrfach auf Platte bzw. im RAM zu halten. Die Verbindung zu ELF ist, dass auch diese geteilten Bibliotheken im ELF-Format gespeichert sind.
@@ -1218,7 +1218,7 @@ Beide schauen wir uns nun an.
       \end{column}\hfill
       \begin{column}{0.65\textwidth}
         \bii
-        \ii Assembler erzeugt Objektdatei im ELF Format{
+        \ii Assembler erzeugt Objektdatei im ELF-Format{
           \bi
           \ii Assembler-Befehle werden zu Maschinencode 
           \ii Pseudo-Instruktionen steuern die Codeerzeugung
@@ -1228,7 +1228,7 @@ Beide schauen wir uns nun an.
         \ii<2-> \structure{Sektionen} enthalten Daten, Code und Metadaten{%
           \bi
           \ii Flags: Allokiert(A), Ausführbar(X), Schreibbar(W)
-          \ii Relative Sprünge (\ircmd{Goto}) bereits aufgelößt
+          \ii Relative Sprünge (\ircmd{Goto}) bereits aufgelöst
           \ii Lücken für noch unbekannte Werte
           \ii Tool: \fbox{\texttt{objdump -D ELF}}
           \ei
@@ -1242,7 +1242,7 @@ Beide schauen wir uns nun an.
         }\medskip
         \ii<2-> \structure{Relokationen} sind Modifikationsregeln {
           \bi
-          \ii Wo muss der Linker den Code modifizeren
+          \ii Wo muss der Linker den Code modifizieren?
           \ii Bsp.: \texttt{\&fib} wird als PC-relative Adresse eingefügt
           \ii Tool: \fbox{\texttt{objdump -r ELF}}
           \ei
@@ -1258,7 +1258,7 @@ Beide schauen wir uns nun an.
   \end{frame}
 #+end_src
 
-Zuerst betrachten wir uns den *Link View* der, wie der Name es andeutet beim Linken von mehreren Objektdateien zu einem ausführbaren Programm verwendet wird. Erzeugt werden die Objektdateien vom Assembler, der aus den *Mnemonics* [fn::Das Wort lässt sich in etwa mit Merkspruch übersetzen und es ist selbst das genaue Gegenteil von dem was es bedeuetet. Ich finde es überhaupt nicht leicht zu merken.] Binärcode erstellt. Neben den Assemblerzeilen als Maschinenbefehle codieren, gibt es auch noch Pseudo-Instruktionen, die die Erzeugung der ELF-Datei steuern. So gibt der Pseudobefehl ~.text~ an, dass ab nun Code kommt, während ~.data~ angibt dass nun Daten folgen. Außerdem beinhaltet Assembler symbolische Namen (~main~, ~foo~), die der Prozessor nicht unterstützt, und die daher in des ELFs landen müssen.
+Zuerst betrachten wir uns den *Link View* der, wie der Name es andeutet beim Linken von mehreren Objektdateien zu einem ausführbaren Programm verwendet wird. Erzeugt werden die Objektdateien vom Assembler, der aus den *Mnemonics* [fn::Das Wort lässt sich in etwa mit Merkspruch übersetzen und es ist selbst das genaue Gegenteil von dem was es bedeutet. Ich finde es überhaupt nicht leicht zu merken.] Binärcode erstellt. Neben den Assemblerzeilen als Maschinenbefehle codieren, gibt es auch noch Pseudo-Instruktionen, die die Erzeugung der ELF-Datei steuern. So gibt der Pseudobefehl ~.text~ an, dass ab nun Code kommt, während ~.data~ angibt dass nun Daten folgen. Außerdem beinhaltet Assembler symbolische Namen (~main~, ~foo~), die der Prozessor nicht unterstützt, und die daher in des ELFs landen müssen.
 Der Link-View besteht hauptsächlich aus drei wichtigen Elementen: Sektionen, Symbole und Relokationen.
 
 *Sektionen* beinhalten die eigentlichen Binärdaten, die können im Fall der Text-Sektion Maschinenbefehle  sind, und im Falle der Daten-Sektion vorinitialisierte globale Variablen. Sektionen haben also, in der ELF-Datei, einen Anfang, eine Länge und einen Namen. Außerdem hat jede Sektion noch Flags, die angeben ob der Inhalt der Sektion einmal in den Prozess geladen werden soll (A), dort ausführbar ist (X) oder geschrieben werden soll (W). Da der Assembler noch nicht alle symbolischen Referenzen auflösen kann (z.B. zu Funktionen aus anderen Objekt-Dateien), lässt er an entsprechender Stelle Platzhalter, die vom Linker aufgefüllt werden. Sie sollten einmal her gehen und eine Objektdatei mittels ~readelf -a~ (Metadaten) ~objdump -D~ (Disassembly) dekodieren um ein Gefühl für den Inhalt dieser Sektionen zu bekommen.
@@ -1269,9 +1269,9 @@ In dieser sind symbolische Namen deklariert.
 Wenn diese in dieser ELF-Datei definiert sind, so referenziert ein Symbol ein bestimmtes Byte in einer der Sektionen.
 So zeugt das Symbol ~main~ in die Text-Sektion (~T~) auf das Byte mit dem Wert ~0x55~, was dem IA-32 Befehl ~push %ebp~ entspricht und den Beginn der Funktion markiert.
 Aber ein Symbol kann auch noch undefiniert (~U~) sein, wie das bei ~fib~ der Fall ist.
-Eine solche Situation zeigt an, dass das Symbol in einer anderen Objekt-Datei definiert sein muss.
+Eine solche Situation zeigt an, dass das Symbol in einer anderen Objektdatei definiert sein muss.
 Die Auflösung der undefinierten Symbole übernimmt der Linker.
-Um sich die Symbole einer ELF-Datei zu betrachten, rufen Sie einmal das Tool ~nm~ auf einer Objektdatei auf.
+Um die Symbole einer ELF-Datei zu betrachten, rufen Sie einmal das Tool ~nm~ auf einer Objektdatei auf.
 
 Außerdem gibt es noch die Liste der *Relokationen*.
 Diese Relokationen sind Anweisungen wie der Binärcode beim Linken bzw.
@@ -1283,15 +1283,15 @@ Da manche Platzhalter eine relative (Funktionsaufrufe auf IA-32 sind Funktionsre
 
 Relokationen spielen sowohl beim Linken als auch beim Laden eine Rolle. Wenn ein Programm es erlauben soll, an unterschiedliche Stellen in den RAM geladen zu werden, so müssen alle Codestellen, die eine absolute Adressieren verlangen, entsprechend angepasst werden. Insbesondere bei geteilten Bibliotheken spielen diese Run-Time Relocations eine große Rolle.
 
-Was geschiet nun also beim Linken mehrerer Objektdateien?
+Was geschieht nun also beim Linken mehrerer Objektdateien?
 Wir rufen den Linker mit mehreren Objektdateien (~main.o~, ~foo.o~) auf.
 Dieser sammelt Sektionen gleichen Namens ein und hängt diese im Ergebnis-ELF hintereinander.
 Wichtig zu verstehen ist, dass nicht einzelne Funktionen die Granularität des Linkers ist, sondern ganze Sektionen.
 
-Nachdem die Sektionen gesammelt und verbunden sind, wird auch die Symboltabelle vereinigt. Dabei werden undefinierte Symbole, soweit möglich, durch definierte Symbole aus anderen Objekt-Dateien (oder aus Bibliotheken) augelöst. Soll am Ende eine ausführbare Datei entstehen, darf kein Symbol unaufgelöst bleiben. Ist dies doch der Fall kommt es zum Fehler zu einem Linker Fehler.
+Nachdem die Sektionen gesammelt und verbunden sind, wird auch die Symboltabelle vereinigt. Dabei werden undefinierte Symbole, soweit möglich, durch definierte Symbole aus anderen Objekt-Dateien (oder aus Bibliotheken) ausgelöst. Soll am Ende eine ausführbare Datei entstehen, darf kein Symbol unaufgelöst bleiben. Ist dies doch der Fall kommt es zum Fehler zu einem Linker Fehler.
 
 Zusätzlich werden beim Linken alle Relokationen aufgelöst, die nun auf nun definierte Symbole zeigen.
-Dazu modifiziert der Linker die Platzhalter in den Sektionen entsprechend des Relokations-Typs und des Symbolwertes.
+Dazu modifiziert der Linker die Platzhalter in den Sektionen entsprechend des Relokationstyps und des Symbolwertes.
 Betrachten Sie sich hierzu die beiden Relokationen:
 Beides sind PC-relative Relokationen (~R_386_PC32~), die das Symbol ~fib~ referenzieren[fn::~e8 xx xx xx xx~ ist ein ~call~-Befehl].
 Die obere Lücke ist in ~main()~ und führt daher einen Sprung nach vorne (um 5 Bytes aus), während die zweite Lücke ein PC-relativ nach hinten springt (der Rekursionsschritt).
@@ -1303,7 +1303,7 @@ Kann eine Relokation bereits vollständig beim Linken durchgeführt werden, so m
     \ii Linker  und Loader haben unterschiedliche Sichten auf die Binärdatei{
       \bi
       \ii Der Loader arbeitet mit Segmenten und Bibliotheksreferenzen
-      \ii Der Lade-Prozess soll möglichst schnell und einfach sein
+      \ii Der Ladeprozess soll möglichst schnell und einfach sein
       \ii Sektionen (und Symbole) werden für den Load View nicht benötigt \hfill \texttt{strip}
       \ei
     }\medskip
@@ -1313,11 +1313,11 @@ Kann eine Relokation bereits vollständig beim Linken durchgeführt werden, so m
       \ii Im Prozess: \btUseTab Ziel-Adresse, Länge der Allokation und Zugriffsrechte
       \ei
     }\medskip
-    \ii \structure{Shared Libraries} sind ebenfalls ELF Dateien {
+    \ii \structure{Shared Libraries} sind ebenfalls ELF-Dateien {
       \bi
       \ii Symbole können für andere ELF-Dateien exportiert werden
-      \ii ELF Dateien können Bibliotheken und exportiere Symbole anfordern
-      \ii Angeforderte Bibliotheken werden mitgeladen und die Importe aufgelößt
+      \ii ELF-Dateien können Bibliotheken und exportiere Symbole anfordern
+      \ii Angeforderte Bibliotheken werden mitgeladen und die Importe aufgelöst
       \ei
     }
     \ei
@@ -1381,7 +1381,7 @@ Alles in allem ist ein ELF-Loader ein relativ einfaches Stück Code, das in eini
     }\medskip
     \ii<3-> \alert{Besonderheiten} von Shared Libraries beim Ladeprozess {
       \bi
-      \ii Das Auflösen der importierten Symbole (Linken) geschiet zur Ladezeit
+      \ii Das Auflösen der importierten Symbole (Linken) geschieht zur Ladezeit
       \ii Bibliothek kann in jedem Prozess woanders geladen sein
       \ii[$\Rightarrow$] Bibliothekscode muss verschiebbar sein 
       \ei
@@ -1431,13 +1431,13 @@ Ohne Argumente wird es Sie nur über seine Fähigkeiten in einer Hilfemeldung in
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
-    \ii Maschinencode-Erzeugung schließt die verbleibende \structure{semantische Lücke} {
+    \ii Maschinencodeerzeugung schließt die verbleibende \structure{semantische Lücke} {
       \bi
       \ii Abbildung der IR-Maschine $\Rightarrow$ reale Maschine mit \alert{endlichen Ressourcen}
       \ii Komplexe Befehlssätze und keine Abstraktion vom Speicher
       \ei
     }\medskip
-    \ii \structure{Call-Frame} enthält Argumente, Rücksprungadresse und Variablen-Slots{
+    \ii \structure{Call-Frame} enthält Argumente, Rücksprungadresse und Variablenslots{
       \bi
       \ii Jede Funktionsinstanz hat ihren eigenen Call-Frame
       \ii Caller und Callee halten sich an die \structure{Aufrufkonvention}
@@ -1447,7 +1447,7 @@ Ohne Argumente wird es Sie nur über seine Fähigkeiten in einer Hilfemeldung in
     \ii \structure{Befehlsauswahl} und \structure{Registerallokation} sind NP-vollständige Probleme {
       \bi
       \ii Die Minimallösung besteht aus Makroexpansion und \alert{ständigem Spilling}
-      \ii Verbesserte Registerallokation sieht Registersatz als Cache für Variablen-Slots
+      \ii Verbesserte Registerallokation sieht Registersatz als Cache für Variablenslots
       \ei
     }\medskip
     \ii ELF: Dateiformat für Objektdateien, Programme und Bibliotheken {
