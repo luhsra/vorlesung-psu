@@ -221,8 +221,8 @@
         \begin{column}{0.49\textwidth}
            \begin{code}[tag=Haskell]
              \begin{haskell}
-               data Tree t = Leaf T
-                           | Node (Tree t) (Tree t)
+               data Tree T = Leaf T
+                           | Node (Tree T) (Tree T)
                freeTree :: Tree Char
                freeTree = Node
                             (Node
