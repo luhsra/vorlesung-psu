@@ -407,7 +407,7 @@ Außerdem sind 3-Adress-Maschinen sehr nahe daran, wie aktuelle RISC-Prozessoren
 
 Um uns die Codeerzeugung im Detail anschauen zu können, wollen wir nun eine *beispielhafte* 3-Adress-Maschine mit zugehörigem Zwischencode definieren.
 Dabei der Funktionsumfang dieser Maschine nicht vollumfänglich, sodass jede beliebige Programmiersprache darauf abgebildet werden kann.
-Insbesondere ist der Umfang der arithmetischen, logischen und bit-weisen Operationen sehr eingeschränkt.
+Insbesondere ist der Umfang der arithmetischen, logischen und bitweisen Operationen sehr eingeschränkt.
 
 Zweck dieser IR-Code-Beschreibung ist es, eine Grundlage für die darauf folgende IR-Code-Erzeugung zu legen.
 Weiterhin werden wir genau diesen in der Übung verwenden, um ein vollständiges Backend, inklusive einem einfachen Optimierer, zu konstruieren.
@@ -438,7 +438,7 @@ Wir müssen uns an dieser Stelle noch keine Gedanken darum machen, wo unsere lok
 Außerdem können wir jede Funktion für sich übersetzen, optimieren und zu Maschinencode überführen.
 Sie können sich die IR-Funktionen und ihre Funktionsaufrufe wie ein Hochsprachen-Gerüst vorstellen, welches wir mit Befehlen von deutlich niedrigerem Abstraktionsgrad füllen.
 
-Bei den *einfachen Befehlen* beschränken wir uns auf die 4 Grundrechenarten und lassen alle Bit-weisen Operationen aus. Zwar könnten wir all diese ebenfalls in den Funktionsumfang aufnehmen, würden dadurch jedoch nur wenig Erkenntnis gewinnen, außer dass man an allen Stellen nicht nur zwischen 4 Operationen, sonder zwischen 45 Operationen unterscheiden muss. Zu Gunsten der Übersichtlichkeit bleiben wir hier, absichtlich, unvollständig.
+Bei den *einfachen Befehlen* beschränken wir uns auf die 4 Grundrechenarten und lassen alle bitweisen Operationen aus. Zwar könnten wir all diese ebenfalls in den Funktionsumfang aufnehmen, würden dadurch jedoch nur wenig Erkenntnis gewinnen, außer dass man an allen Stellen nicht nur zwischen 4 Operationen, sonder zwischen 45 Operationen unterscheiden muss. Zu Gunsten der Übersichtlichkeit bleiben wir hier, absichtlich, unvollständig.
 
 Bei den *logischen Operationen* beschränken wir uns auf das Kleiner-Gleich (~<=~).
 Dies ist tatsächlich keine Einschränkung, da alle anderen Vergleichsoperationen daraus abgeleitet werden können.

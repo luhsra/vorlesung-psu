@@ -251,7 +251,7 @@ Würden wir zwei Kontrollflüsse, einmal vom optimierten Programm und einmal vom
     }\medskip
     \ii Optimierungen analysieren und transformieren \textbf{Programmausschnitte} {
       \bi
-      \ii Wie groß ist der Ausschnitt, über den wir wissen extrahieren?
+      \ii Wie groß ist der Ausschnitt, über den wir Wissen extrahieren?
       \ii Instruktionen, einzelne Basisblöcke, eine ganze Funktion, eine Aufrufhierarchie, mehrere interagierende Threads
       \ei
     }
@@ -1172,7 +1172,7 @@ Zeichnet man ein Diagramm, bei dem man mit Pfeilen ausdrückt, welche Optimierun
 Dies bedeutet, dass keine lineare Optimierungssequenz jemals das bestmögliche Ergebnis liefern kann; Optimierungen sollten also mehrfach ausgeführt werden.
 
 Ein Möglichkeit die einzelnen Optimierungsroutinen zu komponieren ist es, eine Fixpunkt-Iteration zu unternehmen.
-Dazu bekommt jede Routine einen Rückgabewert, der anzeigt ob, sie eine Änderung an der IR-Funktion vorgenommen hat.
+Dazu bekommt jede Routine einen Rückgabewert, der anzeigt, ob sie eine Änderung an der IR-Funktion vorgenommen hat.
 Nun führen wir alle Optimierungen solange aus, bis keine Routine mehr eine Änderung vorgenommen hat.
 Natürlich gibt es noch klügere Methoden diese Komposition vorzunehmen, zum Beispiel indem man den Abhängigkeitsgraphen beachtet, aber für einen möglichst einfachen Übersetzer ist die naive Fixpunktiteration eine gute Möglichkeit, die Optimierungsroutinen wiederholt auf einer Funktion auszuführen.
 

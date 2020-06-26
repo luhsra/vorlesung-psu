@@ -135,7 +135,7 @@ Sollten Sie etwas neugierig auf diesen Aspekt sein, kann ich Ihnen das Papier zu
 
   #+begin_src latex
   \dividerframe{Einfache\\Operationen}
-  \begin{frame}[fragile]{Arithmetische, Bit-weise und logische Operationen}
+  \begin{frame}[fragile]{Arithmetische, bitweise und logische Operationen}
     \begin{center}
       {\Large \verb!+ - * / %     ~ & | ^ << >>  < <= == => >!}
       \OrangeBox<2-|handout:2>{Notation, Vorrang und Assoziativität wird vom Parser aufgelöst.}
@@ -170,7 +170,7 @@ Sollten Sie etwas neugierig auf diesen Aspekt sein, kann ich Ihnen das Papier zu
 #+end_src
 
 
-Zunächst beschäftigen wir uns mit *arithmetischen, bit-weisen und logischen Operationen*, die in allen Programmiersprachen auftauchen, da wir ansonsten nichts ausrechnen können.
+Zunächst beschäftigen wir uns mit *arithmetischen, bitweisen und logischen Operationen*, die in allen Programmiersprachen auftauchen, da wir ansonsten nichts ausrechnen können.
 Sie sind gewissermaßen die Brot- und Butteroperationen, bei denen man nichts aufregendes erwarten darf.
 Sie haben einen (*unäre Operationen*) oder zwei (*binäre Operationen*) Quelloperanden und ein *temporäres Objekt* als Zieloperand.
 Ihre Schnittstelle und ihr Verhalten sind, nebst einiger kleiner Abweichungen, in allen Sprachen gleich und es gibt nur bei der Notation Unterschiede.
@@ -276,7 +276,7 @@ Kurz gesagt: Das geht nicht bzw. es geht halt kaputt, weil die Multiplikation da
 Wenn wir diese, etwas Umgangssprachlich umschriebene Situation etwas gewählter ausdrücken wollen würden, würden wir sagen: /"Die Multiplikation ist abhängig vom Ergebnis der Addition"/.
 Da real existierende sequentielle Maschinen *nicht* in die Zukunft blicken können[fn::Wie schön wäre es doch nicht-deterministische Turing-Maschinen zu haben, die da viel flexibler sind.], folgt daraus direkt, dass die Addition vor der Multiplikation ausgeführt werden muss.
 
-Für die einfachen Operationen (arithmetisch, bit-weise, logisch) sind die Abhängigkeiten ganz einfach:
+Für die einfachen Operationen (arithmetisch, bitweise, logisch) sind die Abhängigkeiten ganz einfach:
 Die Operation hängt von ihren jeweiligen Kindern ab, diese müssen also vorher ausgewertet werden; wir haben eine streng hierarchische Struktur von Abhängigkeiten.
 Wir werden im folgenden Unterkapitel Sprachkonstrukte kennenlernen, mit denen wir die Ausführungsreihenfolge über diese hierarchische Struktur hinaus formen können.
 Zum Beispiel indem wir sagen: Diese zwei Operationen müssen immer in dieser Reihenfolge ausgeführt werden (Sequenzierung:
@@ -572,7 +572,7 @@ Sequenzierung und der Umgang mit Rückgabewerten führt in den meisten Programmi
 Jede Operation, die bei der Auswertung einen Rückgabewert liefert, ist ein Ausdruck (oder auch Expression).
 Daher müssen Ausdrücke in statisch typisierten Sprachen einen Rückgabetyp haben.
 Da sie einen Wert liefern, können sie als Operanden für andere Operationen dienen. 
-Alle arithmetischen, bit-weisen und logischen Operationen sind Ausdrücke!
+Alle arithmetischen, bitweisen und logischen Operationen sind Ausdrücke!
 
 Statements dagegen haben *keinen Rückgabewert* und können daher nicht an beliebigen Stellen als Operanden auftauchen.
 Statements dienen lediglich der Strukturierung und der Sequenzierung des Programms und treten als Operanden von Sprachkonstrukten auf.
