@@ -513,7 +513,7 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
         \end{btBlock}
 
         \bii
-        \ii<2-> Abbildung meinst nicht eindeutig {\\[1ex]
+        \ii<2-> Abbildung meist nicht eindeutig {\\[1ex]
           \enquote{AMD64 kennt 36 \texttt{mov}-Varianten}\\[1ex]
           \bi
           \ii Unterschiedliche Programmgröße
@@ -527,7 +527,7 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
       \end{column}\hfill
       \begin{column}{0.49\textwidth}
         \begin{btBlock}{\hfill\tikzmark{B}Registerallokation\hfill\mbox{}}
-          Bestimme, in welchen Abschnitten eine IR-Variable in ihrem Slot oder in einem CPU Register lebt.
+          Bestimme, in welchen Abschnitten eine IR-Variable in ihrem Slot oder in einem CPU-Register lebt.
         \end{btBlock}
 
         \bii
@@ -535,7 +535,7 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
         \ii<3-> Konsistent für alle Kontrollflüsse
         \ii<3-> Massive Performance-Auswirkung {
           \bi
-          \ii CPU-Register: \hspace{1em}\btSetTab 1 Zyklen
+          \ii CPU-Register: \hspace{1em}\btSetTab 1 Zyklus
           \ii L1-Cache (Hit):     \btUseTab 4 Zyklen
           \ii L2-Cache (Hit):     \btUseTab 10 Zyklen
           \ii Speicher:     \btUseTab 60-100 Zyklen
@@ -547,12 +547,12 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
     \begin{columns}
       \begin{column}<2->{0.49\textwidth}
         \bii
-        \ii[$\Rightarrow$] Für sich: \ALERT{NP-Vollständig}
+        \ii[$\Rightarrow$] Für sich: \ALERT{NP-vollständig}
         \eii
       \end{column}\hfill
       \begin{column}<3->{0.49\textwidth}
         \bii
-        \ii[$\Rightarrow$] Für sich: \ALERT{NP-Vollständig}
+        \ii[$\Rightarrow$] Für sich: \ALERT{NP-vollständig}
         \eii
       \end{column}
     \end{columns}
@@ -573,27 +573,27 @@ Auf diese Weise kann ein Übersetzer den Speicherverbrauch minimieren, was, durc
   \end{frame}
 #+end_src
 
-Nachdem durch die Aufrufkonvention und die Abbildung von IR-Variablen auf Stack-Slots klar ist wie das Datenlayout für einen Call-Frame aussieht, geht es nun darum die IR-Befehl als Maschinenbefehle zu codieren.
-Dazu müssen zwei Entscheidungen getroffen werden: Bei der *Befehlsauswahl* wird für einen IR-Befehl ein einzelner oder eine Sequenz von Maschinenbefehlen ausgewählt. Bei der *Registerallokation* entscheiden wir zu welchem Zeitpunkt eine Variable in ihrem Slot lebt und wann sie in einem CPU Register zu finden ist. Haben wir beide Probleme gelöst können wir die Maschinenbefehle, zusammen mit den passenden Registeroperanden als Assembler raus schreiben und sind fertig mit der Übersetzung. Also eigentlich ganz einfach, wären da nicht zwei NP-Vollständige Probleme.
+Nachdem durch die Aufrufkonvention und die Abbildung von IR-Variablen auf Stack-Slots klar ist, wie das Datenlayout für einen Call-Frame aussieht, geht es nun darum, die IR-Befehle als Maschinenbefehle zu codieren.
+Dazu müssen zwei Entscheidungen getroffen werden: Bei der *Befehlsauswahl* wird für einen IR-Befehl ein einzelner oder eine Sequenz von Maschinenbefehlen ausgewählt. Bei der *Registerallokation* entscheiden wir, zu welchem Zeitpunkt eine Variable in ihrem Slot lebt und wann sie in einem CPU-Register zu finden ist. Haben wir beide Probleme gelöst, können wir die Maschinenbefehle zusammen mit den passenden Registeroperanden als Assembler rausschreiben und sind fertig mit der Übersetzung. Also eigentlich ganz einfach, wären da nicht zwei NP-vollständige Probleme.
 
 Zum einen ist die Befehlsauswahl nicht so einfach:
 Viele Prozessoren, insbesondere CISC-Architekturen, haben viele Varianten eines einzelnen Befehls, die sich alle, mehr oder weniger stark, in ihrer Semantik und in ihren nicht-funktionalen Eigenschaften unterscheiden.
-So kennt die AMD64 Architektur 36 verschiedene Varianten von ~mov~, die im Assembler alle mit dem ~mov~-Opcode notiert werden.
-Außerdem ist nicht für jeden IR-Befehl 1:1 Abbildung möglich, sondern es wird eine 1:N Abbildung auf Maschinenbefehle benötigt um die geforderte Funktionalität umzusetzen.
+So kennt die AMD64-Architektur 36 verschiedene Varianten von ~mov~, die im Assembler alle mit dem ~mov~-Opcode notiert werden.
+Außerdem ist nicht für jeden IR-Befehl eine 1:1 Abbildung möglich, sondern es wird eine 1:N Abbildung auf Maschinenbefehle benötigt, um die geforderte Funktionalität umzusetzen.
 Das ganze wird noch schlimmer, weil die Betrachtung mehrerer IR-Befehle in einer M:N Weise zu besseren Übersetzungsergebnissen führt.
 Alles in allem hat sich herausgestellt, dass eine optimale Befehlsauswahl ein NP-vollständiges Problem ist.
 
 Zum anderen ist auch die Registerallokation ein Problem:
-Die Entscheidung welche Variable zu welchem Zeitpunkt in welchem Register lebt hat zum einen massive Auswirkungen auf die Performance des Programms.
-Dies rührt daher, dass Zugriffe auf den Speicher viel, viel langsamer sind als auf Register[fn::siehe: [[https://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.html][Your computer is already a distributed system. Why isn't your OS?]]][fn::Zugriffszeiten von [[https://stackoverflow.com/a/4087315][Stackoverflow]].]
-Daher kostet jeder Transfer zwischen Stack-Slot und Register richtig viel Zeit und wir möchten davon, während der Laufzeit, möglichst wenige Slot-Register-Transfers haben.
-Aber Registerallokation ist auch ein kompliziertes Problem, wenn man Variablen über Basisblockgrenzen hinweg im Register halten will.
-Erwartet der Code eines Basisblocks, zum Beispiel, eine Variable in einen bestimmtem Register, so müssen alle Vorgängerblöcke dafür sorgen, dass die Variable auch tatsächlich in diesem Register geladen ist.
-Da der CFG im Allgemeinen, aber weder linear noch azyklisch ist, haben wir es hier mit einer zyklischen Rückkopplung solcher Bedingungen zu tun.
+Die Entscheidung, welche Variable zu welchem Zeitpunkt in welchem Register lebt, hat zum einen massive Auswirkungen auf die Performance des Programms.
+Dies rührt daher, dass Zugriffe auf den Speicher viel, viel langsamer sind als auf Register[fn::siehe: [[https://www.usenix.org/legacy/events/hotos09/tech/full_papers/baumann/baumann_html/index.html][Your computer is already a distributed system. Why isn't your OS?]]][fn::Zugriffszeiten von [[https://stackoverflow.com/a/4087315][Stackoverflow]].].
+Daher kostet jeder Transfer zwischen Stack-Slot und Register richtig viel Zeit und wir möchten während der Laufzeit möglichst wenige Slot-Register-Transfers haben.
+Aber Registerallokation ist auch ein kompliziertes Problem, wenn man Variablen über Basisblockgrenzen hinweg im Register halten möchte.
+Erwartet der Code eines Basisblocks zum Beispiel eine Variable in einem bestimmten Register, so müssen alle Vorgängerblöcke dafür sorgen, dass die Variable auch tatsächlich in diesem Register geladen ist.
+Da der CFG im Allgemeinen aber weder linear noch azyklisch ist, haben wir es hier mit einer zyklischen Rückkopplung solcher Bedingungen zu tun.
 Alles in allem hat sich herausgestellt, dass eine optimale Registerallokation ein NP-vollständiges Problem ist.
 
 Aber das ganze wird noch schlimmer, da Befehlsauswahl und Registerallokation miteinander interagieren:
-Nicht jede Befehlssequenz, die die Befehlsauswahl in Betracht zieht braucht gleich Register.
+Nicht jede Befehlssequenz, die die Befehlsauswahl in Betracht zieht, braucht gleich Register.
 Und nicht jeder Maschinenbefehl kann mit jedem Register aufgerufen werden.
 Außerdem gibt es auch noch Befehle, die als Seiteneffekt den Inhalt von Registern verändern. Alles in allem: Die Kombination aus Registerallokation und Befehlsauswahl ist ein richtig richtig dickes Brett.
 
@@ -621,7 +621,7 @@ Außerdem gibt es auch noch Befehle, die als Seiteneffekt den Inhalt von Registe
       \ii<handout:5-|5-> \structure{Spilling}: Variablenwert aus einem Register in den Speicher schreiben.\\[1ex]
       \ii<handout:5-|5-> Variablen immer neuladen
       \ii<handout:5-|5-> Ergebnisse direkt spillen
-      \ii<handout:6-|6-> Jede Variable hat einen Speicher-Slot
+      \ii<handout:6-|6-> Jede Variable hat einen Speicherslot
       \ei
     }
     \ei
@@ -716,7 +716,7 @@ Außerdem gibt es auch noch Befehle, die als Seiteneffekt den Inhalt von Registe
 
   \begin{tikznodeenv}[name=C]\begin{minipage}{\textwidth}
     \bi
-    \ii<6-> Starre Befehlsreihenfolge \alert{ignorieren moderne Mikroarchitekturen}{
+    \ii<6-> Starre Befehlsreihenfolgen \alert{ignorieren moderne Mikroarchitekturen}{
       \bi
       \ii Moderne Prozessoren arbeiten Pipelined, Out-of-Order und Superskalar
       \ii Befehle können im \enquote{Windschatten} anderer Befehle ausgeführt werden
@@ -740,49 +740,49 @@ Außerdem gibt es auch noch Befehle, die als Seiteneffekt den Inhalt von Registe
     }
   \end{frame}
 #+end_src
-Und immer wenn der Informatiker nicht weiter weiß, besinnt man sich auf die einfachste Methode das Problem zu lösen und überlegt sich danach an welchen Stellen man die Methode verbessern kann[fn::Wichtig bei einem solchen Vorgehen inkrementeller Verbesserungen, ist aber, dass man sich leicht in ein lokales Optimum manövrieren kann. Um dies zu vermeiden lohnt es sich eine optimale Lösung zu formulieren, egal wie aufwendig diese ist.]
-Dieser einfachste Basisfall für die Maschinencodeerzeugung wird uns dabei helfen das Problem genauer zu verstehen, bevor wir einen Vorschlag diskutieren, wie wir diese Minimallösung verbessern können. 
+Und immer wenn der Informatiker nicht weiter weiß, besinnt man sich auf die einfachste Methode, das Problem zu lösen und überlegt sich danach, an welchen Stellen man die Methode verbessern kann[fn::Wichtig bei einem solchen Vorgehen inkrementeller Verbesserungen ist aber, dass man sich leicht in ein lokales Optimum manövrieren kann. Um dies zu vermeiden lohnt es sich eine optimale Lösung zu formulieren, egal wie aufwendig diese ist.].
+Dieser einfachste Basisfall für die Maschinencodeerzeugung wird uns dabei helfen, das Problem genauer zu verstehen, bevor wir einen Vorschlag diskutieren, wie wir diese Minimallösung verbessern können.
 Die Minimallösung besteht daraus, dass wir eine Makroexpansion für jeden IR-Befehl durchführen und alle Variablen vor der Sequenz aus dem Slot lesen und direkt danach wieder in zurückschreiben. 
 
 Für die *Makroexpansion* hinterlegen wir für jeden unserer 16 IR-Befehle ein festes Makro, welches wir expandieren, wenn ein solcher Befehl im IR-Programm vorkommt.
 Dieses Makro besteht aus einer Maschinenbefehlsequenz, die einen oder mehrere Instruktionen umfasst.
-An den Stellen an denen Register in die Operanden verwendet würden, enthält das Makro allerdings Platzhalter (R1, R2), die von der Registerallokation gefüllt werden.
-Zusätzlich gibt es noch eine Reihe von Anweisungen welcher IR-Operand in welchen Platzhalter geladen werden soll, und in welchem Platzhalter-Register das Ergebnis zu finden sein wird.
+An den Stellen, an denen Register in den Operationen verwendet werden würden, enthält das Makro allerdings Platzhalter (R1, R2), die von der Registerallokation gefüllt werden.
+Zusätzlich gibt es noch eine Reihe von Anweisungen, welcher IR-Operand in welchen Platzhalter geladen werden soll, und in welchem Platzhalter-Register das Ergebnis zu finden sein wird.
 
 Für jedes Auftreten des IR-Befehls im IR-Programm instantiieren wir das Makro und verbinden die Anweisungen an den Ein- und Ausgängen mit den konkreten Operanden.
 Die Instantiierung des Makros übergeben wir dann an die Registerallokation, die dafür sorgen muss, dass für jeden Platzhalter ein Register ausgewählt wird, die aktuellen Variablen-Werte in den Register landen, und das Ergebnis im Zieloperanden landet.
 
 Die einfachste Variante einer Registerallokation ist ein Spilling-Registerallokator.
 Bei dieser Art der Registerallokation betrachten wir immer nur einen einzigen Befehl:
-Vor dem Befehl laden wir alle Variablen frisch aus ihrem fix-zugeordneten Stack-Slot in ein Register.
+Vor dem Befehl laden wir alle Variablen frisch aus ihrem fix zugeordneten Stack-Slot in ein Register.
 Nachdem die Befehlssequenz abgearbeitet ist, wird das Ergebnis sofort wieder in einen Slot zurückgeschrieben.
 Dieses direkte Zurückschreiben führt dazu, dass eine Variable nur für die Dauer einer einzige Instruktion in einem Register lebt.
-Es gibt keinerlei Probleme, dass es über Kontrollflüsse hinweg zu irgendwelchen Inkonsistenzen kommen kann oder wir vergessen irgendeinen Wert zurückzuschreiben. Schick. Schick aber ineffizient.
+Es gibt keinerlei Probleme, dass es über Kontrollflüsse hinweg zu irgendwelchen Inkonsistenzen kommen kann oder wir vergessen, irgendeinen Wert zurückzuschreiben. Schick. Schick, aber ineffizient.
 
 *Ineffizienz* ist genau das Problem dieser minimalen Maschinencodeerzeugung.
 An (mindestens) drei Stellen wird das Potential der Maschine nicht voll ausgenützt:
 Zum einen transferieren wir ständig Variablen-Werte zwischen Speicher und Register hin und her, egal ob diese vielleicht schon ein einem Register vorgeladen sind.
-Allein am Anteil bei dem ~Add~-Beispiel, bei dem 3 von 4 Befehlen nur Transfers waren, dass ein Hauptteil unseres Programms sich damit beschäftigt den Speicher zu beschäftigen.
-Viel klüger wäre es nur das aus dem Speicher zu laden, was nicht schon im Register ist und Werte, noch einmal verwendet werden, solange es irgendwie geht in Registern zu halten.
+Allein am ~Add~-Beispiel, bei dem 3 von 4 Befehlen nur Transfers waren, wird deutlich, dass ein Hauptteil unseres Programms sich damit beschäftigt, den Speicher zu beschäftigen.
+Viel klüger wäre es, nur das aus dem Speicher zu laden, was nicht schon im Register ist und Werte noch einmal verwendet werden, solange es irgendwie geht, diese in Registern zu halten.
 
 Das zweite Problem ist, dass die starren Makros komplexere Fähigkeiten der CPU nicht ausnützen können.
 Insbesondere bei CISC Maschinen kann ein einzelner Befehl eine sehr komplexe Semantik haben.
-Auf den Folien sehen Sie eine Adressberechnung für ein Array, dass einmal naive aus drei Makros zusammengesetzt wurde, und einmal der passende IA-32 Befehl, der in einem Rutsch ~%eax+8*%ebx~ rechnet und dereferenziert.
-Die Besonderheiten der Prozessor-Architektur werden also nicht vollständig ausgenützt.
+Auf den Folien sehen Sie eine Adressberechnung für ein Array, das einmal naiv aus drei Makros zusammengesetzt wurde, und einmal den passenden IA-32 Befehl, der in einem Rutsch ~%eax+8*%ebx~ rechnet und dereferenziert.
+Die Besonderheiten der Prozessorarchitektur werden also nicht vollständig ausgenützt.
 
 In eine ähnliche Richtung, aber unterschiedlich davon, ist das dritte Problem der Minimallösung:
 Die Makroexpansion ignoriert, dass moderne CPUs Befehle nicht stumpf hintereinander ausführen, sondern dass diese mit einer Pipeline arbeiten, Instruktionen in unterschiedlicher Reihenfolge als angegeben ausführen können (Out-of-Order) und überdies noch mehrere funktionale Einheiten haben (Superskalar).
-Dies führt dazu, dass Befehle Quasi im Windschatten anderer Befehle "umsonst" ausgeführt werden können.
-So können in einer Out-of-Order CPU Befehle auf der ALU ausgeführt werden, während ein früherer Befehl noch auf den Speicher wartet.
+Dies führt dazu, dass Befehle quasi im Windschatten anderer Befehle "umsonst" ausgeführt werden können.
+So können in einer Out-of-Order-CPU Befehle auf der ALU ausgeführt werden, während ein früherer Befehl noch auf den Speicher wartet.
 Dieses Problem kann man so zusammenfassen, dass die Besonderheiten der Prozessor-*Mikroarchitektur* nicht ausgenützt werden.
 
 Für all diese Teilaspekte gibt es Methoden die Maschinencodeerzeugung zu verbessern:
 Zum einen kann man bei der Registerallokation mehr als nur einen Befehl auf einmal betrachten und so eine *globalere Registerallokation* durchführen.
-Durch dieses größere Wissen wird die Allokation zwar aufwändiger, das Ergebnis aber um Größenordnungen besser.
-Um die Prozessorarchitektur auszunützen, haben moderne Übersetzer einen *Peephole-Optimizer*, der immer eine fixe Anzahl an Assemblerinstruktionen (z.B. 3 aufeinanderfolgende Befehle) gegen ein Muster-Datenbank vergleicht und durch effizientere Schnipsel ersetzt.
-Um die mikroarchitekturellen Besonderheiten auszunützen kann die *Instruktion-Selection* Assemblerbefehle so umordnen, dass immer noch die gleiche Berechnung durchgeführt wird, aber möglichst viele Instruktionen im Windschatten anderer verdeckt werden.
+Durch dieses größere Wissen wird die Allokation zwar aufwendiger, das Ergebnis aber um Größenordnungen besser.
+Um die Prozessorarchitektur auszunützen, haben moderne Übersetzer einen *Peephole-Optimizer*, der immer eine fixe Anzahl an Assemblerinstruktionen (z.B. 3 aufeinanderfolgende Befehle) mit einer Muster-Datenbank vergleicht und durch effizientere Schnipsel ersetzt.
+Um die mikroarchitekturellen Besonderheiten auszunützen, kann die *Instruktion-Selektion* Assemblerbefehle so umordnen, dass immer noch die gleiche Berechnung durchgeführt wird, aber möglichst viele Instruktionen im Windschatten anderer verdeckt werden.
 
-Im Folgenden greifen wir uns den Aspekt der Registervergabe heraus und diskutieren einen Registerallokator, der nicht so sehr unter Amnesie leidet und sich, über den Verlauf eines einzelnen Basisblocks hinweg, merkt, welche Variablen bereits in den  Registersatz transferiert wurden.
+Im Folgenden greifen wir uns den Aspekt der Registervergabe heraus und diskutieren einen Registerallokator, der nicht so sehr unter Amnesie leidet und sich, über den Verlauf eines einzelnen Basisblocks hinweg, merkt, welche Variablen bereits in den Registersatz transferiert wurden.
 
 #+begin_src latex
   \begin{frame}[fragile]{Ein Registerallokator mit Gedächtnis}
@@ -852,33 +852,33 @@ Im Folgenden greifen wir uns den Aspekt der Registervergabe heraus und diskutier
 
 
 Zuerst müssen wir die Weltsicht dieses Allokators grundlegend erklären:
-Dieser Allokator mit Gedächtnis sieht den Registersatz als eine Art schnelle Zwischenspeicher (Cache) für die Slots der Variablen im Speicher an.
-Der Allokator geht einen Basisblock, Instruktion für Instruktion, von oben nach unten, durch und merkt sich währenddessen welche Werte bereits im Cache liegen und welche in den Registersatz geladen werden müssen.
-Für letztere werden dann Load-Befehle emittiert um den Cache zu füllen.
+Dieser Allokator mit Gedächtnis sieht den Registersatz als eine Art schnellen Zwischenspeicher (Cache) für die Slots der Variablen im Speicher.
+Der Allokator geht einen Basisblock Instruktion für Instruktion, von oben nach unten, durch und merkt sich währenddessen, welche Werte bereits im Cache liegen und welche in den Registersatz geladen werden müssen.
+Für letztere werden dann Load-Befehle emittiert, um den Cache zu füllen.
 Außerdem schreibt der Allokator die Werte aus den Registern nicht sofort zurück, wie das bei der Minimallösung der Fall war, sondern erst verzögert (lazy spilling).
 In den Worten der Veranstaltung "Grundlagen der Rechnerarchitektur" verwendet dieser Allokator den Registersatz als einen vollassoziativen Cache mit Write-Back Strategie.
-Wenn ihnen dieser Satz Probleme bereitet, gehen Sie noch einmal zu ihren GRA Unterlagen zurück und lesen Sie dort nach, was damit gemeint ist.
+Wenn Ihnen dieser Satz Probleme bereitet, gehen Sie noch einmal zu Ihren GRA Unterlagen zurück und lesen Sie dort nach, was damit gemeint ist.
 
 Verwendet werden kann der Allokator direkt aus der Makroexpansion heraus.
-Auf den Folien sehen Sie wie die Makroexpansion für den ~Add~-IR-Befehl aussieht.
+Auf den Folien sehen Sie, wie die Makroexpansion für den ~Add~-IR-Befehl aussieht.
 Dabei hat die Expansion über ~self.RA~ Zugriff auf den verwendeten Registerallokator.
-Dieser Verwaltet nicht nur, wie der Name andeutet, die vollen und freien Register, sondern die Zuordnung von Register zu Variablen.
+Dieser verwaltet nicht nur, wie der Name andeutet, die vollen und freien Register, sondern auch die Zuordnung von Register zu Variablen.
 Daher ordnet die Makroexpansion an, dass die linke (~instr.lhs~) und die rechte (~instr.rhs~) in Register geladen sein müssen.
-Dabei gibt das Makro zusätzlich die Information an die Registerallokation, dass Sie gedenkt das Register in dem die rechte Seite geladen (~reg_rhs~) ist zu modifizieren.
-Das eigentliche Makro-Sequenz besteht nur aus der Instruktion ~"add"~, welche in den Assembler ausgegeben bzw.
+Dabei gibt das Makro zusätzlich die Information an die Registerallokation, dass Sie gedenkt, das Register in dem die rechte Seite geladen (~reg_rhs~) ist, zu modifizieren.
+Die eigentliche Makro-Sequenz besteht nur aus der Instruktion ~"add"~, welche in den Assembler ausgegeben bzw.
 emittiert wird.
 Am Ende kommuniziert die Makrosequenz, dass die Zielvariable (~instr.dst~) in ~reg_rhs~ zu finden ist.
 
 Um die Integration von Makroexpansion und Registerallokator vollends zu verstehen, schauen wir uns die API des Registerallokators an.
 In einer funktionalen Hierarchie ist der Registerallokator vollständig abhängig von der Makroexpansion.
-Dies bedeutet, dass die Registerallokation niemals von alleine tätig wird, sondern er an neuralgischen Stellen aufgerufen wird um Variablen zu laden bzw.
-ihm die Chance gibt sich mit der Maschinencodeerzeugung zu synchronisieren.
+Dies bedeutet, dass die Registerallokation niemals von alleine tätig wird, sondern an neuralgischen Stellen aufgerufen wird, um Variablen zu laden bzw.
+ihr die Chance gibt, sich mit der Maschinencodeerzeugung zu synchronisieren.
 
-Durch drei Hooks, die jeweils vor der Maschinencodeerzeugung für eine Funktion, einen Basisblock oder eine einzelne Instruktion, erhält der Allokator die Möglichkeit seine interne Buchführung entsprechend anzupassen. An diesen Stellen findet kein Informationsfluss vom Allokator zur Makroexpansion statt.
+Durch drei Hooks, die jeweils vor der Maschinencodeerzeugung für eine Funktion, einen Basisblock oder eine einzelne Instruktion ausgeführt werden, erhält der Allokator die Möglichkeit, seine interne Buchführung entsprechend anzupassen. An diesen Stellen findet kein Informationsfluss vom Allokator zur Makroexpansion statt.
 
 Anders Verhält es sich bei den Funktionen ~alloc_register()~, ~load()~ und ~write()~.
-Hier bekommt der Allokator einen konkreten Arbeitsauftrag von der Makroexpansion ein Register frei zu räumen, eine Variable in ein Register zu transferieren, bzw. ein Ergebnis-Register mit einer IR-Variable zu verknüpfen.
-Dabei muss die Makroexpansion anfordern können, dass ein konkretes Register alloziert werden soll (~reg~, ~dst_reg~), da manche Maschinenbefehle ihre Operanden in bestimmten Registern erwarten.
+Hier bekommt der Allokator einen konkreten Arbeitsauftrag von der Makroexpansion ein Register freizuräumen, eine Variable in ein Register zu transferieren, bzw. ein Ergebnis-Register mit einer IR-Variable zu verknüpfen.
+Dabei muss die Makroexpansion anfordern können, dass ein konkretes Register allokiert werden soll (~reg~, ~dst_reg~), da manche Maschinenbefehle ihre Operanden in bestimmten Registern erwarten.
 Ohne diese Nebenbedingung darf der Allokator sich das Register frei aussuchen.
 
 #+begin_src latex
@@ -906,17 +906,17 @@ Ohne diese Nebenbedingung darf der Allokator sich das Register frei aussuchen.
   \end{frame}
 #+end_src
 
-Bevor wir zur Funktionalität des Allokators kommen, schauen wir uns an auf welcher Datenbasis der Allokator arbeitet[fn::Grundprinzip um informatische Lösungen zu verstehen:
-Fragen Sie danach was der Zustand (Daten) ist und mit nach welchen Regeln diese verarbeitet werden.].
-Der Zustand unseres verbesserten Allokators besteht aus 3 Felder pro Prozessor-Register, die während der Maschinencodeerzeugung kontinuierlich geupdatet werden.
+Bevor wir zur Funktionalität des Allokators kommen, schauen wir uns an auf welcher Datenbasis der Allokator arbeitet[fn::Grundprinzip, um informatische Lösungen zu verstehen:
+Fragen Sie danach, was der Zustand (Daten) ist und mit nach welchen Regeln dieser verarbeitet wird.].
+Der Zustand unseres verbesserten Allokators besteht aus drei Feldern pro Prozessor-Register, die während der Maschinencodeerzeugung kontinuierlich geupdatet werden.
 
 Das ~free~-Feld zeigt an, ob dieses Register für die aktuelle Instruktion bereits allokiert wurde.
-Da wir sicherstellen müssen, dass die beiden ~load()~ Befehle im ~Add~-Makro unterschiedliche Register bekommen, brauchen wir dieses Boolesche Flag um doppelte Herausgabe zu verhindern.
-Diese Felder werden vor jeder Instruktion, im ~before_Instruction()~-Hook zurück auf ~free=true~ gesetzt.
+Da wir sicherstellen müssen, dass die beiden ~load()~ Befehle im ~Add~-Makro unterschiedliche Register bekommen, brauchen wir dieses Boolesche Flag, um doppelte Herausgabe zu verhindern.
+Diese Felder werden vor jeder Instruktion im ~before_Instruction()~-Hook zurück auf ~free=true~ gesetzt.
 
-Das ~value~-Feld zeigt an ob gerade eine Variable in diesem Register "lebt", und wenn ja, welche. Zu Beginn eines Basisblocks wissen wir von keinem Register, dass es den aktuellen Wert einer Variable beinhaltet, weswegen diese Felder als leer initialisiert werden.
+Das ~value~-Feld zeigt an, ob gerade eine Variable in diesem Register "lebt", und wenn ja, welche. Zu Beginn eines Basisblocks wissen wir von keinem Register, dass es den aktuellen Wert einer Variable beinhaltet, weswegen diese Felder als leer initialisiert werden.
 
-Das ~dirty~-Feld zeigt an, dass der Stack-Slot der Variable und der Register-Inhalt gerade nicht synchronisiert sind und im Stack-Slot nur ein veralteter Wert zu finden ist. Dies bedeutet auch, dass der Wert im Register irgendwann in den Speicher zurück geschrieben werden muss. Der Wert des Booleschen ~dirty~-Flags ist nur dann von Relevanz, wenn dem Register ein IR-Variable in ~value~ zugeordnet ist.
+Das ~dirty~-Feld zeigt an, dass der Stack-Slot der Variable und der Register-Inhalt gerade nicht synchronisiert sind und im Stack-Slot nur ein veralteter Wert zu finden ist. Dies bedeutet auch, dass der Wert im Register irgendwann in den Speicher zurückgeschrieben werden muss. Der Wert des Booleschen ~dirty~-Flags ist nur dann von Relevanz, wenn dem Register eine IR-Variable in ~value~ zugeordnet ist.
 
 Gehen wir nun die drei wichtigen API-Befehle (~alloc_register()~, ~load()~ und ~write()~) durch:
 
@@ -949,18 +949,18 @@ Gehen wir nun die drei wichtigen API-Befehle (~alloc_register()~, ~load()~ und ~
 
 Als erstes schauen wir uns ~alloc_register()~ an, mit dem die Makroexpansion ein leeres Register anfordern kann.
 Dies ist beispielsweise notwendig, wenn ein Wert aus dem "Nichts" erschaffen wird, wie dies, zum Beispiel, bei ~Reference~ der Fall ist.
-Das Ziel der Vergabe ist es ein Register so zu wählen, dass im weiteren Verlauf so wenig *Folgekosten* wie möglich entstehen. Zwar kann unser Allokator nicht in die Zukunft schauen, aber wir können zumindest eine oberere Schranke angeben welche *maximalen Folgekosten* im weiteren Verlauf des Basisblocks entstehen können.
-Der Allokator errechnet für jedes CPU Register einen Score und gibt jenes Register mit dem günstigsten Score heraus; er nimmt eine *priorisierte Allokation* vor.
+Das Ziel der Vergabe ist es, ein Register so zu wählen, dass im weiteren Verlauf so wenig *Folgekosten* wie möglich entstehen. Zwar kann unser Allokator nicht in die Zukunft schauen, aber wir können zumindest eine oberere Schranke angeben, welche *maximalen Folgekosten* im weiteren Verlauf des Basisblocks entstehen können.
+Der Allokator errechnet für jedes CPU-Register einen Score und gibt jenes Register mit dem günstigsten Score heraus; er nimmt eine *priorisierte Allokation* vor.
 Für jeden Aufruf von ~alloc_register()~ kommen natürlich nur jene Register in Frage, die noch nicht vergeben sind (~free=yes~).
 
-Die niedrigsten Kosten fallen an, wenn wir ein leeres Register heraus geben. Da kein Wert aus dem Registersatz verdrängt wird, können in der Zukunft auch keine Kosten für ein Neu-Laden des Wertes auftauchen. Leere Register werden also mit der höchsten Priorität vergeben.
+Die niedrigsten Kosten fallen an, wenn wir ein leeres Register herausgeben. Da kein Wert aus dem Registersatz verdrängt wird, können in der Zukunft auch keine Kosten für ein Neu-Laden des Wertes auftauchen. Leere Register werden also mit der höchsten Priorität vergeben.
 
-Als nächstes geben wir Register heraus die zwar einen Wert beinhalten, dieser aber mit dem Stack-Slot synchronisiert sind.
-Für diese Register können im weiteren Verlauf nur kosten für das Neu-Laden des Wertes anfallen, wenn dieser von einem anderen Befehl noch einmal benötigt werden sollte; es fällt maximal ein Speicher-Register Transfer an.
-Wenn dieses Register heraus gegeben wird, wird die Bindung zwischen Register und IR-Variable aufgehoben (~value=None~).
+Als nächstes geben wir Register heraus, die zwar einen Wert beinhalten, dieser aber mit dem Stack-Slot synchronisiert sind.
+Für diese Register können im weiteren Verlauf nur kosten für das Neu-Laden des Wertes anfallen, wenn dieser von einem anderen Befehl noch einmal benötigt werden sollte; es fällt maximal ein Speicher-Register-Transfer an.
+Wenn dieses Register herausgegeben wird, wird die Bindung zwischen Register und IR-Variable aufgehoben (~value=None~).
 
 
-Der teuerste Fall tritt ein, wenn wir ein Register heraus geben, das einen noch nicht synchronisierten Wert beinhaltet (~dirty=yes~). In dieser Situation kommen auf jeden Fall Kosten für die Spill-Operation zusammen und es kann zusätzlich in der Zukunft dazu kommen, dass wir den Wert neu laden müssen. Im schlimmsten Fall zieht die Vergabe dieses Registers also zwei Register-Speicher Transfers hinter sich her. Wir sollten diese Register also nur dann Herausgeben, wenn kein anderes Register mehr frei ist, oder die Makroexpansion ganz explizit nach diesem Register gefragt hat (~alloc_register(reg="ecx")~).
+Der teuerste Fall tritt ein, wenn wir ein Register herausgeben, das einen noch nicht synchronisierten Wert beinhaltet (~dirty=yes~). In dieser Situation kommen auf jeden Fall Kosten für die Spill-Operation zusammen und es kann zusätzlich in der Zukunft dazu kommen, dass wir den Wert neu laden müssen. Im schlimmsten Fall zieht die Vergabe dieses Registers also zwei Register-Speicher-Transfers hinter sich her. Wir sollten diese Register also nur dann Herausgeben, wenn kein anderes Register mehr frei ist, oder die Makroexpansion ganz explizit nach diesem Register gefragt hat (~alloc_register(reg="ecx")~).
 
 #+begin_src latex
 \begin{handoutframeselect}[2-]
@@ -1006,7 +1006,7 @@ Der teuerste Fall tritt ein, wenn wir ein Register heraus geben, das einen noch 
 \end{handoutframeselect}
 #+end_src
 
-Am Ende eines Makroexpansion wird häufig angewiesen, dass das Ergebnis, was nun in einem der allozierten Register vorliegt, in eine IR-Variable geschrieben werden soll. Dabei geht unser Allokator den Weg, dass wir den Wert nicht sofort in den Stack-Slot schreiben, sondern nur ab sofort alle Zugriffe auf die IR-Variable aus dem angegebenen Register bedienen. Dazu setzen wir das ~value~-Feld auf die entsprechende Zielvariable und vermerken, dass Registerinhalt und Stack-Slot gerade nicht übereinstimmen. Das zurückschreiben geschieht dann zu einem späteren Zeitpunkt.
+Am Ende eines Makroexpansion wird häufig angewiesen, dass das Ergebnis, was nun in einem der allokierten Register vorliegt, in eine IR-Variable geschrieben werden soll. Dabei geht unser Allokator den Weg, dass wir den Wert nicht sofort in den Stack-Slot schreiben, sondern nur ab sofort alle Zugriffe auf die IR-Variable aus dem angegebenen Register bedienen. Dazu setzen wir das ~value~-Feld auf die entsprechende Zielvariable und vermerken, dass Registerinhalt und Stack-Slot gerade nicht übereinstimmen. Das Zurückschreiben geschieht dann zu einem späteren Zeitpunkt.
 
 
 #+begin_src latex
@@ -1039,9 +1039,9 @@ Am Ende eines Makroexpansion wird häufig angewiesen, dass das Ergebnis, was nun
 
 Der ~load()~-Befehl unseres Allokators ist der spannendste Teil der verfügbaren API.
 Hier verwenden wir die Buchhaltung, die wir über die Registerinhalte führen, um Ladebefehle zu sparen, wenn Werte bereits im Register-"Cache" verfügbar sind.
-Dabei weißt uns die Makroexpansion an eine gewisse IR-Variable (~src~) in ein Register zu laden. Hierbei unterscheiden wir zwischen mehreren Fällen, abhängig davon wie der aktuelle Allokatorzustand aussieht:
+Dabei weist uns die Makroexpansion an, eine gewisse IR-Variable (~src~) in ein Register zu laden. Hierbei unterscheiden wir zwischen mehreren Fällen, abhängig davon, wie der aktuelle Allokatorzustand aussieht:
 
-Findet sich die zu ladende Variable in keinem Register (~load(z)~), so allozieren wir mittels ~alloc_register()~ ein neues Register und emittieren einen Ladebefehl, der die Variable aus ihrem Stack-Slot in das Register transferiert.
+Findet sich die zu ladende Variable in keinem Register (~load(z)~), so allokieren wir mittels ~alloc_register()~ ein neues Register und emittieren einen Ladebefehl, der die Variable aus ihrem Stack-Slot in das Register transferiert.
 
 Spannend wird es, wenn die Variable bereits in einem Register lebt:
 Wenn die Variable bereits geladen ist und das Register mit dem Stack-Slot synchronisiert ist, geben wir das Register (~ebx~) einfach heraus.
@@ -1098,9 +1098,9 @@ Neben diesen vier Fällen gibt es noch einige Sonderfälle, wenn der Aufrufer vo
   \end{frame}
 #+end_src
 
-Zuletzt müssen wir noch einige Situationen behandeln, die besonderer Behandlung durch den Allokator bedürfen. Informiert wird der Allokator über diese Situationen durch die, bereits erwähnten, Hooks. 
+Zuletzt müssen wir noch einige Situationen behandeln, die besonderer Behandlung durch den Allokator bedürfen. Informiert wird der Allokator über diese Situationen durch die bereits erwähnten Hooks.
 
-Zum einen ist eine Registervergabe, die *Basisblockgrenzen* überschreitet viel schwieriger als eine Block-lokale Vergabe. Wieder haben wir hier das Problem, dass nur die Registerbelegungen die in allen Vorgängerknoten konsistent sind, über Blockgrenzen hinweg Gültigkeit haben. Anders ausgedrückt: Eine Variable muss am Ende aller Vorgängerknoten im gleichen Register geladen sein, um bereits vor der ersten Instruktion eines Blocks als geladen zu gelten. Wir machen es uns hier einfach und werfen vor jedem Block einfach den gesamten Allokatorzustand weg.
+Zum einen ist eine Registervergabe, die *Basisblockgrenzen* überschreitet, viel schwieriger als eine blocklokale Vergabe. Wieder haben wir hier das Problem, dass nur die Registerbelegungen, die in allen Vorgängerknoten konsistent sind, über Blockgrenzen hinweg Gültigkeit haben. Anders ausgedrückt: Eine Variable muss am Ende aller Vorgängerknoten im gleichen Register geladen sein, um bereits vor der ersten Instruktion eines Blocks als geladen zu gelten. Wir machen es uns hier einfach und werfen vor jedem Block einfach den gesamten Allokatorzustand weg.
 
 Ein anderes Problem sind *Funktionsaufrufe*.
 Da eine Funktion nur die Calle-saved Register über einen Funktionsaufruf bewahrt, müssen wir bei einem ~Call~-Befehl alle Register, deren Inhalt potentiell vernichtet wird, invalidieren.
@@ -1110,10 +1110,10 @@ Ebenfalls kommen wir an dieser Stelle wieder mit dem *Alias-Problem* in Berühru
 Eine Referenz auf eine lokale IR-Variable wird auf der Maschinencodeebene zu einem Zeiger auf den entsprechenden Stack-Slot.
 Daher kann ~Store~-Befehl dazu führen, dass der Stack-Slot einer Variable plötzlich einen aktuelleren Wert enthält als das Register.
 Unser Cache wurde also "hintenrum" invalidiert.
-Um dieses Problem zu behandeln, werfen wir bei jedem ~Store~ alle Variablen aus unserer Buchhaltung für die irgendwo in der Funktion eine Referenz erzeugt worden ist. Auf diese Weise verhindern wir, dass wir aus einem Register einen veralteten Wert für gültig halten.
+Um dieses Problem zu behandeln, werfen wir bei jedem ~Store~ alle Variablen aus unserer Buchhaltung, für die irgendwo in der Funktion eine Referenz erzeugt worden ist. Auf diese Weise verhindern wir, dass wir aus einem Register einen veralteten Wert für gültig halten.
 
-Trotz aller dieser konservativen Annahmen, und das häufig wegwerfen des Allokator-Zustandes hat unser verbesserter Allokator bereits einen erheblichen Einfluss auf die Performance von Programmen.
-Um ihnen dies zu verdeutlichen habe ich einen iterativen Fibonacci einmal mit der Minimallösung und einmal mit der verbesserten Registervergabe übersetzt.
+Trotz aller dieser konservativen Annahmen und das häufige Wegwerfen des Allokator-Zustandes, hat unser verbesserter Allokator bereits einen erheblichen Einfluss auf die Performance von Programmen.
+Um Ihnen dies zu verdeutlichen, habe ich einen iterativen Fibonacci einmal mit der Minimallösung und einmal mit der verbesserten Registervergabe übersetzt.
 Dabei kommt bereits ein gewaltige Verbesserung von 36 Prozent heraus und unser Übungsübersetzer kommt in die Region von ~gcc~, wenn dieser ohne Optimierungen gestartet wird.
 Allerdings sehen Sie auch, dass GCC noch einiges aus einem solchen iterativen Fibonacci herausholt.
 Diese Verbesserungen stammen sogar hauptsächlich aus der Registervergabe, da die innere Schleife der Fibonacci-Berechnung gänzlich in Registern stattfinden kann und ohne Speicheroperationen auskommt.

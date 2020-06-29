@@ -187,7 +187,7 @@ Da die notationellen Besonderheiten vom Parser aufgelöst werden, sind diese "ei
 Aber es gibt zwei Aspekte, die dann wichtig werden, wenn wir Operationen behandeln, die sich anders verhalten.
 Zum einen werten die einfachen Operationen all ihre Operanden aus, bevor sie selbst zur Tat schreiten.
 Zum anderen haben die einfachen Operationen *keine Seiteneffekte* über ihr temporäres Zielobjekt hinaus.
-Verwerfen wir dieses temporäre Objekt, so hat eine seiteneffekt-freie Operation keinen dauerhaften Einfluss auf den Zustand der Maschine.
+Verwerfen wir dieses temporäre Objekt, so hat eine seiteneffektfreie Operation keinen dauerhaften Einfluss auf den Zustand der Maschine.
 
 #+begin_src latex
 \begin{frame}{Auswertungsreihenfolge von einfachen Operationen}
