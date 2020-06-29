@@ -450,8 +450,6 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
 :CUSTOM_ID: 11-oo-paradigm
 :END:
 
-
-
 #+begin_src latex
   \dividerframe{Das objektorientierte\\Programmierparadigma}
 
@@ -464,7 +462,7 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
       \ii \alert{Keine Kontrolle}, da programmweiter Zugriff auf Datenstrukturen möglich
       \ii \alert{Leicht unübersichtlich}, da kaum bis keine Hierarchie der Funktionen.
       \ei
-      $\Rightarrow$ Erfordert Disziplin und geistige Kapazität vom Entwickler.
+      $\Rightarrow$ Erfordert Disziplin und geistige Kapazität von den Entwicklern.
     }\medskip
     \ii<2-> Besonders problematisch bei \textbf{großen Softwareprojekten} {
       \bi
@@ -504,12 +502,36 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
     }
      \ei
 
-
-   \begin{btBlock}<3->[type=alert]{}
+     \begin{btBlock}<3->[type=alert]{}
      Diese (objekt-orientierten) Objekte sind eine Erweiterung unserer bisherigen Objekte aus Vorlesung "06 - Objekte".
    \end{btBlock}
   \end{frame}
+#+end_src
 
+Nachdem wir uns mit dem altbekanntem imperativen Paradigma beschäftigt haben, wollen wir uns nun den objektorientierten Paradigma zuwenden.
+Wir tun dies, indem wir zuerst die Schwächen des imperativen Paradigmas für große Softwareprojekte diskutieren, bevor wir den Ansatz den Objektorientierung für diese Schwächen aufzeigen.
+Als virtuellen Ausgangspunkt wählen wir eine imperative Sprache, die auch in ihrem Typssystem eher simpel und monomorph ist. Denken Sie an C oder an Pascal, beides keine konzeptionell reiche Sprachen.
+
+Wie wir gesehen haben hat das imperative Paradigma mehrere Konzepte, die sich mit der Ausführung beschäftigen, aber nur ein Konzept (Records) was uns dabei hilft unsere Daten im Programm zu strukturieren. Diese Vernachlässigung der Datenseite begründet einige der Probleme, die einfache imperative Sprachen zeigen. Zum einen Zwingt uns ein monomorphes Typssystem dazu das Prinzip der prozeduralen Abstraktion zu brechen, da die gleiche Operation auf unterschiedliche Datentypen ausgeführt in zwei unterschiedlichen Prozeduren münden muss. Dies führt zu einer Codeduplikation, die den Wartungsaufwand, der besonders bei großen Softwareprojekten einen erheblichen Teil der Kosten ausmacht, erhöht.
+Ebenso bietet das imperative Paradigma keinerlei Zugriffskontrolle über die Daten und jede Prozedur ist erst einmal gleichberechtigt alle Daten, für die sie einen Zeiger erhaschen kann, zu manipulieren. Dies erfordert, gerade bei vielen Entwicklern, die an der gleichen Quellcodebasis arbeiten, ein enormes Maß an Disziplin, welche erlernt und eingehalten werden muss.
+Zum letzten bietet das rein imperative Paradigma kein Konzept zur Bündelung mehrerer semantisch zusammenhängender Prozeduren. Sicherlich gibt es die Möglichkeit Prozeduren, die zusammen gehören, ähnlich benennen. Aber auch das Erfordert Disziplin von den Entwicklern. Ab einer Vielzahl von Prozeduren, wird die Menge aller Prozeduren zu einem großen See in dem man keinerlei Struktur mehr erkennen kann.
+Was man bräuchte wäre eine zweite Art von Strukturkonzept für Codeorganisation. Teilweise kann dies durch Module bewerkstelligt werden, aber auch Objektorientierung bietet hier Konzepte an.
+
+Wie der Name schon vermuten lässt, stellt die Objektorientierung (OO) nicht mehr die Prozedur in den Mittelpunkt, sondern das Objekt.
+Vergleichen wir Objekte und Prozeduren mit der natürlichen Sprache, so kommen wir zur Analogie, dass Objekte wie Nomen und Prozeduren wie verben sind.
+Die Konzentration von OO auf Objekte verschiebt somit den Fokus vom "was getan wird" zu einem "wem" getan wird.
+Auf den Folien zeige ich ein Beispiel, welches verdeutlicht, dass diese Verschiebung zu intuitiveren Programmstrukturen führen kann.
+Bei Konzentration auf verben, würden wir "Apfel waschen" und "Fahrrad waschen" in der gleichen Kategorie verorten, es wird ja schließlich etwas gewaschen.
+Nun sind beide Reinigungstätigkeiten zwar ähnlich, haben aber in ihren Werkzeugen und ihrem Ziel nur sehr wenig miteinander zu tun.
+Anders sieht es aus, wenn wir und auf die Nomen konzentrieren und unser Fahrrad in den Mittelpunkt stellen.
+An diesen zentralen Begriff hängen wir dann die verben an, die zu diesem Objekt passen:
+"waschen" und "fahren".
+Und schon haben wir, durch die Verschiebung des Fokuspunktes eine Organisation gefunden, die viel mehr den menschlichen Erfahrungen entspricht, die die Welt eher nach ihren Objekten und weniger nach ihren Operationen sortiert.
+
+Die Grundidee von OO ist das Objekt als eigenständige Entität zu denken, dass eine Menge von Eigenschaften hat und über **Methoden** mit anderen Objekten interagiert. Dieses Mitdenken der Methoden als Teil des Objekts ist ein anderer Objektbegriff als der, den wir in Vorlesung "06 - Objekte" gebraucht habe. Denken Sie also für diese Vorlesung beim Begriff Objekt immer ein implizites "OO-" Prefix dazu. 
+
+
+#+begin_src latex
   \begin{frame}{Nachrichten und Objekte}
     \begin{center}
       \includegraphics[width=0.7\textwidth]{fig/11-messages}    
@@ -531,7 +553,7 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
   \end{frame}
 
 
-  \begin{frame}[fragile]{Die Methode als die zentrale Erweiterung}
+  \begin{frame}<handout:4>[fragile]{Die Methode als die zentrale Erweiterung}
     \bi
     \ii Methoden haben einen \structure{Ausführungskontext} mit dem Objekt{
       \bi
@@ -540,29 +562,59 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
       \ii Methode ist eine Closure! (Siehe \enquote{03 - Namen})
       \ei
     }\medskip
-    \ii \structure{Closure}: Eine Funktion die einen Ausführungskontext mitbringt\\ {
+    \ii \structure{Closure}: Eine Prozedur die einen Ausführungskontext mitbringt\\ {
       \bgroup\btAnimation[width=0.8\textwidth]{1:<1-2>,2:<3>,3:<4>,center,padding}{fig/11-closure}\egroup
       \bi
-      \ii Funktionen werden \textbf{immer} in einem Kontext ausgeführt.
+      \ii Prozeduren werden \textbf{immer} in einem Kontext ausgeführt.
       \ii Bei C sind nur die Argumente und die globalen Variablen enthalten
       \ii Bei Closures sind zusätzliche Objekte an Namen gebunden (z.B. \structure{\texttt{this}})
       \ei
     }
     \ei
   \end{frame}
-
-
 #+end_src
 
-FIXME: Die letzte Folie hier ist wenig informativ. Da muss eine Graphik für Closures her!
+Wie wir bereits gesagt haben stehen beim objektorientierten Paradigma stehen die (OO-)Objekte im Mittelpunkt. Um dies noch etwas genauer zu fassen wollen wir uns die Definition von Objektorientierung von Alan Kay, dem Erfinder von Smalltalk, der ersten objektorientierten Programmiersprache, anschauen.
 
-FIXME: Noch eine Folie dahiner für die drei Konzepte: Encapsulation, Polymorphie und 
+Für Kay ist das wichtigste Element von OO das **Messaging** zwischen Objekten. Anstatt Prozeduren mit Argumenten aufzurufen findet alle Interaktion über Nachrichten statt. Objekte schicken anderen Objekten Nachrichten, welche auf diese Nachrichten reagieren. Technisch umgesetzt werden diese Nachrichten mittels Methodenaufrufe, aber das mentale Bild soll sein, dass einzelne Objekte anderen Objekten eine Nachricht schicken. Denken Sie dabei nicht an Netzwerknachrichten, sondern an etwas abstrakteres. Das Firmenobjekt schickt dem Arbeiter eine Nachricht mit der nächsten Aufgabe.
+In Java ist dies durch, dem Objekt angehängte, Methoden implementiert.
 
-Was ist das Paradigma?
+Der zweite Aspekt von OO ist die **Persistenz** des privaten Objektzustandes. Objekte representieren eigenständige Entitäten und haben einen internen Zustand, selbst wenn sie gerade keine Nachricht verarbeiten. Technisch gesehen bedeutet dies, dass die Eigenschaften des Objekts im Speicher residieren müssen um über Methodenaufrufe hinweg Zustand zu halten. Dabei hat jedes Objekt seinen **eigenen** privaten Zustand.
+In Java ist dies durch Objekteigenschaften implementiert{{{see(03-composite-types,Zusammengesetzte Typen)}}}.
 
-Welches Konzept brauchen wir zusätzlich dazu?
+Für Kay ist der dritte Prüfstein von OO, dass die Eigenschaftes des Objekts im Objekt selbst gekapselt sind und nicht von außen zugegriffen werden können.
+Dabei stellen die Methoden des Objekts das "Innen" dar, und jeglicher andere Code das "Außen".
+Hier zeigt sich die klare Erweiterung von OO-Objekten gegenüber Records, die ja von überall zugreifbare Felder beinhalten.
+Durch diese Kapselung wird im Code ganz klar, welcher Code einzelne Eigenschaften eines Objekts lesen und verändern darf.
+In Java ist dies durch die Feldmodifier ~private~, ~protected~ und ~public~ implementiert{{{see(04-limited-visibility,Einschränkung der Sichtbarkeit)}}}.
 
-Wie schlägt sich dieses Konzept technisch nieder?
+Der letzte Aspekt von OO ist für Alan Kay, die Späte Bindung von Nachrichten an Operationen.
+Dies bedeutet, dass nicht bei Versenden einer Nachricht entschieden wird, welcher Code tatsächlich ausgeführt wird, sondern erst beim Empfang der Nachricht durch ein Objekt.
+Auf diese Weise kann bei OO jedes Objekt unterschiedlich auf gewissen Nachrichten reagieren.
+In Java ist dies durch Methoden mit virtuellen Dispatch anhand des dynamischen Typs implementiert {{{see(04-dynamic-dispatch,Überladung und Polymorphismus)}}}.
+
+Gegenüber dem imperativen Paradigma ist die **Methode** das entscheidende ***neue Sprachkonzept**.
+Anstatt Prozeduren und Objekte getrennt voneinander zu halten, sind Methoden Prozeduren, die zu einem bestimmten Objekt gehören.
+Auf wird der Empfang einer Nachricht durch ein Objekt zu einem Methodenaufruf auf dem entsprechenden Objekt.
+Innerhalb der Methode ist das angebundene Objekt sichtbar ohne vom Aufrufendem als Argument mitgegeben zu werden.
+Sie kennen dieses Verhalten zum Beispiel bereits aus Java, wo innerhalb einer Methode die Felder des Objekts und das Objekt selbst (als ~this~) sichtbar sind.
+In Python ist dieses Sichtbarmachen des Objekts noch deutlicher, da Methoden einen ~self~ Parameter haben, der allerdings nicht als Argument angegeben werden muss.
+
+Um das Kernkonzept der Methode drapieren sich noch die anderen Konzepte mit denen die von Kay geforderten Eigenschaften in OO-Sprachen implementiert werden. Durch Zugriffsmodifier können wir die Sichtbarkeit von Feldern einschränken und so Kapselung erreichen. Durch dynamischen Dispatch/virtuellen Methodenaufruf wird das späte Binden implementiert.
+
+Was auf den Folien noch dazu kommt, was aber in gewisser Weise nicht, wie wir sehen werden, in den vier essentiellen Punkten von Kay nicht enthalten ist, ist das Konzept von Subtyp-Polymorphie durch Vererbung{{{see(03-polymorphism,Polymorphismus)}}}. Denn Kay spricht nur davon, wie sich Objekte zu Verhalten haben, er macht aber keine Aussage darüber wie diese Objekte ins Leben treten und wie wir Prozeduren als Methoden an ein Objekt binden. Bei Vererbung geschieht dies durch eine hierarchische Beziehung von Record-Typen, die in einer Subtyp-Beziehung zueinander stehen und in eine Richtung durcheinander Ersetzbar sind. Im nächsten Unterkapitel werden wir jedoch die Prototypen-basierte Objektorientierung kennen lernen, die gänzlich ohne separate Klassen auskommt und alles über einen Objektbau abhandelt. Seien Sie also gespannt.
+
+Aber zurück zu den Methoden.
+Technisch gesehen sind Methoden Closures{{{see(04-call-frames,Function-Call Frames)}}}, also eine Kombination einer Prozedur mit einem (teilweise) gebundenem Ausführungskontext.
+Um dies zu Verstehen bedarf es noch einer Diskussion des Ausführungskontextes:
+Innerhalb einer Prozedur werden Referenzen zu Variablen über den Ausführungskontext aufgelößt.
+In einer C-Funktion beinhaltet dieser Ausführungskontext die gebundenen Parameter und die lokalen Variablen der aktuellen Funktionsinstanz.
+Zusätzlich sind aber auch alle globalen Variablen im Ausführungskontext einer C-Funktion und zwar über Funktionsinkarantionen hinweg.
+In C haben wir also nur zwei Ebenen von hierarchisch Ausführungskontext: dem lokalen der Funktionsinstanz (für jeden Aufruf ein neuer Kontext) und den globalen Kontext (immerwährend).
+
+Für OO müssen wir uns einen dritten, dazwischenliegenden Kontext vorstellen, in dem das aktuelle Objekt (und teilweise dessen Felder) gebunden sind. Bei der Namensauflösung{{{see(04-implicit-resolution,CNSR)}}} werden diese Kontexte (zur Laufzeit!) von innen nach außen durchsucht bis der Variabelenname zum gebundenen Objekt aufgelößt werden kann.
+Durch diesen erweiterten Ausführungskontext ist eine Methode etwas wirklich anderes als eine Prozedur. Denn im Gegensatz zur Prozedur hat die Methode eines Objekts einen Zustand, nämlich die persistent-gespeicherten Eigenschaften des Objekts.
+Technisch löst der Übersetzer diesen erweiterten Ausführungskontext effizient durch einen impliziten ~this~-Parameter durch. Aber das haben wir nun wirklich schon oft genug in diesem Skript erklärt. Kommen wir also wieder mal zu etwas ganz neuem: Prototypen.
 
 ** Prototyp-basierte Objektorientierung
 #+begin_src latex
