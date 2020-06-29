@@ -228,10 +228,18 @@ Solche "best practices" nennen wir **Prinzipien** und sie sind Thema des Softwar
 In dieser Vorlesung wollen wir uns nicht weiter mit Prinzipien auseinander setzen, sonder bei den Konzepten und, in dieser und der nächsten Vorlesung, bei den Paradigmen bleiben.
 
 Grundlegend festzustellen ist, dass es deutlich mehr Programmiersprachen als Paradigmen gibt.
-So gibt es viele Sprachen, die das objektorientierte Paradigma, teils in unterschiedlchen Geschmacksrichtungen, aber häufig mit großer Ähnlichkeit implementieren.
-Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Implementierung eines Paradigmas beschränken, wie das bei frühen Sprachen der Fall war, sondern oft mehrere Paradigmen beinhalten. Damit werden diese zu einer **Multi-Paradigmensprache** und bieten gewissermaßen mehrere Werkzeugkoffer an, aus denen sich die Entwickler bei der Lösung der gestellten Probleme bedienen können. Eine Übersicht und eine detailierte Diskussion von Programmierparadigmen finden Sie im Kapitel [[https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf]["Programming Paradigms for Dummies: What Every Programmer Should Know"]] von Peter Van Roy. Insbesondere die Taxonomie auf Seite 13 (Figure 2) gibt einen großen Überblick über das Thema Programmierparadigmen und wie diese miteinander im Zusammenhang stehen.
+So gibt es viele Sprachen, die das objektorientierte Paradigma, teils in unterschiedlichen Geschmacksrichtungen, aber häufig mit großer Ähnlichkeit implementieren.
+Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Implementierung eines Paradigmas beschränken, wie das bei frühen Sprachen der Fall war, sondern oft mehrere Paradigmen beinhalten. Damit werden diese zu einer **Multi-Paradigmensprache** und bieten gewissermaßen mehrere Werkzeugkoffer an, aus denen sich die Entwickler bei der Lösung der gestellten Probleme bedienen können. Eine Übersicht und eine detaillierte Diskussion von Programmierparadigmen finden Sie im Kapitel [[https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf]["Programming Paradigms for Dummies: What Every Programmer Should Know"]] von Peter Van Roy. Insbesondere die Taxonomie auf Seite 13 (Figure 2) gibt einen großen Überblick über das Thema Programmierparadigmen und wie diese miteinander im Zusammenhang stehen.
 
 * Das imperative Programmierparadigma
+:PROPERTIES:
+:CUSTOM_ID: 11-imperative-paradigma
+:END:
+
+
+In diesem Unterkapitel widmen wir uns dem imperativen Paradigma dem grundlegendsten Paradigma das wir für die Entwicklung von Programmen verwenden können.
+Dabei zähle ich das Sprachkonzept der "Prozeduren" zum imperativen Paradigma hinzu und mache keine gesonderte Unterscheidung zwischen rein imperativem Programmieren (ohne Prozeduren) und einem prozeduralen Paradigma (mit Prozeduren), da diese Unterscheidung seit dem Aufkommen strukturierter Programmierung in den 60ern nicht mehr von tatsächlicher Relevanz ist.
+Aber seien Sie gewarnt, Sie können da draußen auf Menschen treffen, die diese Unterscheidung machen und pedantisch auf ihr beharren.
 
 #+begin_src latex
   \dividerframe{Das Imperative Paradigma}
@@ -255,7 +263,27 @@ Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Imple
     }
     \ei
   \end{frame}
+#+end_src
 
+Um das imperative Paradigma zu charakterisieren werden wir die einzelnen Sprachkonzepte beleuchten, die es ausmachen.
+Diese Konzepte haben Sie alle, in dieser oder in anderen Veranstaltungen, bereits kennen gelernt, jedoch vielleicht bisher nicht als voneinander abtrennbar wahrgenommen. Daher wollen wir die einzelnen Konzepte nun durchgehen und Sie können bei jedem Konzept fragen, ob es wirklich notwendig für eine Sprache ist, und wie die Sprache aussähe, wenn es dieses Konzept nicht gäbe. Auf diese Weise bekommen Sie ein besseres Gefühl für den Designspace in dem sich die Sprachentwickler bewegen, wenn sie ein neues Paradigma entwickeln.
+
+Zunächst, schauen wir uns den Urzustand einer (virtuellen) Maschine an, die nur aus Daten und Operationen besteht.
+Stellen Sie sich vor, beides würde frei im Raum herum schweben um muss erst noch strukturiert durch Konzepte abstrahiert werden.
+Das erste Konzept, was in allen Paradigmen gemein ist, ist **Strukturiertheit der Daten**.
+Anstelle eines großen Sees aus Zahlen (der ganze Speicher als ein ~char~-Array) wollen wir einzelne Objekte haben, die eine innere Struktur haben.
+Ausgedrückt wird dieses Konzept, zum Beispiel, durch Record-Datentypen. Damit können wir einzelne Objekte und deren innere Struktur deklarieren.
+Ohne diese Strukturiertheit kann es keine abstrakte Programmiersprache geben, da man keine semantische Verbindung mehrere Informationshäppchen formulieren kann.
+
+Als Beispiel für Sprachen, die ausschließlich diese Strukturiertheit, und sonst nichts weiter, bieten, kann man Auszeichnungssprachen wie XML bezeichnen.
+Dort gibt es nur Objekte und deren hierarchisch geschachtelte Struktur, aber keiner Operationen.
+Daher ist XML als Sprache nicht Turing-vollständig und daher nicht zu programmieren geeignet. Dennoch bietet XML nützliche Abstraktionen, um Probleme zu abstrahieren.
+
+Als zweites Konzept des imperativen Programmierens kann die **Sequentielle Ausführung von Operationen** gelten.
+Die Idee, dass die Entwickler angeben, in welcher konkreten Reihenfolge einzelne Operationen mit welchen Daten ausgeführt werden, gibt uns die Möglichkeit ein Problem in viele Einzelschritte zu zerlegen. Jede Operation ist die Abstraktion ihrer elektronischen Implementierung, und die Aneinanderreihung von Operationen ist die Verwendung dieser Abstraktion.
+Durch die Sequenzierung geben die Entwickler eine strikte Reihenfolge vor, wie Operationen ausgeführt werden sollen und wählen so selbst eine Linearisierung der Operationsabhängigkeiten. Fragen Sie sich: Wie sähe ein Sprache aus, bei denen Abhängigkeiten zwischen Operationen ganz frei, wie in einem Abhängigkeitsgraphen, formuliert werden können. Und warum wäre das für die Übersichtlichkeit, einem unseren primären Ziel bei der Sprachentwicklung, nicht nützlich.
+
+#+begin_src latex
   \begin{frame}{Kontrollfluss und Prozeduren}
     \begin{columns}
       \begin{column}{0.35\textwidth}
@@ -265,7 +293,7 @@ Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Imple
         \bi
         \ii<2-> Komplexe Abläufe als Kontrollfluss {
           \bi
-          \ii[+=] \structure{Selection}: Endlich können wir eine Operation auch mal auslassen.\\[1ex]
+          \ii[+=] \structure{Selektion}: Endlich können wir eine Operation auch mal auslassen.\\[1ex]
           \ii[+=] \structure{Iteration}: Endlich können wir eine Operation mehrfach ausführen ohne sie doppelt zu notieren.
           \ei
         }\medskip
@@ -285,7 +313,7 @@ Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Imple
     \end{columns}
   \end{frame}
 
-  \begin{frame}[fragile]{Entwurfs-Prinzip: Prozedurale Abstraktion}
+  \begin{frame}[fragile]{Entwurfsprinzip: Prozedurale Abstraktion}
     \bi
     \ii Prozeduren sind eine \ALERT{technische Einrichtung} der Sprache{
       \bi
@@ -320,7 +348,31 @@ Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Imple
     }
     \ei
   \end{frame}
+#+end_src
 
+In die gleiche Richtung wie die Sequenzierung stoßen die Konzepte der **generellen Kontrollflusskonstrukte**, die es uns ebenfalls Erlauben den Ausführungsstrom zu beeinflussen.
+Dabei haben wir die Konzepte **Selektion** und **Iteration** für den Kontrollfluss im kleinen, und **Prozeduren** und **Invokation** im Großen kennen gelernt. 
+
+Durch kleinteiligen Konzepte sind wir in der Lage komplexe Abläufe zu strukturieren und Abhängig von den Eingabedaten unterschiedliche Kontrollflüsse auszuführen. Dabei gibt es diese generellen Konzepte in unterschiedlichen Abstraktiosniveau: Eine "Schleife" mit ~if~ und ~goto~ hat sicherlich ein geringeres Abstraktionsniveau, als eine logisch-kontrollierte Schleife, welche wiederum weniger abstrakt ist als eine Aufzählungsschleife über eine dynamisch berechnete Sequenz von Objekten.
+Stellen Sie sich vor, welchen enormen technischen Fortschritt es dargestellt hat eine Maschine zu bauen, die ihre selbst-berechneten Ergebnisse verwendet um ihre zukünftige Operationsweise zu beeinflussen. Einfach der Hammer, im Vergleich zum [[https://en.wikipedia.org/wiki/Centrifugal_governor][Fliehkraftdrehregler]] unendlich flexibler.
+
+Ebenfalls bedeutend sind die **Prozeduren**, welche die parametrisierbare Wiederverwendung von Code erlauben.
+Eine Menge von Operationen, die zum Beispiel durch Sequenzierung, Selektion und Iteration, strukturiert wurden, können durch eine Prozedur wiederverwendbar gemacht werden.
+Durch die Möglichkeit die lokalen Variablen innerhalb einer Funktionsinstanz mit der Invokation mit den Argumenten vorzubelegen, macht diese Abstraktion parametrisierbar.
+Dieses Konzept gibt den Entwicklern die Möglichkeit selbst neue Abstraktionen innerhalb des Programms zu schaffen.
+Man könnte sagen, dass Prozeduren die Sprachabstraktion sind, die es erlaubt benutzerdefinierte Abstraktionen zu erschaffen.
+Wie bereits mehrfach erwähnt, wird dann der Funktionsaufruf, die Invokation, zu einem **Komplexbefehl**, der sich wie andere Operationen verhält, dessen Semantik aber von den Entwicklern definiert wurde.
+Eine Sprache mit Prozeduren schafft also eine virtuelle Maschine, die innerhalb der Maschine erweitert werden kann.
+
+Es gibt unterschiedliche Nomenklaturen für Prozeduren, die sich teilweise leicht in ihrer Bedeutung unterscheiden. Insbesondere im nächsten Kapitel, wenn es um funktionale Programmierung geht, werden wir einen Unterschied zwischen Prozeduren, die Seiteneffekte haben dürfen, und Funktionen, die frei von Seiteneffekten sind, unterscheiden. Meist hat diese Unterscheidung in den Namen aber keine besonders große Relevanz, und sie wird daher meist recht beliebig verwendet.
+
+Mit den Prozeduren bekommt eine Sprache auch die Chance für ihr erstes Entwurfsprinzip, die **prozedurale Abstraktion**.
+Sogleich ich vorne angekündigt habe, nicht weiter auf Prinzipien einzugehen, werde ich es hier doch tun, weil man durch dieses Prinzip sehr gut den Unterschied zwischen Paradigma und Prinzip erklären kann.
+Bei der prozeduralen Abstraktion geht es darum eine, in sich logisch abgeschlossene, Aufgabe in einer Prozedur zu platzieren und mit einem möglichst sprechendem Namen zu versehen.
+Dies ist ein Entwurfsprinzip, eine Anweisung, wie man das Sprachkonzept der Prozeduren verwenden sollte um nicht wahnsinnig zu werden.
+Das Konzept "Prozedur" hält einen nicht davon die Prozedurgrenzen so zu ziehen, dass eine zusammengehörige Aufgabe zerschnitten und auf mehrere unabhängige Prozeduren verteil wird, die scheinbar zufällig hintereinander aufgerufen werden. Zur Verschleierung des eigentlichen Zwecks der Prozedur ist das ein valides Vorgehen, wenn wir allerdings das Verständnis maximieren wollen, sollten wir uns darauf versteifen das Prinzip der prozeduralen Abstraktion anzuwenden.
+
+#+begin_src latex
   \begin{frame}{Benannter und veränderlicher Zustand}
     \begin{columns}
       \begin{column}{0.25\textwidth}
@@ -342,7 +394,7 @@ Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Imple
           \ii Flexibler Datenfluss und Schleifen mit Auswirkung
           \ei
         }\medskip
-        \ii<4-> Variablen sind Quelle unendlich vieler \ALERT{Bugs} {
+        \ii<handout:4-|4-> Variablen sind Quelle unendlich vieler \ALERT{Bugs} {
           \bi
           \ii Variablen sind ein Seitenkanal zu den Parametern
           \ii Funktionsverhalten kann überraschend werden
@@ -354,7 +406,18 @@ Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Imple
       \end{column}
     \end{columns}
   \end{frame}
+#+end_src  
 
+Nun könnte man meinen, wir wären schon fertig mit den Konzepten, die das imperative Paradigma ausmachen, aber es fehlt noch ein ganz entscheidendes  Konzept, dass wir als so selbstverständlich hinnehmen, dass wir es kaum als ein eigenes Konzept wahrnehmen. Erst die Beschäftigung mit anderen Sprachen, die aktiv auf dieses Konzept verzichten, merken wir, dass es ein eigenständiges Konzept ist: **der benannte und veränderliche Zustand**.
+
+In der Diskussion um Werte- und Referenzmodell{{{see(06-value-reference-model,Werte- und Referenzmodell)}}}, haben wir gesehen, dass Variablen und Objekte echt unterschiedliche Konzepte sind.
+Neben der relativ naheliegenden Idee einer Variable einen Namen zu geben, ist der Schritt den Wert einer Variable zu ändern ein deutlich folgenreicherer.
+Durch die Zuweisungsoperation können wir den Inhalt einer Variable ändern und so den Variablennamen an ein neues Objekt binden.
+Variablen sind auch das Konzept was es uns erlaubt einen flexiblen Datenfluss über komplexe Kontrollfstrukturen hinweg zu notieren. Ohne Variablen müsste jede Instruktion die Ergebnisse ihrer Vorgängeroperation empfangen, ein Ergebnis ändern und an die nächste Operation weitergeben. Durch Variablen bekommen wir die Möglichkeit Werte zwischen zu speichern und zu einem späteren Zeitpunkt wieder zu verwenden. 
+
+Können wir eine veränderliche Variablen global definieren, haben wir die Möglichkeit eines Datenflussseitenkanal über Prozedurgrenzen hinweg  geschaffen. Durch ein globales Konfigurationsflag kann sich unsere Prozedur, aufgerufen mit den selben Argumenten wie vor 3 Milisekunden, plötzlich ganz anders verhalten. Dies bietet eine große Flexibilität, aber auch eine Quelle von Bugs. Diesem Problem werden wir dann in der Vorlesung über das funktionale Paradigma nachgehen.
+
+#+begin_src latex
   \begin{frame}{Das imperatives Programmierparadigma}
     \begin{center}
       \includegraphics[width=0.6\textwidth]{fig/11-procedural-paradigma.pdf}
@@ -379,15 +442,14 @@ Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Imple
   \end{frame}
 #+end_src
 
-Was war das Problem?
-
-Was ist das Paradigma? 
-
-Welche Konzepte brauchen wir für Imperatives Programmieren?
-
-Welche Probleme ergeben sich durch rein imperatives Programmieren?
+Zusammengefasst ist das imperative Paradigma, die Kombination aus veränderlichem strukturiertem Zustand und einer starken Kontrolle für die Entwickler über den Kontrollfluss.
+Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann, und prägt bis heute die Welt der Programmiersprachen grundlegend. Oft verwenden Sprachen, die auf einer höheren Organisationsebene ein anderes Paradigma bieten, in ganz Kleinen, auf der Ebene einzelner Befehle, das imperative Paradigma. So ist Java auf der großen Organisationsebene objekt-orientiert, verwendet jedoch innerhalb von Methoden das imperative Paradigma um den Entwicklern die Kontrolle über die Ausführung zu geben.
 
 * Das objekt-orientierte Programmierparadigma
+:PROPERTIES:
+:CUSTOM_ID: 11-oo-paradigm
+:END:
+
 
 
 #+begin_src latex
