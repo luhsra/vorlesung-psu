@@ -20,11 +20,11 @@
 -----
 
 {{{topic(./09-optimierung.org,fig/09-stamp.png)}}}
+{{{topic(./10-maschinencode.org,fig/10-stamp.png)}}}
 
 * COMMENT FIXME
 
-{{{topic(./09-optimierung.org,fig/09-stamp.png)}}}
-{{{topic(./10-maschinencode.org,fig/10-stamp.png)}}}
+
 
 * COMMENT TODO 6 Vorlesungen
      - Sprachen: Das Objektorientierte Paradigma

@@ -158,7 +158,7 @@
   \end{frame}
 
 
-  \begin{frame}{Hierarchie der Begrifflichkeiten}
+  \begin{frame}<handout:4>{Hierarchie der Begrifflichkeiten}
     \centering
     \btAnimation[width=0.7\textwidth]{range=1-4:<1->}{fig/11-principles}
   \medskip
@@ -170,6 +170,66 @@
     \eii
   \end{frame}
 #+end_src
+
+In den letzten 10 Vorlesungseinheiten haben wir uns mit dem Thema Programmiersprachen und ihrer Übersetzung von zwei Seiten genähert.
+Zum einen haben wir in vier Vorlesungen (Typen, Namen, Objekte, Operationen) einzelne Sprachkonzepte auf einem sehr kleinteiligen Niveau kennen gelernt.
+Zum anderen haben wir uns mit den einzelnen Schritten der Übersetzung (Syntaxanalyse, Semantische Analyse, Zwischencodeerzeugung, Optimierung und Maschinencodeerzeugung) auseinander gesetzt.
+In dieser und der nächsten Vorlesung wollen wir wieder einen Schritt zurück machen, und uns die grundsätzliche Frage stellen "Warum haben wir überhaupt Programmiersprachen?" und "Folgen einzelne Sprachen ähnlichen Paradigmen?".
+
+Mit den verwendeten Sprachkonzepten erlauben Programmiersprachen es uns ein Problem auf einer abstraken Ebene und mit einem großen Abstand zu einer real-existierenden Maschine zu formulieren.
+Dieser Abstnd ist die semantische Lücke und der Übersetzer (oder auch ein Interpreter) überbrücken diese Lücke auf automatisierte Art- und Weise.
+Dabei stellt sich aber die Frage, warum wir diese semantische Lücke aufbauen, wenn wir dafür zusätzliche Werkzeuge brauchen um Sie wieder zu überbrücken.
+Neben der Tatsache das Übersetzer leicht anfällig für Bugs sind, erzeugen komplexe Sprachkonstrukte eine Lernkurve, die von den  Entwicklern erst überwunden werden muss bevor diese effektiv und effizient arbeiten können.
+Welchen nutzen hat es demnach die semantische Lücke aktiv auszuweiten und sogar eventuelle Overheads, die bei der Abbildung auf die Maschine entstehen, in Kauf zu nehmen?
+
+Für die Maschine tun wir dies sicherlich nicht, da diese in allen Fällen das Programm gleich ausführt, egal wie groß die semantische Lücke zum Quellprogramm vorher war.
+Für die Maschine brauchen die Daten auch keine Struktur, da auf der untersten Ebene einer Von-Neumann-Maschiene der Datenspeicher ein großes ~char~-Array ist und das Programm ein Array von Instruktionen.
+Vielmehr müssen wir den Nutzen den semantischen Lücke bei den Entwicklern, insbesondere denen großer Softwaresysteme, suchen.
+
+In großen Softwareprojekten erzeugt das Zusammenspiel von drei Aspekten eine besondere Qualität babylonischer Verwirrung bei den Entwicklern:
+Eine große Menge von heterogenen Informationen (Objekte) wird von vielen Operationen verarbeitet, wobei einzelne Operationen in ihrer Ausführungen voneinander abhängig sein können{{{see(07-operation-dependencies,Abhängigkeiten zwischen Operationen)}}} und daher in einer gewissen Reihenfolge abgearbeitet werden.
+Dieses komplexe Netz interagierender Elemente wird dabei nicht nur von einem einzelnen Entwickler orchestriert, sondern von einem oder mehreren Entwicklungsteams, die über die gesamte Erde, in unterschiedlichen Zeitzonen und mit unterschiedlichem kulturellen Hintergrund, verteilt an dem Programm arbeiten.
+Und hier kommt das eigentliche Problem bei der Programmierung: **Wie können wir den Menschen das Verständnis und die Kommunikation von Programmcode erleichtern?**
+
+Diese Aufgabe stellt sich als garnicht so leicht heraus.
+Wollen wir zunächst einmal die beiden Prozessoren vergleichen:
+Auf der einen Seite des Rings stehen die mechanischen Rechenanlagen (Computer), die eine große Menge an Speicher haben auf den sie mit großer Bandbreite uniform (jede Zugriff dauert in etwa gleich lange) zugreifen können.
+Zusätzlich zu diesem perfekten Gedächtnis führen Maschinen in jedem Operationszyklus eine strikt definierte Aktion durch; ohne Gnade, ohne Zögern, ohne Fehler und ohne Müdigkeit, immer uniform.
+Auf der anderen Seite befinden sich unsere Gehirne, die im direkten Vergleich nicht gut abschneiden:
+Der Speicher eines Menschen ist begrenzt und nicht erweiterbar, Zugriffe dauern unterschiedlich lange (erinnern) und können verfälschte, oft nur assoziierte, Ergebnisse liefern.
+Die Verarbeitung der abgerufenen Ergebnisse ist langsam, fehleranfällig, und nicht zu selten uneindeutig. 
+Noch schlimmer wird es wenn zwei Menschen miteinander kommunizieren: Wo zwei identisch arbeitende Maschinen mit dem gleichen Programm ausstatten können, haben zwei Menschen niemals das gleiche Set an Assoziatione, was unweigerlich zu Missverständnissen führt. Außerdem hat der Kommunikationskanal nur eine sehr geringe Datenrate, was im krassen Gegensatz elektrischen oder opto-elektrischen Computernetzen zu sehen ist.
+Das eigentliche Problem ist also nicht die Maschine, sondern der Mensch, der diese, in Gemeinschaft mit anderen, versucht zu instruieren.
+
+Um mit der Komplexität von Systemen umzugehen, haben wir ein unfassbar nützliches Werkzeug entwickelt:
+**die Abstraktion**.
+Durch die Abstraktion strukturieren wir große Probleme und Lösungen in immer kleiner werdende Partikulärprobleme und -lösungen.
+Dabei muss ein Mensch nicht die gesamte Lösung für ein Problem verstehen, sondern kann auf einer Abstraktionsstufe stoppen und die Lösung aus Partikulärlösungen der nächst niedrigeren Stufe komponieren.
+Um das etwas Anschaulicher zu gestelten:
+Die Abstraktion Record bietet uns die Möglichkeit viele Objekte mit gleicher Struktur zu erstellen und auf die einzelnen Felder zuzugreifen.
+Dabei müssen wir uns (meist) keine Gedanken machen, wie diese Felder in den Speicher gelegt werden oder wie die Offsets berechnet werden.
+Durch die Verwendung der Abstraktion können wir das Datenlayout und die Addressberechnungen dem Übersetzer überlassen und den Programmcode für einen Algorithmus auf einem deutlich abstrakteren Niveau formulieren.
+Am Ende arbeitet das Programm ebenso, als hätten wir die Adressberechnungen direkt mit dem Algorithmus vermischt, aber durch die Verwendung der Abstraktion wird das Programm deutlich verständlicher und für andere leichter zu verstehen.
+
+Im Rahmen von Programmiersprachen können wir die angebotenen Abstraktionen mit Begrifflichkeiten fassen:
+Auf der kleinteiligsten Ebene finden wir die **Konzepte** einer Sprache.
+Jedes Konzept ist eine Abstraktion die von der Sprache bereit gestellt wird.
+So ist die Möglichkeit einen Record Datentypen anstatt manuelle Adressberechnungen zu verwenden ebenso ein Sprachkonzept, wie die Möglichkeit Prozeduren zu erstellen ein Konzept ist.
+Aber auch höhere Abstraktionen, wie Threads (Ausführungsfäden) oder Nachrichten, können Sprachkonzepte darstellen, wenn diese direkt in der Spezifikation der Sprache angeboten werden.
+
+Aus einer Kombination von Konzepten kann man ein **Paradigma** formen.
+Ein Paradigma ist eine aufeinander abgestimmte Menge von Konzepten, die man in einer Sprache verwenden kann.
+Ein Paradigma stellt quasi einen vorgefertigten Werkzeugkasten an Konzepten dar aus dem man sich bedienen kann um ein konkretes Problem zu lösen.
+Als Beispiel kann hier das imperative Paradigma dienen, welches es erlaubt Daten strukturiert als veränderlichen Zustand abzulegen und durch sequentiell abgearbeitete Prozeduren zu verarbeiten.
+Andere Paradigmen können die Menge der angebotenen Konzepte vergrößern (Das objektorientierte Paradigma), aber auch bewusst einschränken (Das funktionale Paradigma).
+
+Haben wir einmal ein Paradigma (=Werkzeugkasten) definiert und wird es von einer Sprache angeboten, stellt sich noch die Frage, wie wir die enthaltenen Konzepte (=Werkzeuge) kombinieren können, ohne uns beständig in den Fuss zu schießen.
+Solche "best practices" nennen wir **Prinzipien** und sie sind Thema des Software Engineerings. Dort lernen Sie, wie Sie Objektorientierung richtig verwenden und sich, zum Beispiel, bei Vererbung an das [[https://de.wikipedia.org/wiki/Liskovsches_Substitutionsprinzip][Liskovsche Substitutionsprinzip]] halten.
+In dieser Vorlesung wollen wir uns nicht weiter mit Prinzipien auseinander setzen, sonder bei den Konzepten und, in dieser und der nächsten Vorlesung, bei den Paradigmen bleiben.
+
+Grundlegend festzustellen ist, dass es deutlich mehr Programmiersprachen als Paradigmen gibt.
+So gibt es viele Sprachen, die das objektorientierte Paradigma, teils in unterschiedlchen Geschmacksrichtungen, aber häufig mit großer Ähnlichkeit implementieren.
+Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Implementierung eines Paradigmas beschränken, wie das bei frühen Sprachen der Fall war, sondern oft mehrere Paradigmen beinhalten. Damit werden diese zu einer **Multi-Paradigmensprache** und bieten gewissermaßen mehrere Werkzeugkoffer an, aus denen sich die Entwickler bei der Lösung der gestellten Probleme bedienen können. Eine Übersicht und eine detailierte Diskussion von Programmierparadigmen finden Sie im Kapitel [[https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf]["Programming Paradigms for Dummies: What Every Programmer Should Know"]] von Peter Van Roy. Insbesondere die Taxonomie auf Seite 13 (Figure 2) gibt einen großen Überblick über das Thema Programmierparadigmen und wie diese miteinander im Zusammenhang stehen.
 
 * Das imperative Programmierparadigma
 
