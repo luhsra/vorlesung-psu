@@ -153,35 +153,35 @@ Effiziente Programmierer:
   \end{frame}
 #+end_src
 
-In dem Teil der Veranstaltung "Programmiersprachen und Übersetzer" der sich mit der technischen Seite, dem Übersetzerbau, beschäftigt haben wir zunehmend darauf hingearbeitet die semantische Lücke zwischen dem Text der Quellcodeebene und dem Programm der Maschinenebene zu schließen.
+In dem Teil der Veranstaltung "Programmiersprachen und Übersetzer", der sich mit der technischen Seite, dem Übersetzerbau, beschäftigt, haben wir zunehmend darauf hingearbeitet, die semantische Lücke zwischen dem Text der Quellcodeebene und dem Programm der Maschinenebene zu schließen.
 Schrittweise haben wir uns von Zeichen zu Tokens (Scanner), von Tokens zu Bäumen (Parsing), von Bäumen zu semantisch korrekten Bäumen (Semantische Analyse), und von abstrakten Syntaxbäumen zum Zwischencode (Codeerzeugung) bewegt.
 Aber es fehlt noch ein letzter Schritt:
-Wir müssen von der Ebene des Zwischencodes zu Ebene der real existierenden Maschine kommen.
+Wir müssen von der Ebene des Zwischencodes zur Ebene der real existierenden Maschine kommen.
 Und da gibt es noch einige Unterschiede:
 Wo die IR-Maschine beliebig viele Register hat, hat der Prozessor nur eine endliche Anzahl derer.
-Wo die IR-Maschine Funktionsaufrufe mit Parameterübergabe beherrscht, gibt es auf dem physikalische-existierenden Prozessor nur einen ~call~-Befehl, der mehr ein Sprung auf Steroiden ist.
-Wo die IR-Maschine unspezifiziert ist wie das Programm startet, müssen wir für die Ausführungsplattform ein passendes Binärformat erzeugen.
+Wo die IR-Maschine Funktionsaufrufe mit Parameterübergabe beherrscht, gibt es auf dem physikalisch existierenden Prozessor nur einen ~call~-Befehl, der mehr ein Sprung auf Steroiden ist.
+Wo die IR-Maschine unspezifiziert ist, wie das Programm startet, müssen wir für die Ausführungsplattform ein passendes Binärformat erzeugen.
 All diese verbleibenden Aspekte werden wir in die Vorlesung thematisieren.
 Damit vollenden wir unsere Reise zur Schließung der semantischen Lücke, einer Reise, die man als 10.000 Abstraktionsebenen unter der Entwicklungsumgebung bezeichnen könnte.
 
 Als Zielplattform, anhand derer wir die Maschinencodeerzeugung diskutieren werden, habe ich die IA-32 (32-Bit Intel Architektur) gewählt.
-Nicht weil diese besonders hübsch oder zugänglich ist, sondern weil sie ein seit 40 Jahren stabiles Prozessorinterface bietet.
+Nicht, weil diese besonders hübsch oder zugänglich ist, sondern weil sie ein seit 40 Jahren stabiles Prozessorinterface bietet.
 Außerdem unterstützen alle Intel CPUs bis heute diesen 32-Bit Modus, auch wenn wir diese normalerweise im 64-Bit AMD64 Modus betreiben.
-Daher können Sie die Programme, die aus dem Übungsübersetzer fallen wirklich ausführen und schrittweise im Debugger durchgehen.
+Daher können Sie die Programme, die aus dem Übungsübersetzer fallen, wirklich ausführen und schrittweise im Debugger durchgehen.
 Dabei ist die Konzentration auf IA-32 kein Hindernis für die Verallgemeinerbarkeit der vorgestellten Techniken. Jede Abbildung des Zwischencodes auf eine reale Prozessorarchitektur muss die selben Probleme lösen, wie wir dies für IA-32 tun müssen. Oft fallen dabei Designentscheidungen anders aus, aber die Probleme bleiben die gleichen.
 
-Das erste Problem, dessen wir uns annehmen müssen ist wie wir die *Speicherabstraktion* der IR-Maschine auf den Prozessor abbilden.
+Das erste Problem, dessen wir uns annehmen müssen, ist, wie wir die *Speicherabstraktion* der IR-Maschine auf den Prozessor abbilden.
 Unsere IR-Maschine ist mit einer sehr mächtigen Speicherabstraktion ausgestattet, weil wir dort zum einen symbolisch benannte Variablen (Register) haben, von denen wir unendlich viele besitzen können.
-Außerdem gibt es die Befehle ~StackAlloc~ und ~HeapAlloc~, die es uns erlauben zusätzlichen Speicherplatz für Objekte anzufordern; es gibt also eine sehr rudimentäre Unterstützung für Objekte.
+Außerdem gibt es die Befehle ~StackAlloc~ und ~HeapAlloc~, die es uns erlauben, zusätzlichen Speicherplatz für Objekte anzufordern; es gibt also eine sehr rudimentäre Unterstützung für Objekte.
 Reale Prozessoren sind deutlich eingeschränkter: Kein realer Prozessor hat unendlich viele Registern, sondern ihre Anzahl ist beschränkt. Der Speicher ist auch nicht so hübsch in Variablen und allozierte Objekte strukturiert, sondern wir arbeiten nur mit einer endlichen Anzahl an Speicherzellen, die wir über einen numerischen Index (== Zeiger) ansprechen können.
 Zwischen beiden Welten bedarf es also einer Abbildungsfunktion.
 
 Das zweite Problem sind die *Befehle der IR-Maschine*:
 Wir haben uns den Zwischencode so definiert, dass die meisten Befehle 3 Operanden haben (Quadrupelschreibweise), wobei Quell- und Zieloperanden getrennt voneinander gewählt werden können.
 Auf IA-32 haben wir diesen Luxus nicht, dort haben Befehle in der Regel 2 Operanden, wovon ein Operand eine doppelte Rolle hat und sowohl Quell- als auch Zieloperand ist.
-Außerdem haben wir auf der IR-Ebene den ~Call~ Befehl, der nicht nur eine Funktion aufruft, sondern auch, nebenbei, eine beliebige Anzahl an Argumenten als Parameter an die neue Funktionsinstanz übergeben kann, wo sie dann wie lokale Variablen verwendet werden können.
-Das ist sehr schickt, aber es unterstützt keine reale Maschine.
-Das Attribut bei dem Sie stutzig werden müssen ist "beliebige Anzahl", denn nichts auf einer realen Maschine hat eine beliebige Anzahl; immer gibt es irgendeine Art von oberen Schranke[fn::Am Ende besteht die Maschine eben doch aus einer endlichen Anzahl von Atomen, die nur eine endliche Anzahl von Taktzyklen betrieben werden kann, bevor Elektromigration alle Gates und Leitungen aufgefressen hat.
+Außerdem haben wir auf der IR-Ebene den ~Call~-Befehl, der nicht nur eine Funktion aufruft, sondern auch, nebenbei, eine beliebige Anzahl an Argumenten als Parameter an die neue Funktionsinstanz übergeben kann, wo sie dann wie lokale Variablen verwendet werden können.
+Das ist sehr schick, aber es wird von keiner realen Maschine unterstützt.
+Das Attribut, bei dem Sie stutzig werden müssen, ist "beliebige Anzahl", denn nichts auf einer realen Maschine hat eine beliebige Anzahl; immer gibt es irgendeine Art von oberer Schranke[fn::Am Ende besteht die Maschine eben doch aus einer endlichen Anzahl von Atomen, die nur eine endliche Anzahl von Taktzyklen betrieben werden kann, bevor Elektromigration alle Gates und Leitungen aufgefressen hat.
 [[https://de.wikipedia.org/wiki/Memento_mori][Oh Memento Mori]]!].
 Auch hier brauchen wir für jeden IR-Befehl eine Abbildung auf einen IA-32-Befehl.
 
@@ -192,7 +192,7 @@ IA-32 kennt aber Kontrollflussgraphen nicht als Dateiformat, sondern nur einen l
 Wir müssen unser übersetztes Programm so in eine Datei speichern, dass es vom Betriebssystem, als ein Prozess, in den Speicher geladen wird, wo es dann als Instruktionsstrom abgearbeitet werden kann.
 Wir schauen uns dazu an, wie das ELF-Binärformat für Linux aufgebaut ist und wie der erzeugte Assemblercode im Anschluss an die Übersetzung für die Ausführung vorbereitet wird.
 
-Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließen. Am Ende haben wir ein ausführbares Binärprogramm.
+Alles in allem: Machen Sie sich bereit, die letzte semantische Lücke zu schließen. Am Ende haben wir ein ausführbares Binärprogramm.
 
 * Speicherabstraktion: Call-Frames
 :PROPERTIES:
@@ -253,49 +253,49 @@ Alles in allem: Machen Sie sich bereit die letzte semantische Lücke zu schließ
   \end{frame}
 #+end_src
 
-Der erste Schritt über den wir uns bei der Transformation von IR-Code zu Maschinencode Gedanken machen werden sind Funktionsaufrufe.
-Anhand dieser Funktionsaufrufe lernen wir nicht nur wie Argumente transportiert werden, sondern auch wie lokale Variablen im Call-Frame abgelegt werden.
+Der erste Schritt, über den wir uns bei der Transformation von IR-Code zu Maschinencode Gedanken machen werden, sind Funktionsaufrufe.
+Anhand dieser Funktionsaufrufe lernen wir nicht nur, wie Argumente transportiert werden, sondern auch, wie lokale Variablen im Call-Frame abgelegt werden.
 Dazu wollen wir uns aber zunächst in Erinnerung rufen, was der IR-Befehl ~Call~ genau getan hat.
 Der erste Operand von ~Call~ war der Name der Funktion, die der Aufrufer (Caller) aktivieren will (Callee).
 Die restlichen (beliebig viele) Operanden sind die Argumente, die vom Caller zum Callee übertragen werden (Datenfluss A).
 Für jeden Funktionsaufruf entsteht eine neue *Funktionsinstanz*, die wir mit eigenen lokalen Variablen ausstatten, die im Call-Frame gespeichert werden.
-Zusätzlich wird im Call-Frame auch noch eine Rücksprungadresse gespeichert, die Angibt an welche Codestelle im Caller wir beim ~Return~-Befehl zurückkehren.
+Zusätzlich wird im Call-Frame auch noch eine Rücksprungadresse gespeichert, die angibt, an welche Codestelle im Caller wir beim ~Return~-Befehl zurückkehren.
 Mit der Rückkehr kann, über den Rückgabewert, ein zweiter Datenfluss (R) stattfinden.
 
-Zentral bei der Abbildung auf die Maschine ist der Call-Frame. Für diesen stellt sich die Frage nach dem Datenlayout. Ähnlich wie bei Record-Typen müssen wir uns auf ein konkretes Abbild im Speicher festlegen. Nur so können wir die Verwendung von symbolischen Namen effizient auf die Zeiger-basierte Adressierung der Maschine abbilden. Darüber hinaus müssen wir die Entscheidung über den Besitzer{{{see(06-ownership,Besitz von Objekten)}}} des Call-Frames treffen: Wer erzeugt den Call-Frame und wer löscht ihn wieder? Caller oder Callee? 
-Außerdem müssen wir uns darauf festlegen, was der Callee am Maschinenzustand überhaupt verändern darf. Darf der Callee den gesamten Speicher mit Nullen überschreiben (eher nicht nützlich), oder darf der Caller annehmen das einige Teile des Maschinenzustands unverändert bleiben.
+Zentral bei der Abbildung auf die Maschine ist der Call-Frame. Für diesen stellt sich die Frage nach dem Datenlayout. Ähnlich wie bei Record-Typen müssen wir uns auf ein konkretes Abbild im Speicher festlegen. Nur so können wir die Verwendung von symbolischen Namen effizient auf die zeigerbasierte Adressierung der Maschine abbilden. Darüber hinaus müssen wir die Entscheidung über den Besitzer{{{see(06-ownership,Besitz von Objekten)}}} des Call-Frames treffen: Wer erzeugt den Call-Frame und wer löscht ihn wieder? Caller oder Callee?
+Außerdem müssen wir uns darauf festlegen, was der Callee am Maschinenzustand überhaupt verändern darf. Darf der Callee den gesamten Speicher mit Nullen überschreiben (eher nicht nützlich), oder darf der Caller annehmen, dass einige Teile des Maschinenzustands unverändert bleiben.
 
-Wie sie bereits sehen, ich spreche hier häufig davon, dass wir uns festlegen müssen.
+Wie Sie bereits sehen, ich spreche hier häufig davon, dass wir uns festlegen müssen.
 Diese Entscheidungen, die wir bei der Abbildung von Funktionsaufrufen und dem Call-Frame machen, sind nicht zwingend, sondern es sind Designentscheidungen.
-Es sind Konventionen, an die sich sowohl Caller, als auch Callee, halten um miteinander arbeiten zu können.
+Es sind Konventionen, an die sich sowohl Caller als auch Callee halten, um miteinander arbeiten zu können.
 Daher heißen diese Designentscheidungen auch Aufrufkonventionen.
 
 Eine *Aufrufkonvention* regelt, im Kern, drei Dinge:
 Zum einen wird geregelt, wie Operanden von Caller zum Callee kommen.
 Dabei legt der Caller die Operanden an fest definierte Orte in der Maschine (z.B.
-auf den Stack oder ins Register) und der Callee verlässt sich darauf an genau diesen Stellen die Argumente zu finden.
+auf den Stack oder ins Register) und der Callee verlässt sich darauf, an genau diesen Stellen die Argumente zu finden.
 In der Rückrichtung verhält es sich mit dem Rückgabewert:
 Der Callee legt sein Berechnungsergebnis an eine vordefinierte Stelle in der Maschine, wo sie der Caller wieder auslesen kann.
 
-Das Dritte, was eine Aufrufkonvention regelt, ist der Maschinenzustand, der über einen einen Funktionsaufruf hinaus unberührt bleibt.
+Das Dritte, was eine Aufrufkonvention regelt, ist der Maschinenzustand, der über einen Funktionsaufruf hinaus unberührt bleibt.
 Wir haben schon häufiger davon gesprochen, dass wir Funktionsaufrufe als Komplexoperationen ansehen können, mit denen der Befehlssatz erweitert wird.
-Die Aufrufkonvention beschreibt dann welche Seiteneffekte eine solche ~Call~-Komplexoperation auf den Maschinenzustand hat.
+Die Aufrufkonvention beschreibt dann, welche Seiteneffekte eine solche ~Call~-Komplexoperation auf den Maschinenzustand hat.
 Eine mögliche Regel könnte zum Beispiel sein: Der Callee darf nur das Register ~eax~, seinen eigenen Call-Frame, und alle über Zeiger erreichbare Speicherzellen verändern.
 
 Aufrufkonventionen dienen dazu Kompatibilität zu schaffen.
-Zum einen kann ein Übersetzer so Funktionen unabhängig voneinander zu Maschinencode übersetzen, da die Regel für Funktionsaufrufe überall gleich sind.
-Dies funktioniert sogar, wenn wir den Übersetzer auf mehreren Quelldateien ausführen um eine separate Übersetzung durch zu führen (dazu später mehr).
+Zum einen kann ein Übersetzer so Funktionen unabhängig voneinander zu Maschinencode übersetzen, da die Regeln für Funktionsaufrufe überall gleich sind.
+Dies funktioniert sogar, wenn wir den Übersetzer auf mehreren Quelldateien ausführen, um eine separate Übersetzung durchzuführen (dazu später mehr).
 Aber eine Aufrufkonvention fördert auch die Kompatibilität zwischen verschiedenen Übersetzern, und sogar zwischen unterschiedlichen Programmiersprachen.
-So ist die Aufrufkonvention für C Funktionen auf den meisten Plattformen die Lingua Franca um Funktionen aus anderen Programmiersprachen aufzurufen.
+So ist die Aufrufkonvention für C-Funktionen auf den meisten Plattformen die Lingua Franca, um Funktionen aus anderen Programmiersprachen aufzurufen.
 
 Als Beispiel werden wir uns im Folgenden der System-V Aufrufkonvention für C auf der IA-32 Plattform beschäftigen.
-Diese können Sie genauer im [[http://www.sco.com/developers/devspecs/abi386-4.pdf][Spezifikationsdokument]] ab Seite 35 ganz genau nachlesen.
+Diese können Sie genauer im [[http://www.sco.com/developers/devspecs/abi386-4.pdf][Spezifikationsdokument]] ab Seite 35 nachlesen.
 Keine Angst, die Spezifikation ist sehr klar und, wenn Sie mit dieser Vorlesungseinheit durch sind, gut zu verstehen.
-Bei dieser Konvention werden die Argumente von rechts nach links auf den Stack gelegt, was dazu führt dass das erste Argument zu oberst auf dem Stack liegt. Wir werden gleich sehen, welchen Vorteil diese Entscheidung bei Funktionen mit einer variablen Anzahl an Argumenten hat (z.B. ~printf()~). 
-Außerdem regelt die Aufrufkonvention das Rückgabewerte von Typ ~int~ in ~%eax~ und Fließkommazahlen in ~%st0~ gespeichert werden.
-Bezüglich des unveränderten Maschinenzustands regelt die System-V Aufrufkonvention, dass fünf Register (~%esp, %ebp, %ebx, %esi, %edi~) nach einem Funktionsaufruf den gleichen Zustand haben müssen, wie vor dem Funktionsaufruf. Die *Callee-saved Register* werden vom Callee gespeichert und am Ende wieder hergestellt.
+Bei dieser Konvention werden die Argumente von rechts nach links auf den Stack gelegt, was dazu führt, dass das erste Argument zu oberst auf dem Stack liegt. Wir werden gleich sehen, welchen Vorteil diese Entscheidung bei Funktionen mit einer variablen Anzahl an Argumenten hat (z.B. ~printf()~).
+Außerdem regelt die Aufrufkonvention, dass Rückgabewerte vom Typ ~int~ in ~%eax~ und Fließkommazahlen in ~%st0~ gespeichert werden.
+Bezüglich des unveränderten Maschinenzustands regelt die System-V Aufrufkonvention, dass fünf Register (~%esp, %ebp, %ebx, %esi, %edi~) nach einem Funktionsaufruf den gleichen Zustand haben müssen, wie vor dem Funktionsaufruf. Die *Callee-saved Register* werden vom Callee gespeichert und am Ende wiederhergestellt.
 
-Da Konventionen nur Konventionen sind, gibt es natürlich verschiedene Aufrufkonventionen [fn::siehe [[https://xkcd.com/927/][xkcd: Competing Standard]]]. So verwendet Windows, im gleichen Programm, für normale Funktionsaufrufe die fastcall-Konvention für normale Funktionsaufrufe und die Pascal-Konvention für Systemaufruf.
+Da Konventionen nur Konventionen sind, gibt es natürlich verschiedene Aufrufkonventionen[fn::siehe [[https://xkcd.com/927/][xkcd: Competing Standard]]]. So verwendet Windows im selben Programm für normale Funktionsaufrufe die fastcall-Konvention und die Pascal-Konvention für Systemaufrufe.
 
 #+begin_src latex
 \begin{frame}{Call-Frame auf IA-32/Linux}
@@ -343,50 +343,50 @@ Da Konventionen nur Konventionen sind, gibt es natürlich verschiedene Aufrufkon
   \end{frame}
 #+end_src  
 
-Betrachten wir uns die Situation eines Funktionsaufrufs und die Erzeugung des Call-Frames auf IA-32 noch einmal genauer.
+Betrachten wir die Situation eines Funktionsaufrufs und die Erzeugung des Call-Frames auf IA-32 noch einmal genauer.
 Basis für diese Betrachtung ist, dass der Stack auf IA-32 von den hohen zu den niedrigen Adressen wächst, was sich in Maschinenbefehlen wie ~push~ und ~pop~ niederschlägt.
 Außerdem wird im Register ~%esp~ der Stackzeiger gespeichert, der als impliziter Quell- und Zieloperand für ~push/pop~ dient.
 Wir starten unsere Betrachtung im Caller, der eine Funktion mit 3 Parametern aufrufen wird.
-Um diesen Aufruf zu tätigen führt der Caller die sogenannte *Aufrufsequenz* durch.
+Um diesen Aufruf zu tätigen, führt der Caller die sogenannte *Aufrufsequenz* durch.
 Die Aufrufsequenz sind jene Maschinenbefehle, die auf Seiten des Callers den Funktionsaufruf vorbereiten und durchführen. 
 
-Der erste Schritt der Aufrufsequenz ist speichern der Argumente auf den Stack.
+Der erste Schritt der Aufrufsequenz ist das Speichern der Argumente auf den Stack.
 Dabei legen wir die Argumente von rechts nach links auf den Stack.
 Achten Sie bei der Animation auf den linken und den rechten Rand des Stacks.
 Auf der linken Seite sehen wir, wie der Stackzeiger mit jedem Argument nach unten wandert, da er immer auf das oberste Element des Stacks zeigt.
-Auf der rechten Seite habe ich notiert wie wir, zu jedem Zeitpunkt, auf das jeweilige Argument relativ zum Stackzeiger zugreifen könnten.
+Auf der rechten Seite habe ich notiert, wie wir zu jedem Zeitpunkt auf das jeweilige Argument relativ zum Stackzeiger zugreifen könnten.
 Nachdem alle drei Argumente auf dem Stack liegen, können wir auf den Wert von ~arg2~ mit einem relativen Offset von 8 (~8(%esp)~ == ~%esp + 8~) zugreifen.
 
-Dieser relative Zugriff ist von großer Bedeutung, weil der Stackzeiger (und später der Basiszeiger) der Anker ist an dem wir den Call-Frame festhalten können.
+Dieser relative Zugriff ist von großer Bedeutung, weil der Stackzeiger (und später der Basiszeiger) der Anker ist, an dem wir den Call-Frame festhalten können.
 Über die relativen und konstanten (!)
 Offsets können wir dann auf die einzelnen Felder des Call-Frames zugreifen.
-Dieses Vorgehen ist dem Vorgehen für Records sehr ähnlich: Auch dort gab es einen Zeiger an dem wir das Objekt fest gehalten haben und relative Offsets, die wir mit dem Datenlayout fest gelegt haben. Genauso verhält es sich bei Call-Frames.
+Dieses Vorgehen ist dem Vorgehen für Records sehr ähnlich: Auch dort gab es einen Zeiger, an dem wir das Objekt festgehalten haben und relative Offsets, die wir mit dem Datenlayout festgelegt haben. Genauso verhält es sich bei Call-Frames.
 
 In den relativen Offsets liegt auch der Grund, wieso die Argumente von rechts nach links auf den Stack gelegt werden:
 Stellen Sie sich vor, dass unsere Funktion nicht nur 3 Parameter hat, sondern noch viel mehr, im schlimmsten Fall sogar eine variable Anzahl.
 Diese würden unter ~arg2~ liegen und sie hätten keinen Einfluss auf die relativen Offsets für die ersten 3 Argumente.
-Der Callee kann also auf die ersten Argumente zugreifen, ohne zu wissen wie viele Argumente noch kommen.
+Der Callee kann also auf die ersten Argumente zugreifen, ohne zu wissen, wie viele Argumente noch kommen.
 Überlegen Sie sich dazu, mit welchem Offset das erste Argument von ~printf()~[fn::int printf(const char *format, ...)]
 relativ zum Stackzeiger gespeichert ist.
 Da mit diesem ersten Argument ~format~ gespeichert ist, wie viele Argumente noch zu erwarten sind, kann die Implementierung die restlichen Offsets dynamisch berechnen.
 Wenn sie diesen Mechanismus noch genauer verstehen möchten, schauen Sie sich die Manpage [[https://linux.die.net/man/3/va_arg][va_arg(3)]] an.
 
-Nachdem die Argumente auf dem Stack liegen wird der Maschinenbefehl ~call~ ausgeführt, der die Rücksprungadresse auf den Stack legt und den Kontrollfluss zum Callee umleitet.
+Nachdem die Argumente auf dem Stack liegen, wird der Maschinenbefehl ~call~ ausgeführt, der die Rücksprungadresse auf den Stack legt und den Kontrollfluss zum Callee umleitet.
 Durch die Rücksprungadresse können wir später den Kontrollfluss des Callers wieder aufnehmen.
 
-Da die Kontrolle über die Maschine nun beim Callee liegt, kann dieser den Rest des Call-Frames anlegen indem der Stackpointer noch weiter nach unten verschoben wird.
+Da die Kontrolle über die Maschine nun beim Callee liegt, kann dieser den Rest des Call-Frames anlegen, indem der Stackpointer noch weiter nach unten verschoben wird.
 In diesem Zwischenbereich (gelb) werden dann die lokalen Variablen abgelegt.
-Wie Sie sehen habe ich in der Animation keine feste Größe für diesen Bereich angegeben sondern erst mal die Zahl ~x~.
-Solange eine Funktion nur lokale Variablen hat, aber niemals eine dynamische Stackallokation (~StackAlloc~) durchführt, ist der gelbe Bereich von bekannter Größe und die Zahl ~x~ eine Konstante. In diesem Fall können wir weiterhin über einen konstanten Stackzeiger-Offset auf die Argumente zugreifen. Hätte unsere Funktion beispielsweise 3 lokale Variablen a 4 Byte, würden wir mit ~24(%esp)~ an ~arg2~ kommen.
+Wie Sie sehen, habe ich in der Animation keine feste Größe für diesen Bereich angegeben, sondern erst mal die Zahl ~x~.
+Solange eine Funktion nur lokale Variablen hat, aber niemals eine dynamische Stackallokation (~StackAlloc~) durchführt, ist der gelbe Bereich von bekannter Größe und die Zahl ~x~ eine Konstante. In diesem Fall können wir weiterhin über einen konstanten Stackzeiger-Offset auf die Argumente zugreifen. Hätte unsere Funktion beispielsweise 3 lokale Variablen à 4 Byte, würden wir mit ~24(%esp)~ an ~arg2~ kommen.
 
 Problematisch wird es, wenn der gelbe Bereich von unbekannter Größe ist.
-In diesem Fall brauchen wir einen zweiten Zeiger, der in die Mitte des Call-Frames zeigt, sodass die Parameter weiterhin über konstante Offsets erreicht werden kann.
+In diesem Fall brauchen wir einen zweiten Zeiger, der in die Mitte des Call-Frames zeigt, sodass die Parameter weiterhin über konstante Offsets erreicht werden können.
 Dieser Zeiger heißt *Basiszeiger* und wird auf IA-32 in ~%ebp~ gespeichert.
 Es heißt deswegen Basiszeiger, weil er eigentlich an die Basis des Call-Frames zeigt, die viele Autoren am Beginn des gelben Bereichs verorten.
 Für diese Autoren beginnt der Call-Frame erst mit den lokalen Variablen und die Argumente gehören noch zum Call-Frame des Aufrufers.
 Da ich es aber unlogisch finde, dass Parameter und lokale Variablen einer Funktionsinstanz in unterschiedlichen Call-Frames liegen, definieren wir den Call-Frame in dieser Veranstaltung so, dass er sowohl Parameter und lokale Variablen überdeckt.
 
-Verwendet man einen Basiszeiger, so muss der ursprüngliche Wert dieses Registers gesichert (und am Ende wieder hergestellt) werden. Schließlich gehört ~%ebp~ zu den Callee-Save Registern.
+Verwendet man einen Basiszeiger, so muss der ursprüngliche Wert dieses Registers gesichert (und am Ende wiederhergestellt) werden. Schließlich gehört ~%ebp~ zu den Callee-Save Registern.
 
 Am Ende der Funktion baut der Callee seinen Anteil des Call-Frames wieder ab und gibt die Kontrolle mit dem ~ret~-Maschinenbefehl an den Caller zurück.
 Dieser entfernt dann wieder die Parameter vom Stack und fährt mit seinem Kontrollfluss, nun um den Rückgabewert reicher, fort.
@@ -419,16 +419,16 @@ Dieser entfernt dann wieder die Parameter vom Stack und fährt mit seinem Kontro
 
 Ich möchte noch ganz kurz darauf eingehen, in welchen Aspekten sich Aufrufkonventionen unterscheiden können.
 Da auf aktuellen Plattformen Speicherzugriffe langsamer sind als Registerzugriffe, werden bei neueren Aufrufkonventionen die ersten Argumente nicht über den Speicher, sondern über die Register übergeben.
-Diese ist eine Optimierung, die insbesondere bei Funktionen mit weniger Argumenten, was die meisten Funktionen sind, erheblich die Anzahl der Speicheroperationen einschränkt.
+Dies ist eine Optimierung, die insbesondere bei Funktionen mit weniger Argumenten, was die meisten Funktionen sind, die Anzahl der Speicheroperationen erheblich einschränkt.
 
 Eine andere Designentscheidung für Aufrufkonventionen ist die Anzahl der Callee-Save Register.
-Umso mehr Register als Callee-Save angenommen werden umso mehr Sicherungsoperationen können wir uns auf Seiten des Aufrufers sparen, da diese beim Callee gesichert werden.
-Andersherum, bei weniger Callee-save Registern, haben Funktionen, insbesondere Blattfunktionen, mehr Register zur Verfügung, die ohne Sicherung verwendet werden können.
-Das grundlegende Problem ist, dass der Caller nicht weiß welche Register der Callee tatsächlich verwenden wird, und der Callee nicht weiß welche Register sein Caller in der Zukunft noch verwenden will.
-Deshalb suchen Aufrufkonventionen nach einem Trade-Off zwischen keine Callee-save Register und ausschließlich Callee-save Registern, der diese gegenseitige Nicht-Kennen ausgleicht. Meist kümmert sich sowohl Caller als auch Callee um etwa die Sicherung des halben Registersatzes.
+Umso mehr Register als Callee-Save angenommen werden, desto mehr Sicherungsoperationen können wir uns auf Seiten des Aufrufers sparen, da diese beim Callee gesichert werden.
+Andersherum, bei weniger Callee-save Registern haben Funktionen, insbesondere Blattfunktionen, mehr Register zur Verfügung, die ohne Sicherung verwendet werden können.
+Das grundlegende Problem ist, dass der Caller nicht weiß, welche Register der Callee tatsächlich verwenden wird, und der Callee nicht weiß, welche Register sein Caller in der Zukunft noch verwenden will.
+Deshalb suchen Aufrufkonventionen nach einem Trade-Off zwischen keine Callee-save Register und ausschließlich Callee-save Registern, der dieses gegenseitige Nicht-Kennen ausgleicht. Meist kümmert sich sowohl Caller als auch Callee um etwa die Sicherung des halben Registersatzes.
 
-Der dritte Aspekt der ebenfalls in Aufrufkonventionen geregelt ist, sind zusätzliche, nicht sichtbare Register.
-So wird beim thiscall (C++) der Zeiger auf das Objekt auf dem eine Methode ausgeführt werden soll im Register ~%ecx~ übergeben. Über solche zusätzlichen Argumente haben wir allerdings schon im Kapitel zur Codeerzeugung ausführlich geredet{{{see(08-codegen-records, Codeerzeugung für Records)}}}.
+Der dritte Aspekt, der ebenfalls in Aufrufkonventionen geregelt ist, sind zusätzliche, nicht sichtbare Register.
+So wird beim thiscall (C++) der Zeiger auf das Objekt, auf dem eine Methode ausgeführt werden soll, im Register ~%ecx~ übergeben. Über solche zusätzlichen Argumente haben wir allerdings schon im Kapitel zur Codeerzeugung ausführlich geredet{{{see(08-codegen-records, Codeerzeugung für Records)}}}.
 
 #+begin_src latex
   \begin{frame}[fragile]{Lokale Variablen}
@@ -466,26 +466,26 @@ So wird beim thiscall (C++) der Zeiger auf das Objekt auf dem eine Methode ausge
 
 Die Aufrufkonvention legt fest, welche Argumente über den Speicher im Call-Frame und welche in Registern übergeben werden.
 Daher wissen wir nun, wie der Maschinenzustand aussieht, bevor die erste Instruktion unserer Funktion ausgeführt wird.
-Nachdem wir dort den alten Basiszeiger gesichert und einen etabliert haben, können wir mit konstanten Offsets auf die Parameter zugreifen.
-Aber es fehlt noch etwas essentiellen:
-Wie bilden wir die lokalen Variablen auf den Speicher ab.
-Diesen (gelben) Teil habe ich bisher absichtlich ausgelassen um jetzt darauf genauer einzugehen.
+Nachdem wir dort den alten Basiszeiger gesichert und einen neuen etabliert haben, können wir mit konstanten Offsets auf die Parameter zugreifen.
+Aber es fehlt noch etwas essentielles:
+Wie bilden wir die lokalen Variablen auf den Speicher ab?
+Diesen (gelben) Teil habe ich bisher absichtlich ausgelassen, um jetzt genauer darauf einzugehen.
 
 Das Problem ist, dass es (meist) mehr lokale Variablen in einer IR-Funktion gibt als der Registersatz der Maschine Plätze vorsieht.
-So bleiben bei IA-32 noch 6 "General-Purpose Register" über, nachdem wir Stackzeiger und Basiszeiger abgezogen haben, in denen wir Werte speichern können.
-Für alle Funktionen die nur 6 IR-Variablen haben können wir also eine 1:1 Abbildung vornehmen und brauchen keinen Stackspeicher vorsehen.
+So bleiben bei IA-32 noch 6 "General-Purpose Register" über, in denen wir Werte speichern können, nachdem wir Stackzeiger und Basiszeiger abgezogen haben.
+Für alle Funktionen, die nur 6 IR-Variablen haben, können wir also eine 1:1 Abbildung vornehmen und brauchen keinen Stackspeicher vorsehen.
 Aber wie oft trifft das schon ein, nur 6 Variablen?
 
 Daher müssen wir den Call-Frame als zusätzlichen Zustandsspeicher für die Funktionsinstanz auffassen.
-Dazu legen wir am Beginn der Funktion eine gewissen Anzahl an *Speicherslots* an, in denen wir Variablenwerte zwischenspeichern können, wenn sie gerade nicht in Register liegen. Wir können dann Werte zwischen Registern und Speicherslots hin und her verschieben.
+Dazu legen wir am Beginn der Funktion eine gewisse Anzahl an *Speicherslots* an, in denen wir Variablenwerte zwischenspeichern können, wenn sie gerade nicht in Register liegen. Wir können dann Werte zwischen Registern und Speicherslots hin und her verschieben.
 
-Bei der einfachsten Variante diese Abbildung von IR-Variable durchzuführen, geben legen wir für jede Variable einen festen Slot an, der Fix mit dieser IR-Variable verbunden ist.
-Durch diese fixe Zuordnung zwischen IR-Variable und Stack-Slot, können wir für jede Variable einen konstanten Basiszeiger-Offset angeben mit dem wir den zugehörigen Slot adressieren können.
+Bei der einfachsten Variante diese Abbildung von IR-Variablen durchzuführen, legen wir für jede Variable einen festen Slot an, der fix mit dieser IR-Variable verbunden ist.
+Durch diese fixe Zuordnung zwischen IR-Variable und Stack-Slot können wir für jede Variable einen konstanten Basiszeiger-Offset angeben, mit dem wir den zugehörigen Slot adressieren können.
 
 Ich möchte hier noch einmal ganz deutlich machen, dass es einen kategorischen Unterschied zwischen Variable und Stack-Slot gibt:
 Variablen sind ein Konzept der IR-Ebene und so auf der Maschinenebene so nicht vorhanden.
 Slots dagegen sind auf der Maschinenebene vorhanden, da wir auf eine konkrete Speicherzelle zeigen können und sagen:
-"Das ist der Stack-Slot 3 im Call-Frame zu eine Funktionsinstanz von ~bar()~".
+"Das ist der Stack-Slot 3 im Call-Frame zu einer Funktionsinstanz von ~bar()~".
 Wie ist aber das Verhältnis von Variable zu Slot (in unserer fixen Zuordnung)?
 Man kann es sich bildlich so vorstellen, dass die Variable ein Geist ist, der entweder gerade in einem Register oder in einem Stack-Slot lebt.
 Zu jedem Zeitpunkt kann dieser Geist nur in einem dieser beiden Orte leben, denn entweder enthält ein Register den aktuellen Wert der Variable oder ein Stack-Slot.
@@ -1185,14 +1185,14 @@ Diese Verbesserungen stammen sogar hauptsächlich aus der Registervergabe, da di
   \end{frame}
 #+end_src
 
-Mit Makroexpansion und Registervergabe haben wir jetzt alle Bausteine zusammen um einen Übersetzer zu bauen, der aus dem Quellcode ein Stück Assembler-Programm für einen konkreten Prozessor erstellt[fn::Er herrscht große Freude allerorten!].
+Mit Makroexpansion und Registervergabe haben wir jetzt alle Bausteine zusammen, um einen Übersetzer zu bauen, der aus dem Quellcode ein Stück Assembler-Programm für einen konkreten Prozessor erstellt[fn::Er herrscht große Freude allerorten!].
 Aber damit sind wir eigentlich noch lange nicht fertig, denn Prozessoren führen, wie wir in der ersten Vorlesung gelernt haben, keinen Assembler aus, sondern binär-codierte Maschinenbefehle aus dem Speicher.
-Daher müssen wir noch kurz besprechen, was nach dem Übersetzer kommt um ein vollständiges Bild zu bekommen.
+Daher müssen wir noch kurz besprechen, was nach dem Übersetzer kommt, um ein vollständiges Bild zu bekommen.
 
-Diskutieren werden wir diesen weiteren Lebenslauf unseres Programms anhand es ELF-Dateiformats, welches unter Linux verwendet wird um bereits übersetzte Programme und Programmfragmente so speichern und welche auch die Basis für die Ausführung eines Programms im Rahmen eines Prozesses darstellt[fn::Sollte ihnen der Unterschied zwischen Programm und Prozess nicht klar sein, schauen Sie sich noch einmal die zugehörigen Folien in der Veranstaltung "Grundlagen der Betriebssysteme" an.].
-ELF ist also der zentrale Angelpunkt um binär-codierten Maschinencode zu speichern und zur Ausführung zu bringen.
+Diskutieren werden wir diesen weiteren Lebenslauf unseres Programms anhand es ELF-Dateiformats, welches unter Linux verwendet wird, um bereits übersetzte Programme und Programmfragmente zu speichern, und welche auch die Basis für die Ausführung eines Programms im Rahmen eines Prozesses darstellt[fn::Sollte Ihnen der Unterschied zwischen Programm und Prozess nicht klar sein, schauen Sie sich noch einmal die zugehörigen Folien in der Veranstaltung "Grundlagen der Betriebssysteme" an.].
+ELF ist also der zentrale Angelpunkt, um binär-codierten Maschinencode zu speichern und zur Ausführung zu bringen.
 
-ELF ist auch eng verbunden mit der *separaten Übersetzung* von Quellcodedateien. Dabei wird der Übersetzer für mehrere Quelldateien separat aufgerufen, mit dem Zwischenschritt über den Assembler, ein Objekt-Datei erstellt. Diese Objektdateien, die bereits Binärdaten enthalten und dem ELF-Format entsprechen, werden dann vom *Linker* zu ein großen ELF-Datei zusammengebunden. Dabei werden symbolische Referenzen zwischen den Objektdateien aufgelöst, sodass es möglich ist eine Funktion, die in einer anderen Objekt-Datei definiert ist, aufzurufen.
+ELF ist auch eng verbunden mit der *separaten Übersetzung* von Quellcodedateien. Dabei wird der Übersetzer für mehrere Quelldateien separat aufgerufen und mit dem Zwischenschritt über den Assembler eine Objekt-Datei erstellt. Diese Objektdateien, die bereits Binärdaten enthalten und dem ELF-Format entsprechen, werden dann vom *Linker* zu einer großen ELF-Datei zusammengebunden. Dabei werden symbolische Referenzen zwischen den Objektdateien aufgelöst, sodass es möglich ist, eine Funktion, die in einer anderen Objekt-Datei definiert ist, aufzurufen.
 
 Ebenfalls spielt das ELF-Format eine zentrale Rolle für die gemeinsame Verwendung von Bibliotheken.
 Durch diese "Shared Libraries" kann Binärcode in mehreren Programmen und Prozessen verwenden werden, ohne ihn mehrfach auf Platte bzw. im RAM zu halten. Die Verbindung zu ELF ist, dass auch diese geteilten Bibliotheken im ELF-Format gespeichert sind.
@@ -1256,16 +1256,16 @@ Beide schauen wir uns nun an.
   \end{frame}
 #+end_src
 
-Zuerst betrachten wir uns den *Link View* der, wie der Name es andeutet beim Linken von mehreren Objektdateien zu einem ausführbaren Programm verwendet wird. Erzeugt werden die Objektdateien vom Assembler, der aus den *Mnemonics* [fn::Das Wort lässt sich in etwa mit Merkspruch übersetzen und es ist selbst das genaue Gegenteil von dem was es bedeutet. Ich finde es überhaupt nicht leicht zu merken.] Binärcode erstellt. Neben den Assemblerzeilen als Maschinenbefehle codieren, gibt es auch noch Pseudo-Instruktionen, die die Erzeugung der ELF-Datei steuern. So gibt der Pseudobefehl ~.text~ an, dass ab nun Code kommt, während ~.data~ angibt dass nun Daten folgen. Außerdem beinhaltet Assembler symbolische Namen (~main~, ~foo~), die der Prozessor nicht unterstützt, und die daher in des ELFs landen müssen.
+Zuerst betrachten wir den *Link View* der, wie der Name es andeutet, beim Linken von mehreren Objektdateien zu einem ausführbaren Programm verwendet wird. Erzeugt werden die Objektdateien vom Assembler, der aus den *Mnemonics*[fn::Das Wort lässt sich in etwa mit Merkspruch übersetzen und es ist selbst das genaue Gegenteil von dem, was es bedeutet. Ich finde es überhaupt nicht einfach zu merken.] Binärcode erstellt. Neben den als Maschinenbefehle kodierten Assemblerzeilen gibt es auch noch Pseudo-Instruktionen, die die Erzeugung der ELF-Datei steuern. So gibt der Pseudobefehl ~.text~ an, dass ab nun Code kommt, während ~.data~ angibt, dass nun Daten folgen. Außerdem beinhaltet Assembler symbolische Namen (~main~, ~foo~), die der Prozessor nicht unterstützt, und die daher in des ELFs landen müssen.
 Der Link-View besteht hauptsächlich aus drei wichtigen Elementen: Sektionen, Symbole und Relokationen.
 
-*Sektionen* beinhalten die eigentlichen Binärdaten, die können im Fall der Text-Sektion Maschinenbefehle  sind, und im Falle der Daten-Sektion vorinitialisierte globale Variablen. Sektionen haben also, in der ELF-Datei, einen Anfang, eine Länge und einen Namen. Außerdem hat jede Sektion noch Flags, die angeben ob der Inhalt der Sektion einmal in den Prozess geladen werden soll (A), dort ausführbar ist (X) oder geschrieben werden soll (W). Da der Assembler noch nicht alle symbolischen Referenzen auflösen kann (z.B. zu Funktionen aus anderen Objekt-Dateien), lässt er an entsprechender Stelle Platzhalter, die vom Linker aufgefüllt werden. Sie sollten einmal her gehen und eine Objektdatei mittels ~readelf -a~ (Metadaten) ~objdump -D~ (Disassembly) dekodieren um ein Gefühl für den Inhalt dieser Sektionen zu bekommen.
+*Sektionen* beinhalten die eigentlichen Binärdaten, die im Fall der Text-Sektion Maschinenbefehle sind, und im Falle der Daten-Sektion vorinitialisierte globale Variablen. Sektionen haben also, in der ELF-Datei, einen Anfang, eine Länge und einen Namen. Außerdem hat jede Sektion noch Flags, die angeben, ob der Inhalt der Sektion einmal in den Prozess geladen werden soll (A), dort ausführbar ist (X) oder geschrieben werden soll (W). Da der Assembler noch nicht alle symbolischen Referenzen auflösen kann (z.B. zu Funktionen aus anderen Objekt-Dateien), lässt er an entsprechender Stelle Platzhalter, die vom Linker aufgefüllt werden. Sie sollten einmal hergehen und eine Objektdatei mittels ~readelf -a~ (Metadaten) ~objdump -D~ (Disassembly) dekodieren, um ein Gefühl für den Inhalt dieser Sektionen zu bekommen.
 
-Neben der eigentlichen Nutzlast, die in Sektionen gespeichert, gibt es noch die Symboltabelle[fn::Technisch gesehen ist die Symboltabelle auch eine Sektion, die allerdings nicht in den Prozess geladen wird.
-Aber zum erklären ist es einfacher hier einen strikten Unterschied zu postulieren.].
+Neben der eigentlichen Nutzlast, die in Sektionen gespeichert ist, gibt es noch die Symboltabelle[fn::Technisch gesehen ist die Symboltabelle auch eine Sektion, die allerdings nicht in den Prozess geladen wird.
+Aber zum Erklären ist es einfacher hier einen strikten Unterschied zu postulieren.].
 In dieser sind symbolische Namen deklariert.
-Wenn diese in dieser ELF-Datei definiert sind, so referenziert ein Symbol ein bestimmtes Byte in einer der Sektionen.
-So zeugt das Symbol ~main~ in die Text-Sektion (~T~) auf das Byte mit dem Wert ~0x55~, was dem IA-32 Befehl ~push %ebp~ entspricht und den Beginn der Funktion markiert.
+Wenn diese in der ELF-Datei definiert sind, so referenziert ein Symbol ein bestimmtes Byte in einer der Sektionen.
+So zeigt das Symbol ~main~ in die Text-Sektion (~T~) auf das Byte mit dem Wert ~0x55~, was dem IA-32 Befehl ~push %ebp~ entspricht und den Beginn der Funktion markiert.
 Aber ein Symbol kann auch noch undefiniert (~U~) sein, wie das bei ~fib~ der Fall ist.
 Eine solche Situation zeigt an, dass das Symbol in einer anderen Objektdatei definiert sein muss.
 Die Auflösung der undefinierten Symbole übernimmt der Linker.
@@ -1276,19 +1276,19 @@ Diese Relokationen sind Anweisungen wie der Binärcode beim Linken bzw.
 beim Laden verändert werden muss.
 So enthält eine Objekt-Datei für jede Verwendung eines undefinierten Symbols eine Relokation, die das undefinierte Symbol mit der Verwendungsstelle verbindet.
 Steht irgendwann die Adresse eines Symbols fest, so wird die referenzierte Lücke entsprechend umgebogen.
-Da manche Platzhalter eine relative (Funktionsaufrufe auf IA-32 sind Funktionsrelativ) und manche eine absolute Adressierung (Referenzerzeugung einer Variable) verlangen, hat jede Relokation noch einen Typ, der angibt wie die Adresse des Symbols in die Binärdaten hinein gepatcht werden sollen.
+Da manche Platzhalter eine relative (Funktionsaufrufe auf IA-32 sind Funktionsrelativ) und manche eine absolute Adressierung (Referenzerzeugung einer Variable) verlangen, hat jede Relokation noch einen Typ, der angibt, wie die Adresse des Symbols in die Binärdaten hineingepatcht werden soll.
 
 
-Relokationen spielen sowohl beim Linken als auch beim Laden eine Rolle. Wenn ein Programm es erlauben soll, an unterschiedliche Stellen in den RAM geladen zu werden, so müssen alle Codestellen, die eine absolute Adressieren verlangen, entsprechend angepasst werden. Insbesondere bei geteilten Bibliotheken spielen diese Run-Time Relocations eine große Rolle.
+Relokationen spielen sowohl beim Linken als auch beim Laden eine Rolle. Wenn ein Programm es erlauben soll, an unterschiedliche Stellen in den RAM geladen zu werden, so müssen alle Codestellen, die eine absolute Adressierung verlangen, entsprechend angepasst werden. Insbesondere bei geteilten Bibliotheken spielen diese Run-Time Relocations eine große Rolle.
 
 Was geschieht nun also beim Linken mehrerer Objektdateien?
 Wir rufen den Linker mit mehreren Objektdateien (~main.o~, ~foo.o~) auf.
 Dieser sammelt Sektionen gleichen Namens ein und hängt diese im Ergebnis-ELF hintereinander.
 Wichtig zu verstehen ist, dass nicht einzelne Funktionen die Granularität des Linkers ist, sondern ganze Sektionen.
 
-Nachdem die Sektionen gesammelt und verbunden sind, wird auch die Symboltabelle vereinigt. Dabei werden undefinierte Symbole, soweit möglich, durch definierte Symbole aus anderen Objekt-Dateien (oder aus Bibliotheken) ausgelöst. Soll am Ende eine ausführbare Datei entstehen, darf kein Symbol unaufgelöst bleiben. Ist dies doch der Fall kommt es zum Fehler zu einem Linker Fehler.
+Nachdem die Sektionen gesammelt und verbunden sind, wird auch die Symboltabelle vereinigt. Dabei werden undefinierte Symbole, soweit möglich, durch definierte Symbole aus anderen Objekt-Dateien (oder aus Bibliotheken) aufgelöst. Soll am Ende eine ausführbare Datei entstehen, darf kein Symbol unaufgelöst bleiben. Ist dies doch der Fall, kommt es zu einem Linker-Fehler.
 
-Zusätzlich werden beim Linken alle Relokationen aufgelöst, die nun auf nun definierte Symbole zeigen.
+Zusätzlich werden beim Linken alle Relokationen aufgelöst, die auf nun definierte Symbole zeigen.
 Dazu modifiziert der Linker die Platzhalter in den Sektionen entsprechend des Relokationstyps und des Symbolwertes.
 Betrachten Sie sich hierzu die beiden Relokationen:
 Beides sind PC-relative Relokationen (~R_386_PC32~), die das Symbol ~fib~ referenzieren[fn::~e8 xx xx xx xx~ ist ein ~call~-Befehl].
@@ -1345,22 +1345,22 @@ Kann eine Relokation bereits vollständig beim Linken durchgeführt werden, so m
 
 Die zweite Sicht auf eine ELF-Datei ist die Load-View.
 Diese wird beim Laden eines Programms in den Adressraum eines Prozesses verwendet.
-Dabei werden völlig andere Metadaten verwendet als beim Linken, was es auch erlaubt die Metadaten über Sektionen und Symbole aus der ELF-Datei zu entfernen.
-Dieses "strippen" von Binärdateien wird verwendet um kleinere Programme zu erzeugen, aber auch um Informationen über die Programmstruktur vor einem Reverse-Engineer zu verheimlichen.
-Daher wird ihnen ihnen ~nm /bin/bash~ nur ~nm:
+Dabei werden völlig andere Metadaten verwendet als beim Linken, was es auch erlaubt, die Metadaten über Sektionen und Symbole aus der ELF-Datei zu entfernen.
+Dieses "strippen" von Binärdateien wird verwendet, um kleinere Programme zu erzeugen, aber auch, um Informationen über die Programmstruktur vor einem Reverse-Engineer zu verheimlichen.
+Daher wird Ihnen ~nm /bin/bash~ nur ~nm:
 /bin/bash no symbols~ ausgeben.
 
-Aber zurück zum Ladeprozess: Dieser basiert auf *Segmenten*, die eine Abbildung von einem Abschnitt der ELF-Datei und einem Speicherbereich im Adressraum vornehmen. Jedes Segment, welches als "zu laden" markiert ist, wird beim Ladeprozess aus der ELF-Datei in den Speicher eines Prozesses geladen. Dabei trägt ein Segment wiederum Metadaten: So kann ein Segment angeben an eine fixe Adresse geladen zu werden oder besondere Zugriffsrechte zu bekommen. So muss der Zielbereich eines Segments, welches ausführbaren Code enthält, nach dem Laden beim Betriebssystem als ausführbar markiert werden, da es ansonsten zu einem Segmentation Fault kommt.
+Aber zurück zum Ladeprozess: Dieser basiert auf *Segmenten*, die eine Abbildung von einem Abschnitt der ELF-Datei und einem Speicherbereich im Adressraum vornehmen. Jedes Segment, welches als "zu laden" markiert ist, wird beim Ladeprozess aus der ELF-Datei in den Speicher eines Prozesses geladen. Dabei trägt ein Segment wiederum Metadaten: So kann ein Segment angeben, an eine fixe Adresse geladen zu werden oder besondere Zugriffsrechte zu bekommen. So muss der Zielbereich eines Segments, welches ausführbaren Code enthält, nach dem Laden beim Betriebssystem als ausführbar markiert werden, da es ansonsten zu einem Segmentation Fault kommt.
 
-Auf der Seite des ELFs besteht ein Segment aus einem ~Offset~, der relativ zum Beginn der ELF-Datei berechnet wird, der Länge in der Datei (~FileSiz~).
-Auf der Abbildungsseite kann ein Segment eine virtuelle Adresse (~VirtAddr~) vorgeben an die es geladen werden will, eine Abbildungslänge (~MemSiz~)  und besagte Segment-Metadaten (~Flg~)
+Auf der Seite des ELFs besteht ein Segment aus einem ~Offset~, das relativ zum Beginn der ELF-Datei berechnet wird, und der Länge in der Datei (~FileSiz~).
+Auf der Abbildungsseite kann ein Segment eine virtuelle Adresse (~VirtAddr~) vorgeben, an die es geladen werden will, eine Abbildungslänge (~MemSiz~)  und besagte Segment-Metadaten (~Flg~)
 
 Ist die Abbildungslänge länger als die Dateilänge, wird beim Laden mit Nullen aufgefüllt.
 Auf diese Weise ist auch das BSS Segment implementiert:
-Beim Segment dass die Daten-Sektion enthält gilt ~FileSiz < MemSize~.
+Beim Segment, das die Daten-Sektion enthält, gilt ~FileSiz < MemSize~.
 
 Der Loader iteriert über die Segmente und fordert entsprechende Bereiche im Adressraum an.
-In diese Bereich werden dann die Daten aus der ELF Datei, entsprechend der Segmente, kopiert und beim Betriebssystem entsprechend als ausführbar oder schreibbar markiert. Nach dem Ladeprozess springt der Loader an den Einstiegspunkt, der ebenfalls in den ELF Metadaten gespeichert wird.
+In diese Bereiche werden dann die Daten aus der ELF Datei, entsprechend der Segmente, kopiert und beim Betriebssystem entsprechend als ausführbar oder schreibbar markiert. Nach dem Ladeprozess springt der Loader an den Einstiegspunkt, der ebenfalls in den ELF-Metadaten gespeichert wird.
 
 Alles in allem ist ein ELF-Loader ein relativ einfaches Stück Code, das in einigen Zeilen und mit einigen Kopieroperationen bereits eine Datei zur Ausführung bringen kann. Komplizierter wird es erst, wenn die Binärdatei an unterschiedlichen Stellen geladen werden kann oder es geteilte Bibliotheken gibt.
 
@@ -1389,22 +1389,22 @@ Alles in allem ist ein ELF-Loader ein relativ einfaches Stück Code, das in eini
   \end{frame}
 #+end_src
 
-Wie bereits angedeutet, geteilte Bibliotheken sind ein gutes Mittel um Platz, sowohl auf der Platte als auch im RAM, zu sparen.
+Wie bereits angedeutet, geteilte Bibliotheken sind ein gutes Mittel, um Platz, sowohl auf der Platte als auch im RAM, zu sparen.
 Dies funktioniert indem Shared Libraries Code enthalten, der von mehreren Programmen referenziert werden kann.
 Beim Laden wird dann nicht nur das ausführbare Hauptprogramm geladen, sondern auch noch alle referenzierten Bibliotheken. 
-Der Loader löst dann alle Querverbindungen zwischen Bibliothek und Hauptprogramm auf, sodass es so wirkt als hätten wir den Inhalt der Bibliothek im Linkprozess mit in das Binärprogramm kopiert.
+Der Loader löst dann alle Querverbindungen zwischen Bibliothek und Hauptprogramm auf, sodass es so wirkt, als hätten wir den Inhalt der Bibliothek im Linkprozess mit in das Binärprogramm kopiert.
 
-Ein weiterer Vorteil von geteilten Bibliotheken ist, dass wir bei einem Update nur die Bibliothek updaten müssen um eine ganze Reihe von Programmen mit dem Update zu versorgen. Dieser Vorteil, ist allerdings auch ein Nachteil, wenn ein System Programme enthält, welche die selbe Bibliothek in unterschiedlichen Versionen erwarten.
+Ein weiterer Vorteil von geteilten Bibliotheken ist, dass wir bei einem Update nur die Bibliothek updaten müssen, um eine ganze Reihe von Programmen mit dem Update zu versorgen. Dieser Vorteil, ist allerdings auch ein Nachteil, wenn ein System Programme enthält, welche die selbe Bibliothek in unterschiedlichen Versionen erwarten.
 
 
-Wie sich mit geteilten Bibliotheken Platz auf der Platte sparen lässt ist einigermaßen naheliegend:
-Der Code der Bibliothek liegt nur einmal auf Platte und nicht zig mal für jedes Binärprogramm was ihn verwendet.
+Wie sich mit geteilten Bibliotheken Platz auf der Platte sparen lässt, ist einigermaßen naheliegend:
+Der Code der Bibliothek liegt nur einmal auf Platte und nicht zig mal für jedes Binärprogramm, was ihn verwendet.
 Aber wie lässt sich durch geteilte Bibliotheken Platz im RAM sparen, wo die Bibliothek doch in unterschiedlichen Adressräumen zugreifbar ist.
 Die Antwort liegt darin zuzugeben, dass Segmente beim Laden nicht wirklich in den Speicher *kopiert* werden, sondern der Abschnitt im ELF nur mittels *Speichervirtualisierung* eingeblendet wird.
-Die gleiche physikalische Seite, wie sie im RAM Riegel liegt, wird also in mehreren Prozessen, teilweise an unterschiedlichen virtuellen Adressen, sichtbar.
+Die gleiche physikalische Seite, wie sie im RAM-Riegel liegt, wird also in mehreren Prozessen, teilweise an unterschiedlichen virtuellen Adressen, sichtbar.
 Daher muss der Code in geteilten Bibliotheken auch Unabhängig von seiner Ladeadresse sein, was mit diversen technischen Tricks erreicht werden kann. 
 
-Auf Ebene der ELF Datei funktionieren Bibliotheken so, dass das Hauptprogramm und jede Bibliothek eine Liste der benötigten Bibliotheken enthält. Außerdem sind in den ELF-Dateien auch noch alle importierten und der exportierten dynamischen Symbolen vermerkt, die als Referenzen vom Loader aufgelöst werden. Eine Übersicht über die benötigten Bibliotheken einer Binärdatei erhalten Sie mit dem Werkzeug ~ldd~:
+Auf Ebene der ELF-Datei funktionieren Bibliotheken so, dass das Hauptprogramm und jede Bibliothek eine Liste der benötigten Bibliotheken enthält. Außerdem sind in den ELF-Dateien auch noch alle importierten und der exportierten dynamischen Symbolen vermerkt, die als Referenzen vom Loader aufgelöst werden. Eine Übersicht über die benötigten Bibliotheken einer Binärdatei erhalten Sie mit dem Werkzeug ~ldd~:
 
 #+begin_example
 $ ldd /bin/bash
@@ -1416,12 +1416,12 @@ $ ldd /bin/bash
 #+end_example
 
 
-Hier sehen wir, dass 5 Shared Libraries bei Start einer Bash-Shell geladen werden.
+Hier sehen wir, dass fünf Shared Libraries bei Start einer Bash-Shell geladen werden.
 Dabei gibt es in dieser Ausgabe zwei besondere Bibliotheken:
 Die ~linux-vdso.so~ ist eine Bibliothek, die vom Betriebssystemkern stammt und schnellen sehr ausgewählte Kerndatenstrukturen zulässt{{{wikipedia_en(VDSO)}}}.
 Die andere ist die ~ld-linux.so~ (letzte Zeile).
-Diese ist das Ladeprogramm selbst und hat, bei der GNU C Bibliothek, die Besonderheit sowohl eine geteilte Bibliothek, als auch eine ausführbare Datei zu sein.
-Überzeugen sie sich selbst davon: Finden Sie den Pfad ihrer ~ld-linux.so~ heraus und führen Sie den Loader einmal von Hand aus.
+Diese ist das Ladeprogramm selbst und hat bei der GNU C Bibliothek die Besonderheit, sowohl eine geteilte Bibliothek als auch eine ausführbare Datei zu sein.
+Überzeugen Sie sich selbst davon: Finden Sie den Pfad Ihrer ~ld-linux.so~ heraus und führen Sie den Loader einmal von Hand aus.
 Ohne Argumente wird es Sie nur über seine Fähigkeiten in einer Hilfemeldung in Kenntnis setzen.
 
 * Zusammenfassung
