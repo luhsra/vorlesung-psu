@@ -35,15 +35,23 @@
 (defun org-macro-topic (file img)
  (with-file-from-disk file
   (let* ((url (s-replace ".org" ".html" file))
+         (number (s-replace-regexp "-.*" "" file))
          (date (org-global-prop-value "date"))
+         (words (string-to-number
+                 (s-trim
+                  (shell-command-to-string
+                   (format "make -s %s.wc" number)))))
+         (minutes (/ words 200))
          (video-url (org-global-prop-value "video_url"))
          (date-html (if date (format "<span class=\"structure\">%s</span> " date) ""))
          )
     (concat
      "#+begin_export html\n"
-     (format "<h2>%s<a href=\"%s\">%s</a></h2>"
+     (format "<h2>%s<a href=\"%s\">%s</a> <span class=\"float-right\">(%s minutes)</span></h2>"
              date-html
-             url (org-global-prop-value "subtitle"))
+             url (org-global-prop-value "subtitle")
+             minutes
+             )
      (format "<div class=\"row\"><div class=\"col-md-4\"><img class=\"img-index\" src=\"%s\"></div>" img)
      "<div class=\"col-md-8\">\n"
      "<p>"

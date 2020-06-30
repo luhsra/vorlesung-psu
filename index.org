@@ -22,6 +22,10 @@
 {{{topic(./09-optimierung.org,fig/09-stamp.png)}}}
 {{{topic(./10-maschinencode.org,fig/10-stamp.png)}}}
 
+-----
+
+{{{topic(./11-oo-paradigm.org,fig/11-stamp.png)}}}
+
 * COMMENT FIXME
 
 
