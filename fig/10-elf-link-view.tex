@@ -88,7 +88,7 @@
           label={[anchor=north east,inner sep=1pt,xshift=-3pt,fill=srared!40]north east:\scriptsize AX},
           ] (section2-text) {
       \tikzmark{fib-def}55 89 e5 .. ..\\
-      e8 \tikznode[text width=1.4cm,draw,fill=srared!20,name=fib-call]{00 00 00 00}\\
+      e8 \tikznode[text width=1.4cm,fill=safegreen!30,name=fib-call]{c3 ff ff ff}\\
       .. .. .. .. c3
     };
 
@@ -97,19 +97,21 @@
       \tikznode[name=sym2-fib]{T fib}
     };
 
-    \node[below=0.2 of symbols2,section,fill=luhblue!30,
-    ] (relocs2) {
-      \tikznode[name=reloc2]{R\_386\_PC32 fib}
-    };
+    %\node[below=0.2 of symbols2,section,fill=luhblue!30,
+    %] (relocs2) {
+    %  \tikznode[name=reloc2]{R\_386\_PC32 fib}
+    %};
     
-    \draw[->] (reloc2.west) -- ++(west:1.2ex) |- (sym2-fib.west);
-    \draw[->] (reloc2.east) -- ++(east:1ex) |- (fib-call.east);
+    %\draw[->] (reloc2.west) -- ++(west:1.2ex) |- ($(sym2-fib.west)+(down:2pt)$);
+    %\draw[->] (reloc2.east) -- ++(east:1ex) |- (fib-call.east);
+    \draw[->] (sym2-fib.west) -- ++(west:1.2ex) |- ($(pic cs:fib-def)+(up:3pt)$);
+
 
     \node[rotate=90,anchor=south,yshift=1ex] at (section-text-label) (section2-label)
       {\scriptsize Sections};
     
-    \node[draw,fit=(section2-label) (section2-text) (relocs2),
-         label={[anchor=south west]south west:foo.o}
+    \node[draw,fit=(section2-label) (section2-text) (symbols2), % (relocs2),
+         label={[anchor=south west]south west:fib.o}
          ](object-foo) {};
 
 

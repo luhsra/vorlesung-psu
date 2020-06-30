@@ -36,9 +36,7 @@ Effiziente Programmierer:
 
 #+begin_src latex
   \subtitle{{{{subtitle()}}}}
-  \begin{frame}
-    \maketitle
-  \end{frame}
+  \maketitleframe
 
   \begin{frame}{Einordnung in die Vorlesung: Maschinencodeerzeugung}
     \begin{center}
