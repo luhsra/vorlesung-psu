@@ -871,10 +871,14 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
 
 
 ** Kritikpunkte am Objekt-Orientierten Paradigma
+:PROPERTIES:
+:CUSTOM_ID: 11-oo-critique
+:END:
+
 #+begin_src latex
   \dividerframe{Kritik am Objektorientierten Entwurf}
 
-  \begin{frame}[fragile]{Konzentration auf Objekte}
+  \begin{frame}<handout:1,3>[fragile]{Konzentration auf Objekte}
     \bi
     \ii Objekt-orientierte Entwurfsmethoden fokussieren Objekte {%
       \bi
@@ -900,7 +904,7 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
       \ei
     
     \overlayboxHBOX
-    \begin{overlaybox}<3->[draw=srared,ultra thick]
+    \begin{overlaybox}<handout:3-|3->[draw=srared,ultra thick]
       \includegraphics[height=5cm]{fig/11-hund}
     \end{overlaybox}
   \end{frame}
@@ -986,34 +990,43 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
     \ei
   
     \overlayboxHBOX
-    \begin{overlaybox}<3->[draw=srared,ultra thick]
+    \begin{overlaybox}<handout:3-|3->[draw=srared,ultra thick]
       \includegraphics[height=8cm]{fig/11-callstack}
     \end{overlaybox}
   \end{frame}
 #+end_src
-Welche Kritikpunkte wurden an OO angebracht?
 
-Warum würde man Nouns über Verben präferieren? Das hat negative Auswirkungen
+Bevor wir mit der Diskussion des Objektorientierten Paradigmas zum Ende kommen, und auf Vorbereitung der nächsten Vorlesung, will ich noch einige Kritikpunkte aufgreifen, die an diesem Paradigma geäußert worden sind.
+Diese Kritik ist dabei selten am Paradigma selbst, sondern mehr auf die Prinzipien seiner Verwendung, gerichtet.
+Dennoch fußen ja all diese Prinzipien auf den Mechanismen, die wir im OO Paradigma vereinigt haben und daher lohnt es sich an dieser Stelle einen Blick auf die Kritik zu werfen.
 
-- Nicht jede Funktion kann einer/m Klasse/Objekt zugeordnet weden
-  - Von welchem Objekt ist GCD ein Methode? Wem muss ich eine Nachricht schicken um den größten gemeinsamen Teiler auszurechnen
-  - Fallback über statische Funktionen in nicht-instantiierten Klassen (Math.sin())
-  - Das Objekt-Modell passt einfach nicht auf alles
-- Reine Klassenbasierte-Objektorientierung erlaubt keinen globalen Zustand
-  - Man müsste ein globales Kontext-Objekt überall mit hin durch reichen.
-  - Idee geht leider bei Libraries kaputt, da das Kontext-Objekt nicht beliebig erweiterbar ist.
-  - Quick-Fix: Das Singleton Entwurfsmuster. Geht aber nur mit statischen Attributen
+Um diese Kritik zu verstehen, muss man sich kurz die Grundüberlegung von OO vor Augen halten: Alle Entitäten sind Objekte, die Nachrichten austauschen. OO legt also einen großen Fokus auf die Objekte, was sich auch in der OO Entwurfsmethode der **Verb/Nomen-Analyse** niederschlägt. Diese wird verwendet um Software objektorientiert zu entwerfen. Dazu geht nimmt man sich definierte Use-Cases zu Hand, markiert sich alle Nomen und alle verben, die sich auf diese Nomen beziehen. Ganz grob vereinfacht, sagt man dann, dass alle Nomen Objekte/Klassen werden und die verben, untergeordnet, als Methoden an diese Objekte gehangen werden. Ich werde das hier nicht tiefer ausführen, da es eigentlich ein Thema des Software Engineering ist. Was wir allerdings in dieser Entwurfsmethodik sehen, ist dass die verben den Nomen untergeordnet werden.
 
-- Ineffizienzen
-  - Funktionen kommen immer mit einem Kontext 
+Der erste, relativ philosophische, Kritikpunkt zielt dann auch genau darauf ab, dass Verben vernachlässigt: Durch die OO Designphilosophie haben wir uns Jahrelang nur auf die Objekte versteift und Software danach gebaut, wie wir die alles einzelnen Objekten zuordnen können. Aber deswegen sind verben, also Tätigkeiten bzw. Aktionen, ja nicht weniger wichtig geworden. Allerdings zwingt uns das Objektorientierte Paradigma dazu, jedenfalls wenn man es konsequent durchzieht, dass Tätigkeiten (verben) niemals alleine auftreten können. Sondern sie werden gewissermaßen immer von einem Objekt an der Leine geführt. Aus dieser gezwungenen Kopplung ergeben sich dann auch die anderen Kritikpunkte, die man am OO Paradigma anbringen kann.
 
-    Joe Armstrong (Erlang Inventor): "The problem with object-oriented languages 
-       is they've got all this implicit environment that they carry around with them.
-       You wanted a banana but what you got was a gorilla holding the banana and the entire jungle."
+So stellt sich bei manchen Aktionen (wir nennen sie dann mal wieder Funktionen), die Frage zu welchem Objekt sie gehören sollen.
+An welchem Objekt sollte denn die Funktion "größter gemeinsamer Teiler" hängen?
+Sollte es eine Methode von "Integer" sein?
+Was ist dann mit anderen Objekten, die sich auch wie eine Ganzzahl verhalten, aber in keiner Vererbungsbeziehung zu Integer stehen (z.B.
+BigInt).
+Sollte die ihre eigene Implementierung für ~gcd()~ mitbringen?
+Und was sollte jemand tun, der sich einen neuen Algorithmus überlegt, der Ganzzahlen verarbeitet?
+In Java kann man ja von außen nicht einfach eine Methode an eine bereits definierte Klasse ranflanschen.
+Das ist alles schwierig.
+Daher wählt für dieses Problem häufig die Lösung über Klassen die nur **statische Methoden** beinhalten.
+Diese Klassen dienen nur als Container für statische Methoden, sollen aber nie instantiiert werden.
+Das Paradebeispiel dafür ist Javas ~java.lang.Math~ Klasse, die alle wichtigen mathematischen Funktionen beinhaltet.
+An diese Stelle werden die Prinzipien des Objektorientierten Designs absichtlich umgangen, indem die Konzepte des Objektorientierten Paradigmas missbraucht werden.
+Dieses Muster, dass Konzepte, die anders verwendet werden solle, missbraucht wird um Probleme mit den Designprinzipien zu umgehen werden wir noch häufiger sehen.
+Oft genug nennen wir diese kreativen Lösungen dann **Designpattern** und schreiben Bücher darüber.
 
-- Kreis-Elipse Problem
-  => Vererbungshierarchie ist manchmal nicht eindeutig bestimmbar
+Ziemlich Ähnlich zum letzten Problem ist das Herumreichen von blanken Funktionen.
+Da eine Methode immer an einem Objekt hängt, können wir nicht einfach einen Funktionszeiger herumreichen. So ist es bei Java nicht möglich eine Methode als Argument zu übergeben (~foo(obj.method)~).
+Der Workaround für dieses Problem ist dann oft, dass man eine Klasse ohne Attribute erzeugt, die genau eine Methode beinhaltet. Um jetzt diese Methode herum zu reichen, erzeugt man ein Objekt für die Klasse und reicht das herum. Auf diese Weise kann man den selben Effekt erreichen, als hätte man Funktionszeiger, da das Objekt ja die gebundene Methode Huckepack herum reicht. Allerdings, und da liegt das wirkliche Problem: Der Aufrufende muss den Methodennamen statisch kennen. In Java ist es (jedenfalls bevor es Lambdas gab) nicht möglich anonyme Funktionsobjekte herum zu reichen.
+Um dieses Problem zu Umschiffen gibt es sogar mehrere Designpatterns (Command, Strategy, Proxy), die als Surrogat für Funktionszeiger verwendet werden.
 
+
+FIXME: Beschreibe die restlichen Folien
 * Zusammenfassung
 
 #+begin_src latex
