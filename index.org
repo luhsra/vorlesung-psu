@@ -25,22 +25,14 @@
 -----
 
 {{{topic(./11-oo-paradigm.org,fig/11-stamp.png)}}}
+{{{topic(./12-functional-paradigm.org,fig/12-stamp.png)}}}
 
-* COMMENT FIXME
-
+#+begin_center
+**EOF**
+#+end_center
 
 
 * COMMENT TODO 6 Vorlesungen
-     - Sprachen: Das Objektorientierte Paradigma
-       - SOLID
-       - https://de.wikipedia.org/wiki/Prinzipien_objektorientierten_Designs
-         
-     - Sprachen: Das Funktionale Paradigma
-       - Freiheit von Seiteneffekten
-       - Parametrische Datentypen
-       - Unifikation von Generischen Datentypen
-       
-
 Was wir nicht machen:
   - Logische Programmierung (z.B. Prolog)
   - Parallele Programmierung

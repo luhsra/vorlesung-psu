@@ -67,7 +67,7 @@ fig/%.pdf: fig/%.svg bin/svgfig
 10_stamp_page=0
 11_stamp=fig/11-call-hierarchy.pdf
 11_stamp_page=0
-12_stamp=fig/11-call-hierarchy.pdf
+12_stamp=fig/12-function.pdf
 12_stamp_page=0
 
 

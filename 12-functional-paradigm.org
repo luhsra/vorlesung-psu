@@ -164,7 +164,11 @@ Es stellt sich allerdings noch die Frage, wie man in einer Welt ohne Schleifen w
 
 Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgenden widmen wollen: Wie kann man so überhaupt übersichtlich, effizient, und effektiv programmieren! Man könnte meinen, dass dies alles viel zu beschnitten ist. Aber mit dem funktionalen Paradigma kommen eine ganze Reihe von Sprachkonzepten, die es einfach machen funktional zu programmieren. Diese wollen wir uns im folgenden anschauen.
 
-* Aufzählungstypen und Pattern Matching
+* Funktionale Datentypen
+:PROPERTIES:
+:CUSTOM_ID: 12-functional-types
+:END:
+
 
 #+begin_src latex
   \dividerframe{Unveränderliche\\Datentypen}
@@ -203,7 +207,7 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
     \ei
   \end{frame}
 
-  \begin{frame}{Update und Modifikation von Listen}
+  \begin{frame}<handout:1-3>{Update und Modifikation von Listen}
     \btAnimation[width=0.8\textwidth]{range=1-3:<1->,3:<4->,center,padding=2ex}{fig/12-trees}
   
     \bi
@@ -218,14 +222,38 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
      $\Rightarrow$ Passt hervorragend zur rekursiven Struktur funktionaler Programme.
     \ei
   \end{frame}
+#+end_src
 
-  \begin{frame}[fragile]{Aufzählungstypen mit Nutzlast}
+Bevor wir uns den Operationen im funktionalen Paradigma zuwenden, müssen wir uns über die Objekte unterhalten.
+Durch die Freiheit von Seitenffekten, sind alle Objekte in einem funktionalen Programm unveränderlich.
+Es sind also alles **Immutable Objects**, von denen wir an anderer Stelle schon einmal geredet haben{{{see(06-immutable-objects,Fallstudie: Unveränderliche Objekte)}}}, die nur bei der Initialisierung vom Konstruktor mit Werten gefüllt werden. Dies führt auch direkt dazu, dass Referenz- und Wertemodell{{{see(06-value-reference-model,Werte- und Referenzmodell für Variablen)}}} zu einem Punkt zusammenfallen und wir keine Zeigertypen in einer rein funktionalen Sprache brauchen.
+Die Beschränkung auf unveränderliche Objekte führt aber auch dazu, dass wir andere Datentypen brauchen, mit denen wir dennoch effizient Berechnungen durchführen können.
+
+Um eine Berechnung durchzuführen geben wir einer Funktion eines (oder mehrere) dieser unveränderlichen Objekte als Argumente mit. Die Funktion kann die Informationen daraus auslesen, kombinieren, und ein neues Objekt mit den Ergebnissen erzeugen, welches dann zurück gegeben wird. Wollen wir ein Feld in einem Objekt "updaten", müssen wir eine Kopie anlegen, in der alle bis auf eines der Felder gleich sind wie im orginalen Objekt. Für die funktionale Programmierung müssen wir also beständig Informationen aus Objekten extrahieren, und neue Objekte mit beinahe gleichem Inhalt konstruieren. Auf den ersten Blick mag dies Ineffizient sein, aber Übersetzer für die Sprache sind ziemlich gut darin, unnötige Kopien zu vermeiden. Überlassen Sie dieses Problem also erstmal den Übersetzern. 
+
+Aber wir haben auch ein Problem auf der Verwendungsebene der Sprache: Nicht jede Datenstruktur eignet sich gleich gut für dieses Muster des partiellen Updatens. Zum einen müssten wir für große monolithische Objekte (wie ein Array), viele Daten kopieren um ein einzelnes Feld zu verändern, zum anderen wäre es schön Typen und Syntax zu haben um mit sehr wenig Code Informationen aus Objekten zu extrahieren und neue Objekte anzulegen. Diesen Herausforderungen für funktionale Datenstruktur wollen wir uns nun widmen.
+
+Partielle Updates von Daten funktioniert mit einigen Datentypen besser als mit anderen. Wie wir schon gesagt haben eignen sich große Arrays eher weniger. Aber welche Datentypen eignen sich denn dann für funktionale Programmierung? Die Antwort darauf sind Datenstrukturen, die aus vielen kleinen Objekten bestehen, die sich gegenseitig hierarchisch referenzieren. Das Paradebeispiel hierfür ist die einfach **verkette Liste**. Aber auch Bäume eignen sich ganz gut. 
+
+
+Solche Datenstrukturen eigenen sich daher gut, da man die Datenstruktur (in ihrer Gesamtheit) leicht erweitern kann ohne die bereits bestehenden Objekte zu modifizieren. So kann man zu einer verketten Liste vorne etwas anhängen, indem man ein neues Listenelement erzeugt, welches auf den bereits existierenden Listenkopf zeigt. Selbst wenn der bereits bestehende Listenkopf an einen anderen Namen gebunden ist, ist das kein Problem: Die neue Liste teilt sich einfach alle, bis auf das erste, Listenelement mit der alten Liste. Und da alle Elemente unveränderlich sind, bekommen wir niemals ein Problem! Niemals kann es in der Zukunft geschehen, dass eine Operation auf der alten Liste dazu führt, dass die neue Liste sich verändert. 
+
+Will man in einer solchen unveränderlichen Struktur ein Element in der Mitte der Liste austauschen, so muss man alle Elemente bis zum betroffenen Element kopieren, da sich ja deren Nachfolger ändert. Allerdings bleiben nur so, bereits existierende Liste intakt. Im folgenden Stück Python Code habe ich die Situation auf der Folie für Sie einmal nachempfunden. Die Klasse ~Elem~ beschreibt die Listenelement. Neben dem Wert des Elements (~value~) und der Referenz auf das folgende Element (~next~), hat jedes Element eine eindeutige Nummer (~__id__~), die im Konstruktor gesetzt wird. Auf diese Weise können Sie in der Ausgabe nachvollziehen, welche Listen sich welche Objekte teilen. So hat das Element ~([#0] 4 None)~ die eindeutige Nummer 0, den Wert 4, und keinen (~None~) Nachfolger.
+
+Die Funktion ~cat()~ hängt vorne an die Liste ein neues Element an, während die Funktion ~setnth()~ das Nte Element in einer bestehenden Liste austauscht. Dazu geht ~setnth()~ die Liste rekursiv durch, bis Sie beim entsprechenden Element angekommen ist und erzeugt ein neues Element mit dem neuen Wert. Bei der Rückkehr aus der Rekursion werden die Werte aus der alten Liste kopiert und neu "verzeigert". 
+
+#+INCLUDE: ../lst/12-immutable.py
+
+In ähnlicher Weise sind verzeigerte Bäume eine gute funktionale Datenstruktur. Beide haben es gemein, dass die Datenstrukturen rekursiv sind. Ein Kind eines Baumelements ist selbst wieder ein Baum. Bei der Liste ist der Nachfolger wieder eine Liste (oder das Listenendsymbol).
+
+#+begin_src latex
+  \begin{frame}<handout:1,2,4,5>[fragile]{Aufzählungstypen mit Nutzlast}
     \OrangeBox{\textbf{Problem:} Wir wollen viele Objekte erzeugen und wieder zerlegen}
     \medskip
     \begin{columns}
       \begin{column}{0.49\textwidth}
         \begin{code}[tag=Rust]
-          \begin{onlyenv}<1>
+          \begin{onlyenv}<handout:1|1>
             \begin{rust}
               enum PointKind {
                 XY,
@@ -233,7 +261,7 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
               };
             \end{rust}
           \end{onlyenv}%
-          \begin{onlyenv}<2->
+          \begin{onlyenv}<handout:2-|2->
             \begin{rust}
               enum Point {
                 XY(i32, i32),
@@ -243,7 +271,7 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
           \end{onlyenv}
         \end{code}
       \end{column}\hfill
-      \begin{column}<3->{0.49\textwidth}
+      \begin{column}<handout:3-|3->{0.49\textwidth}
         \begin{code}[tag=Rust]
           \begin{rust}[style=highlighting]
             @4fn handle(p : Point);@
@@ -259,12 +287,12 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
     \ii Funktionale Sprachen bieten Aufzählungstypen (\structure{enum}) \only<2->{mit Nutzlast} {
       \bi
       \ii Endliche (aufzählbare) Anzahl an Varianten
-      \ii<2-> Jeder Variante kann unterschiedliche Felder mit sich führen.
-      \ii<3-> Aufzählungsname wird Konstruktor.
-      \ii<4-> Tagged variante Records (\structure{union}) sind typsicher und polymorph
+      \ii<handout:2-|2-> Jeder Variante kann unterschiedliche Felder mit sich führen.
+      \ii<handout:3-|3-> Aufzählungsname wird Konstruktor.
+      \ii<handout:4-|4-> Tagged variante Records (\structure{union}) sind typsicher und polymorph
       \ei
     }
-    \ii<5-> Rekursiv generisch-polymorphe typsichere Aufzählungstypen {
+    \ii<handout:5-|5-> Rekursiv generisch-polymorphe typsichere Aufzählungstypen {
       \begin{columns}
         \begin{column}{0.49\textwidth}
            \begin{code}[tag=Haskell]
@@ -300,7 +328,34 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
     }
     \ei
   \end{frame}
+#+end_src  
 
+Neben der Verwendbarkeit von Datenstrukturen haben wir allerdings noch eine zweite Dimension, die wir uns für unsere Daten vom funktionalen Paradigma wünschen:
+Einfache Handhabbarkeit.
+Es muss einfach sein Objekte zu erzeugen und wieder zu zerlegen.
+Denn beides werden wir ständig machen, da wir ja keine Modifikationen durchführen werden.
+Dazu haben sich **Aufzählungstypen mit Nutzlast** als sehr geeignete Typen heraus gestellt.
+Kennen gelernt haben wir einfache Aufzählungstypen bereits in der Vorlesung über Typen{{{see(03-scalar-types,Skalare Typen)}}} als skalare Datentypen.
+Dort haben wir gelernt, dass ein eine Aufzählung einen diskreten und endlichen Wertebereich hat, der von den Entwicklern deklariert wird.
+Jedes Element einer Aufzählung ist ein möglicher Wert, eine Variante, der Aufzählung.
+
+Nun wollen wir aus diesen Aufzählungen zu zusammengesetzten Typen{{{see(03-composite-types,Zusammengesetzte Typen)}}} erweitern.
+Jede Variante der Aufzählung bekommt jetzt noch eine Nutzlast in Form von Felder (ähnlich wie bei Records). Dabei erlauben wir, dass jede Variante unterschiedliche Felder haben kann. Die Aufzählung selbst wird dabei zu einem einzelnen Datentypen, der wir verwenden können um Variable und Parameter zu deklarieren.
+Die einzelnen Varianten werden zu Konstruktoren, die ihre angehängten Felder als Argumente bekommen, und ein Objekt vom Aufzählungstypen erzeugen. 
+
+Diese Art der Aufzählungen ist ähnlich zu den varianten Records (~union~), allerdings hat jedes Objekt zusätzlich das Wissen mit welchem Variantenkonstruktor sie erzeugt wurde. Im Gegensatz zu C-~union~ Objekten kann man durch dieses Wissen die einzelnen Felder auch wieder Typsicher aus dem Objekt extrahieren. Falls es ihnen leichter fällt C Code zu verstehen, bietet das folgende Stück C Code die gleiche Funktionalität wie der auf den Folien gezeigte Aufzählungstyp ~Point~. Sie müssen zugeben, dass es sich wirklich lohnt Syntax in der Sprache zu haben, mit der man gleichzeitig die Aufzählungswerte, die Konstruktoren und die Felder deklarieren kann:
+
+#+INCLUDE: ../lst/12-variant.c
+
+In Haskell ist die Syntax für solche Aufzählungstypen sogar noch kompakter und erlaubt es auch sehr einfach Typen für rekursive Datenstrukturen zu definieren. Zusätzlich kommt noch dazu, dass solche rekursiven Typen bei Haskell generisch sind{{{see(03-polymorphism,Polymorphismus: Generische Typen)}}}.
+Da die Haskell Syntax doch sehr kompakt ist, wollen wir den Ausdruck ~data Tree T = Leaf T | Node (Tree T) (Tree T)~ Schritt für Schritt auseinander nehmen.
+
+Das Schlüsselwort ~data~ leitet die Deklaration eines neuen Typen ein. Der Name des neuen Typen ist ~Tree~ und er hat einen generischen Typparameter ~T~. Instantiiert mit einem ~Char~ (Haskell: ~Tree Char~) würde dieser Type den Typausdruck ~Tree(Char)~ erzeugen, einen Baum mit Buchstaben an den Blättern. Auf der rechten Seite des ~=~ befinden sich die beiden Varianten dieses Aufzählungstyps (~Leaf~ und ~Node~):
+Zunächst haben wir die Variante ~Leaf~, die mit einem Feld Nutzlast kommt, welches vom Typ parametrischen ~T~ ist. In einem ~Tree Char~, würde jedes Blatt also genau einen Buchstaben speichern. Die zweite Variante von ~Tree~ ist ein innerer Knoten ~Node~, der zwei Felder hat, die beide vom vom parametrischen Typ ~Tree T~ sind. Im Kontext eines ~Tree Char~ heißt dies, dass ein innner Knoten zwei Felder hat, die wiederrum vom Type ~Tree Char~ sind. 
+
+Wie im Rust Beispiel, sind die Aufzählungsvariante gleichzeitig Konstruktoren um Objekte vom Typ ~Tree T~ zu instantiieren. Im Beispiel sehen wir, dass die Variable ~freeTree~ als ein ~Tree Char~ deklariert wird und wir danach einen entsprechenden Baum an den Namen binden. Hier kommen die Variantennamen als Konstruktoren zum Einsatz.
+
+#+begin_src latex
   \begin{frame}[fragile]{Destructuring Bind und Pattern Matching}
     \OrangeBox{Deklaration und Konstruktion von Aufzählungsobjekten ist sehr kompakt.}
     \bi
@@ -322,7 +377,7 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
             \end{rust}
           \end{code}
         \end{column}\hfill
-        \begin{column}<3->{0.49\textwidth}
+        \begin{column}<handout:2-|3->{0.49\textwidth}
           \begin{code}[tag=Rust]
             \begin{rust}
               let norm = match p1 {
@@ -334,7 +389,7 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
         \end{column}
       \end{columns}
     }\medskip
-    \ii<3-> \structure{Pattern Matching}: Selektionsoperation mittels Destructuring Bind{
+    \ii<handout:2-|3-> \structure{Pattern Matching}: Selektionsoperation mittels Destructuring Bind{
       \bi
       \ii Ähnlich, aber mächtiger wie ein switch-case in C
       \ii Vergleich eines Objekts gegen mehrere Muster und Destructuring Bind
@@ -345,6 +400,21 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
     \ei
   \end{frame}
 #+end_src
+
+Aber wir wollen Objekte ja nicht nur kompakt erzeugen, sondern sie, und auch andere unveränderliche Objekte,  auch kompakt verwenden. Dazu haben sich zwei sehr nah verwandte Konzepte etabliert, mit denen man Objekte wieder zerlegen kann. Mit dem **destructuring bind** binden wir die einzelnen Subobjekte eines Objekts mittels eines Musters an Namen. Mit dem **pattern matching** verwenden wir solche Muster um zwischen unterschiedlichen Varianten eines Aufzählungstyps zu eine Fallunterscheidung durchzuführen. 
+
+Beim **destructuring bind**, einem Wort für das ich keine deutsche Entsprechung kenne, verwenden wir ein Muster mit freien Variablennamen um ein Objekt in einer Zuweisung zu zerlegen. Dabei muss das Muster die gleiche Struktur haben, wie das Objekt was wir zerlegen wollen, sonst schlägt die Zerlegung zur Laufzeit fehl. Ist das Objekt ein Record, so muss das Muster auch aussehen wie ein Record, ist das Objekt ein Tupel, so muss das Muster auch ein Tupel sein. Im Muster befinden sich anstatt konkreter Werte Namen, die frei, also noch ungebunden, sind. Im Beispiel sieht dass dann so aus, dass wir das Tupelobjekt ~(1,2)~ zerlegen wollen. Das Muster auf der linken Seite ist ~(x0, x1)~ und enthält die freien Namen ~x0~ und ~x1~. Durch das destructuring bind weisen wir die entsprechenden Subobjekte den Namen zu, sodass danach ~x0~ den Wert 1 und ~x1~ den Wert 2 hat.
+
+Destructuring bind sollten bei ihnen bereits ein Gefühl von Bekanntheit erzeugen, da es sehr ähnlich aussieht wie Unifikation, bei dem wir ja auch Muster aneinander angeglichen haben.
+Allerdings gibt es zwei bedeutende Unterschiede zur Unifikikation:
+(1) Beim destructuring bind ist ganz klar, dass es ein Muster und eine Vorlage gibt und abgleichen nur in eine Richtung geschieht.
+Bei der Unifikation sind beide Seiten gleichberechtigt.
+(2) Beim destructuring bind darf jeder freie Name nur genau einmal im Muster auftreten, während bei der Unifikation freie Variablen mehrfach auftreten dürfen.
+Durch beide Einschränkungen ist das destructuring bind deterministisch und schnell zu bewerkstelligen, während die Unifikation ein NP-vollständiges Problem ist.
+
+Sehr verwandt zum destructuring bind ist das **pattern matching** bei wir auch strukturelle Muster verwenden, aber diesmal um eine Fallunterscheidung durch zu führen. Der Ablauf ist dann wie ein ~switch-case~: Ein gegebenes Objekt (~p1~ auf den Folien) wird gegen eine Reihe von Mustern verglichen. Das erste Muster das auf das Objekt passt führt dazu, dass der entsprechende Arm der Fallunterscheidung selektiert wird. Mittels destructuring bind wird das Muster (~Point::XY (x,y)~)verwendet um das Objekt zu zerlegen und Teile davon an Namen zu binden, die dann innerhalb der Fallunterscheidung zur Verfügung stehen.
+
+Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzählungstypen mit Nutzlast vergleichen und Variantenspezifischen Code ausführen. Im Gegensatz zu einer ~if-elif-else~ Kaskade ist es bei diesem Konstrukt für den Übersetzer auch leicht zu prüfen, ob wirklich alle Fälle der Aufzählung abgehandelt wurden, oder ob ein Fall vergessen wurde.
 
 * Funktionen als Bürger erster Klasse
 
