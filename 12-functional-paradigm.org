@@ -116,6 +116,54 @@
   \end{frame}
 #+end_src
 
+
+Wir haben die letzte Vorlesung mit das objektorientierten Paradigmas besprochen und mit einer Kritik beendet.
+Angetreten ist dieses Paradigma und die damit verbundenen Designprinzipien um Softwareentwicklung "im Großen", als in großen Softwareprojekten an denen viele Menschen arbeiten, möglich zu machen. Und in dieser Hinsicht hat das OO Paradigma einiges geleistetet. Wir sind mit aktuellen Entwicklungsmodellen in der Lage viel viel größere Softwareprojekte zu realisieren, als wir das noch vor 40 Jahren waren. Teilweise ist das auf schnellere Hardware, was zu schnelleren Compile-Test-Zyklen führt, zurückzuführen, aber das bessere Verständnis für die Probleme, die erst in großen Projekten sichtbar werden, hat ebenso dazu beigetragen. Die Modelierung von Software entlang den Objekten, die sie versucht abzubilden, erleichtert es uns Menschen darüber zu reden. Aber, wie wir gesehen haben, das OO Paradigma ist nicht ohne Kritik. 
+
+Der grundlegende Konflikt der bei der Softwareentwicklung großer Projekte auftritt ist, dass ein solches Projekt viele Interagierende Entitäten hat: Auf der Ebene der Entwicklung haben wir viele Menschen, die, verstreut über den ganzen Erdball, gemeinsam an einer Software arbeiten wollen. Dies erfordert einiges an Koordination, aber auch an Kommunikation; die Menschen müssen sich in ihrer Sprache über die Struktur der Software austauschen können (Hier hat OO einiges geleistet). Auf der Ebene der Software haben wir ebenfalls viele interagierende Entitäten: Viele Module enthalten eine vielzahl an Klassen, von denen Objekte instantiiert werden, die alle einen Zustand haben (Persistenz!) und sich gegenseitig Nachrichten zuschicken (Methodenaufruf!). Diese technische Komplexität kommt dann mit der begrenzten geistigen Kapazität von Menschen zusammen: Wir müssen Sie verstehen um sie beherschen zu können und um sie anderen mitteilen zu können.
+
+Jetzt gibt es aber eine Kluft zwischen dem Quellcode, der die Klassen definiert, und dem Universum instantiierter Objekte ein Problem: Im Gegensatz zu statischen Codestrukturen sieht man den dynamischen Zustand nicht. Wo der Quellcode, durch die Verwendung des imperativen Paradigmas, relativ lokal abläuft (Eine Zeile nach der anderen), ist der dynamische Zustand viel schwierige zu fassen. Denn der Zustand eines Objektes ist die Kombination aller Änderungen, die dieses Objekt seit seiner Geburt{{{see(06-birth,Geburt von Objekten)}}} erfahren hat. Wir versuchen diesen dynamischen Zustand besser fassbar zu machen, indem wie **Invarianten** einführen, die den Raum möglicher Belegungen eingrenzt. Aber selbst mit guten Invarianten, müssen wir bei der Entwicklung immer die möglichen Zustände des Objektuniversums in unseren Köpfen nachvollziehen. Allzuhäufig fallen dabei die Randfälle, also da wo Objekte gerade noch die Invarianten einhalten, hinten runter und führen zu Softwarefehlern.
+
+Es ist dieses Problem des Zustandsraums, dem sich das **funktionale Paradigma** annimmt.
+Mit diesem Paradigma **eliminieren** wir den **veränderlichen Zustand**.
+Lesen Sie den letzten Satz noch einmal, atmen Sie tief durch, und versuchen Sie die tragweite dieser Entscheidung zu verstehen.
+Wir verbieten die Veränderung von Zustand[fn::Lassen Sie uns das gleich ein bisschen einschränken:
+Nur das reine funktionale Paradigma geht in dieser Radikalität gegen veränderlichen Zustand vor.
+Nur wenige Sprachen ziehen dies zum extrem durch.
+Aber selbst abgeschwächte Formen führen zu einem völlig veränderten Nachdenken über Programmiersprachen.
+Bleiben Sie also dabei, wenn wir jetzt einmal das Extrem ausloten].
+Dieser radikale Schritt hat eine ganze Reihe von Implikationen, denen wir uns jetzt widmen werden, bevor wir darüber reden, wie man mit einer solch eingeschränkten Sprache nützliche Programme entwerfen kann.
+
+Zunächst müssen wir uns einmal überlegen, was der Zustand eines Programs ist. All die Variablen die wir haben, die lokalen, die globalen, und die einzelnen Parameter von Funktionsinstanzen. All das ist Zustand. Aber auch die Objekte, die wir nur indirekt über diese Variablen über Referenzen erreichen können{{{see(06-garbage-collection,Mark-and-Sweep Garbage Collector)}}}, sind der Zustand eines Programms. Immer wenn wir ein existierendes Objekt verändern, dann benötigen wir das Sprachkonzept "veränderlicher Zustand". Jedes Beschreiben eines Record-Felds, jedes Setzen eines Array-Elements, jedes Verändern einer Variable, all das verändert den existierenden Zustand. All das wollen wir verbieten. Einzig zwei Dinge werden uns gelassen: Wir können neue Objekte parametrisiert erzeugen, und wir können einen bisher ungebundenen Namen an ein existierendes Objekt binden. Etwas flapsiger, und ungenau, ausgedrückt, würde man sagen: Variablen können nicht überschrieben, Objekte nicht verändert werden.
+
+Was hat diese Einschränkung zur Folge? Eine ganze Menge! Bei der Diskussion der Operationen{{{see(07-operation-dependencies,Operationen und Seiteneffekte)}}} und ihrer Abhängigkeiten haben wir den Begriff der Seiteneffekte eingeführt. Ein Seiteneffekt einer Operation führt dazu, dass die Operation über ihren Rückggabewert hinaus, den Zustand der virtuellen Maschine verändert. Und es sind genau dies Seiteneffekte, die wir bei der funktionalen Programmierung verbieten werde.
+
+Durch Seiteneffekte und globalen Zustand kann eine Prozedur Zustand besitzen und bei wiederholten Aufruf mit den selben Argumenten, jedesmal ein anderes Ergebnis liefern. Der globale Zustand, bzw. jeder andere veränderbare Ausführungskontext, agiert in solchen Situationen als **Seitenkanal** für die Prozedur:
+
+#+begin_src python
+counter = 0
+def inc():
+    global counter
+    counter += 1
+    return counter
+
+print [inc(), inc(), inc()]
+#+end_src
+
+Wenn wir nun Prozeduren mit mathematischen Funktionen vergleichen, sehen wir, dass es hier eine Lücke gibt. Solche Prozeduren, die ihren Ausführungskontext verändern, sind keine Funktionen im mathematischen Sinne, da ihr Ergebnis nicht nur von ihren Eingabeparametern abhängt. Stellen Sie sich das einmal vor, wie das wäre, wenn die Addition in einem Ganzzahlring jedes mal ein anderes Ergebnis liefern würde. So könnte ja niemand Mathematik machen! Aber in der Programmierung erlauben wir uns das, wenn wir veränderlichen Zustand haben.
+
+Mit dem funktionalen Paradigma werden Prozeduren also zu echten mathematischen Funktionen, deren Ergebnis nur noch von den übergebenen Argumenten abhängt. Die Ausführung einer solchen Funktion hat **keine Seitenffekte** und wir können Sie beliebig oft aufrufen, es wird immer das gleiche das gleiche dabei raus kommen. Auf diese Weise schafft es das funktionale Paradigma, dass nicht nur die Ausführung von Quellcode lokal ist, sondern auch, dass der Zustandsraum lokaler wird. Dies erleichtert es ungemein über die Korrektheit eines Programms nachzudenken. 
+
+Vergleichen wir die drei Paradigmen, die wir in dieser Vorlesung besprechen, so sehen wir eine Entwicklung in zwei Richtungen, ausgehend vom imperativen Paradigma. Dieses grundlegende Paradigma hat vier Elemente: Sequenzierung, Komplexe Datentypen, Prozeduren und Veränderlichen Zustand. Damit kann man schon ziemlich viel machen. Das Objektorientierte Paradigma erweitert diesen Werkzeugkasten um die Methode, die Zustand und Prozedur vereint. Es entsteht eine Closure, eine Prozedur, die dynamisch erzeugten Zustand mit sich herumträgt (das Objekt auf dem die Methode aufgerufen wird). 
+
+Das funktionale Paradigma geht einen anderen Weg: Anstatt ein weiteres Konzept einzuführen, schränkt es ein grundlegendes Konzept ein: Der veränderliche Zustand verliert seine Veränderlichkeit, was direkt dazu führt, dass Prozeduren zu Funktionen werden. Es hat aber auch zur Folge, dass einige Sprachkonstrukte keinen Nutzen mehr haben bzw. das andere Konzepte größere Wichtigkeit erlangen.
+
+Durch Seiteneffektfreiheit haben wir keine echten Variablen mehr und keine veränderlichen Objekte. Dies führt direkt dazu, dass Statements ohne Rückggabewerte keinen Sinn mehr haben. Außerdem hatten wir darüber geredet{{{see(07-iteration,Iteration: Wiederholte Ausführung)}}}, dass Schleifen nur durch Seiteneffekte mit dem restlichen Code kommunizieren können. Beides fällt also in einer rein funktionale Programmiersprache weg. Haskell[fn::Eine rein funktionale Programmiersprache] kennt einfach keine Schleifen! Alles was wir an Konzepten in unserem funktionalen Werkzeugkasten (=Paradigma) haben wollen, muss einen Rückgabewert erzeugen, da dies der einzige Kanal ist Ergebnisse nach Außen kommunizieren zu können. Es muss also alles ein **Ausdruck** werden.
+
+Es stellt sich allerdings noch die Frage, wie man in einer Welt ohne Schleifen wiederholte Ausführung bewerkstelligen soll. Die Antwort darauf, wird dem Erstsemester-Studierenden nicht gefallen: **Rekursion**. Bei der Rekursion hat jeder Rekursionschritt einen Rückgabewert und wir können, bis zur Abbruchbedingung, eine variable Anzahl an Rekursionsschritten durchführen. Daher ist Rekursion für das funktionale Paradigma ein essentielles Konzept.
+
+Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgenden widmen wollen: Wie kann man so überhaupt übersichtlich, effizient, und effektiv programmieren! Man könnte meinen, dass dies alles viel zu beschnitten ist. Aber mit dem funktionalen Paradigma kommen eine ganze Reihe von Sprachkonzepten, die es einfach machen funktional zu programmieren. Diese wollen wir uns im folgenden anschauen.
+
 * Aufzählungstypen und Pattern Matching
 
 #+begin_src latex
@@ -622,9 +670,6 @@
 
 #+end_src
 
-#+begin_src latex
-FIXME: Vorteile Seiteneffektfreier ausführung
-#+end_src
 * Funktionale Ein-/Ausgabe
 
 #+begin_src latex
