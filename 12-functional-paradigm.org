@@ -941,6 +941,9 @@ Bemerkenswert ist die Kombination von Funktionskomposition, partieller Anwendung
 Dieser Vorteil lässt sich ebenfalls im kleinen Erreichen: Wenn wir uns zum Ausgangspunkt der Besprechung des funktionalen Paradigmas zurückkehren, wissen wir dass Funktionen keine Seiteneffekte haben. Daher lässt sich ein Aufruf ~map(func, sequence)~ trivialerweise, ohne sich groß synchronisieren zu müssen, auf viele Prozessoren verteilen. In Python bietet die ~multiprocessing~ Bibliothek eine [[https://docs.python.org/3/library/multiprocessing.html#multiprocessing.pool.Pool.map][~map()~-Variante]], die alle Elemente einer Liste auf einem Pool von Workern parallel abarbeitet und so eine Maschine mit mehreren Kernen besser ausnutzt.
 
 * Funktionale Ein-/Ausgabe
+:PROPERTIES:
+:CUSTOM_ID: 12-functional-io
+:END:
 
 #+begin_src latex
   \dividerframe{Funktionale\\Ein-/Ausgabe}
@@ -987,7 +990,7 @@ Dieser Vorteil lässt sich ebenfalls im kleinen Erreichen: Wenn wir uns zum Ausg
       \ii Es gibt noch weitere Forschungssprachen: Clean, Mercury\\[1ex]
       \ei
     }\medskip
-    \ii<2-> In Haskell wird I/O über die  \structure{I/O Monade} gesteuert{\medskip
+    \ii<2-|handout:2-> In Haskell wird I/O über die  \structure{I/O Monade} gesteuert{\medskip
       \begin{columns}
         \begin{column}{0.6\textwidth}
             \btAnimation[width=\textwidth]{1:<1-2>,range=2-3:<3-end>,center,padding}{fig/12-haskell-io}
@@ -1053,6 +1056,24 @@ Dieser Vorteil lässt sich ebenfalls im kleinen Erreichen: Wenn wir uns zum Ausg
   \end{frame}
 #+end_src
 
+Jetzt habe ich ihnen in vielen Worten die Welt des funktionalen Paradigmas näher gebracht. Aber es sollte bei ihnen noch ein großes Fragezeichen offen sein. Gehen Sie kurz in sich und überlegen Sie ob es mit den genannten Konzepten, die das funktionale Paradigma beinhaltet, ein sinnvolles Programm erstellt werden kann. Nur zu, ich warte hier auf Sie, keine Eile... Denken Sie an alles was wir hinzugefügt haben: Funktionen als Bürger erster Klasse, Komposition, partielle Anwendung von Funktionen, Listenmanipulationen. Das ist doch alles super schick, was könnte da fehlen? Ich verrate es ihnen: Seiteneffekte. Denn Seiteneffekte beinhalten nicht nur das Wiederbeschreiben von Variablen, sondern auch jegliche Ein- und Ausgabe eines Programms. Das bedeutet, dass ein rein funktionales Programm hervorragend den ganzen Tag rechnen könnte, wir aber weder Daten hinein, noch wieder hinaus bekommen würden. Das ist jetzt eher anti-klimaktisch. Irgendwie müssen wir damit jetzt umgehen und eine Lösung finden.
+
+Die erste Variante wäre nicht päpstlicher als der Papst zu sein und das mit der Freiheit von Seiteneffekten nicht ganz so eng zu nehmen und nur den Aspekt "Funktionen als Bürger erster Klasse" zu betonen indem wir einen **funktionalen Programmierstil** pflegen. Dies ist der Weg, den die meisten Sprachen mit funktionalen Elementen gehen, da der vollständige Verzicht auf Seiteneffekte eine ziemlich große Einschränkung ist. Beim funktionalen Programmierstil behalten wir die Idee von Seiteneffekten, was Schleifen und Statements weiterhin zu nützlichen Konstrukten macht, und führen anonyme Funktionen, partielle Anwendung und Funktionskomposition ein.
+
+Zum Beispiel ist es in Python möglich einen funktionalen Programmierstil zu pflegen, etwas dass ich ihnen schon die gesamte Vorlesung heimlich untergeschoben habe. Denken Sie an all die Funktionen höherer Ordnung zurück: ~traversal()~ zur Baumtraversierung oder ~fixpoint()~ zur Fixpunktiteration. An dieser Stelle habe interpretierte Skriptsprachen einen strategischen Vorteil für die Adoption eines funktionalen Programmierstils; Da der Interpreter während der Ausführung die Funktionen eh als Objekte im Speicher hat, kann man auch eben dem Benutzer die Möglichkeit einräumen neue Funktionen zu erzeugen. Aber auch bei übersetzten Sprachen setzt sich zunehmend funktionale Sprachkonzepte durch. So hat sowohl C++ als auch Java in neuerer Zeit anonyme Funktionen mittels Lambda-Ausdruck eingeführt.
+
+
+Aber auch in rein-funktionalen Programmiersprachen kann man Ein- und Ausgabe einpflegen ohne die Freiheit von Seiteneffekten gleich ganz über Bord zu werfen. Dabei ist die Idee, dass man die I/O aus der Sprache entfernt und in der virtuellen Maschine der Sprache versteckt. Dazu verwendet man in Haskell die **I/O Monade**. Monaden sind noch viel allgemeinere Mathematische Objekte, die ich in diesem Rahmen leider nicht ausgiebig diskutieren kann. Daher werde ich die I/O Monade nur, so gut es geht, phenomenologisch erklären.
+
+Die Grundidee ist, dass das Programm ein monadisch komponiertes Funktionsobjekt definiert, welches die virtuelle Maschine verwendet um das gesamte Universum in der I/O Monade zu transformieren. Klingt erstmal etwas großspurig, das ganze Universum zu transformieren, aber ist genau das was wir brauchen um weiterhin Seiteneffektfreiheit zu haben. Denn wir das Universum als Read-Only Kopie bekommen und ein neues Universumsobjekt in leichter Abwandlung erzeugen, so gibt es ja keine Seiteneffekte auf irgendeinen externen Zustand.
+Um diese Transformation der ganzen Welt etwas angenehmer zu gestalten, verwenden wir Monaden, die eine Art Meta-Auswertungsstrategie darstellen.
+
+Wollen wir versuchen das ganze etwas plastischer zu machen: Ein Haskell Programm hat ein ~main~ Objekt vom Monaden-Typ ~IO ()~. Wenn der Haskell Prozess gestartet wird, nimmt die Haskell Laufzeitumgebung, der das Universum als Argument gegeben wurde, und führt das ~main~-Objekt aus. Dabei kann der Code in ~main~ Daten aus dem Universum anfordern (Eingabe) und wieder zurückspielen (Ausgabe). Das Monadenobjekt hat also an den richtigen Stellen Ein- und Auslässe für Weltzustand, die von der I/O Monade bespielt werden.
+Auf diese Weise bleibt das Monadenobjekt selbst frei von Seiteneffekten.
+
+Zusätzlich stellt Haskell über sein striktes und statisches Typssystem sicher, dass nur IO-Monadenobjekte Weltzustand anfordern und zurückspielen können. Daher hat ein reales Haskell-Programm auf der obersten Aufrufhierarchie eine Reihe von monadisch komponierten Objekten, die wiederrum vollständig Seiteneffektfreie Funktionen aufrufen um die tatsächliche Berechnung durchzuführen. Dem gesamten Monadenkonzept, welche noch andere spannende Anwendungen in der Welt der Programmiersprachen hat, liegt ein größerer Kategorien-theoretischer Hintergrund zu Grunde. Für ihren 10.000 Meilenblick ist die Take-Away Message, dass man in Haskell an der Typsignatur direkt ablesen kann ob eine Funktion Ein-/Ausgabe machen kann oder ob es eine Seiteneffektfreie pure Funktion ist.
+
+Für eine gut Illustrierte Erklärung zu Monaden verweise ich Sie auf den hervorragenden Blogartikel [[http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html][Functors, Applicatives, And Monads in Pictures]] von Aditya Bhargava.
 
 * Zusammenfassung
 #+begin_src latex
