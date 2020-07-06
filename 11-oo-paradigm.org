@@ -1,5 +1,5 @@
 #+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 11 - Das Objekt-Orientierte Programmierparadigma
+#+SUBTITLE: 11 - Das Objektorientierte Programmierparadigma
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
@@ -97,7 +97,7 @@
       \ALERT{Aber:} \btSetTab Warum türmen wir überhaupt \\\btUseTab diese semantische Lücke auf?
 
       \bii
-      \iida Lernkurve: Abstraktionen müssen gelernt werden.
+      \iida Lernkurve: Abstraktionen müssen gelernt werden
       \iida Fehleranfällig: Übersetzer können Bugs haben
       \iida Abstraktionen erzeugen oft einen Overhead
       \eii
@@ -107,22 +107,22 @@
   \end{columns}
   \end{frame}
 
-  \begin{frame}{Komplexität und Nicht-Determinismus}
+  \begin{frame}{Komplexität und Nichtdeterminismus}
     \bi
     \ii Große Systeme haben zwei Dimensionen, die das \structure{Verständnis} erschweren{%
       \bi
       \ii \structure{Komplexität}: Anzahl der interagierenden Elemente?
-      \ii \structure{Nicht-Determinismus}: Wie vorhersagbar sind die Interaktionen?
+      \ii \structure{Nichtdeterminismus}: Wie vorhersagbar sind die Interaktionen?
       \ei
     }\bigskip
     \ii<2-> \textbf{Beispiel}: Das gesamte Universum {
       \bi
       \ii Viele Elemente (Atome), die  zufällig interagieren (Quantenmechanik)
-      \ii Für das funktionieren des Universums ist das egal.
-      \ii Für unser Verständnis vom Universum ein Problem.
+      \ii Für das Funktionieren des Universums ist das egal
+      \ii Für unser Verständnis vom Universum ein Problem
       \ei
     }\bigskip
-    \ii<3-> Ein großes Programm als ein großes System.{%
+    \ii<3-> Ein großes Programm als ein großes System {%
       \bi
       \ii Viele Elemente (Daten) interagieren miteinander (abhängige Operationen).
       \ii Für die Maschine egal. Operationen werden stumpf nacheinander ausgeführt.
@@ -143,7 +143,7 @@
     \bigskip
 
     \bi
-    \ii Sprachen bieten Abstraktionen zum denken und kommunizieren{%
+    \ii Sprachen bieten Abstraktionen zum Denken und Kommunizieren{%
       \bi
       \ii \structure{Konzepte}: Welche Abstraktionen kann es überhaupt geben?\\[1ex]
          Beispiele: Records, Zustand, Prozeduren, Closures, Threads, Nachrichten\\[3ex]
@@ -163,27 +163,27 @@
     \btAnimation[width=0.7\textwidth]{range=1-4:<1->}{fig/11-principles}
   \medskip
     \bii
-    \ii<2->  Paradigmen bündeln Konzepte zu einem konsiztenten Programmiermodell
-    \ii<3-> Es gibt \ALERT<3->{viel mehr} Sprachen als Paradigmen
+    \ii<2->  Paradigmen bündeln Konzepte zu einem konsistenten Programmiermodell.
+    \ii<3-> Es gibt \ALERT<3->{viel mehr} Sprachen als Paradigmen.
     \ii<4-> Die meisten Sprachen bedienen mehr als ein Paradigma.\\[1ex]
     Oft: Ein Paradigma für \structure{Grobstruktur} + Ein Paradigma für die \structure{Feinstruktur}
     \eii
   \end{frame}
 #+end_src
 
-In den letzten 10 Vorlesungseinheiten haben wir uns mit dem Thema Programmiersprachen und ihrer Übersetzung von zwei Seiten genähert.
+In den letzten zehn Vorlesungseinheiten haben wir uns mit dem Thema Programmiersprachen und ihrer Übersetzung von zwei Seiten genähert.
 Zum einen haben wir in vier Vorlesungen (Typen, Namen, Objekte, Operationen) einzelne Sprachkonzepte auf einem sehr kleinteiligen Niveau kennen gelernt.
 Zum anderen haben wir uns mit den einzelnen Schritten der Übersetzung (Syntaxanalyse, Semantische Analyse, Zwischencodeerzeugung, Optimierung und Maschinencodeerzeugung) auseinander gesetzt.
 In dieser und der nächsten Vorlesung wollen wir wieder einen Schritt zurück machen, und uns die grundsätzliche Frage stellen "Warum haben wir überhaupt Programmiersprachen?" und "Folgen einzelne Sprachen ähnlichen Paradigmen?".
 
-Mit den verwendeten Sprachkonzepten erlauben Programmiersprachen es uns ein Problem auf einer abstraken Ebene und mit einem großen Abstand zu einer real-existierenden Maschine zu formulieren.
-Dieser Abstnd ist die semantische Lücke und der Übersetzer (oder auch ein Interpreter) überbrücken diese Lücke auf automatisierte Art- und Weise.
+Mit den verwendeten Sprachkonzepten erlauben Programmiersprachen es uns ein Problem auf einer abstrakten Ebene und mit einem großen Abstand zu einer real-existierenden Maschine zu formulieren.
+Dieser Abstand ist die semantische Lücke und der Übersetzer (oder auch ein Interpreter) überbrücken diese Lücke auf automatisierte Art- und Weise.
 Dabei stellt sich aber die Frage, warum wir diese semantische Lücke aufbauen, wenn wir dafür zusätzliche Werkzeuge brauchen um Sie wieder zu überbrücken.
 Neben der Tatsache das Übersetzer leicht anfällig für Bugs sind, erzeugen komplexe Sprachkonstrukte eine Lernkurve, die von den  Entwicklern erst überwunden werden muss bevor diese effektiv und effizient arbeiten können.
 Welchen nutzen hat es demnach die semantische Lücke aktiv auszuweiten und sogar eventuelle Overheads, die bei der Abbildung auf die Maschine entstehen, in Kauf zu nehmen?
 
 Für die Maschine tun wir dies sicherlich nicht, da diese in allen Fällen das Programm gleich ausführt, egal wie groß die semantische Lücke zum Quellprogramm vorher war.
-Für die Maschine brauchen die Daten auch keine Struktur, da auf der untersten Ebene einer Von-Neumann-Maschiene der Datenspeicher ein großes ~char~-Array ist und das Programm ein Array von Instruktionen.
+Für die Maschine brauchen die Daten auch keine Struktur, da auf der untersten Ebene einer Von-Neumann-Maschine der Datenspeicher ein großes ~char~-Array ist und das Programm ein Array von Instruktionen.
 Vielmehr müssen wir den Nutzen den semantischen Lücke bei den Entwicklern, insbesondere denen großer Softwaresysteme, suchen.
 
 In großen Softwareprojekten erzeugt das Zusammenspiel von drei Aspekten eine besondere Qualität babylonischer Verwirrung bei den Entwicklern:
@@ -191,24 +191,24 @@ Eine große Menge von heterogenen Informationen (Objekte) wird von vielen Operat
 Dieses komplexe Netz interagierender Elemente wird dabei nicht nur von einem einzelnen Entwickler orchestriert, sondern von einem oder mehreren Entwicklungsteams, die über die gesamte Erde, in unterschiedlichen Zeitzonen und mit unterschiedlichem kulturellen Hintergrund, verteilt an dem Programm arbeiten.
 Und hier kommt das eigentliche Problem bei der Programmierung: **Wie können wir den Menschen das Verständnis und die Kommunikation von Programmcode erleichtern?**
 
-Diese Aufgabe stellt sich als garnicht so leicht heraus.
+Diese Aufgabe stellt sich als gar nicht so leicht heraus.
 Wollen wir zunächst einmal die beiden Prozessoren vergleichen:
 Auf der einen Seite des Rings stehen die mechanischen Rechenanlagen (Computer), die eine große Menge an Speicher haben auf den sie mit großer Bandbreite uniform (jede Zugriff dauert in etwa gleich lange) zugreifen können.
 Zusätzlich zu diesem perfekten Gedächtnis führen Maschinen in jedem Operationszyklus eine strikt definierte Aktion durch; ohne Gnade, ohne Zögern, ohne Fehler und ohne Müdigkeit, immer uniform.
 Auf der anderen Seite befinden sich unsere Gehirne, die im direkten Vergleich nicht gut abschneiden:
 Der Speicher eines Menschen ist begrenzt und nicht erweiterbar, Zugriffe dauern unterschiedlich lange (erinnern) und können verfälschte, oft nur assoziierte, Ergebnisse liefern.
 Die Verarbeitung der abgerufenen Ergebnisse ist langsam, fehleranfällig, und nicht zu selten uneindeutig. 
-Noch schlimmer wird es wenn zwei Menschen miteinander kommunizieren: Wo zwei identisch arbeitende Maschinen mit dem gleichen Programm ausstatten können, haben zwei Menschen niemals das gleiche Set an Assoziatione, was unweigerlich zu Missverständnissen führt. Außerdem hat der Kommunikationskanal nur eine sehr geringe Datenrate, was im krassen Gegensatz elektrischen oder opto-elektrischen Computernetzen zu sehen ist.
+Noch schlimmer wird es wenn zwei Menschen miteinander kommunizieren: Wo zwei identisch arbeitende Maschinen mit dem gleichen Programm ausstatten können, haben zwei Menschen niemals das gleiche Set an Assoziationen, was unweigerlich zu Missverständnissen führt. Außerdem hat der Kommunikationskanal nur eine sehr geringe Datenrate, was im krassen Gegensatz elektrischen oder opto-elektrischen Computernetzen zu sehen ist.
 Das eigentliche Problem ist also nicht die Maschine, sondern der Mensch, der diese, in Gemeinschaft mit anderen, versucht zu instruieren.
 
 Um mit der Komplexität von Systemen umzugehen, haben wir ein unfassbar nützliches Werkzeug entwickelt:
 **die Abstraktion**.
 Durch die Abstraktion strukturieren wir große Probleme und Lösungen in immer kleiner werdende Partikulärprobleme und -lösungen.
 Dabei muss ein Mensch nicht die gesamte Lösung für ein Problem verstehen, sondern kann auf einer Abstraktionsstufe stoppen und die Lösung aus Partikulärlösungen der nächst niedrigeren Stufe komponieren.
-Um das etwas Anschaulicher zu gestelten:
+Um das etwas Anschaulicher zu gestalten:
 Die Abstraktion Record bietet uns die Möglichkeit viele Objekte mit gleicher Struktur zu erstellen und auf die einzelnen Felder zuzugreifen.
 Dabei müssen wir uns (meist) keine Gedanken machen, wie diese Felder in den Speicher gelegt werden oder wie die Offsets berechnet werden.
-Durch die Verwendung der Abstraktion können wir das Datenlayout und die Addressberechnungen dem Übersetzer überlassen und den Programmcode für einen Algorithmus auf einem deutlich abstrakteren Niveau formulieren.
+Durch die Verwendung der Abstraktion können wir das Datenlayout und die Adressberechnungen dem Übersetzer überlassen und den Programmcode für einen Algorithmus auf einem deutlich abstrakteren Niveau formulieren.
 Am Ende arbeitet das Programm ebenso, als hätten wir die Adressberechnungen direkt mit dem Algorithmus vermischt, aber durch die Verwendung der Abstraktion wird das Programm deutlich verständlicher und für andere leichter zu verstehen.
 
 Im Rahmen von Programmiersprachen können wir die angebotenen Abstraktionen mit Begrifflichkeiten fassen:
@@ -252,12 +252,12 @@ Aber seien Sie gewarnt, Sie können da draußen auf Menschen treffen, die diese 
     \ii   \ldots all data was unstructured and all operations were floating.{
       \bi
       \ii<2->[+=] \structure{Records}: Daten werden zu Datenstrukturen zusammengefasst.
-      \ii<2->[+=]\structure{Sequenzierung}: Befehle nacheinander ausführen. Ergebnisse weitergegeben.
+      \ii<2->[+=]\structure{Sequenzierung}: Befehle nacheinander ausführen, Ergebnisse weitergegeben
       \ei
     }\medskip
     \ii<2-> Beispiel: Reverse Polish Notation (wie in PostFix) {
       \bi
-      \ii Von Links nach rechts ausführen, Impliziter Stack für die Berechnung
+      \ii Von links nach rechts ausführen, impliziter Stack für die Berechnung
       \ii \texttt{1 3 + 5 4 - *} == \texttt{(1 + 3) * (5 - 4)}
       \ei
     }
@@ -317,7 +317,7 @@ Durch die Sequenzierung geben die Entwickler eine strikte Reihenfolge vor, wie O
     \bi
     \ii Prozeduren sind eine \ALERT{technische Einrichtung} der Sprache{
       \bi
-      \ii Gibt uns das grundlegende Prinzip der Code-Wiederverwendung.
+      \ii Gibt uns das grundlegende Prinzip der Code-Wiederverwendung
       \ii Die Sprache schreibt \textbf{nicht} vor, wie diese zu Verwenden sind.
       \begin{columns}
         \hfill
@@ -334,7 +334,7 @@ Durch die Sequenzierung geben die Entwickler eine strikte Reihenfolge vor, wie O
       \end{columns}
       \ei
     }\bigskip
-    \ii<2-> \structure{Prozedurale Abstraktion}: Zerlegung des Problems als in Teilprobleme{
+    \ii<2-> \structure{Prozedurale Abstraktion}: Zerlegung des Problems in Teilprobleme{
       \bi
       \ii Aufteilung des Codes anhand \textbf{problemspezifischer Grenzen}
       \ii Eine Funktionalität $\rightarrow$ Eine Prozedur
@@ -353,7 +353,7 @@ Durch die Sequenzierung geben die Entwickler eine strikte Reihenfolge vor, wie O
 In die gleiche Richtung wie die Sequenzierung stoßen die Konzepte der **generellen Kontrollflusskonstrukte**, die es uns ebenfalls Erlauben den Ausführungsstrom zu beeinflussen.
 Dabei haben wir die Konzepte **Selektion** und **Iteration** für den Kontrollfluss im kleinen, und **Prozeduren** und **Invokation** im Großen kennen gelernt. 
 
-Durch kleinteiligen Konzepte sind wir in der Lage komplexe Abläufe zu strukturieren und Abhängig von den Eingabedaten unterschiedliche Kontrollflüsse auszuführen. Dabei gibt es diese generellen Konzepte in unterschiedlichen Abstraktiosniveau: Eine "Schleife" mit ~if~ und ~goto~ hat sicherlich ein geringeres Abstraktionsniveau, als eine logisch-kontrollierte Schleife, welche wiederum weniger abstrakt ist als eine Aufzählungsschleife über eine dynamisch berechnete Sequenz von Objekten.
+Durch kleinteiligen Konzepte sind wir in der Lage komplexe Abläufe zu strukturieren und Abhängig von den Eingabedaten unterschiedliche Kontrollflüsse auszuführen. Dabei gibt es diese generellen Konzepte in unterschiedlichen Abstraktionsniveau: Eine "Schleife" mit ~if~ und ~goto~ hat sicherlich ein geringeres Abstraktionsniveau, als eine logisch-kontrollierte Schleife, welche wiederum weniger abstrakt ist als eine Aufzählungsschleife über eine dynamisch berechnete Sequenz von Objekten.
 Stellen Sie sich vor, welchen enormen technischen Fortschritt es dargestellt hat eine Maschine zu bauen, die ihre selbst-berechneten Ergebnisse verwendet um ihre zukünftige Operationsweise zu beeinflussen. Einfach der Hammer, im Vergleich zum [[https://en.wikipedia.org/wiki/Centrifugal_governor][Fliehkraftdrehregler]] unendlich flexibler.
 
 Ebenfalls bedeutend sind die **Prozeduren**, welche die parametrisierbare Wiederverwendung von Code erlauben.
@@ -380,7 +380,7 @@ Das Konzept "Prozedur" hält einen nicht davon die Prozedurgrenzen so zu ziehen,
       \end{column}\hfill
       \begin{column}{0.65\textwidth}
         \bi
-        \ii<2-> Eingaben und (Zwischen-)ergebnisse speichern{%
+        \ii<2-> Eingaben und (Zwischen-)Ergebnisse speichern{%
           \bi
           \ii Speicherzellen mit symbolischem Namen
           \ii Objekte werden an diese Namen gebunden
@@ -390,7 +390,7 @@ Das Konzept "Prozedur" hält einen nicht davon die Prozedurgrenzen so zu ziehen,
         \ii<3-> \structure{Veränderlicher Zustand} ist ein eigenes Konzept{%
           \bi
           \ii += \structure{Variablen} und \structure{Zuweisung}
-          \ii Gebundene Namen können neu gebunden  werden.
+          \ii Gebundene Namen können neu gebunden  werden
           \ii Flexibler Datenfluss und Schleifen mit Auswirkung
           \ei
         }\medskip
@@ -398,7 +398,7 @@ Das Konzept "Prozedur" hält einen nicht davon die Prozedurgrenzen so zu ziehen,
           \bi
           \ii Variablen sind ein Seitenkanal zu den Parametern
           \ii Funktionsverhalten kann überraschend werden
-          \ii Zustand kann inkonsistent werden.
+          \ii Zustand kann inkonsistent werden
           \ei
         }
         \ei
@@ -413,9 +413,9 @@ Nun könnte man meinen, wir wären schon fertig mit den Konzepten, die das imper
 In der Diskussion um Werte- und Referenzmodell{{{see(06-value-reference-model,Werte- und Referenzmodell)}}}, haben wir gesehen, dass Variablen und Objekte echt unterschiedliche Konzepte sind.
 Neben der relativ naheliegenden Idee einer Variable einen Namen zu geben, ist der Schritt den Wert einer Variable zu ändern ein deutlich folgenreicherer.
 Durch die Zuweisungsoperation können wir den Inhalt einer Variable ändern und so den Variablennamen an ein neues Objekt binden.
-Variablen sind auch das Konzept was es uns erlaubt einen flexiblen Datenfluss über komplexe Kontrollfstrukturen hinweg zu notieren. Ohne Variablen müsste jede Instruktion die Ergebnisse ihrer Vorgängeroperation empfangen, ein Ergebnis ändern und an die nächste Operation weitergeben. Durch Variablen bekommen wir die Möglichkeit Werte zwischen zu speichern und zu einem späteren Zeitpunkt wieder zu verwenden. 
+Variablen sind auch das Konzept was es uns erlaubt einen flexiblen Datenfluss über komplexe Kontrollstrukturen hinweg zu notieren. Ohne Variablen müsste jede Instruktion die Ergebnisse ihrer Vorgängeroperation empfangen, ein Ergebnis ändern und an die nächste Operation weitergeben. Durch Variablen bekommen wir die Möglichkeit Werte zwischen zu speichern und zu einem späteren Zeitpunkt wieder zu verwenden. 
 
-Können wir eine veränderliche Variablen global definieren, haben wir die Möglichkeit eines Datenflussseitenkanal über Prozedurgrenzen hinweg  geschaffen. Durch ein globales Konfigurationsflag kann sich unsere Prozedur, aufgerufen mit den selben Argumenten wie vor 3 Milisekunden, plötzlich ganz anders verhalten. Dies bietet eine große Flexibilität, aber auch eine Quelle von Bugs. Diesem Problem werden wir dann in der Vorlesung über das funktionale Paradigma nachgehen.
+Können wir eine veränderliche Variablen global definieren, haben wir die Möglichkeit eines Datenflussseitenkanal über Prozedurgrenzen hinweg  geschaffen. Durch ein globales Konfigurationsflag kann sich unsere Prozedur, aufgerufen mit den selben Argumenten wie vor 3 Millisekunden, plötzlich ganz anders verhalten. Dies bietet eine große Flexibilität, aber auch eine Quelle von Bugs. Diesem Problem werden wir dann in der Vorlesung über das funktionale Paradigma nachgehen.
 
 #+begin_src latex
   \begin{frame}{Das imperatives Programmierparadigma}
@@ -426,8 +426,8 @@ Können wir eine veränderliche Variablen global definieren, haben wir die Mögl
     \bi
     \ii Das \structure{imperative Programmierparadigma} umfasst mehrere Konzepte{
       \bi
-      \ii Operationen: Sequenzierung, Konstrolstrukturen, Prozeduren
-      \ii Daten: Strukturierte Daten, benannter und veränderlicher Zustand
+      \ii Operationen: Sequenzierung, Kontrollstrukturen, Prozeduren
+      \ii Daten: strukturierte Daten, benannter und veränderlicher Zustand
       \ii Beispiele für rein imperative Sprachen: Fortran, COBOL, PL/I, C, Pascal
       \ei
     }\medskip
@@ -443,9 +443,9 @@ Können wir eine veränderliche Variablen global definieren, haben wir die Mögl
 #+end_src
 
 Zusammengefasst ist das imperative Paradigma, die Kombination aus veränderlichem strukturiertem Zustand und einer starken Kontrolle für die Entwickler über den Kontrollfluss.
-Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann, und prägt bis heute die Welt der Programmiersprachen grundlegend. Oft verwenden Sprachen, die auf einer höheren Organisationsebene ein anderes Paradigma bieten, in ganz Kleinen, auf der Ebene einzelner Befehle, das imperative Paradigma. So ist Java auf der großen Organisationsebene objekt-orientiert, verwendet jedoch innerhalb von Methoden das imperative Paradigma um den Entwicklern die Kontrolle über die Ausführung zu geben.
+Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann, und prägt bis heute die Welt der Programmiersprachen grundlegend. Oft verwenden Sprachen, die auf einer höheren Organisationsebene ein anderes Paradigma bieten, in ganz Kleinen, auf der Ebene einzelner Befehle, das imperative Paradigma. So ist Java auf der großen Organisationsebene objektorientiert, verwendet jedoch innerhalb von Methoden das imperative Paradigma um den Entwicklern die Kontrolle über die Ausführung zu geben.
 
-* Das objekt-orientierte Programmierparadigma
+* Das objektorientierte Programmierparadigma
 :PROPERTIES:
 :CUSTOM_ID: 11-oo-paradigm
 :END:
@@ -458,11 +458,11 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
     \bi
     \ii Imperativ: \textbf{Betonung} der Operationen bei \ALERT{Vernachlässigung} der Daten{%
       \bi
-      \ii \alert{Codeduplikation}, da Funktionen sind strikt an ihre Datentypen gekoppelt.
+      \ii \alert{Codeduplikation}, da Funktionen strikt an ihre Datentypen gekoppelt sind
       \ii \alert{Keine Kontrolle}, da programmweiter Zugriff auf Datenstrukturen möglich
-      \ii \alert{Leicht unübersichtlich}, da kaum bis keine Hierarchie der Funktionen.
+      \ii \alert{Leicht unübersichtlich}, da kaum bis keine Hierarchie der Funktionen
       \ei
-      $\Rightarrow$ Erfordert Disziplin und geistige Kapazität von den Entwicklern.
+      $\Rightarrow$ Erfordert Disziplin und geistige Kapazität von den Entwicklern
     }\medskip
     \ii<2-> Besonders problematisch bei \textbf{großen Softwareprojekten} {
       \bi
@@ -475,7 +475,7 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
   \end{frame}
 
   \begin{frame}{\enquote{Objekte} als zentraler Begriff}
-    \OrangeBox{Menschen denken eher in Objekten (Nomen) als in Aktionen (verben)}
+    \OrangeBox{Menschen denken eher in Objekten (Nomen) als in Aktionen (Verben)}
     \begin{columns}
       \begin{column}{0.33\textwidth}
         \begin{btBlock}{Prozedural}
@@ -484,7 +484,7 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
         \end{btBlock}
       \end{column}\hfill
       \begin{column}{0.33\textwidth}
-        \begin{btBlock}{Objekt-Orientiert}
+        \begin{btBlock}{Objektorientiert}
         Fahrrad \btSetTab waschen\\
         \btUseTab fahren
       \end{btBlock}
@@ -494,41 +494,41 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
     \bi
     \ii<2-> Entwurf entlang von Objekten spiegelt menschliche Erfahrungswelten {
       \bi
-      \ii Eine Fabrik besteht aus: Hallen, Arbeitern, Maschienen, einem Gelände.
+      \ii Eine Fabrik besteht aus: Hallen, Arbeitern, Maschinen, einem Gelände.
       \ii All diese Entitäten haben (veränderliche) \structure{Eigenschaften}.
       \ii Entitäten \structure{interagieren miteinander} anstatt verarbeitet zu werden:\\
-      Arbeiter motiert Reifen $\Rightarrow$ montieren(reifen, by=arbeiter)
+      Arbeiter montiert Reifen $\Rightarrow$ montieren(reifen, by=arbeiter)
       \ei
     }
      \ei
 
      \begin{btBlock}<3->[type=alert]{}
-     Diese (objekt-orientierten) Objekte sind eine Erweiterung unserer bisherigen Objekte aus Vorlesung "06 - Objekte".
+     Diese (objektorientierten) Objekte sind eine Erweiterung unserer bisherigen Objekte aus Vorlesung "06 - Objekte".
    \end{btBlock}
   \end{frame}
 #+end_src
 
 Nachdem wir uns mit dem altbekanntem imperativen Paradigma beschäftigt haben, wollen wir uns nun den objektorientierten Paradigma zuwenden.
 Wir tun dies, indem wir zuerst die Schwächen des imperativen Paradigmas für große Softwareprojekte diskutieren, bevor wir den Ansatz den Objektorientierung für diese Schwächen aufzeigen.
-Als virtuellen Ausgangspunkt wählen wir eine imperative Sprache, die auch in ihrem Typssystem eher simpel und monomorph ist. Denken Sie an C oder an Pascal, beides keine konzeptionell reiche Sprachen.
+Als virtuellen Ausgangspunkt wählen wir eine imperative Sprache, die auch in ihrem Typsystem eher simpel und monomorph ist. Denken Sie an C oder an Pascal, beides keine konzeptionell reiche Sprachen.
 
-Wie wir gesehen haben hat das imperative Paradigma mehrere Konzepte, die sich mit der Ausführung beschäftigen, aber nur ein Konzept (Records) was uns dabei hilft unsere Daten im Programm zu strukturieren. Diese Vernachlässigung der Datenseite begründet einige der Probleme, die einfache imperative Sprachen zeigen. Zum einen Zwingt uns ein monomorphes Typssystem dazu das Prinzip der prozeduralen Abstraktion zu brechen, da die gleiche Operation auf unterschiedliche Datentypen ausgeführt in zwei unterschiedlichen Prozeduren münden muss. Dies führt zu einer Codeduplikation, die den Wartungsaufwand, der besonders bei großen Softwareprojekten einen erheblichen Teil der Kosten ausmacht, erhöht.
+Wie wir gesehen haben hat das imperative Paradigma mehrere Konzepte, die sich mit der Ausführung beschäftigen, aber nur ein Konzept (Records) was uns dabei hilft unsere Daten im Programm zu strukturieren. Diese Vernachlässigung der Datenseite begründet einige der Probleme, die einfache imperative Sprachen zeigen. Zum einen Zwingt uns ein monomorphes Typsystem dazu das Prinzip der prozeduralen Abstraktion zu brechen, da die gleiche Operation auf unterschiedliche Datentypen ausgeführt in zwei unterschiedlichen Prozeduren münden muss. Dies führt zu einer Codeduplikation, die den Wartungsaufwand, der besonders bei großen Softwareprojekten einen erheblichen Teil der Kosten ausmacht, erhöht.
 Ebenso bietet das imperative Paradigma keinerlei Zugriffskontrolle über die Daten und jede Prozedur ist erst einmal gleichberechtigt alle Daten, für die sie einen Zeiger erhaschen kann, zu manipulieren. Dies erfordert, gerade bei vielen Entwicklern, die an der gleichen Quellcodebasis arbeiten, ein enormes Maß an Disziplin, welche erlernt und eingehalten werden muss.
 Zum letzten bietet das rein imperative Paradigma kein Konzept zur Bündelung mehrerer semantisch zusammenhängender Prozeduren. Sicherlich gibt es die Möglichkeit Prozeduren, die zusammen gehören, ähnlich benennen. Aber auch das Erfordert Disziplin von den Entwicklern. Ab einer Vielzahl von Prozeduren, wird die Menge aller Prozeduren zu einem großen See in dem man keinerlei Struktur mehr erkennen kann.
 Was man bräuchte wäre eine zweite Art von Strukturkonzept für Codeorganisation. Teilweise kann dies durch Module bewerkstelligt werden, aber auch Objektorientierung bietet hier Konzepte an.
 
 Wie der Name schon vermuten lässt, stellt die Objektorientierung (OO) nicht mehr die Prozedur in den Mittelpunkt, sondern das Objekt.
-Vergleichen wir Objekte und Prozeduren mit der natürlichen Sprache, so kommen wir zur Analogie, dass Objekte wie Nomen und Prozeduren wie verben sind.
+Vergleichen wir Objekte und Prozeduren mit der natürlichen Sprache, so kommen wir zur Analogie, dass Objekte wie Nomen und Prozeduren wie Verben sind.
 Die Konzentration von OO auf Objekte verschiebt somit den Fokus vom "was getan wird" zu einem "wem" getan wird.
 Auf den Folien zeige ich ein Beispiel, welches verdeutlicht, dass diese Verschiebung zu intuitiveren Programmstrukturen führen kann.
-Bei Konzentration auf verben, würden wir "Apfel waschen" und "Fahrrad waschen" in der gleichen Kategorie verorten, es wird ja schließlich etwas gewaschen.
+Bei Konzentration auf Verben, würden wir "Apfel waschen" und "Fahrrad waschen" in der gleichen Kategorie verorten, es wird ja schließlich etwas gewaschen.
 Nun sind beide Reinigungstätigkeiten zwar ähnlich, haben aber in ihren Werkzeugen und ihrem Ziel nur sehr wenig miteinander zu tun.
 Anders sieht es aus, wenn wir und auf die Nomen konzentrieren und unser Fahrrad in den Mittelpunkt stellen.
-An diesen zentralen Begriff hängen wir dann die verben an, die zu diesem Objekt passen:
+An diesen zentralen Begriff hängen wir dann die Verben an, die zu diesem Objekt passen:
 "waschen" und "fahren".
 Und schon haben wir, durch die Verschiebung des Fokuspunktes eine Organisation gefunden, die viel mehr den menschlichen Erfahrungen entspricht, die die Welt eher nach ihren Objekten und weniger nach ihren Operationen sortiert.
 
-Die Grundidee von OO ist das Objekt als eigenständige Entität zu denken, dass eine Menge von Eigenschaften hat und über **Methoden** mit anderen Objekten interagiert. Dieses Mitdenken der Methoden als Teil des Objekts ist ein anderer Objektbegriff als der, den wir in Vorlesung "06 - Objekte" gebraucht habe. Denken Sie also für diese Vorlesung beim Begriff Objekt immer ein implizites "OO-" Prefix dazu. 
+Die Grundidee von OO ist das Objekt als eigenständige Entität zu denken, dass eine Menge von Eigenschaften hat und über **Methoden** mit anderen Objekten interagiert. Dieses Mitdenken der Methoden als Teil des Objekts ist ein anderer Objektbegriff als der, den wir in Vorlesung "06 - Objekte" gebraucht habe. Denken Sie also für diese Vorlesung beim Begriff Objekt immer ein implizites "OO-" Präfix dazu. 
 
 
 #+begin_src latex
@@ -543,7 +543,7 @@ Die Grundidee von OO ist das Objekt als eigenständige Entität zu denken, dass 
       \ii \structure{Messaging}: Objekte kommunizieren durch den Versand von Nachrichten.
       \ii \structure{Persistenz}: Objekte haben privaten Zustand, auch wenn sie nicht aktiv sind.
       \ii \structure{Kapselung}: Informationen werden im Objekt verborgen.
-      \ii \structure{Späte Bindung}: Ausgeführte Operation wird spätmöglichst ausgewählt.
+      \ii \structure{Späte Bindung}: Ausgeführte Operation wird möglichst spät ausgewählt.
       \ee
     \end{btBlock}
   \end{frame}
@@ -557,29 +557,29 @@ Die Grundidee von OO ist das Objekt als eigenständige Entität zu denken, dass 
     \bi
     \ii Methoden haben einen \structure{Ausführungskontext} mit dem Objekt{
       \bi
-      \ii Objekt auf der die Methode aufgerufen wird, wird sichtbar.
+      \ii Objekt, auf dem die Methode aufgerufen wird, wird sichtbar.
       \ii Objektattribute sind in der Methode zugreifbar.
       \ii Methode ist eine Closure! (Siehe \enquote{03 - Namen})
       \ei
     }\medskip
-    \ii \structure{Closure}: Eine Prozedur die einen Ausführungskontext mitbringt\\ {
+    \ii \structure{Closure}: Eine Prozedur, die einen Ausführungskontext mitbringt\\ {
       \bgroup\btAnimation[width=0.8\textwidth]{1:<1-2>,2:<3>,3:<4>,center,padding}{fig/11-closure}\egroup
       \bi
       \ii Prozeduren werden \textbf{immer} in einem Kontext ausgeführt.
-      \ii Bei C sind nur die Argumente und die globalen Variablen enthalten
-      \ii Bei Closures sind zusätzliche Objekte an Namen gebunden (z.B. \structure{\texttt{this}})
+      \ii Bei C sind nur die Argumente und die globalen Variablen enthalten.
+      \ii Bei Closures sind zusätzliche Objekte an Namen gebunden (z.B. \structure{\texttt{this}}).
       \ei
     }
     \ei
   \end{frame}
 #+end_src
 
-Wie wir bereits gesagt haben stehen beim objektorientierten Paradigma stehen die (OO-)Objekte im Mittelpunkt. Um dies noch etwas genauer zu fassen wollen wir uns die Definition von Objektorientierung von Alan Kay, dem Erfinder von Smalltalk, der ersten objektorientierten Programmiersprache, anschauen.
+Wie wir bereits gesagt haben, stehen beim objektorientierten Paradigma die (OO-)Objekte im Mittelpunkt. Um dies noch etwas genauer zu fassen, wollen wir uns die Definition von Objektorientierung von Alan Kay, dem Erfinder von Smalltalk, der ersten objektorientierten Programmiersprache, anschauen.
 
-Für Kay ist das wichtigste Element von OO das **Messaging** zwischen Objekten. Anstatt Prozeduren mit Argumenten aufzurufen findet alle Interaktion über Nachrichten statt. Objekte schicken anderen Objekten Nachrichten, welche auf diese Nachrichten reagieren. Technisch umgesetzt werden diese Nachrichten mittels Methodenaufrufe, aber das mentale Bild soll sein, dass einzelne Objekte anderen Objekten eine Nachricht schicken. Denken Sie dabei nicht an Netzwerknachrichten, sondern an etwas abstrakteres. Das Firmenobjekt schickt dem Arbeiter eine Nachricht mit der nächsten Aufgabe.
+Für Kay ist das wichtigste Element von OO das **Messaging** zwischen Objekten. Anstatt Prozeduren mit Argumenten aufzurufen, findet alle Interaktion über Nachrichten statt. Objekte schicken anderen Objekten Nachrichten, welche auf diese Nachrichten reagieren. Technisch umgesetzt werden diese Nachrichten mittels Methodenaufrufe, aber das mentale Bild soll sein, dass einzelne Objekte anderen Objekten eine Nachricht schicken. Denken Sie dabei nicht an Netzwerknachrichten, sondern an etwas Abstrakteres. Das Firmenobjekt schickt dem Arbeiter eine Nachricht mit der nächsten Aufgabe.
 In Java ist dies durch, dem Objekt angehängte, Methoden implementiert.
 
-Der zweite Aspekt von OO ist die **Persistenz** des privaten Objektzustandes. Objekte representieren eigenständige Entitäten und haben einen internen Zustand, selbst wenn sie gerade keine Nachricht verarbeiten. Technisch gesehen bedeutet dies, dass die Eigenschaften des Objekts im Speicher residieren müssen um über Methodenaufrufe hinweg Zustand zu halten. Dabei hat jedes Objekt seinen **eigenen** privaten Zustand.
+Der zweite Aspekt von OO ist die **Persistenz** des privaten Objektzustandes. Objekte repräsentieren eigenständige Entitäten und haben einen internen Zustand, selbst wenn sie gerade keine Nachricht verarbeiten. Technisch gesehen bedeutet dies, dass die Eigenschaften des Objekts im Speicher residieren müssen um über Methodenaufrufe hinweg Zustand zu halten. Dabei hat jedes Objekt seinen **eigenen** privaten Zustand.
 In Java ist dies durch Objekteigenschaften implementiert{{{see(03-composite-types,Zusammengesetzte Typen)}}}.
 
 Für Kay ist der dritte Prüfstein von OO, dass die Eigenschaftes des Objekts im Objekt selbst gekapselt sind und nicht von außen zugegriffen werden können.
@@ -602,42 +602,42 @@ In Python ist dieses Sichtbarmachen des Objekts noch deutlicher, da Methoden ein
 
 Um das Kernkonzept der Methode drapieren sich noch die anderen Konzepte mit denen die von Kay geforderten Eigenschaften in OO-Sprachen implementiert werden. Durch Zugriffsmodifier können wir die Sichtbarkeit von Feldern einschränken und so Kapselung erreichen. Durch dynamischen Dispatch/virtuellen Methodenaufruf wird das späte Binden implementiert.
 
-Was auf den Folien noch dazu kommt, was aber in gewisser Weise nicht, wie wir sehen werden, in den vier essentiellen Punkten von Kay nicht enthalten ist, ist das Konzept von Subtyp-Polymorphie durch Vererbung{{{see(03-polymorphism,Polymorphismus)}}}. Denn Kay spricht nur davon, wie sich Objekte zu Verhalten haben, er macht aber keine Aussage darüber wie diese Objekte ins Leben treten und wie wir Prozeduren als Methoden an ein Objekt binden. Bei Vererbung geschieht dies durch eine hierarchische Beziehung von Record-Typen, die in einer Subtyp-Beziehung zueinander stehen und in eine Richtung durcheinander Ersetzbar sind. Im nächsten Unterkapitel werden wir jedoch die Prototypen-basierte Objektorientierung kennen lernen, die gänzlich ohne separate Klassen auskommt und alles über einen Objektbau abhandelt. Seien Sie also gespannt.
+Was auf den Folien noch dazu kommt, was aber in gewisser Weise nicht, wie wir sehen werden, in den vier essentiellen Punkten von Kay nicht enthalten ist, ist das Konzept von Subtyp-Polymorphie durch Vererbung{{{see(03-polymorphism,Polymorphismus)}}}. Denn Kay spricht nur davon, wie sich Objekte zu Verhalten haben, er macht aber keine Aussage darüber wie diese Objekte ins Leben treten und wie wir Prozeduren als Methoden an ein Objekt binden. Bei Vererbung geschieht dies durch eine hierarchische Beziehung von Record-Typen, die in einer Subtyp-Beziehung zueinander stehen und in eine Richtung durcheinander Ersetzbar sind. Im nächsten Unterkapitel werden wir jedoch die prototypenbasierte Objektorientierung kennen lernen, die gänzlich ohne separate Klassen auskommt und alles über einen Objektbau abhandelt. Seien Sie also gespannt.
 
 Aber zurück zu den Methoden.
 Technisch gesehen sind Methoden Closures{{{see(04-call-frames,Function-Call Frames)}}}, also eine Kombination einer Prozedur mit einem (teilweise) gebundenem Ausführungskontext.
 Um dies zu Verstehen bedarf es noch einer Diskussion des Ausführungskontextes:
-Innerhalb einer Prozedur werden Referenzen zu Variablen über den Ausführungskontext aufgelößt.
+Innerhalb einer Prozedur werden Referenzen zu Variablen über den Ausführungskontext aufgelöst.
 In einer C-Funktion beinhaltet dieser Ausführungskontext die gebundenen Parameter und die lokalen Variablen der aktuellen Funktionsinstanz.
-Zusätzlich sind aber auch alle globalen Variablen im Ausführungskontext einer C-Funktion und zwar über Funktionsinkarantionen hinweg.
+Zusätzlich sind aber auch alle globalen Variablen im Ausführungskontext einer C-Funktion und zwar über Funktionsinkarnationen hinweg.
 In C haben wir also nur zwei Ebenen von hierarchisch Ausführungskontext: dem lokalen der Funktionsinstanz (für jeden Aufruf ein neuer Kontext) und den globalen Kontext (immerwährend).
 
-Für OO müssen wir uns einen dritten, dazwischenliegenden Kontext vorstellen, in dem das aktuelle Objekt (und teilweise dessen Felder) gebunden sind. Bei der Namensauflösung{{{see(04-implicit-resolution,CNSR)}}} werden diese Kontexte (zur Laufzeit!) von innen nach außen durchsucht bis der Variabelenname zum gebundenen Objekt aufgelößt werden kann.
+Für OO müssen wir uns einen dritten, dazwischenliegenden Kontext vorstellen, in dem das aktuelle Objekt (und teilweise dessen Felder) gebunden sind. Bei der Namensauflösung{{{see(04-implicit-resolution,CNSR)}}} werden diese Kontexte (zur Laufzeit!) von innen nach außen durchsucht bis der Variablenname zum gebundenen Objekt aufgelöst werden kann.
 Durch diesen erweiterten Ausführungskontext ist eine Methode etwas wirklich anderes als eine Prozedur. Denn im Gegensatz zur Prozedur hat die Methode eines Objekts einen Zustand, nämlich die persistent-gespeicherten Eigenschaften des Objekts.
 Technisch löst der Übersetzer diesen erweiterten Ausführungskontext effizient durch einen impliziten ~this~-Parameter durch. Aber das haben wir nun wirklich schon oft genug in diesem Skript erklärt. Kommen wir also wieder mal zu etwas ganz neuem: Prototypen.
 
-** Prototyp-basierte Objektorientierung
+** Prototypenbasierte Objektorientierung
 :PROPERTIES:
 :CUSTOM_ID: 11-prototype-oo
 :END:
 #+begin_src latex
 \dividerframe{Prototypen}
-  \begin{frame}{Objekt-Orientierung ohne Klassen}
+  \begin{frame}{Objektorientierung ohne Klassen}
     \begin{btBlock}{}
       Da Sie alle OO auf Basis von Klassen zur Genüge kennen, werden wir eine andere Art der OO Programmierung betrachten.
     \end{btBlock}
     \medskip
     \bi
-    \ii Javascript kennt \ALERT{keine Klassen} und ist \ADVANTAGE{dennoch} Objekt-Orientiert{
+    \ii Javascript kennt \ALERT{keine Klassen} und ist \ADVANTAGE{dennoch} objektorientiert{
       \bi \def\C{\bgroup\textcolor{safegreen}\checkmark\egroup}
-      \ii Javascript-Objekt haben Attribute (\C) gebundene Methoden (\C)
-      \ii Methoden werden erst beim Aufruf aufgelößt (\C)
+      \ii Javascript-Objekte haben Attribute (\C) und gebundene Methoden (\C)
+      \ii Methoden werden erst beim Aufruf aufgelöst (\C)
       \ii Informationen können mittels lexikalischem Scoping verborgen (\C) werden
       \ei
     }\medskip
-    \ii JavaScript verwendet \structure{Prototypen-basierte Vererbung}{
+    \ii JavaScript verwendet \structure{prototypenbasierte Vererbung}{
       \bi
-      \ii Flexibler, Erweiterbarer, und Mächtiger als klassenbasierte Vererbung
+      \ii Flexibler, erweiterbarer, und mächtiger als klassenbasierte Vererbung
       \ii Hohe Dynamik, die besonders für eine Skriptsprache geeignet ist
       \ii Wenige Sprachmechanismen, aber ein gewisser Zoo an syntaktischem Zucker
       \ei
@@ -670,7 +670,7 @@ Technisch löst der Übersetzer diesen erweiterten Ausführungskontext effizient
     }\medskip
     \ii<handout:2-|2-> \texttt{\_\_proto\_\_}: Fallback für die Suche nach Attributen{
       \bi
-      \ii Situation: Ein Objekt hat das geforderte Attribut nicht
+      \ii Situation: Ein Objekt hat das geforderte Attribut nicht.
       \ii Die Suche wird beim Prototypen, der in \texttt{\_\_proto\_\_} referenziert ist, fortgesetzt.
       \ii Es entsteht die \structure{Prototypenkette}, die bei \texttt{\{\}} endet.
       \ei\smallskip
@@ -680,19 +680,19 @@ Technisch löst der Übersetzer diesen erweiterten Ausführungskontext effizient
   \end{frame}
 #+end_src
 
-Da Sie Klassenbasierte Objektorientierung aus Java ja bereits kennen, will ich Sie nicht weiter damit langweilen ihnen Vererbung mittels Klassen noch einmal zu reinterieren. Anstatt dessen wollen wir uns **Prototypen-basierte Objektorientierung** als eine andere Geschmacksrichtung von OO anschauen, die, wie ich finde, sogar die geforderten 4 Eigenschaften noch deutlicher macht, als dies bei Klassenbasierter OO der Fall ist. Als Beispiel werden wir uns  Prototypen-OO in JavaScript, da diese Sprache auf wirklich jedem modernen Gerät im Browser zur Verfügung steht.
+Da Sie klassenbasierte Objektorientierung aus Java ja bereits kennen, will ich Sie nicht weiter damit langweilen Ihnen Vererbung mittels Klassen noch einmal zu reiterieren. Anstatt dessen wollen wir uns **prototypenbasierte Objektorientierung** als eine andere Geschmacksrichtung von OO anschauen, die, wie ich finde, sogar die geforderten 4 Eigenschaften noch deutlicher macht, als dies bei klassenbasierter OO der Fall ist. Als Beispiel werden wir uns  Prototypen-OO in JavaScript, da diese Sprache auf wirklich jedem modernen Gerät im Browser zur Verfügung steht.
 
-Vorneweg, JavaScript unterstützt im Kern keine Klassenbasierte OO, sondern nur Prototypen-OO, obwohl es inzwischen Syntaxzucker gibt, der es so erscheinen lässt als hätte JavaScript Klassen. Diese in [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes][ECMAScript 2015]] eingeführte Syntax ist am Ende nur ein ganz dünnes Furnier über der eigentlichen Prototypen-basierte JavaScript OO Engine. Wir schauen uns daher nur diese unterliegende Schicht an, in der JavaScript die 4 geforderten Eigenschaften von Ray erfüllt.
+Vorneweg, JavaScript unterstützt im Kern keine Klassenbasierte OO, sondern nur Prototypen-OO, obwohl es inzwischen Syntaxzucker gibt, der es so erscheinen lässt als hätte JavaScript Klassen. Diese in [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes][ECMAScript 2015]] eingeführte Syntax ist am Ende nur ein ganz dünnes Furnier über der eigentlichen prototypenbasierte JavaScript OO Engine. Wir schauen uns daher nur diese unterliegende Schicht an, in der JavaScript die 4 geforderten Eigenschaften von Ray erfüllt.
 
 Generell kann man sagen, dass Prototypen-OO flexibler ist als Klassenbasierte-OO, da man zur Laufzeit die Methoden und Eigenschaften von bereits erzeugten Objekten verändern kann.
 Dies ist nur daher möglich, da JavaScript im Herzen eine im Interpreter dynamisch ausgeführte Skriptsprache ist, auch wenn es heutzutage Just-in-Time Übersetzer gibt, die JavaScript im Browser zu schnell-ausführendem Maschinencode übersetzt.
 Um Prototypen-OO in Javascript zu verstehen, muss man zwei Sprachmechanismen verstehen: Die *Prototypenkette* und den JavaScript **Methodenaufruf**.
 
 Schauen wir uns zunächst JavaScript Objekte und die Prototypenkette an.
-Die erste wichtige Eigenschaft von JavaScript ist, dass Record- und Abbildungstypen zusammefallen.
+Die erste wichtige Eigenschaft von JavaScript ist, dass Record- und Abbildungstypen zusammenfallen.
 In JavaScript ist alles drei einfach ein ~object~.
 Diese JS-Objekte können als Sack voller Attribute beschrieben werden, die über einen dynamisch generierten Key abgerufen werden können.
-Daher hat JavaScript zwei semantisch äquivalente Notationen um auf Attribute zuzugreifen:
+Daher hat JavaScript zwei semantisch äquivalente Notationen, um auf Attribute zuzugreifen:
 ~obj.a~ und ~obj["a"]~ bedeuten exakt das gleiche und greifen auf das Attribut ~a~ des Objekts zu.
 Wir können, wie wir auf den Folien sehen, sogar Attribute zu einem bereits existierenden Objekt hinzufügen (~obj.zz~).
 Ein leeres Objekt, ohne Attribute, kann in JavaScript einfach über ~{}~ erzeugt werden und dann mit neuen Attributen ausgestattet werden.
@@ -728,12 +728,12 @@ Da in JavaScript alle Objekte gleichberechtigt sind, gibt es keine Unterscheidun
     \ii Prototypenkette implementiert dynamischen und hierarchischen Lookup{%
       \bi
       \ii Objekt in der Kettenmitte erweitern $\rightarrow$ Alle Kinder werden erweitert
-      \ii Speichereffizient, aber mit höhreren Lookup-Kosten verbunden.
+      \ii Speichereffizient, aber mit höheren Lookup-Kosten verbunden
       \ei
     }\medskip
     \ii<2-> JavaScript bindet den Namen \structure{\texttt{this}} an das aktuelle Objekt{
       \bi
-      \ii Attribute können auf Funktionen verweisen.
+      \ii Attribute können auf Funktionen verweisen
       \ii Objekt-Attribut als Funktion aufrufen $\Rightarrow$ \texttt{this} wird das Objekt gebunden
       \ei
     }
@@ -767,8 +767,8 @@ Da in JavaScript alle Objekte gleichberechtigt sind, gibt es keine Unterscheidun
     \bi
     \ii \textbf{Alle} Funktionen können als Konstruktoren verwendet werden{
       \bi
-      \ii Das Schlüsselwort \structure{\texttt{new}} ruft Funktion im Kontext eines neuen Objekts auf.
-      \ii Jede Funktion hat eine \structure{\texttt{.prototype}}-Attribut, die als \texttt{\_\_proto\_\_} gesetzt wird.
+      \ii Das Schlüsselwort \structure{\texttt{new}} ruft Funktion im Kontext eines neuen Objekts auf
+      \ii Jede Funktion hat ein \structure{\texttt{.prototype}}-Attribut, das als \texttt{\_\_proto\_\_} gesetzt wird.
       \ei
     }
     \ei
@@ -823,7 +823,7 @@ Da in JavaScript alle Objekte gleichberechtigt sind, gibt es keine Unterscheidun
     \ei
   \end{frame}
 
-  \begin{frame}{Prototypen-basierte Objektorientierung}
+  \begin{frame}{Prototypenbasierte Objektorientierung}
     \bi
     \ii Objekte erben alle Eigenschaft ihrer Prototypen {
       \bi
@@ -832,11 +832,11 @@ Da in JavaScript alle Objekte gleichberechtigt sind, gibt es keine Unterscheidun
       \ii Sieht aus wie klonen, ist aber effizienter.
       \ei
     }\medskip
-    \ii Alle Objekte sind \structure{gleichberechtig} und können Prototypen werden {
+    \ii Alle Objekte sind \structure{gleichberechtigt} und können Prototypen werden {
       \bi
-      \ii Keine Unterscheidung zwischen Objekten und Klassen.
+      \ii Keine Unterscheidung zwischen Objekten und Klassen
       \ii JavaScript: \texttt{obj.\_\_proto\_\_} zeigt wieder auf ein Objekt
-      \ii Es entsteht ein Baum von Objekten die Prototypen füreinander sind.
+      \ii Es entsteht ein Baum von Objekten, die Prototypen füreinander sind.
       \ii Die Wurzel des Baums ist das leere Objekt: \texttt{\{\}}
       \ei
     }\medskip
@@ -851,11 +851,11 @@ Da in JavaScript alle Objekte gleichberechtigt sind, gibt es keine Unterscheidun
   \end{frame}
 #+end_src
 
-Durch die Prototypenketten können wir relativ Speichereffizient eine Vielzahl an Objekten dynamisch Attribute hinzufügen. Allerdings kostet und diese Speichereffizienz und die Dynamik und Flexibilität der Attribut-Lookups Laufzeit. Im Zweifel muss ja jeder Attributzugriff durch das Abgehen der gesamten Prototypenkette aufgelößt werden. Für eine Scriptsprache ein valider Trade-Off zwischen Flexibilität und Laufzeit; für eine übersetzte Sprache würden wir uns zweimal überlegen ein solches Feature einzubauen.
+Durch die Prototypenketten können wir relativ speichereffizient eine Vielzahl an Objekten dynamisch Attribute hinzufügen. Allerdings kostet und diese Speichereffizienz und die Dynamik und Flexibilität der Attribut-Lookups Laufzeit. Im Zweifel muss ja jeder Attributzugriff durch das Abgehen der gesamten Prototypenkette aufgelöst werden. Für eine Skriptsprache ein valider Trade-Off zwischen Flexibilität und Laufzeit; für eine übersetzte Sprache würden wir uns zweimal überlegen ein solches Feature einzubauen.
 
 Der zweite Mechanismus, mit dem JavaScript dann endgültig zur OO Sprache wird, ist die Art und Weise wie der **Methodenaufruf** geschieht. Vorneweg muss man erklären, dass in JavaScript Funktionen an jeder Stelle erzeugt werden können (~var FUN = function () { return 23;};~) und auch wieder aufgerufen werden können (~FUN()~). Daher können Funktionen auch in  Objekt-Attributen gespeichert werden. Die Magie geschieht in JavaScript an der Stelle an der eine Funktion als Attribut eines Objekts aufgerufen wird (~obj.f()~). In diesem Fall wird die Funktion mit einem Ausführungskontext aufgerufen in dem die Variable ~this~ an das Objekt gebunden ist. Extrahiert die Funktion zuerst und ruft sie anderweitig auf (~var ff = obj.f; ff()~), greift dieser Mechanismus nicht!
 
-Durch diese Art des Methodenaufrufs, kann jede Funktion zu einer gebundenen Methode werden, indem man sie als Attribut des Objekts speichert. Zusammen mit der Prototypenkette, kommt man dann schnell dazu, dass es möglich ist solche Methoden zu vererben, indem man eine Funktion als Attribut eines Prototypen-Objekts setzt. Bei der Attributsuche wird dann die Prototypenkette nach oben abgegangen, die Funktion extrahiert und mit gebundenem ~this~ (auf das orginale Objekt) aufgerufen. Fertig ist der virtuelle Methodenaufruf, dessen Bindung zum Zeitpunkt des Aufrufes stattfindet (siehe Späte Bindung).
+Durch diese Art des Methodenaufrufs, kann jede Funktion zu einer gebundenen Methode werden, indem man sie als Attribut des Objekts speichert. Zusammen mit der Prototypenkette, kommt man dann schnell dazu, dass es möglich ist solche Methoden zu vererben, indem man eine Funktion als Attribut eines Prototypen-Objekts setzt. Bei der Attributsuche wird dann die Prototypenkette nach oben abgegangen, die Funktion extrahiert und mit gebundenem ~this~ (auf das originale Objekt) aufgerufen. Fertig ist der virtuelle Methodenaufruf, dessen Bindung zum Zeitpunkt des Aufrufs stattfindet (siehe Späte Bindung).
 
 Da das manuelle aufbauen einer Prototypenkette eher mühsam ist, bietet JavaScript noch einige Mechanismen, die es uns erleichtern, diese Art der Objektorientierung zu verwenden. Eine davon ist die Verwendung von **Funktionen als Konstruktoren**: Für jedes Funktionsobjekt (~Foo~), dass wir anlegen, wird zusätzlich ein Prototypenobjekt (~Foo.protoype~) angelegt, welches ein Attribut ~constructor~ hat, welches (zyklisch) auf die Funktion zeigt. 
 
@@ -870,7 +870,7 @@ Daher hat JavaScript inzwischen syntaktischen Zucker (~class~, ~extends~) um kla
 Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da jedes Objekt nur einen Vorgänger in der Prototypenkette hat.
 
 
-** Kritikpunkte am Objekt-Orientierten Paradigma
+** Kritikpunkte am objektorientierten Paradigma
 :PROPERTIES:
 :CUSTOM_ID: 11-oo-critique
 :END:
@@ -880,9 +880,9 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
 
   \begin{frame}<handout:1,3>[fragile]{Konzentration auf Objekte}
     \bi
-    \ii Objekt-orientierte Entwurfsmethoden fokussieren Objekte {%
+    \ii Objektorientierte Entwurfsmethoden fokussieren Objekte {%
       \bi
-      \ii \structure{Verb/Nomen-Analyse} von Use-Case Beschreibungen\\[1ex]
+      \ii \structure{Verb/Nomen-Analyse} von Use-Case-Beschreibungen\\[1ex]
           Alle Nomen werden Klassen/Objekte.\hspace{1em} Alle Verben werden Methoden.\\[2ex]
      \ii Arbeiter (Nomen) montiert (verb) Reifen (Nomen) an Auto (Nomen).\\[2ex]
           \begin{center}
@@ -896,7 +896,7 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
         \end{center}
         \ei
       }\bigskip
-      \ii<2-> \ALERT{Kritik}: Objekt-Orientierung vernachlässigt Verben {\\[1ex]
+      \ii<2-> \ALERT{Kritik}: Objektorientierung vernachlässigt Verben {\\[1ex]
         \begin{displayquote}[Steve Yegge, Execution in the Kingdom of Nouns][\hfill]
           Object Oriented Programming puts the Nouns \alert{first and foremost}. Why would you go to such lengths to put one part of speech on \textbf{a pedestal}? Why should one kind of concept take precedence over another? It's not as if OOP has suddenly made verbs \alert{less important} in the way we actually think.
         \end{displayquote}
@@ -925,12 +925,12 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
     \ii<2-> Wir können keine blanken Funktion herumreichen {
       \bi
       \ii Callback-Funktionen müssen immer von einem Objekt \enquote{bewacht} werden
-      \ii[$\Rightarrow$] Leere Objekte die nur eine Methode \enquote{\texttt{execute()/run()/do()}} haben{
+      \ii[$\Rightarrow$] Leere Objekte, die nur eine Methode \enquote{\texttt{execute()/run()/do()}} haben{
         \begin{center}
           \codebox{void java.lang.Runnable.run();}
         \end{center}
       }\medskip
-      \ii \structure{Designpatterns} um diese Schwäche zu umschiffen: Command, Strategy, Proxy
+      \ii \structure{Designpatterns}, um diese Schwäche zu umschiffen: Command, Strategy, Proxy
       \ei
     }
     \ei
@@ -941,7 +941,7 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
     \ii Von manchen Klassen kann es nur eine Instanz geben {
       \bi
       \ii Manche Entitäten sollten in einem Programm nur einmal existieren.
-      \ii Beispiel: Managerobjekt, dass \textbf{alleinige} Kontrolle über einen Aspekt hat.
+      \ii Beispiel: Managerobjekt, das \textbf{alleinige} Kontrolle über einen Aspekt hat
       \ii \structure{Designpattern}: Singleton (nur möglich durch statische Attribute)
       \ei
     }\bigskip
@@ -965,7 +965,7 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
 
   \begin{frame}{\enquote{Objektorientierung ist ineffizient!}}
     \bi
-    \ii OO-Entwurfsprinzipien verleitet Probleme zu feinschichtig zu zerlegen{\\[1ex]
+    \ii OO-Entwurfsprinzipien verleiten, Probleme zu feinschichtig zu zerlegen{\\[1ex]
       \begin{center}
         \includegraphics[page=1,height=1.8cm]{fig/11-call-hierarchy}\hspace{2cm}
         \includegraphics[page=2,height=1.8cm]{fig/11-call-hierarchy}
@@ -974,12 +974,12 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
       \bi
       \ii Verteilung der Verantwortlichkeit auf viele Objekte
       \ii Unübersichtlicher Kontrollfluss zwischen den einzelnen Methoden
-      \ii Viele Methodenaufrufe zwischen den Schichten.
+      \ii Viele Methodenaufrufe zwischen den Schichten
       \ei
     }\medskip
     \ii<2-> Hohe Kosten für den einzelnen  Methodenaufrufe{
       \bi
-      \ii \structure{Späte Bindung}: Dynamic Dispatch wählt Methode zur Laufzeit auf
+      \ii \structure{Späte Bindung}: Dynamic Dispatch wählt Methode zur Laufzeit aus
       \ii \structure{this}: Der implizite durchgeschleifte Parameter ist nicht umsonst.
       \ei
       \medskip
@@ -1000,9 +1000,9 @@ Bevor wir mit der Diskussion des Objektorientierten Paradigmas zum Ende kommen, 
 Diese Kritik ist dabei selten am Paradigma selbst, sondern mehr auf die Prinzipien seiner Verwendung, gerichtet.
 Dennoch fußen ja all diese Prinzipien auf den Mechanismen, die wir im OO Paradigma vereinigt haben und daher lohnt es sich an dieser Stelle einen Blick auf die Kritik zu werfen.
 
-Um diese Kritik zu verstehen, muss man sich kurz die Grundüberlegung von OO vor Augen halten: Alle Entitäten sind Objekte, die Nachrichten austauschen. OO legt also einen großen Fokus auf die Objekte, was sich auch in der OO Entwurfsmethode der **Verb/Nomen-Analyse** niederschlägt. Diese wird verwendet um Software objektorientiert zu entwerfen. Dazu geht nimmt man sich definierte Use-Cases zu Hand, markiert sich alle Nomen und alle verben, die sich auf diese Nomen beziehen. Ganz grob vereinfacht, sagt man dann, dass alle Nomen Objekte/Klassen werden und die verben, untergeordnet, als Methoden an diese Objekte gehangen werden. Ich werde das hier nicht tiefer ausführen, da es eigentlich ein Thema des Software Engineering ist. Was wir allerdings in dieser Entwurfsmethodik sehen, ist dass die verben den Nomen untergeordnet werden.
+Um diese Kritik zu verstehen, muss man sich kurz die Grundüberlegung von OO vor Augen halten: Alle Entitäten sind Objekte, die Nachrichten austauschen. OO legt also einen großen Fokus auf die Objekte, was sich auch in der OO Entwurfsmethode der **Verb/Nomen-Analyse** niederschlägt. Diese wird verwendet um Software objektorientiert zu entwerfen. Dazu geht nimmt man sich definierte Use-Cases zu Hand, markiert sich alle Nomen und alle Verben, die sich auf diese Nomen beziehen. Ganz grob vereinfacht, sagt man dann, dass alle Nomen Objekte/Klassen werden und die Verben, untergeordnet, als Methoden an diese Objekte gehangen werden. Ich werde das hier nicht tiefer ausführen, da es eigentlich ein Thema des Software Engineering ist. Was wir allerdings in dieser Entwurfsmethodik sehen, ist dass die Verben den Nomen untergeordnet werden.
 
-Der erste, relativ philosophische, Kritikpunkt zielt dann auch genau darauf ab, dass Verben vernachlässigt: Durch die OO Designphilosophie haben wir uns Jahrelang nur auf die Objekte versteift und Software danach gebaut, wie wir die alles einzelnen Objekten zuordnen können. Aber deswegen sind verben, also Tätigkeiten bzw. Aktionen, ja nicht weniger wichtig geworden. Allerdings zwingt uns das Objektorientierte Paradigma dazu, jedenfalls wenn man es konsequent durchzieht, dass Tätigkeiten (verben) niemals alleine auftreten können. Sondern sie werden gewissermaßen immer von einem Objekt an der Leine geführt. Aus dieser gezwungenen Kopplung ergeben sich dann auch die anderen Kritikpunkte, die man am OO Paradigma anbringen kann.
+Der erste, relativ philosophische, Kritikpunkt zielt dann auch genau darauf ab, dass Verben vernachlässigt: Durch die OO Designphilosophie haben wir uns Jahrelang nur auf die Objekte versteift und Software danach gebaut, wie wir die alles einzelnen Objekten zuordnen können. Aber deswegen sind Verben, also Tätigkeiten bzw. Aktionen, ja nicht weniger wichtig geworden. Allerdings zwingt uns das Objektorientierte Paradigma dazu, jedenfalls wenn man es konsequent durchzieht, dass Tätigkeiten (Verben) niemals alleine auftreten können. Sondern sie werden gewissermaßen immer von einem Objekt an der Leine geführt. Aus dieser gezwungenen Kopplung ergeben sich dann auch die anderen Kritikpunkte, die man am OO Paradigma anbringen kann.
 
 So stellt sich bei manchen Aktionen (wir nennen sie dann mal wieder Funktionen), die Frage zu welchem Objekt sie gehören sollen.
 An welchem Objekt sollte denn die Funktion "größter gemeinsamer Teiler" hängen?
@@ -1042,30 +1042,30 @@ In der nächsten Vorlesung schauen wir uns dann das funktionale Paradigma an, be
     \bi
     \ii Programmierparadigmen sind Sammlungen von Sprachkonzepten {
       \bi
-      \ii Ausweiten der Semantischen Lücke macht eine Sprache \alert{nicht mächtiger},\\
-          aber den Code leichter \advantage{verständlicher}.
-      \ii Paradigmen werden durch Software-Enginnering Prinzipien diszipliniert.
+      \ii Ausweiten der semantischen Lücke macht eine Sprache \alert{nicht mächtiger},\\
+          aber den Code besser \advantage{verständlich}.
+      \ii Paradigmen werden durch Software-Engineering-Prinzipien diszipliniert.
       \ei
     }
     \ii Das imperative Programmierparadigma {
       \bi
-      \ii Sequentielles Abarbeiten von Operationen, die den Zustand verändern.
-      \ii Strikte Vorgabe, wie eine Aufgabe durch zu führen ist.
+      \ii Sequentielles Abarbeiten von Operationen, die den Zustand verändern
+      \ii Strikte Vorgabe, wie eine Aufgabe durch zu führen ist
       \ii Prozedurale Abstraktion zerlegt das Problem entlang von Aufgaben
       \ei
     }
-    \ii Das objekt-orientierte Programmierparadigma {
+    \ii Das objektorientierte Programmierparadigma {
       \bi
       \ii \structure{Interagierende Objekte} sollen die reale Welt abbilden
       \ii Objekte senden \structure{Nachrichten} bzw. rufen sich ihre Methoden gegenseitig auf
       \ii Prototypen erlauben \structure{klassenlose Objektorientierung}
       \ei
     }
-    \ii Objekt-Orientierung hat ebenfalls \alert{Probleme} {
+    \ii Objektorientierung hat ebenfalls \alert{Probleme} {
       \bi
       \ii Funktionen werden immer von Objekten dominiert.
       \ii Globaler Kontext nur über statische Methoden/Attribute
-      \ii Designpatterns müssen konzeptionelle Schwächen ausgleichen
+      \ii Designpatterns müssen konzeptionelle Schwächen ausgleichen.
       \ei
     }
     \ei
