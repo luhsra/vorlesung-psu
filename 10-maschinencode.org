@@ -2,6 +2,7 @@
 #+SUBTITLE: 10 - Maschinencode
 #+DATE: [2020-06-30]
 #+SETUPFILE: setup.org
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/pWelK
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 

@@ -14,8 +14,8 @@ def compose(f, g):
 x = compose(inc, inc)
 print(x(0))
 
-def partial(f, *args0):
-    return lambda *args1: f(*(args0+args1))
+def partial(f, arg0):
+    return lambda *args: f(arg0, *args)
 
 def add(a,b):
     return a+b

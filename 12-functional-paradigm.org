@@ -417,7 +417,9 @@ Sehr verwandt zum destructuring bind ist das **pattern matching** bei wir auch s
 Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzählungstypen mit Nutzlast vergleichen und Variantenspezifischen Code ausführen. Im Gegensatz zu einer ~if-elif-else~ Kaskade ist es bei diesem Konstrukt für den Übersetzer auch leicht zu prüfen, ob wirklich alle Fälle der Aufzählung abgehandelt wurden, oder ob ein Fall vergessen wurde.
 
 * Funktionen als Bürger erster Klasse
-
+:PROPERTIES:
+:CUSTOM_ID: 12-first-class-functions
+:END:
 #+begin_src latex
   \dividerframe{Funktionen als \\Bürger erster Klasse}
 
@@ -433,7 +435,7 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
       \ei
     }
     \medskip
-    \ii<3-> \structure{Funktionen höhrerer Ordnung} haben Funktionen als Parameter{
+    \ii<handout:3-|3-> \structure{Funktionen höhrerer Ordnung} haben Funktionen als Parameter{
       \bi
       \ii Viele Imperative Sprachen bieten bereits Funktionszeiger
       \ii \ALERT{Aber:} Funktionen sind immer noch nicht wirklich gleichberechtigt! 
@@ -467,6 +469,25 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
                             \btUseTab algorithmischen Aspekte einer Sprache gestärkt!}
     \end{frame}
 #+end_src
+
+Die Auswirkungen der Entscheidung keinen veränderlichen Zustand zu erlauben hat natürlich nicht nur Auswirkung auf die Objekte, sondern auch auf die Organisation der Operationen. Hier ist die Stellung der Funktionen, die ja nun richtige Funktionen im mathematischen Sinne sind, von besonderer Bedeutung. Diese mathematischere Sicht auf Funktionen führt auch dazu, dass wir die Rolle von Prozeduren/Funktionen innerhalb der Sprache neu überdenken.
+
+Bisher haben wir Operationen und Objekte als zwei unterschiedliche Sphären einer Programmiersprache geredet. Es gab die Welt der Operationen, in der Kombinationsregeln für Daten definiert sind, und die Welt der Objekte, in die passiven Datenträger beheimatet sind. Funktionen haben wir in dieser Kategorisierung in die Welt der Operationen gesteckt.  Wir haben Funktionen ja sogar als Komplexoperationen, die mittels Funktionsaufruf aktiviert werden, bezeichnet.
+
+In dieser Kategorisierung bekommt eine Funktion mehrere Objekte als Argumente, verarbeitet diese (inzwischen sogar ohne Seiteneffekte) und gibt wieder ein Objekt als Rückgabewert aus. Eine solche Funktion, die nur passive Objekte, die gewissermaßen faul im Speicher herumlungern, verarbeitet nennen wir **Funktion erster Ordnung**. In unserer Übungssprache L0 haben wir ausschließlich solche Funktionen.
+
+Aber es gibt auch **Funktionen höherer Ordnung**, die nicht nur normale Objekte als Argument bekommen können, sondern auch Funktionen. Sie heißen deswegen "von höherer Ordnung", da sie ja Funktionen sind, die Funktionen verarbeiten. Eine Funktion, die eine Funktion erster Ordnung bekommt, ist demnach eine Funktion zweiter Ordnung. Geben wir diese Funktion wiederum einer dritten Funktion mit, so wäre diese eine Funktion dritter Ordnung. Die Funktionen höherer Ordnung sind also alle Funktionen, die keine Funktionen erster Ordnung sind.
+
+Solche Funktionen höherer Ordnung sind eine ziemlich gebräuchliche Technik. Immer wenn ein **Funktionszeiger** als Argument auftaucht haben wir eine Funktion höherer Ordnung vor uns. Jede Form von Callback ist ein Indikator für eine Funktion höherer Ordnung. Dies gibt es sogar in der Sprache C, die ja ansonsten eher nicht für ihre semantische Reichhaltigkeit bekannt ist.
+
+Aber selbst wenn es Funktionen höherer Ordnung in einer Sprache gibt, sind Funktionen und Objekte immer noch nicht gleich berechtigt. Wir können zwar mittels Funktionszeigern Funktionen weitergeben, oder sogar als Rückgabewert bekommen, aber wir sind auf jene Funktionen beschränkt, die im Quelltext definiert wurden. In C kann ich zur Laufzeit, mittels ~malloc()~ eine beliebige Anzahl von Objekten erzeugen, aber ich kann keine einzige Funktion neu erzeugen. In C ist die Menge der existierenden Funktionen nach der Übersetzung abgeschlossen und fix, die Menge der Objekte dagegen dynamisch. Das ist doch total unfair! Ich möchte ebenfalls Funktionen zur Laufzeit erzeugen können. Nur dann herscht wirkliche Gleichberechtigung zwischen Funktionen und Objekten, dann wenn Funktionen selbst zum Objekt werden.
+
+Bei Sprachen die Gleichberechtigung für Objekte und Funktionen bieten sagt man dass die Funktionen **Bürger erster Klasse** (first-class citizens) sind.
+In solchen Sprachen gibt es keinen prinzipiellen Unterschied zwischen Funktionen und Objekte, und man braucht beide Universen nicht mehr als getrennt voneinander ansehen. Wir haben nur noch Objekte, von denen manche aufrufbar, und damit Funktionen sind. Wir haben solche Funktionsobjekte schon öfters in Aktion gesehen, ohne sie wirklich zu diskutieren. In Python sind Funktionen solche Bürger erster Klasse, und können zur Laufzeit erzeugt werden.
+Eine Funktion höherer Ordnung kann neue Funktion erzeugen und zurückgeben. Im Beispiel verarbeitet ~f()~ das Funktionsobjekte ~y()~ und die Zahl ~23~ um eine neue Funktion ~z()~ zu erzeugen.
+
+Wenn Funktionen von nun an Funktionsobjekte sind, dann brauchen wir auch Operationen, die wir auf ihnen ausführen können.
+Die einfachste Operation ist dabei der **Aufruf**, der ein Funktionsobjekt zusammen mit einigen Argumenten als Funktionsinstanz aktiviert. Auf der abstrakten Ebene legt der Aufrufoperator (~apply(func, *args)~) einen Call-Frame an, bindet die Argumente an die Parameter und startet die Ausführung des Funktionsrumpfes. Aber es gibt noch andere Operationen, die wir auf Funktionsobjekten ausführen können, mit denen wir uns noch beschäftigen werden.
 
 #+begin_src latex
   \dividerframe{Funktionales Programmieren}
@@ -554,7 +575,34 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
     \end{columns}
 
   \end{frame}
+#+end_src
 
+Funktionen höherer Ordnung nehmen einen besonderen Platz in der Welt der Programmiersprachen ein, da sie von einer Auswertungsstrategie abstrahieren können.
+Die Funktion höherer Ordnung bekommt ein Funktionsobjekt als Argument und kann dies in ihrem Funktionsrumpf an beliebiger Stelle, beliebig oft und mit beliebigen Argumenten aufrufen.
+Der Rumpf der "äußeren" Funktion bestimmt also eine Auswertestrategie, die ihr Benutzer beliebige Funktionalität durch Übergabe von unterschiedlichen Callback-Funktionen parametrisieren kann.Auf den Folien sehen wir, wie die Funktion ~outer()~ eine Auswertestrategie einer Funktion auf einem Array mit mindestens 2 Elementen codiert.
+Aufgerufen mit unterschiedlichen Funktionsobjekten (~innerA~, ~innerB~) liefert ~outer()~ unterschiedliche Ergebnisse, die jedoch nach dem gleichen Muster berechnet werden.
+Durch Funktionen höherer Ordnung können wir also nicht nur in den passiven Daten, sondern auch in den Verarbeitungsschritten, eine Art prozeduraler Abstraktion vornehmen.
+Wo die prozedurale Abstraktion ein Vorgehen vollständig abstrahiert hat, kann die funktionale Abstraktion mit Funktionen höherer Ordnung ein Vorgehen partiell abstrahieren und parametrisierbare "Lücken" lassen.
+
+Eine der grundlegensten Konzepte funktionaler Programmierung ist der **Lambda-Ausdruck**, der es uns erlaubt anonyme Funktionsobjekte zu erzeugen.
+Dies muss man im Gegensatz zur normalen Funktionsdefinition sehen, bei der ein Funktionsobjekt erzeugt wird und sofort an einen Funktionsnamen gebunden wird.
+Das anonyme Funktionsobjekt hat selbst keinen Namen, kann also nicht direkt durch die Namensauflösung gefunden werden,  jedoch kann es wie jedes Funktionsobjekt herumgereicht und aufgerufen werden.
+
+Wo die Funktionsdefinition die Funktion in einem statischen Kontext[fn::Statisch meint hier, dass das Funktionsobjekt über die gesamte Laufzeit existiert, wie dies auch bei globalen Variablen der Fall ist] anlegt, erzeugt ein Lambda-Ausdruck ein  Funktionsobjekte dynamisch im Kontext des Programmablaufs.
+Dies hat zur Folge, dass der Lambda-Ausdruck in einem aktiven Auswertungskontext einer bereits laufenden Funktion ausgewertet wird, aus dem der Ausdruck Namen innerhalb des Lambda-Rumpfes binden kann{{{see(04-call-frames,Lexikalisches Scoping)}}}.
+Daher sind Lambda-Ausdrücke nicht nur eine bequeme Ersatzschreibweise für Funktionsdefinition, sondern haben ihren eigenen Wert. Machen wir das kurz an einem Beispiel fest:
+
+#+begin_src python
+def make_multiplier(factor):
+    return lambda x: x * factor
+
+fn = make_multiplier(2)
+print [fn, fn(23), make_multiplier(3)(13)]
+#+end_src
+
+Im Beispiel definieren wir die Funktion ~make_multiplier()~ die, mittels eines Lambda-Ausdruckes, Funktionsobjekte erzeugt. Als Argument hat die Funktion den Parameter ~factor~. Der Lambda-Ausdruck erzeugt eine Funktion mit einem Argument ~x~, die zusätzlich den Namen ~factor~ aus ihrem dynamischen Aufrufkontext bindet. Jedes mal, wenn wir ~make_multiplier~ aufrufen, wird ein neues Funktionsobjekt erzeugt, dass in seinem partiell gebundenem Auswertungskontext den Namen ~factor~ bereits gebunden hat. Etwas abstrakter gesprochen erzeugt ~make_multiplier()~ Funktionen, die eine gegebene mit einem  Faktor multiplizieren.
+
+#+begin_src latex
   \begin{frame}{Beispiel: Listenmanipulationen}
     \bi
     \ii Listen sind die funktionale \enquote{Brot-und-Butter} Datenstruktur{
@@ -593,8 +641,60 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
       \end{column}
     \end{columns}
   \end{frame}
+#+end_src
 
-  \begin{frame}[fragile]{Komposition von Funktionen}
+Wir haben bereits erwähnt, dass Funktionen höherer Ordnung Auswertungsstrategien abstrahieren können und wir haben bereits diskutiert, warum einfach-verkettete Listen eine Datenstruktur sind, die gut für die funktionale Programmierung geeignet sind. Da ist es naheliegend, dass sich einige Standardfunktionen höherer Ordnung zur Verarbeitung von Listen heraus gebildet haben, die Listenmanipulationen abstrahieren. Wir wollen kurz die drei wichtigsten Funktionen dieser Klasse diskutieren.
+
+Die Funktion ~map()~ bildet eine Liste, mittels einer übergebenen Funktion, auf eine neu erstellten Liste gleicher Länge ab. Dabei bildet ~map()~ jedes Listenelement mittels einer übergebenen Funktion auf ein neues Objekt ab, aus denen die Listliste erzeugt wird. Durch diese Abstraktion lassen sich viele Konstrukte, die sonst durch iterative Schleifen implementiert werden müssten, im funktionalen Paradigma ausdrücken ohne die Rekursion über die Liste jedesmal implementieren zu müssen. Schauen wir uns kurz die rekursive Definition von ~map()~ an:
+
+#+begin_src python
+def map(func, sequence):
+    if not sequence:
+        return []
+    return [func(sequence[0])] + map(func, sequence[1:])
+
+print map(lambda x: x*2, [1,2,3,4])
+#+end_src
+
+Die Funktion ~filter()~ wird dazu benutzt die Elemente einer Liste nach einem gegebenen Kriterium zu filtern und nur aus den selektierten Elementen eine neue Liste zu erzeugen. Das gesuchte Kriterium wird als Prädikatsfunktion übergeben und bildet jedes Element der Liste auf einen Booleschen Wert ab. ~filter()~ führt also die Aschenputteloperation aus, und wird die guten ins Töpfchen (Rückgabeliste) und die schlechten ins Kröpfchen (~continue~). Die rekursive Definition von ~filter()~ sieht folgendermassen aus:
+
+#+begin_src python
+def filter(predicate, sequence):
+    if not sequence:
+        return []
+
+    head, tail = sequence[0], sequence[1:]
+    if predicate(head):
+        return [head] + filter(predicate, tail)
+    else:
+        return filter(predicate, tail)
+
+print filter(lambda x: (x % 2) == 0, [1,2,3,4])
+#+end_src
+
+Die Funktion ~reduce()~ wird dazu verwendet, die Elemente einer Liste  mittels einer **Aggregierungsfunktion**, paarweise zu einem einzelnen Wert "zusammen gefaltet". Dabei gibt es zwei grundlegende Spielarten von ~reduce()~, je nachdem ob die Listenelemente rechts-assoziativ oder links-assoziativ kombiniert werden. Zusätzlich gibt es die Unterscheidung ob ein Initialwert angegeben wird oder nicht. Während die Assoziativität und der Anfangswert für Operationen wie ~+~ keine Rolle spielt, ist der Reihenfolge der Reduktion für andere Aggregierungsfunktionen essentiell.  Im folgenden Beispiel sehen wir sowohl die links-assoziative als auch die rechts-assoziative Variante, implementiert im imperativen Paradigma. Durch die Aggrgierungsfunktion, die zwei-elementige Tupel erzeugt, ist gut zu erkennen wie sich die Auswertestrategien unterscheiden.
+
+#+begin_src python
+def reduce_left(func, sequence, initial):
+    for elem in sequence:
+        initial = func(initial, elem)
+    return initial
+
+def reduce_right(func, sequence, initial):
+    for elem in reversed(sequence):
+        initial = func(elem, initial)
+    return initial
+
+print reduce_left (lambda x,y: (x,y), [1,2,3,4,5], "init")
+# => ((((('init', 1), 2), 3), 4), 5)
+print reduce_right(lambda x,y: (x,y), [1,2,3,4,5], "init")
+# => (1, (2, (3, (4, (5, 'init')))))
+#+end_src
+
+Neben diesen Listenmanipulatoren, kann es ähnliche Operationen auch auf komplexeren Datenstrukturen wie Bäumen geben. So würde ein ~mapTree()~ einen Baum auf einen Baum gleicher Struktur abbilden, bei dem jeder Knoten durch eine gegebene Funktion transformiert wird. Im Grunde war unsere ~traverse()~-Funktion aus der Vorlesung über die semantische Analyse{{{see(05-tree-traversal,Traversierung von Bäumen)}}} genau solch eine Funktion höherer Ordnung auf dem AST.
+
+#+begin_src latex
+\begin{frame}[fragile]{Komposition von Funktionen}
 
     \bi
     \ii \structure{Funktionskomposition} ist die Hintereinanderausführung von Funktionen{
@@ -688,8 +788,91 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
     \end{column}
   \end{columns}
   \end{frame}
+#+end_src
 
-  \begin{frame}[t,fragile]{Beispiel: Eine Verarbeitungskette}
+Aber ich habe ihnen ja noch mehr Operationen auf Funktionsobjekten versprochen. Die sollen sie von Form der **Funktionskomposition** und der **partiellen Anwendung** von Funktionen auch bekommen! So wie die Addition zwei Zahlen miteinander kombiniert, so können die genannten Operationen bereits existierende Funktionsobjekte manipulieren, ganz in dem Sinne Funktionen zu Bürgern erster Klasse zu machen. 
+
+Die erste Operation ist die **Funktionskomposition** (~compose()~), die aus mehreren Funktionsobjekten ein neues Funktionsobjekt erzeugt, welches die gegebenen Funktionen hintereinander ausführen wird.
+Dazu füttert das neue Funktionsobjekt die eigenen Argumente an die erste übergebene Funktion, deren Ergebnis wird wiederum als Argument an die zweite Funktion gegeben, und so weiter  bis das Ergebnis der letzten Funktion als endgültiger Rückgabewert an den Aufrufer der komponierten Funktion geht. Auf den Folien zeige ich ihnen nur die Komposition zweier Funktionen, aber dies ist mit beliebig vielen hintereinander ausgeführten Funktionen möglich.
+
+Besondere Wichtigkeit haben die Typsignaturen der komponierten Funktionen: Das neue Funktionsobjekt hat die gleiche Anzahl und Typisierung ihrer Parameter wie die erste übergebene Funktion. Den Rückgabetyp erbt sie von der letzten komponierten Funktion. Zudem ist es für die Komposition essentiell, dass die Rückgabewerte und Paramtertypen der direkt hintereinander komponierten Funktionen kompatibel sind. Dies führt auch direkt dazu, dass ausschließlich die erste Funktion einer Funktionskomposition mehr als einen Parameter haben kann, alle anderen komponierten Funktionen dürfen nur einen Parameter besitzen.
+Die Einschränkungen in den Typen der komponierten Funktion ist auch recht einleuchtend, wenn man bedenkt, dass Funktionskomposition zu einer Art Pipeline-Auswertung führt. Klar müssen dann die Rückgabetypen einer Stufe kompatibel mit den Eingabetypen der nächsten Stufe sein.
+
+Durch die Komposition lassen sich aus einfachen Funktionen komplexe Verarbeitungsstufen eines einzelnen Wertes komponieren.
+So lassen sich zum Beispiel die Verarbeitung von Bildern hervorragend und sehr klar als Komposition darstellen: ~convertToGrayscale . scaleDown . detectContour . scaleUp~. Man kann bei dieser Komposition (ich habe die Haskell-Notation für Komposition mit ~.~ gewählt), wie ein Bild durch die Verarbeitungsstufen geschoben wird. Zuerst entfärben wir das Bild, bevor wir das Graustufenbild auf eine kleinere größe Skalieren, bevor wir eine Kantenerkennung durchführen und das Ergebnis wieder auf die Orginalgröße (unter Informationsverlust) hoch skalieren.
+An diesem Beispiel sehen wir auch gut, wie das funktionale Paradigma den Fokus auf die Verarbeitung von Daten legt, anstatt wie das objektorientierte Paradigma, die Daten in den Vordergrund zu rücken.
+
+Durch die Komposition und die strikte Verwendung von Ausdrücken lassen sich kompakt  unterschiedliche Verarbeitungsstufen erzeugen. Die Funktion ~picturePipeline~ erzeugt eine Funktionskomposition, die anhand des Booleschen Parameters ~fast~ das Bild für die Kantenerkennung herunterskaliert oder direkt auf dem orginalgroßen Bild arbeitet. Dabei hat der Ausdruck ~(scaleDown . detectContour . scaleUp)~ die gleiche Typsignatur wie ~detectContour~. Das Beispiel ist dabei nur als eine Art funktionaler Pseudocode zu verstehen.
+
+#+begin_src haskell
+
+picturePipeline fast = loadFile 
+                       . convertToGrayscale
+                       . (if fast 
+                          then (scaleDown . detectContour . scaleUp)
+                          else detectContour)
+
+main = (picturePipeline true) "testImage.png"
+#+end_src
+
+Übrigens kennen Sie bereits die Funktionskompositon aus dem Bereich der Unix-Systemprogrammierung. Die Komposition von einfachen Unix-Tools mit dem ~|~ Operator ihrer Shell stellt ebenfalls eine Funktionskomposition auf gröberer Granularität dar. Auch dort müssen die Aus- und Eingabeformate der hintereinander ausgeführten Tools zueinander passen. Funktions
+
+
+Bei der häufigen Verwendung der Komposition kommt man schnell zu dem Punkt, an dem man ständige einstellige Funktionen definiert, die ihr Argument an eine Funktion mit mehreren Argumenten weitergibt, wobei die restlichen Parameter mit einer Konstanten belegt werden. So könnte man auf die Idee kommen, die obige Bildverarbeitungsstufe dahingehend zu optimieren, das Bild auf unterschiedliche größen herunter zu skalieren:
+
+#+begin_src python
+def scaleDown(width, height, picture):
+    print "scaleDown(%s, %s, %s)" %(width, height, picture)
+
+def scaleDown128(picture):
+    return scaleDown(128, 128, picture)
+
+def scaleDown256(picture):
+    return scaleDown(256, 256, picture)
+
+def scaleDown512(picture):
+    return scaleDown(512, 512, picture)
+#+end_src
+
+Solche sich wiederholenden Funktionsdefinition sind natürlich unangenehm und erzeugen eine ganze Menge Boilerplate Code, den wir wiederrum funktional abstrahieren könnten, indem wir eine Funktion höherer Ordnung schreiben, die Skalierungsfunktionen mittels Lambda-Ausdruck zur Verwendung in Funktionskompositionen erzeugt:
+
+#+begin_src python
+  def makeScaleDown(width, height):
+      return lambda picture: scaleDown(width, height, picture)
+
+  pipeline = compose(makeScaleDown(256, 256), detectContour)
+#+end_src
+
+Mittels der Funktion ~makeScaleDown()~ können wir nun beliebige einstellige Funktionen zur Bildskalierung erzeugen, die wir in eine Verarbeitungskette einbauen können. Was wir hier auf manuellem Wege durchgeführt haben ist, nennt man eine **partielle Anwendung** einer Funktion.
+Der partiellen Anwendung geht in etwa die folgende Überlegung vorraus: Um eine mehrstellige Funktion aufzurufen benötigt man für jeden Parameter ein Argument. Durch die partielle Anwendung binden wir einen Teil der Parameter an bereits bekannte Argumente und erzeugen eine Funktion mit entsprechend weniger Parametern, die restlichen Argumente vorher einsammelt bevor die ursprüngliche Funktion gestart wird.
+
+Im Beispiel sieht diese Überlegung dann in etwa so aus: Die Funktion ~scaleDown()~ benötigt drei Parameter um ein Bild zu skalieren: Die Breite des Zielbildes, die Höhe des Zielbildes und das Quellbild. Beim Aufruf von ~makeScaleDown(width, height)~ kennen wir bereits zwei dieser drei formalen Parameter und können eine partielle Anwendung durchführen. Dazu erzeugen wir ein neues Funktionobjekt, welches ~width~ und ~height~ in seinem Aufrufkontext gebunden hat und nur noch das letzte Argument (~picture~) einsammelen muss. Bei der Aktivierung der anonymen Funktion wird das übergebene Bild anhand der Breite und der Höhe aus dem lexikalisch gebundenen Aufrufkontext herunter skaliert.
+
+Dieses Muster, welches wir hier einmal  manuell für ~scaleDown~ durchexerziert haben, lässt sich hervorragend funktional abstrahieren, indem wir ~scaleDown~ nicht statisch in die Funktion ~makeScaleDown()~ codieren, sondern eine Funktion höherer Ordnung ~partial()~ definieren, die den ersten Parameter eine Funktion partiell bindet. Leider funktioniert das Beispiel im Browser nicht, weswegen Sie es in einer Python Shell ausprobieren müssen.
+
+#+begin_src python
+def scaleDown(width, height, picture):
+    print "scaleDown(%s, %s, %s)" %(width, height, picture)
+
+def partial(func, arg0):
+    return lambda *args: func(arg0, *args)
+
+scaleDown128 = partial(partial(scaleDown, 128), 128)
+scaleDown128("foobar.png")
+#+end_src
+
+Auf den Folien sehen wir gut, wie die partielle Anwendung einer zweistelligen Funktion ein neues Funktionsobjekt mit nur noch einem Parameter erzeugt. Dabei wandert der partiell gebundene Parameter, der im neuen Objekt den Wert ~23~ hat, in den Ausführungskontext der neu erzeugten Funktion und wird bei endgültigen Aufruf an der ursprünglich zweistelligen Funktion übergeben.
+In funktionalen Sprachen bzw. funktionalen Hilfsbibliotheken[fn::siehe [[https://docs.python.org/3.7/library/functools.html#functools.partial][Python 3.7: functools.partial]]], findet man auch Varianten von ~partial()~, die nicht nur den ersten Parameter partiell binden können.
+
+Das Konzept der partiellen Anwendung ist so wichtig, dass in der funktionalen Programmiersprache jede Funktion durch **Currying** partiell anwendbar ist, ohne dass man explizit eine ~partial()~ Funktion aufrufen muss. Dies funktioniert, indem bei Haskell alle Funktionen mit die mehr als einem Argument benötigen automatisch zu einer Sequenz von einstelligen Funktionen transformiert werden, die immer einen weiteren Parameter partiell bindet. Konkret heißt dass, das keine Funktion in Haskell mehr als einen Parameter hat.
+
+Machen wir das ganze etwas konkreter an der Funktion ~add :: Int -> Int -> Int~: Der Körper der Funktion benötigt zwei Ganzzahlen um die Addition durchführen zu können. Ruft man die Funktion mit nur einem Argument auf (~(add 3)~) so erhält man ein Funktionsobjekt, dass noch einen Parameter bekommt der dann zu drei addiert wird.  Aufgerufen mit zwei Argumenten (~add 1 2~) wird die Addition direkt ausgeführt. Currying ist auch der Grund, wieso Funktionssignaturen in Haskell so "komisch" aussehen, denn eigentlich ist die Signatur von ~add()~ ~Int -> (Int -> Int)~, was bedeutet, dass hier ein Abbildung von einem Int auf eine Funktion "Int nach Int" durchgeführt wird, aus einer Ganzzahl wird eine Funktion. Daher sind in Haskell die Ausdrücke ~add 2 3~, ~(add 2) 3~ und ~add(2)(3)~ vollständig äquivalent.
+
+Toll! Wir können jetzt also nicht nur komplexere Funktionen aus einfacheren komponieren, sondern die partielle Anwendung erlaubt es uns auch aus einer hochgradig parametrisierbaren Funktion viele vorparametrisierte Funktionen abzuleiten.
+Lassen Sie uns das nun zur Anwendung bringen.
+
+#+begin_src latex
+    \begin{frame}[t,fragile]{Beispiel: Eine Verarbeitungskette}
     \begin{columns}
       \begin{column}{0.25\textwidth}
         \btAnimation[width=0.9\textwidth]{1:<1-3>,range=2-4:<4->}{fig/12-points}
@@ -707,24 +890,24 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
       \end{column}
     \end{columns}
     \begin{columns}
-      \begin{column}<2->{0.4\textwidth}
+      \begin{column}<handout:2-|2->{0.4\textwidth}
         \begin{code}[]\ttfamily\footnotesize
           \def\I{\mbox{\hspace{2ex}}}%
           def norm(N, point): ...\\
-          \uncover<6->{maxD = \textbackslash}\\
-           \I\uncover<6->{reduce(max,}\\
-           \I\I\uncover<5->{filter(lambda d: d <= 1.0,}\\
-           \I\I\I\uncover<4->{map(}\uncover<3->{partial(norm, 2)}\uncover<4->{,}\\
-           \I\I\I\I\uncover<4->{points)}\uncover<5->{)}\uncover<6->{)}\\
+          \uncover<handout:6-|6->{maxD = \textbackslash}\\
+           \I\uncover<handout:6-|6->{reduce(max,}\\
+           \I\I\uncover<handout:5-|5->{filter(lambda d: d <= 1.0,}\\
+           \I\I\I\uncover<handout:4-|4->{map(}\uncover<handout:3-|3->{partial(norm, 2)}\uncover<handout:4-|4->{,}\\
+           \I\I\I\I\uncover<handout:4-|4->{points)}\uncover<handout:5-|5->{)}\uncover<handout:6-|6->{)}\\
        \end{code}
       \end{column}\hfill
       \begin{column}{0.59\textwidth}
         \bii
-        \ii<2-> Generische Normierungsfunktion $\|\cdot\|_N$
-        \ii<3-> Die Distanz zum Ursprung ist die 2-Norm
-        \ii<4-> Bilde jeden Punkt auf seine Distanz ab
-        \ii<5-> Filtere Distanzen die $\le 1$ sind
-        \ii<6-> Reduziere Distanzen zur maximalen Distanz
+        \ii<handout:2-|2-> Generische Normierungsfunktion $\|\cdot\|_N$
+        \ii<handout:3-|3-> Die Distanz zum Ursprung ist die 2-Norm
+        \ii<handout:4-|4-> Bilde jeden Punkt auf seine Distanz ab
+        \ii<handout:5-|5-> Filtere Distanzen die $\le 1$ sind
+        \ii<handout:6-|6-> Reduziere Distanzen zur maximalen Distanz
         \eii
 
       \end{column}
@@ -739,6 +922,23 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
   \end{frame}
 
 #+end_src
+
+Auf den Folien sehen Sie, wie wir eine gegebene Aufgabenstellung, bei der es um die Verarbeitung einer Punktwolke geht, funktional lösen können.
+Dabei ist der erste Schritt, wie wir aus einer generischen Normierungsfunktion die 2-Norm durch partielle Anwendung ableiten und zu einer einstelligen Funktion machen, die einen Punkt in seine Distanz zum Ursprung transformiert.
+Durch ~map()~ wenden wir die 2-Norm auf jeden Punkt der Punkwolke an um eine Liste der Distanzen zum Ursprung zu berechnen. Diese Liste filtern wir mittels ~filter()~ und einer anonymen Funktion um nur noch die Distanzen von Punkten innerhalb des Einkeitskreises zu betrachten.
+Um nun die größte Distanz zum Ursprung innerhalb des Einheitskreises zu berechnen reduzieren wir die Restliste mittels ~max()~, wobei die Assoziativität keine Rolle spielt.
+Mittels partieller Anwendung ließe sich diese Verarbeitungskette in Haskell noch kompakter schreiben, indem man die Funktion nicht direkt auf ~points~ anwendet, sonder zuerst eine Verarbeitungsfunktion (~maxDistance~) erzeugt und im Anschluss anwendet:
+
+#+begin_src haskell
+maxDistance :: [Point] -> Float
+maxDistance = (map (norm 2)) . (filter \x -> x < 1.0) . (reduce max)
+
+maxD = maxDistance points
+#+end_src
+
+Bemerkenswert ist die Kombination von Funktionskomposition, partieller Anwendung und normalen Listenmanipulationsfunktionen. Dieses Muster von Abbildung, Ausfiltern und Reduzieren hat auch in der Verarbeitung großer Datenmengen Einzug gehalten. Das sogenannte **MapReduce**{{{wikipedia_en(MapReduce)}}} Verfahren wurde Jahrelang bei Google als zentrales Verarbeitungsmodell für große Datenmengen verwendet. Dabei wird zuerst eine große Menge von Dokumenten (Webseites) unabhängig voneinander und parallel auf vielen Rechnern verarbeitet (~map()~) und die Ergebnisse im Anschluss kombiniert (~reduce()~). Der große Vorteil dieses Modells ist die Unabhängigkeit und leichte Parallelisierbarkeit des Abbildungsschrittes.
+
+Dieser Vorteil lässt sich ebenfalls im kleinen Erreichen: Wenn wir uns zum Ausgangspunkt der Besprechung des funktionalen Paradigmas zurückkehren, wissen wir dass Funktionen keine Seiteneffekte haben. Daher lässt sich ein Aufruf ~map(func, sequence)~ trivialerweise, ohne sich groß synchronisieren zu müssen, auf viele Prozessoren verteilen. In Python bietet die ~multiprocessing~ Bibliothek eine [[https://docs.python.org/3/library/multiprocessing.html#multiprocessing.pool.Pool.map][~map()~-Variante]], die alle Elemente einer Liste auf einem Pool von Workern parallel abarbeitet und so eine Maschine mit mehreren Kernen besser ausnutzt.
 
 * Funktionale Ein-/Ausgabe
 
