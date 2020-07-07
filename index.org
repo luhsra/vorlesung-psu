@@ -25,18 +25,8 @@
 -----
 
 {{{topic(./11-oo-paradigm.org,fig/11-stamp.png)}}}
-
-
-
-
-* COMMENT TODO 6 Vorlesungen
 {{{topic(./12-functional-paradigm.org,fig/12-stamp.png)}}}
 
 #+begin_center
 **EOF**
 #+end_center
-
-Was wir nicht machen:
-  - Logische Programmierung (z.B. Prolog)
-  - Parallele Programmierung
-  - Parsingtheorie in Detail

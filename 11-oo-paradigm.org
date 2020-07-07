@@ -1,7 +1,9 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 11 - Das Objektorientierte Programmierparadigma
 #+SETUPFILE: setup.org
+#+DATE: [2020-07-07]
 #+INCLUDE: export-prologue.org
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/wYklY
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 
 #+NAME: topic

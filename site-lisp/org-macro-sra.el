@@ -41,7 +41,7 @@
                  (s-trim
                   (shell-command-to-string
                    (format "make -s %s.wc" number)))))
-         (minutes (/ words 200))
+         (minutes (/ words 100))
          (video-url (org-global-prop-value "video_url"))
          (date-html (if date (format "<span class=\"structure\">%s</span> " date) ""))
          )
