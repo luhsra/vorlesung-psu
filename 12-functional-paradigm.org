@@ -31,9 +31,9 @@
 
   \begin{frame}{Probleme, Probleme, Probleme,\ldots}
     \bi
-    \ii Kleine Programme sind \advantage{einfach}, Große Softwareprojekte sind \alert{schwer}.{
+    \ii Kleine Programme sind \advantage{einfach}, große Softwareprojekte sind \alert{schwer}.{
       \bi
-      \ii Viele EntwicklerInnen, Viele Standorte, Viele Zeitzonen
+      \ii Viele EntwicklerInnen, viele Standorte, viele Zeitzonen
       \ii Riesige Codebasis und \structure{interagierende Komponenten}
       \ii Viele Prozeduren (Algorithmen) und viele Objekte (Daten)
       \ei
@@ -43,7 +43,7 @@
     \includegraphics[width=3.5cm]{fig/12-brain}
   \end{center}
 
-    \ii Begrenzte geistitge Kapazität: \structure{Veränderlicher Zustand} sieht man nicht {
+    \ii Begrenzte geistige Kapazität: \structure{Veränderlicher Zustand} sieht man nicht {
       \bi
       \ii[$\leftrightarrow$] Ausführung von Code ist meist sequentiell und lokal
       \ii Der aktuelle Zustand ist \textbf{Akkumulation aller Änderungen}

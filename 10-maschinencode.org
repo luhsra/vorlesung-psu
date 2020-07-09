@@ -1294,7 +1294,7 @@ Dazu modifiziert der Linker die Platzhalter in den Sektionen entsprechend des Re
 Betrachten Sie sich hierzu die beiden Relokationen:
 Beides sind PC-relative Relokationen (~R_386_PC32~), die das Symbol ~fib~ referenzieren[fn::~e8 xx xx xx xx~ ist ein ~call~-Befehl].
 Die obere Lücke ist in ~main()~ und führt daher einen Sprung nach vorne (um 5 Bytes aus), während die zweite Lücke ein PC-relativ nach hinten springt (der Rekursionsschritt).
-Kann eine Relokation bereits vollständig beim Linken durchgeführt werden, so müssen wir Sie nicht in die ausführbare Datei übernehmen.
+Kann eine Relokation bereits vollständig beim Linken durchgeführt werden, so müssen wir sie nicht in die ausführbare Datei übernehmen.
 
 #+begin_src latex
   \begin{frame}{ELF: Load View}
