@@ -82,7 +82,7 @@
       \end{center}
     \end{column}\hfill
     \begin{column}{0.65\textwidth}
-      Mit unserem Übersetzer haben die semantische Lücke \advantage{überwunden}:
+      Mit unserem Übersetzer haben wir die semantische Lücke \advantage{überwunden}:
 
       \begin{center}
         Source $\rightarrow$ AST $\rightarrow$ IR $\rightarrow$ ASM $\rightarrow$ ELF
@@ -175,62 +175,62 @@
 
 In den letzten zehn Vorlesungseinheiten haben wir uns mit dem Thema Programmiersprachen und ihrer Übersetzung von zwei Seiten genähert.
 Zum einen haben wir in vier Vorlesungen (Typen, Namen, Objekte, Operationen) einzelne Sprachkonzepte auf einem sehr kleinteiligen Niveau kennen gelernt.
-Zum anderen haben wir uns mit den einzelnen Schritten der Übersetzung (Syntaxanalyse, Semantische Analyse, Zwischencodeerzeugung, Optimierung und Maschinencodeerzeugung) auseinander gesetzt.
-In dieser und der nächsten Vorlesung wollen wir wieder einen Schritt zurück machen, und uns die grundsätzliche Frage stellen "Warum haben wir überhaupt Programmiersprachen?" und "Folgen einzelne Sprachen ähnlichen Paradigmen?".
+Zum anderen haben wir uns mit den einzelnen Schritten der Übersetzung (Syntaxanalyse, Semantische Analyse, Zwischencodeerzeugung, Optimierung und Maschinencodeerzeugung) auseinandergesetzt.
+In dieser und der nächsten Vorlesung wollen wir wieder einen Schritt zurück machen und uns die grundsätzliche Fragen "Warum haben wir überhaupt Programmiersprachen?" und "Folgen einzelne Sprachen ähnlichen Paradigmen?" stellen.
 
-Mit den verwendeten Sprachkonzepten erlauben Programmiersprachen es uns ein Problem auf einer abstrakten Ebene und mit einem großen Abstand zu einer real-existierenden Maschine zu formulieren.
+Mit den verwendeten Sprachkonzepten erlauben Programmiersprachen es uns, ein Problem auf einer abstrakten Ebene und mit einem großen Abstand zu einer real existierenden Maschine zu formulieren.
 Dieser Abstand ist die semantische Lücke und der Übersetzer (oder auch ein Interpreter) überbrücken diese Lücke auf automatisierte Art- und Weise.
-Dabei stellt sich aber die Frage, warum wir diese semantische Lücke aufbauen, wenn wir dafür zusätzliche Werkzeuge brauchen um Sie wieder zu überbrücken.
-Neben der Tatsache das Übersetzer leicht anfällig für Bugs sind, erzeugen komplexe Sprachkonstrukte eine Lernkurve, die von den  Entwicklern erst überwunden werden muss bevor diese effektiv und effizient arbeiten können.
-Welchen nutzen hat es demnach die semantische Lücke aktiv auszuweiten und sogar eventuelle Overheads, die bei der Abbildung auf die Maschine entstehen, in Kauf zu nehmen?
+Dabei stellt sich aber die Frage, warum wir diese semantische Lücke aufbauen, wenn wir dafür zusätzliche Werkzeuge brauchen, um sie wieder zu überbrücken.
+Neben der Tatsache, dass Übersetzer leicht anfällig für Bugs sind, erzeugen komplexe Sprachkonstrukte eine Lernkurve, die von den Entwicklern erst überwunden werden muss, bevor diese effektiv und effizient arbeiten können.
+Welchen Nutzen hat es demnach, die semantische Lücke aktiv auszuweiten und sogar eventuelle Overheads, die bei der Abbildung auf die Maschine entstehen, in Kauf zu nehmen?
 
 Für die Maschine tun wir dies sicherlich nicht, da diese in allen Fällen das Programm gleich ausführt, egal wie groß die semantische Lücke zum Quellprogramm vorher war.
 Für die Maschine brauchen die Daten auch keine Struktur, da auf der untersten Ebene einer Von-Neumann-Maschine der Datenspeicher ein großes ~char~-Array ist und das Programm ein Array von Instruktionen.
-Vielmehr müssen wir den Nutzen den semantischen Lücke bei den Entwicklern, insbesondere denen großer Softwaresysteme, suchen.
+Vielmehr müssen wir den Nutzen der semantischen Lücke bei den Entwicklern, insbesondere denen großer Softwaresysteme, suchen.
 
 In großen Softwareprojekten erzeugt das Zusammenspiel von drei Aspekten eine besondere Qualität babylonischer Verwirrung bei den Entwicklern:
-Eine große Menge von heterogenen Informationen (Objekte) wird von vielen Operationen verarbeitet, wobei einzelne Operationen in ihrer Ausführungen voneinander abhängig sein können{{{see(07-operation-dependencies,Abhängigkeiten zwischen Operationen)}}} und daher in einer gewissen Reihenfolge abgearbeitet werden.
+Eine große Menge von heterogenen Informationen (Objekte) wird von vielen Operationen verarbeitet, wobei einzelne Operationen in ihren Ausführungen voneinander abhängig sein können{{{see(07-operation-dependencies,Abhängigkeiten zwischen Operationen)}}} und daher in einer gewissen Reihenfolge abgearbeitet werden.
 Dieses komplexe Netz interagierender Elemente wird dabei nicht nur von einem einzelnen Entwickler orchestriert, sondern von einem oder mehreren Entwicklungsteams, die über die gesamte Erde, in unterschiedlichen Zeitzonen und mit unterschiedlichem kulturellen Hintergrund, verteilt an dem Programm arbeiten.
 Und hier kommt das eigentliche Problem bei der Programmierung: **Wie können wir den Menschen das Verständnis und die Kommunikation von Programmcode erleichtern?**
 
-Diese Aufgabe stellt sich als gar nicht so leicht heraus.
+Diese Aufgabe stellt sich als gar nicht so einfach heraus.
 Wollen wir zunächst einmal die beiden Prozessoren vergleichen:
-Auf der einen Seite des Rings stehen die mechanischen Rechenanlagen (Computer), die eine große Menge an Speicher haben auf den sie mit großer Bandbreite uniform (jede Zugriff dauert in etwa gleich lange) zugreifen können.
+Auf der einen Seite des Rings stehen die mechanischen Rechenanlagen (Computer), die eine große Menge an Speicher haben, auf den sie mit großer Bandbreite uniform (jede Zugriff dauert in etwa gleich lange) zugreifen können.
 Zusätzlich zu diesem perfekten Gedächtnis führen Maschinen in jedem Operationszyklus eine strikt definierte Aktion durch; ohne Gnade, ohne Zögern, ohne Fehler und ohne Müdigkeit, immer uniform.
 Auf der anderen Seite befinden sich unsere Gehirne, die im direkten Vergleich nicht gut abschneiden:
 Der Speicher eines Menschen ist begrenzt und nicht erweiterbar, Zugriffe dauern unterschiedlich lange (erinnern) und können verfälschte, oft nur assoziierte, Ergebnisse liefern.
-Die Verarbeitung der abgerufenen Ergebnisse ist langsam, fehleranfällig, und nicht zu selten uneindeutig. 
-Noch schlimmer wird es wenn zwei Menschen miteinander kommunizieren: Wo zwei identisch arbeitende Maschinen mit dem gleichen Programm ausstatten können, haben zwei Menschen niemals das gleiche Set an Assoziationen, was unweigerlich zu Missverständnissen führt. Außerdem hat der Kommunikationskanal nur eine sehr geringe Datenrate, was im krassen Gegensatz elektrischen oder opto-elektrischen Computernetzen zu sehen ist.
-Das eigentliche Problem ist also nicht die Maschine, sondern der Mensch, der diese, in Gemeinschaft mit anderen, versucht zu instruieren.
+Die Verarbeitung der abgerufenen Ergebnisse ist langsam, fehleranfällig, und nicht zu selten uneindeutig.
+Noch schlimmer wird es, wenn zwei Menschen miteinander kommunizieren: Wo wir zwei identisch arbeitende Maschinen mit dem gleichen Programm ausstatten können, haben zwei Menschen niemals das gleiche Set an Assoziationen, was unweigerlich zu Missverständnissen führt. Außerdem hat der Kommunikationskanal nur eine sehr geringe Datenrate, was im krassen Gegensatz elektrischen oder opto-elektrischen Computernetzen steht.
+Das eigentliche Problem ist also nicht die Maschine, sondern der Mensch, der diese in Gemeinschaft mit anderen versucht zu instruieren.
 
 Um mit der Komplexität von Systemen umzugehen, haben wir ein unfassbar nützliches Werkzeug entwickelt:
 **die Abstraktion**.
 Durch die Abstraktion strukturieren wir große Probleme und Lösungen in immer kleiner werdende Partikulärprobleme und -lösungen.
 Dabei muss ein Mensch nicht die gesamte Lösung für ein Problem verstehen, sondern kann auf einer Abstraktionsstufe stoppen und die Lösung aus Partikulärlösungen der nächst niedrigeren Stufe komponieren.
-Um das etwas Anschaulicher zu gestalten:
-Die Abstraktion Record bietet uns die Möglichkeit viele Objekte mit gleicher Struktur zu erstellen und auf die einzelnen Felder zuzugreifen.
+Um das etwas anschaulicher zu gestalten:
+Die Abstraktion Record bietet uns die Möglichkeit, viele Objekte mit gleicher Struktur zu erstellen und auf die einzelnen Felder zuzugreifen.
 Dabei müssen wir uns (meist) keine Gedanken machen, wie diese Felder in den Speicher gelegt werden oder wie die Offsets berechnet werden.
 Durch die Verwendung der Abstraktion können wir das Datenlayout und die Adressberechnungen dem Übersetzer überlassen und den Programmcode für einen Algorithmus auf einem deutlich abstrakteren Niveau formulieren.
-Am Ende arbeitet das Programm ebenso, als hätten wir die Adressberechnungen direkt mit dem Algorithmus vermischt, aber durch die Verwendung der Abstraktion wird das Programm deutlich verständlicher und für andere leichter zu verstehen.
+Am Ende arbeitet das Programm ebenso, als hätten wir die Adressberechnungen direkt mit dem Algorithmus vermischt, aber durch die Verwendung der Abstraktion wird das Programm deutlich verständlicher und für andere einfacher zu verstehen.
 
 Im Rahmen von Programmiersprachen können wir die angebotenen Abstraktionen mit Begrifflichkeiten fassen:
 Auf der kleinteiligsten Ebene finden wir die **Konzepte** einer Sprache.
-Jedes Konzept ist eine Abstraktion die von der Sprache bereit gestellt wird.
-So ist die Möglichkeit einen Record Datentypen anstatt manuelle Adressberechnungen zu verwenden ebenso ein Sprachkonzept, wie die Möglichkeit Prozeduren zu erstellen ein Konzept ist.
+Jedes Konzept ist eine Abstraktion, die von der Sprache bereitgestellt wird.
+So ist die Möglichkeit, einen Record Datentypen anstatt manuelle Adressberechnungen zu verwenden, ebenso ein Sprachkonzept, wie die Möglichkeit Prozeduren zu erstellen ein Konzept ist.
 Aber auch höhere Abstraktionen, wie Threads (Ausführungsfäden) oder Nachrichten, können Sprachkonzepte darstellen, wenn diese direkt in der Spezifikation der Sprache angeboten werden.
 
 Aus einer Kombination von Konzepten kann man ein **Paradigma** formen.
 Ein Paradigma ist eine aufeinander abgestimmte Menge von Konzepten, die man in einer Sprache verwenden kann.
-Ein Paradigma stellt quasi einen vorgefertigten Werkzeugkasten an Konzepten dar aus dem man sich bedienen kann um ein konkretes Problem zu lösen.
-Als Beispiel kann hier das imperative Paradigma dienen, welches es erlaubt Daten strukturiert als veränderlichen Zustand abzulegen und durch sequentiell abgearbeitete Prozeduren zu verarbeiten.
-Andere Paradigmen können die Menge der angebotenen Konzepte vergrößern (Das objektorientierte Paradigma), aber auch bewusst einschränken (Das funktionale Paradigma).
+Ein Paradigma stellt quasi einen vorgefertigten Werkzeugkasten an Konzepten dar, aus dem man sich bedienen kann, um ein konkretes Problem zu lösen.
+Als Beispiel kann hier das imperative Paradigma dienen, welches es erlaubt, Daten strukturiert als veränderlichen Zustand abzulegen und durch sequentiell abgearbeitete Prozeduren zu verarbeiten.
+Andere Paradigmen können die Menge der angebotenen Konzepte vergrößern (das objektorientierte Paradigma), aber auch bewusst einschränken (das funktionale Paradigma).
 
-Haben wir einmal ein Paradigma (=Werkzeugkasten) definiert und wird es von einer Sprache angeboten, stellt sich noch die Frage, wie wir die enthaltenen Konzepte (=Werkzeuge) kombinieren können, ohne uns beständig in den Fuss zu schießen.
+Haben wir einmal ein Paradigma (=Werkzeugkasten) definiert und wird es von einer Sprache angeboten, stellt sich noch die Frage, wie wir die enthaltenen Konzepte (=Werkzeuge) kombinieren können, ohne uns beständig in den Fuß zu schießen.
 Solche "best practices" nennen wir **Prinzipien** und sie sind Thema des Software Engineerings. Dort lernen Sie, wie Sie Objektorientierung richtig verwenden und sich, zum Beispiel, bei Vererbung an das [[https://de.wikipedia.org/wiki/Liskovsches_Substitutionsprinzip][Liskovsche Substitutionsprinzip]] halten.
-In dieser Vorlesung wollen wir uns nicht weiter mit Prinzipien auseinander setzen, sonder bei den Konzepten und, in dieser und der nächsten Vorlesung, bei den Paradigmen bleiben.
+In dieser Vorlesung wollen wir uns nicht weiter mit Prinzipien auseinandersetzen, sonder bei den Konzepten und, in dieser und der nächsten Vorlesung, bei den Paradigmen bleiben.
 
 Grundlegend festzustellen ist, dass es deutlich mehr Programmiersprachen als Paradigmen gibt.
-So gibt es viele Sprachen, die das objektorientierte Paradigma, teils in unterschiedlichen Geschmacksrichtungen, aber häufig mit großer Ähnlichkeit implementieren.
+So gibt es viele Sprachen, die das objektorientierte Paradigma, teils in unterschiedlichen Geschmacksrichtungen, aber häufig mit großer Ähnlichkeit, implementieren.
 Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Implementierung eines Paradigmas beschränken, wie das bei frühen Sprachen der Fall war, sondern oft mehrere Paradigmen beinhalten. Damit werden diese zu einer **Multi-Paradigmensprache** und bieten gewissermaßen mehrere Werkzeugkoffer an, aus denen sich die Entwickler bei der Lösung der gestellten Probleme bedienen können. Eine Übersicht und eine detaillierte Diskussion von Programmierparadigmen finden Sie im Kapitel [[https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf]["Programming Paradigms for Dummies: What Every Programmer Should Know"]] von Peter Van Roy. Insbesondere die Taxonomie auf Seite 13 (Figure 2) gibt einen großen Überblick über das Thema Programmierparadigmen und wie diese miteinander im Zusammenhang stehen.
 
 * Das imperative Programmierparadigma
@@ -239,7 +239,7 @@ Allerdings ist zu beobachten, dass moderne Sprachen sich nicht nur auf die Imple
 :END:
 
 
-In diesem Unterkapitel widmen wir uns dem imperativen Paradigma dem grundlegendsten Paradigma das wir für die Entwicklung von Programmen verwenden können.
+In diesem Unterkapitel widmen wir uns dem imperativen Paradigma, dem grundlegendsten Paradigma, das wir für die Entwicklung von Programmen verwenden können.
 Dabei zähle ich das Sprachkonzept der "Prozeduren" zum imperativen Paradigma hinzu und mache keine gesonderte Unterscheidung zwischen rein imperativem Programmieren (ohne Prozeduren) und einem prozeduralen Paradigma (mit Prozeduren), da diese Unterscheidung seit dem Aufkommen strukturierter Programmierung in den 60ern nicht mehr von tatsächlicher Relevanz ist.
 Aber seien Sie gewarnt, Sie können da draußen auf Menschen treffen, die diese Unterscheidung machen und pedantisch auf ihr beharren.
 
@@ -267,23 +267,25 @@ Aber seien Sie gewarnt, Sie können da draußen auf Menschen treffen, die diese 
   \end{frame}
 #+end_src
 
-Um das imperative Paradigma zu charakterisieren werden wir die einzelnen Sprachkonzepte beleuchten, die es ausmachen.
-Diese Konzepte haben Sie alle, in dieser oder in anderen Veranstaltungen, bereits kennen gelernt, jedoch vielleicht bisher nicht als voneinander abtrennbar wahrgenommen. Daher wollen wir die einzelnen Konzepte nun durchgehen und Sie können bei jedem Konzept fragen, ob es wirklich notwendig für eine Sprache ist, und wie die Sprache aussähe, wenn es dieses Konzept nicht gäbe. Auf diese Weise bekommen Sie ein besseres Gefühl für den Designspace in dem sich die Sprachentwickler bewegen, wenn sie ein neues Paradigma entwickeln.
+Um das imperative Paradigma zu charakterisieren, werden wir die einzelnen Sprachkonzepte beleuchten, die es ausmachen.
+Diese Konzepte haben Sie alle, in dieser oder in anderen Veranstaltungen, bereits kennengelernt, jedoch vielleicht bisher nicht als voneinander abtrennbar wahrgenommen.
+Daher wollen wir die einzelnen Konzepte nun durchgehen und Sie können sich bei jedem Konzept fragen, ob es wirklich notwendig für eine Sprache ist, und wie die Sprache aussähe, wenn es dieses Konzept nicht gäbe.
+Auf diese Weise bekommen Sie ein besseres Gefühl für den Designspace, in dem sich die Sprachentwickler bewegen, wenn sie ein neues Paradigma entwickeln.
 
-Zunächst, schauen wir uns den Urzustand einer (virtuellen) Maschine an, die nur aus Daten und Operationen besteht.
-Stellen Sie sich vor, beides würde frei im Raum herum schweben um muss erst noch strukturiert durch Konzepte abstrahiert werden.
-Das erste Konzept, was in allen Paradigmen gemein ist, ist **Strukturiertheit der Daten**.
+Zunächst schauen wir uns den Urzustand einer (virtuellen) Maschine an, die nur aus Daten und Operationen besteht.
+Stellen Sie sich vor, beides würde frei im Raum herum schweben und muss erst noch strukturiert durch Konzepte abstrahiert werden.
+Das erste Konzept, was allen Paradigmen gemein ist, ist die **Strukturiertheit der Daten**.
 Anstelle eines großen Sees aus Zahlen (der ganze Speicher als ein ~char~-Array) wollen wir einzelne Objekte haben, die eine innere Struktur haben.
-Ausgedrückt wird dieses Konzept, zum Beispiel, durch Record-Datentypen. Damit können wir einzelne Objekte und deren innere Struktur deklarieren.
-Ohne diese Strukturiertheit kann es keine abstrakte Programmiersprache geben, da man keine semantische Verbindung mehrere Informationshäppchen formulieren kann.
+Ausgedrückt wird dieses Konzept zum Beispiel durch Record-Datentypen. Damit können wir einzelne Objekte und deren innere Struktur deklarieren.
+Ohne diese Strukturiertheit kann es keine abstrakte Programmiersprache geben, da man keine semantische Verbindung mehrerer Informationshäppchen formulieren kann.
 
 Als Beispiel für Sprachen, die ausschließlich diese Strukturiertheit, und sonst nichts weiter, bieten, kann man Auszeichnungssprachen wie XML bezeichnen.
 Dort gibt es nur Objekte und deren hierarchisch geschachtelte Struktur, aber keiner Operationen.
-Daher ist XML als Sprache nicht Turing-vollständig und daher nicht zu programmieren geeignet. Dennoch bietet XML nützliche Abstraktionen, um Probleme zu abstrahieren.
+Daher ist XML als Sprache nicht Turing-vollständig und daher nicht zum Programmieren geeignet. Dennoch bietet XML nützliche Abstraktionen, um Probleme zu abstrahieren.
 
 Als zweites Konzept des imperativen Programmierens kann die **Sequentielle Ausführung von Operationen** gelten.
-Die Idee, dass die Entwickler angeben, in welcher konkreten Reihenfolge einzelne Operationen mit welchen Daten ausgeführt werden, gibt uns die Möglichkeit ein Problem in viele Einzelschritte zu zerlegen. Jede Operation ist die Abstraktion ihrer elektronischen Implementierung, und die Aneinanderreihung von Operationen ist die Verwendung dieser Abstraktion.
-Durch die Sequenzierung geben die Entwickler eine strikte Reihenfolge vor, wie Operationen ausgeführt werden sollen und wählen so selbst eine Linearisierung der Operationsabhängigkeiten. Fragen Sie sich: Wie sähe ein Sprache aus, bei denen Abhängigkeiten zwischen Operationen ganz frei, wie in einem Abhängigkeitsgraphen, formuliert werden können. Und warum wäre das für die Übersichtlichkeit, einem unseren primären Ziel bei der Sprachentwicklung, nicht nützlich.
+Die Idee, dass die Entwickler angeben, in welcher konkreten Reihenfolge einzelne Operationen mit welchen Daten ausgeführt werden, gibt uns die Möglichkeit, ein Problem in viele Einzelschritte zu zerlegen. Jede Operation ist die Abstraktion ihrer elektronischen Implementierung, und die Aneinanderreihung von Operationen ist die Verwendung dieser Abstraktion.
+Durch die Sequenzierung geben die Entwickler eine strikte Reihenfolge vor, wie Operationen ausgeführt werden sollen und wählen so selbst eine Linearisierung der Operationsabhängigkeiten. Fragen Sie sich: Wie sähe ein Sprache aus, bei denen Abhängigkeiten zwischen Operationen ganz frei, wie in einem Abhängigkeitsgraphen, formuliert werden können. Und warum wäre das für die Übersichtlichkeit, einem unserer primären Ziele bei der Sprachentwicklung, nicht nützlich.
 
 #+begin_src latex
   \begin{frame}{Kontrollfluss und Prozeduren}
@@ -352,17 +354,17 @@ Durch die Sequenzierung geben die Entwickler eine strikte Reihenfolge vor, wie O
   \end{frame}
 #+end_src
 
-In die gleiche Richtung wie die Sequenzierung stoßen die Konzepte der **generellen Kontrollflusskonstrukte**, die es uns ebenfalls Erlauben den Ausführungsstrom zu beeinflussen.
-Dabei haben wir die Konzepte **Selektion** und **Iteration** für den Kontrollfluss im kleinen, und **Prozeduren** und **Invokation** im Großen kennen gelernt. 
+In die gleiche Richtung wie die Sequenzierung stoßen die Konzepte der **generellen Kontrollflusskonstrukte**, die es uns ebenfalls Erlauben, den Ausführungsstrom zu beeinflussen.
+Dabei haben wir die Konzepte **Selektion** und **Iteration** für den Kontrollfluss im kleinen, und **Prozeduren** und **Invokation** im Großen kennengelernt. 
 
-Durch kleinteiligen Konzepte sind wir in der Lage komplexe Abläufe zu strukturieren und Abhängig von den Eingabedaten unterschiedliche Kontrollflüsse auszuführen. Dabei gibt es diese generellen Konzepte in unterschiedlichen Abstraktionsniveau: Eine "Schleife" mit ~if~ und ~goto~ hat sicherlich ein geringeres Abstraktionsniveau, als eine logisch-kontrollierte Schleife, welche wiederum weniger abstrakt ist als eine Aufzählungsschleife über eine dynamisch berechnete Sequenz von Objekten.
-Stellen Sie sich vor, welchen enormen technischen Fortschritt es dargestellt hat eine Maschine zu bauen, die ihre selbst-berechneten Ergebnisse verwendet um ihre zukünftige Operationsweise zu beeinflussen. Einfach der Hammer, im Vergleich zum [[https://en.wikipedia.org/wiki/Centrifugal_governor][Fliehkraftdrehregler]] unendlich flexibler.
+Durch kleinteilige Konzepte sind wir in der Lage, komplexe Abläufe zu strukturieren und Abhängig von den Eingabedaten unterschiedliche Kontrollflüsse auszuführen. Dabei gibt es diese generellen Konzepte in unterschiedlichen Abstraktionsniveaus: Eine "Schleife" mit ~if~ und ~goto~ hat sicherlich ein geringeres Abstraktionsniveau als eine logisch kontrollierte Schleife, welche wiederum weniger abstrakt ist als eine Aufzählungsschleife über eine dynamisch berechnete Sequenz von Objekten.
+Stellen Sie sich vor, welchen enormen technischen Fortschritt es dargestellt hat, eine Maschine zu bauen, die ihre selbst berechneten Ergebnisse verwendet, um ihre zukünftige Operationsweise zu beeinflussen. Einfach der Hammer, im Vergleich zum [[https://en.wikipedia.org/wiki/Centrifugal_governor][Fliehkraftdrehregler]] unendlich flexibler.
 
 Ebenfalls bedeutend sind die **Prozeduren**, welche die parametrisierbare Wiederverwendung von Code erlauben.
-Eine Menge von Operationen, die zum Beispiel durch Sequenzierung, Selektion und Iteration, strukturiert wurden, können durch eine Prozedur wiederverwendbar gemacht werden.
-Durch die Möglichkeit die lokalen Variablen innerhalb einer Funktionsinstanz mit der Invokation mit den Argumenten vorzubelegen, macht diese Abstraktion parametrisierbar.
-Dieses Konzept gibt den Entwicklern die Möglichkeit selbst neue Abstraktionen innerhalb des Programms zu schaffen.
-Man könnte sagen, dass Prozeduren die Sprachabstraktion sind, die es erlaubt benutzerdefinierte Abstraktionen zu erschaffen.
+Eine Menge von Operationen, die zum Beispiel durch Sequenzierung, Selektion und Iteration strukturiert wurden, können durch eine Prozedur wiederverwendbar gemacht werden.
+Durch die Möglichkeit, die lokalen Variablen innerhalb einer Funktionsinstanz mit der Invokation mit den Argumenten vorzubelegen, ist diese Abstraktion parametrisierbar.
+Dieses Konzept gibt den Entwicklern die Möglichkeit, selbst neue Abstraktionen innerhalb des Programms zu schaffen.
+Man könnte sagen, dass Prozeduren die Sprachabstraktion sind, die es erlaubt, benutzerdefinierte Abstraktionen zu erschaffen.
 Wie bereits mehrfach erwähnt, wird dann der Funktionsaufruf, die Invokation, zu einem **Komplexbefehl**, der sich wie andere Operationen verhält, dessen Semantik aber von den Entwicklern definiert wurde.
 Eine Sprache mit Prozeduren schafft also eine virtuelle Maschine, die innerhalb der Maschine erweitert werden kann.
 
@@ -370,9 +372,9 @@ Es gibt unterschiedliche Nomenklaturen für Prozeduren, die sich teilweise leich
 
 Mit den Prozeduren bekommt eine Sprache auch die Chance für ihr erstes Entwurfsprinzip, die **prozedurale Abstraktion**.
 Sogleich ich vorne angekündigt habe, nicht weiter auf Prinzipien einzugehen, werde ich es hier doch tun, weil man durch dieses Prinzip sehr gut den Unterschied zwischen Paradigma und Prinzip erklären kann.
-Bei der prozeduralen Abstraktion geht es darum eine, in sich logisch abgeschlossene, Aufgabe in einer Prozedur zu platzieren und mit einem möglichst sprechendem Namen zu versehen.
-Dies ist ein Entwurfsprinzip, eine Anweisung, wie man das Sprachkonzept der Prozeduren verwenden sollte um nicht wahnsinnig zu werden.
-Das Konzept "Prozedur" hält einen nicht davon die Prozedurgrenzen so zu ziehen, dass eine zusammengehörige Aufgabe zerschnitten und auf mehrere unabhängige Prozeduren verteil wird, die scheinbar zufällig hintereinander aufgerufen werden. Zur Verschleierung des eigentlichen Zwecks der Prozedur ist das ein valides Vorgehen, wenn wir allerdings das Verständnis maximieren wollen, sollten wir uns darauf versteifen das Prinzip der prozeduralen Abstraktion anzuwenden.
+Bei der prozeduralen Abstraktion geht es darum, eine in sich logisch abgeschlossene Aufgabe in einer Prozedur zu platzieren und mit einem möglichst sprechendem Namen zu versehen.
+Dies ist ein Entwurfsprinzip, eine Anweisung, wie man das Sprachkonzept der Prozeduren verwenden sollte, um nicht wahnsinnig zu werden.
+Das Konzept "Prozedur" hält einen nicht davon ab, die Prozedurgrenzen so zu ziehen, dass eine zusammengehörige Aufgabe zerschnitten und auf mehrere unabhängige Prozeduren verteilt wird, die scheinbar zufällig hintereinander aufgerufen werden. Zur Verschleierung des eigentlichen Zwecks der Prozedur ist das ein valides Vorgehen, wenn wir allerdings das Verständnis maximieren wollen, sollten wir uns darauf versteifen, das Prinzip der prozeduralen Abstraktion anzuwenden.
 
 #+begin_src latex
   \begin{frame}{Benannter und veränderlicher Zustand}
@@ -410,14 +412,14 @@ Das Konzept "Prozedur" hält einen nicht davon die Prozedurgrenzen so zu ziehen,
   \end{frame}
 #+end_src  
 
-Nun könnte man meinen, wir wären schon fertig mit den Konzepten, die das imperative Paradigma ausmachen, aber es fehlt noch ein ganz entscheidendes  Konzept, dass wir als so selbstverständlich hinnehmen, dass wir es kaum als ein eigenes Konzept wahrnehmen. Erst die Beschäftigung mit anderen Sprachen, die aktiv auf dieses Konzept verzichten, merken wir, dass es ein eigenständiges Konzept ist: **der benannte und veränderliche Zustand**.
+Nun könnte man meinen, wir wären schon fertig mit den Konzepten, die das imperative Paradigma ausmachen, aber es fehlt noch ein ganz entscheidendes Konzept, das wir als so selbstverständlich hinnehmen, dass wir es kaum als ein eigenes Konzept wahrnehmen. Erst bei der Beschäftigung mit anderen Sprachen, die aktiv auf dieses Konzept verzichten, merken wir, dass es ein eigenständiges Konzept ist: **der benannte und veränderliche Zustand**.
 
-In der Diskussion um Werte- und Referenzmodell{{{see(06-value-reference-model,Werte- und Referenzmodell)}}}, haben wir gesehen, dass Variablen und Objekte echt unterschiedliche Konzepte sind.
+In der Diskussion um Werte- und Referenzmodell{{{see(06-value-reference-model,Werte- und Referenzmodell)}}} haben wir gesehen, dass Variablen und Objekte echt unterschiedliche Konzepte sind.
 Neben der relativ naheliegenden Idee einer Variable einen Namen zu geben, ist der Schritt den Wert einer Variable zu ändern ein deutlich folgenreicherer.
 Durch die Zuweisungsoperation können wir den Inhalt einer Variable ändern und so den Variablennamen an ein neues Objekt binden.
-Variablen sind auch das Konzept was es uns erlaubt einen flexiblen Datenfluss über komplexe Kontrollstrukturen hinweg zu notieren. Ohne Variablen müsste jede Instruktion die Ergebnisse ihrer Vorgängeroperation empfangen, ein Ergebnis ändern und an die nächste Operation weitergeben. Durch Variablen bekommen wir die Möglichkeit Werte zwischen zu speichern und zu einem späteren Zeitpunkt wieder zu verwenden. 
+Variablen sind auch das Konzept, was es uns erlaubt, einen flexiblen Datenfluss über komplexe Kontrollstrukturen hinweg zu notieren. Ohne Variablen müsste jede Instruktion die Ergebnisse ihrer Vorgängeroperation empfangen, ein Ergebnis ändern und an die nächste Operation weitergeben. Durch Variablen bekommen wir die Möglichkeit, Werte zwischenzuspeichern und zu einem späteren Zeitpunkt wieder zu verwenden.
 
-Können wir eine veränderliche Variablen global definieren, haben wir die Möglichkeit eines Datenflussseitenkanal über Prozedurgrenzen hinweg  geschaffen. Durch ein globales Konfigurationsflag kann sich unsere Prozedur, aufgerufen mit den selben Argumenten wie vor 3 Millisekunden, plötzlich ganz anders verhalten. Dies bietet eine große Flexibilität, aber auch eine Quelle von Bugs. Diesem Problem werden wir dann in der Vorlesung über das funktionale Paradigma nachgehen.
+Können wir eine veränderliche Variable global definieren, haben wir die Möglichkeit eines Datenflussseitenkanal über Prozedurgrenzen hinweg geschaffen. Durch ein globales Konfigurationsflag kann sich unsere Prozedur, aufgerufen mit den selben Argumenten wie vor 3 Millisekunden, plötzlich ganz anders verhalten. Dies bietet eine große Flexibilität, aber auch eine Quelle von Bugs. Diesem Problem werden wir dann in der Vorlesung über das funktionale Paradigma nachgehen.
 
 #+begin_src latex
   \begin{frame}{Das imperatives Programmierparadigma}
@@ -444,8 +446,8 @@ Können wir eine veränderliche Variablen global definieren, haben wir die Mögl
   \end{frame}
 #+end_src
 
-Zusammengefasst ist das imperative Paradigma, die Kombination aus veränderlichem strukturiertem Zustand und einer starken Kontrolle für die Entwickler über den Kontrollfluss.
-Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann, und prägt bis heute die Welt der Programmiersprachen grundlegend. Oft verwenden Sprachen, die auf einer höheren Organisationsebene ein anderes Paradigma bieten, in ganz Kleinen, auf der Ebene einzelner Befehle, das imperative Paradigma. So ist Java auf der großen Organisationsebene objektorientiert, verwendet jedoch innerhalb von Methoden das imperative Paradigma um den Entwicklern die Kontrolle über die Ausführung zu geben.
+Zusammengefasst ist das imperative Paradigma die Kombination aus veränderlichem strukturiertem Zustand und einer starken Kontrolle für die Entwickler über den Kontrollfluss.
+Es prägt bis heute die Welt der Programmiersprachen grundlegend. Oft verwenden Sprachen, die auf einer höheren Organisationsebene ein anderes Paradigma bieten, im ganz Kleinen, auf der Ebene einzelner Befehle, das imperative Paradigma. So ist Java auf der großen Organisationsebene objektorientiert, verwendet jedoch innerhalb von Methoden das imperative Paradigma, um den Entwicklern die Kontrolle über die Ausführung zu geben.
 
 * Das objektorientierte Programmierparadigma
 :PROPERTIES:
@@ -510,27 +512,27 @@ Das imperative Paradigma, was das Paradigma, was man als solches bezeichnen kann
   \end{frame}
 #+end_src
 
-Nachdem wir uns mit dem altbekanntem imperativen Paradigma beschäftigt haben, wollen wir uns nun den objektorientierten Paradigma zuwenden.
+Nachdem wir uns mit dem altbekanntem imperativen Paradigma beschäftigt haben, wollen wir uns nun dem objektorientierten Paradigma zuwenden.
 Wir tun dies, indem wir zuerst die Schwächen des imperativen Paradigmas für große Softwareprojekte diskutieren, bevor wir den Ansatz den Objektorientierung für diese Schwächen aufzeigen.
-Als virtuellen Ausgangspunkt wählen wir eine imperative Sprache, die auch in ihrem Typsystem eher simpel und monomorph ist. Denken Sie an C oder an Pascal, beides keine konzeptionell reiche Sprachen.
+Als virtuellen Ausgangspunkt wählen wir eine imperative Sprache, die auch in ihrem Typsystem eher simpel und monomorph ist. Denken Sie an C oder an Pascal, beides keine konzeptionell reichen Sprachen.
 
-Wie wir gesehen haben hat das imperative Paradigma mehrere Konzepte, die sich mit der Ausführung beschäftigen, aber nur ein Konzept (Records) was uns dabei hilft unsere Daten im Programm zu strukturieren. Diese Vernachlässigung der Datenseite begründet einige der Probleme, die einfache imperative Sprachen zeigen. Zum einen Zwingt uns ein monomorphes Typsystem dazu das Prinzip der prozeduralen Abstraktion zu brechen, da die gleiche Operation auf unterschiedliche Datentypen ausgeführt in zwei unterschiedlichen Prozeduren münden muss. Dies führt zu einer Codeduplikation, die den Wartungsaufwand, der besonders bei großen Softwareprojekten einen erheblichen Teil der Kosten ausmacht, erhöht.
-Ebenso bietet das imperative Paradigma keinerlei Zugriffskontrolle über die Daten und jede Prozedur ist erst einmal gleichberechtigt alle Daten, für die sie einen Zeiger erhaschen kann, zu manipulieren. Dies erfordert, gerade bei vielen Entwicklern, die an der gleichen Quellcodebasis arbeiten, ein enormes Maß an Disziplin, welche erlernt und eingehalten werden muss.
-Zum letzten bietet das rein imperative Paradigma kein Konzept zur Bündelung mehrerer semantisch zusammenhängender Prozeduren. Sicherlich gibt es die Möglichkeit Prozeduren, die zusammen gehören, ähnlich benennen. Aber auch das Erfordert Disziplin von den Entwicklern. Ab einer Vielzahl von Prozeduren, wird die Menge aller Prozeduren zu einem großen See in dem man keinerlei Struktur mehr erkennen kann.
-Was man bräuchte wäre eine zweite Art von Strukturkonzept für Codeorganisation. Teilweise kann dies durch Module bewerkstelligt werden, aber auch Objektorientierung bietet hier Konzepte an.
+Wie wir gesehen haben, hat das imperative Paradigma mehrere Konzepte, die sich mit der Ausführung beschäftigen, aber nur ein Konzept (Records), was uns dabei hilft, unsere Daten im Programm zu strukturieren. Diese Vernachlässigung der Datenseite begründet einige der Probleme, die einfache imperative Sprachen zeigen. Zum einen zwingt uns ein monomorphes Typsystem dazu, das Prinzip der prozeduralen Abstraktion zu brechen, da die gleiche Operation auf unterschiedliche Datentypen ausgeführt in zwei unterschiedlichen Prozeduren münden muss. Dies führt zu einer Codeduplikation, die den Wartungsaufwand, der besonders bei großen Softwareprojekten einen erheblichen Teil der Kosten ausmacht, erhöht.
+Ebenso bietet das imperative Paradigma keinerlei Zugriffskontrolle über die Daten und jede Prozedur ist erst einmal gleichberechtigt alle Daten, für die sie einen Zeiger erhaschen kann, zu manipulieren. Dies erfordert, gerade wenn viele Entwickler an der gleichen Quellcodebasis arbeiten, ein enormes Maß an Disziplin, welches erlernt und eingehalten werden muss.
+Zum letzten bietet das rein imperative Paradigma kein Konzept zur Bündelung mehrerer semantisch zusammenhängender Prozeduren. Sicherlich gibt es die Möglichkeit, Prozeduren, die zusammen gehören, ähnlich zu benennen. Aber auch das erfordert Disziplin von den Entwicklern. Ab einer gewissen Größe wird die Menge aller Prozeduren zu einem großen See, in dem man keinerlei Struktur mehr erkennen kann.
+Was man bräuchte, wäre eine zweite Art von Strukturkonzept für Codeorganisation. Teilweise kann dies durch Module bewerkstelligt werden, aber auch Objektorientierung bietet hier Konzepte an.
 
 Wie der Name schon vermuten lässt, stellt die Objektorientierung (OO) nicht mehr die Prozedur in den Mittelpunkt, sondern das Objekt.
 Vergleichen wir Objekte und Prozeduren mit der natürlichen Sprache, so kommen wir zur Analogie, dass Objekte wie Nomen und Prozeduren wie Verben sind.
 Die Konzentration von OO auf Objekte verschiebt somit den Fokus vom "was getan wird" zu einem "wem" getan wird.
 Auf den Folien zeige ich ein Beispiel, welches verdeutlicht, dass diese Verschiebung zu intuitiveren Programmstrukturen führen kann.
-Bei Konzentration auf Verben, würden wir "Apfel waschen" und "Fahrrad waschen" in der gleichen Kategorie verorten, es wird ja schließlich etwas gewaschen.
+Bei Konzentration auf Verben würden wir "Apfel waschen" und "Fahrrad waschen" in der gleichen Kategorie verorten, es wird ja schließlich etwas gewaschen.
 Nun sind beide Reinigungstätigkeiten zwar ähnlich, haben aber in ihren Werkzeugen und ihrem Ziel nur sehr wenig miteinander zu tun.
 Anders sieht es aus, wenn wir und auf die Nomen konzentrieren und unser Fahrrad in den Mittelpunkt stellen.
 An diesen zentralen Begriff hängen wir dann die Verben an, die zu diesem Objekt passen:
 "waschen" und "fahren".
-Und schon haben wir, durch die Verschiebung des Fokuspunktes eine Organisation gefunden, die viel mehr den menschlichen Erfahrungen entspricht, die die Welt eher nach ihren Objekten und weniger nach ihren Operationen sortiert.
+Und schon haben wir, durch die Verschiebung des Fokuspunktes, eine Organisation gefunden, die viel mehr den menschlichen Erfahrungen entspricht, die die Welt eher nach ihren Objekten und weniger nach ihren Operationen sortiert.
 
-Die Grundidee von OO ist das Objekt als eigenständige Entität zu denken, dass eine Menge von Eigenschaften hat und über **Methoden** mit anderen Objekten interagiert. Dieses Mitdenken der Methoden als Teil des Objekts ist ein anderer Objektbegriff als der, den wir in Vorlesung "06 - Objekte" gebraucht habe. Denken Sie also für diese Vorlesung beim Begriff Objekt immer ein implizites "OO-" Präfix dazu. 
+Die Grundidee von OO ist das Objekt als eigenständige Entität zu sehen, das eine Menge von Eigenschaften hat und über **Methoden** mit anderen Objekten interagiert. Dieses Mitdenken der Methoden als Teil des Objekts ist ein anderer Objektbegriff als der, den wir in Vorlesung "06 - Objekte" gebraucht habe. Denken Sie also für diese Vorlesung beim Begriff Objekt immer ein implizites "OO-" Präfix dazu. 
 
 
 #+begin_src latex
@@ -579,9 +581,9 @@ Die Grundidee von OO ist das Objekt als eigenständige Entität zu denken, dass 
 Wie wir bereits gesagt haben, stehen beim objektorientierten Paradigma die (OO-)Objekte im Mittelpunkt. Um dies noch etwas genauer zu fassen, wollen wir uns die Definition von Objektorientierung von Alan Kay, dem Erfinder von Smalltalk, der ersten objektorientierten Programmiersprache, anschauen.
 
 Für Kay ist das wichtigste Element von OO das **Messaging** zwischen Objekten. Anstatt Prozeduren mit Argumenten aufzurufen, findet alle Interaktion über Nachrichten statt. Objekte schicken anderen Objekten Nachrichten, welche auf diese Nachrichten reagieren. Technisch umgesetzt werden diese Nachrichten mittels Methodenaufrufe, aber das mentale Bild soll sein, dass einzelne Objekte anderen Objekten eine Nachricht schicken. Denken Sie dabei nicht an Netzwerknachrichten, sondern an etwas Abstrakteres. Das Firmenobjekt schickt dem Arbeiter eine Nachricht mit der nächsten Aufgabe.
-In Java ist dies durch, dem Objekt angehängte, Methoden implementiert.
+In Java ist dies durch dem Objekt angehängte Methoden implementiert.
 
-Der zweite Aspekt von OO ist die **Persistenz** des privaten Objektzustandes. Objekte repräsentieren eigenständige Entitäten und haben einen internen Zustand, selbst wenn sie gerade keine Nachricht verarbeiten. Technisch gesehen bedeutet dies, dass die Eigenschaften des Objekts im Speicher residieren müssen um über Methodenaufrufe hinweg Zustand zu halten. Dabei hat jedes Objekt seinen **eigenen** privaten Zustand.
+Der zweite Aspekt von OO ist die **Persistenz** des privaten Objektzustandes. Objekte repräsentieren eigenständige Entitäten und haben einen internen Zustand, selbst wenn sie gerade keine Nachricht verarbeiten. Technisch gesehen bedeutet dies, dass die Eigenschaften des Objekts im Speicher residieren müssen, um über Methodenaufrufe hinweg Zustand zu halten. Dabei hat jedes Objekt seinen **eigenen** privaten Zustand.
 In Java ist dies durch Objekteigenschaften implementiert{{{see(03-composite-types,Zusammengesetzte Typen)}}}.
 
 Für Kay ist der dritte Prüfstein von OO, dass die Eigenschaftes des Objekts im Objekt selbst gekapselt sind und nicht von außen zugegriffen werden können.
@@ -590,33 +592,33 @@ Hier zeigt sich die klare Erweiterung von OO-Objekten gegenüber Records, die ja
 Durch diese Kapselung wird im Code ganz klar, welcher Code einzelne Eigenschaften eines Objekts lesen und verändern darf.
 In Java ist dies durch die Feldmodifier ~private~, ~protected~ und ~public~ implementiert{{{see(04-limited-visibility,Einschränkung der Sichtbarkeit)}}}.
 
-Der letzte Aspekt von OO ist für Alan Kay, die Späte Bindung von Nachrichten an Operationen.
+Der letzte Aspekt von OO ist für Alan Kay die späte Bindung von Nachrichten an Operationen.
 Dies bedeutet, dass nicht bei Versenden einer Nachricht entschieden wird, welcher Code tatsächlich ausgeführt wird, sondern erst beim Empfang der Nachricht durch ein Objekt.
 Auf diese Weise kann bei OO jedes Objekt unterschiedlich auf gewissen Nachrichten reagieren.
 In Java ist dies durch Methoden mit virtuellen Dispatch anhand des dynamischen Typs implementiert {{{see(04-dynamic-dispatch,Überladung und Polymorphismus)}}}.
 
 Gegenüber dem imperativen Paradigma ist die **Methode** das entscheidende ***neue Sprachkonzept**.
 Anstatt Prozeduren und Objekte getrennt voneinander zu halten, sind Methoden Prozeduren, die zu einem bestimmten Objekt gehören.
-Auf wird der Empfang einer Nachricht durch ein Objekt zu einem Methodenaufruf auf dem entsprechenden Objekt.
+Auf diese Weise wird der Empfang einer Nachricht durch ein Objekt zu einem Methodenaufruf auf dem entsprechenden Objekt.
 Innerhalb der Methode ist das angebundene Objekt sichtbar ohne vom Aufrufendem als Argument mitgegeben zu werden.
 Sie kennen dieses Verhalten zum Beispiel bereits aus Java, wo innerhalb einer Methode die Felder des Objekts und das Objekt selbst (als ~this~) sichtbar sind.
-In Python ist dieses Sichtbarmachen des Objekts noch deutlicher, da Methoden einen ~self~ Parameter haben, der allerdings nicht als Argument angegeben werden muss.
+In Python ist dieses Sichtbarmachen des Objekts noch deutlicher, da Methoden einen ~self~-Parameter haben, der allerdings nicht als Argument angegeben werden muss.
 
-Um das Kernkonzept der Methode drapieren sich noch die anderen Konzepte mit denen die von Kay geforderten Eigenschaften in OO-Sprachen implementiert werden. Durch Zugriffsmodifier können wir die Sichtbarkeit von Feldern einschränken und so Kapselung erreichen. Durch dynamischen Dispatch/virtuellen Methodenaufruf wird das späte Binden implementiert.
+Um das Kernkonzept der Methode drapieren sich noch die anderen Konzepte, mit denen die von Kay geforderten Eigenschaften in OO-Sprachen implementiert werden. Durch Zugriffsmodifier können wir die Sichtbarkeit von Feldern einschränken und so Kapselung erreichen. Durch dynamischen Dispatch/virtuelle Methodenaufrufe wird das späte Binden implementiert.
 
-Was auf den Folien noch dazu kommt, was aber in gewisser Weise nicht, wie wir sehen werden, in den vier essentiellen Punkten von Kay nicht enthalten ist, ist das Konzept von Subtyp-Polymorphie durch Vererbung{{{see(03-polymorphism,Polymorphismus)}}}. Denn Kay spricht nur davon, wie sich Objekte zu Verhalten haben, er macht aber keine Aussage darüber wie diese Objekte ins Leben treten und wie wir Prozeduren als Methoden an ein Objekt binden. Bei Vererbung geschieht dies durch eine hierarchische Beziehung von Record-Typen, die in einer Subtyp-Beziehung zueinander stehen und in eine Richtung durcheinander Ersetzbar sind. Im nächsten Unterkapitel werden wir jedoch die prototypenbasierte Objektorientierung kennen lernen, die gänzlich ohne separate Klassen auskommt und alles über einen Objektbau abhandelt. Seien Sie also gespannt.
+Was auf den Folien noch dazu kommt, was aber in gewisser Weise nicht, wie wir sehen werden, in den vier essentiellen Punkten von Kay enthalten ist, ist das Konzept von Subtyp-Polymorphie durch Vererbung{{{see(03-polymorphism,Polymorphismus)}}}. Denn Kay spricht nur davon, wie sich Objekte zu verhalten haben, er macht aber keine Aussage darüber, wie diese Objekte ins Leben treten und wie wir Prozeduren als Methoden an ein Objekt binden. Bei Vererbung geschieht dies durch eine hierarchische Beziehung von Record-Typen, die in einer Subtyp-Beziehung zueinander stehen und in eine Richtung durcheinander ersetzbar sind. Im nächsten Unterkapitel werden wir jedoch die prototypenbasierte Objektorientierung kennenlernen, die gänzlich ohne separate Klassen auskommt und alles über einen Objektbau abhandelt. Seien Sie also gespannt.
 
 Aber zurück zu den Methoden.
 Technisch gesehen sind Methoden Closures{{{see(04-call-frames,Function-Call Frames)}}}, also eine Kombination einer Prozedur mit einem (teilweise) gebundenem Ausführungskontext.
-Um dies zu Verstehen bedarf es noch einer Diskussion des Ausführungskontextes:
+Um dies zu verstehen bedarf es noch einer Diskussion des Ausführungskontextes:
 Innerhalb einer Prozedur werden Referenzen zu Variablen über den Ausführungskontext aufgelöst.
 In einer C-Funktion beinhaltet dieser Ausführungskontext die gebundenen Parameter und die lokalen Variablen der aktuellen Funktionsinstanz.
 Zusätzlich sind aber auch alle globalen Variablen im Ausführungskontext einer C-Funktion und zwar über Funktionsinkarnationen hinweg.
-In C haben wir also nur zwei Ebenen von hierarchisch Ausführungskontext: dem lokalen der Funktionsinstanz (für jeden Aufruf ein neuer Kontext) und den globalen Kontext (immerwährend).
+In C haben wir also nur zwei Ebenen von hierarchisch Ausführungskontext: den lokalen der Funktionsinstanz (für jeden Aufruf ein neuer Kontext) und den globalen Kontext (immerwährend).
 
-Für OO müssen wir uns einen dritten, dazwischenliegenden Kontext vorstellen, in dem das aktuelle Objekt (und teilweise dessen Felder) gebunden sind. Bei der Namensauflösung{{{see(04-implicit-resolution,CNSR)}}} werden diese Kontexte (zur Laufzeit!) von innen nach außen durchsucht bis der Variablenname zum gebundenen Objekt aufgelöst werden kann.
-Durch diesen erweiterten Ausführungskontext ist eine Methode etwas wirklich anderes als eine Prozedur. Denn im Gegensatz zur Prozedur hat die Methode eines Objekts einen Zustand, nämlich die persistent-gespeicherten Eigenschaften des Objekts.
-Technisch löst der Übersetzer diesen erweiterten Ausführungskontext effizient durch einen impliziten ~this~-Parameter durch. Aber das haben wir nun wirklich schon oft genug in diesem Skript erklärt. Kommen wir also wieder mal zu etwas ganz neuem: Prototypen.
+Für OO müssen wir uns einen dritten dazwischenliegenden Kontext vorstellen, in dem das aktuelle Objekt (und teilweise dessen Felder) gebunden sind. Bei der Namensauflösung{{{see(04-implicit-resolution,CNSR)}}} werden diese Kontexte (zur Laufzeit!) von innen nach außen durchsucht, bis der Variablenname zum gebundenen Objekt aufgelöst werden kann.
+Durch diesen erweiterten Ausführungskontext ist eine Methode etwas wirklich anderes als eine Prozedur. Denn im Gegensatz zur Prozedur hat die Methode eines Objekts einen Zustand, nämlich die persistent gespeicherten Eigenschaften des Objekts.
+Technisch löst der Übersetzer diesen erweiterten Ausführungskontext effizient durch einen impliziten ~this~-Parameter. Aber das haben wir nun wirklich schon oft genug in diesem Skript erklärt. Kommen wir also wieder mal zu etwas ganz neuem: Prototypen.
 
 ** Prototypenbasierte Objektorientierung
 :PROPERTIES:
@@ -736,7 +738,7 @@ Da in JavaScript alle Objekte gleichberechtigt sind, gibt es keine Unterscheidun
     \ii<2-> JavaScript bindet den Namen \structure{\texttt{this}} an das aktuelle Objekt{
       \bi
       \ii Attribute können auf Funktionen verweisen
-      \ii Objekt-Attribut als Funktion aufrufen $\Rightarrow$ \texttt{this} wird das Objekt gebunden
+      \ii Objekt-Attribut als Funktion aufrufen $\Rightarrow$ \texttt{this} wird an das Objekt gebunden
       \ei
     }
     \ei
@@ -878,7 +880,7 @@ Was allerdings mit Prototypen-OO nicht abbildbar ist, ist Mehrfachvererbung, da 
 :END:
 
 #+begin_src latex
-  \dividerframe{Kritik am Objektorientierten Entwurf}
+  \dividerframe{Kritik am objektorientierten Entwurf}
 
   \begin{frame}<handout:1,3>[fragile]{Konzentration auf Objekte}
     \bi
