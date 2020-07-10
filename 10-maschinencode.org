@@ -1042,10 +1042,12 @@ Dabei weist uns die Makroexpansion an, eine gewisse IR-Variable (~src~) in ein R
 
 Findet sich die zu ladende Variable in keinem Register (~load(z)~), so allokieren wir mittels ~alloc_register()~ ein neues Register und emittieren einen Ladebefehl, der die Variable aus ihrem Stack-Slot in das Register transferiert.
 
-Spannend wird es, wenn die Variable bereits in einem Register lebt:
+Spannend wird es, wenn die Variable bereits in einem Register lebt.[fn::Dieser ist einer der Knackpunkte des Registerallokators mit Gedächtnis.]
 Wenn die Variable bereits geladen ist und das Register mit dem Stack-Slot synchronisiert ist, geben wir das Register (~ebx~) einfach heraus.
-Erst wenn Werte als dreckig markiert sind, müssen wir unterscheiden, ob die Makroexpansion gedenkt den Wert zu verändern oder nicht.
-Will die Expansion den Wert einer Variable nur lesen, so können wir dreckige Register einfach herausgeben. Soll das Register während der Befehlssequenz allerdings auch modifiziert werden, so müssen wir den Wert vorher durch einen Spill-Befehl in den Stack-Slot sichern.
+Erst wenn Register als dreckig markiert sind, müssen wir unterscheiden, was die Makroexpansion mit dem Register vorhat:
+Will die Expansion das Register mit dem Variablenwert nur lesen, so können wir dreckige Register einfach herausgeben.
+Will die Makroexpansion nicht nur den Wert einer Variable haben, sondern darüber hinaus das Register auch zum rechnen bzw. für das Ergebnis verwenden, so müssen wir dreckige Register zuerst durch einen Spill-Befehl mit dem entsprechenden Stack-Slot synchronisieren.
+Würden wir das dreckige Register nicht vorher in den Variablen-Slot zurückschreiben, würden der aktuellste Wert der Variable verloren gehen.
 
 Neben diesen vier Fällen gibt es noch einige Sonderfälle, wenn der Aufrufer von ~load()~ ein konkretes Register angefordert hat. In diesem Fall kann es sich lohnen, wenn ein Wert bereits in einem anderen Register geladen ist, den Inhalt beider Register zu tauschen (~xchg~) Befehl. Falls Sie weitergehendes Interesse an diesen Sonderfällen haben, können Sie diese im Übungsübersetzer anschauen.
 
