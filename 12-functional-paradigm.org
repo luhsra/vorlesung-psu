@@ -43,10 +43,10 @@
     \includegraphics[width=3.5cm]{fig/12-brain}
   \end{center}
 
-    \ii Begrenzte geistige Kapazität: \structure{Veränderlicher Zustand} sieht man nicht {
+    \ii Begrenzte geistige Kapazität: \structure{Veränderlichen Zustand} sieht man nicht {
       \bi
       \ii[$\leftrightarrow$] Ausführung von Code ist meist sequentiell und lokal
-      \ii Der aktuelle Zustand ist \textbf{Akkumulation aller Änderungen}
+      \ii Der aktuelle Zustand ist die \textbf{Akkumulation aller Änderungen}
       \ii Ohne Einhaltung von Invarianten leicht \alert{unübersichtlich}
       \ei
     }
@@ -59,8 +59,8 @@
     \bi
     \ii \structure{Rein Funktional}: Prozeduren werden zu mathematischen Funktionen {
       \bi
-      \ii Das Ergebnis einer (echte) Funktion hängt nur von ihren Parametern ab.
-      \ii Kein Seitenkanal über den globaler Zustand.
+      \ii Das Ergebnis einer (echten) Funktion hängt nur von ihren Parametern ab.
+      \ii Kein Seitenkanal über den globalen Zustand.
       \ii Funktionsausführung hat \ADVANTAGE{keine Seiteneffekte}!
       \ei
     }
@@ -102,7 +102,7 @@
       \ii \structure{Immutable Objekte}: \btSetTab Werte- und Referenzmodell fallen zusammen!
       \ii \structure{Ausdrücke}:  \btUseTab Jede Operation braucht einen Rückgabewert!
       \ii \structure{Rekursion}:  \btUseTab Wiederholte Ausführungen nur durch Rekursion!
-      \ii \structure{Funktionen}: \btUseTab Funktionsaufrufe modelieren abhängigkeiten Operationen!
+      \ii \structure{Funktionen}: \btUseTab Funktionsaufrufe modellieren abhängigkeiten Operationen!
       \ei
     }\medskip
     \ii<3-> Weitere wichtige Fragen, die direkt aufkommen! {
@@ -182,8 +182,8 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
     \ii Objekte werden nur initialisiert, aber nie verändert. {
       \bi
       \ii Jede Referenz erlaubt nur das Lesen des Objekts
-      \ii "Modifikation" nur über partielle Kopie und parametrisierte Konstruktoren
-      \ii Effizienz: Übersetzer kann viele dieser Kopie durch Optimierungen entfernen
+      \ii "Modifikation" nur über partielle Kopien und parametrisierte Konstruktoren
+      \ii Effizienz: Übersetzer kann viele dieser Kopien durch Optimierungen entfernen
       \ei
 
       \begin{center}
@@ -198,7 +198,7 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
         \end{minipage}
       \end{center}
     }
-    \ii<2-> Bei hierarchisch verzeigerte Datentypen funktioniert das besonders gut {
+    \ii<2-> Bei hierarchisch verzeigerten Datentypen funktioniert das besonders gut {
       \bi
       \ii \structure{Einfach verkettete Listen}: Vorne anhängen ist leicht
       \ii \structure{Bäume}: Unterbäume können bei einem Knotenupdate übernommen werden
@@ -215,7 +215,7 @@ Jedoch gibt es noch einige andere Fragen, die aufkommen, denen wir uns im Folgen
       \bi
       \ii<2-> \structure{Vorne anhängen} erfordert keine Änderung der vorhandenen Listenelemente
       \ii<2-> \structure{Gebundene Namen} bleiben valide und verändern ihren Wert nicht.
-      \ii<3-> \structure{Updates} erfordert Elementkopien bis zur Änderungsstelle
+      \ii<3-> \structure{Updates} erfordern Elementkopien bis zur Änderungsstelle
       \ei
     }\medskip
     \ii<4-> Einfach verkettete Listen sind eine \ALERT{rekursive} Datenstruktur\\
@@ -287,12 +287,12 @@ In ähnlicher Weise sind verzeigerte Bäume eine gute funktionale Datenstruktur.
     \ii Funktionale Sprachen bieten Aufzählungstypen (\structure{enum}) \only<2->{mit Nutzlast} {
       \bi
       \ii Endliche (aufzählbare) Anzahl an Varianten
-      \ii<handout:2-|2-> Jeder Variante kann unterschiedliche Felder mit sich führen.
+      \ii<handout:2-|2-> Jede Variante kann unterschiedliche Felder mit sich führen.
       \ii<handout:3-|3-> Aufzählungsname wird Konstruktor.
       \ii<handout:4-|4-> Tagged variante Records (\structure{union}) sind typsicher und polymorph
       \ei
     }
-    \ii<handout:5-|5-> Rekursiv generisch-polymorphe typsichere Aufzählungstypen {
+    \ii<handout:5-|5-> Rekursive generisch-polymorphe typsichere Aufzählungstypen {
       \begin{columns}
         \begin{column}{0.49\textwidth}
            \begin{code}[tag=Haskell]
@@ -363,7 +363,7 @@ Wie im Rust Beispiel, sind die Aufzählungsvariante gleichzeitig Konstruktoren u
       \bi
       \ii Muster mit der gleichen Struktur aber freien Namen
       \ii Objekt wird auf dieses Muster aufgeteilt
-      \ii Freie Namen werden werden an die zerlegten Subobjekte gebunden
+      \ii Freie Namen werden an die zerlegten Subobjekte gebunden
       \ei
       \medskip
       \begin{columns}
@@ -394,7 +394,7 @@ Wie im Rust Beispiel, sind die Aufzählungsvariante gleichzeitig Konstruktoren u
       \ii Ähnlich, aber mächtiger wie ein switch-case in C
       \ii Vergleich eines Objekts gegen mehrere Muster und Destructuring Bind
       \ii Der entsprechende Arm wird mit den gebundenen Namen ausgeführt
-      \ii Semantische Analyse kann prüfen ob alle Fälle abgedeckt sind
+      \ii Semantische Analyse kann prüfen, ob alle Fälle abgedeckt sind
       \ei
     }
     \ei
@@ -431,13 +431,13 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
       \bi
       \ii Funktionen und Objekte sind zwei getrennte Universen
       \ii<2-> Funktionsanwendung kombiniert eine Funktion und mehrere Objekte\\[2ex]
-      \ii<2->[$\Rightarrow$] Definition: Funktion erster Ordnung hat nur passive Objekte als Argument
+      \ii<2->[$\Rightarrow$] Definition: Eine Funktion erster Ordnung hat nur passive Objekte als Argument
       \ei
     }
     \medskip
-    \ii<handout:3-|3-> \structure{Funktionen höhrerer Ordnung} haben Funktionen als Parameter{
+    \ii<handout:3-|3-> \structure{Funktionen höherer Ordnung} haben Funktionen als Parameter{
       \bi
-      \ii Viele Imperative Sprachen bieten bereits Funktionszeiger
+      \ii Viele imperative Sprachen bieten bereits Funktionszeiger
       \ii \ALERT{Aber:} Funktionen sind immer noch nicht wirklich gleichberechtigt! 
       \ei
     }
@@ -453,8 +453,8 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
     \bi
     \ii Im funktionalen Paradigma sind Funktionen wirklich gleichberechtigt {
       \bi
-      \ii Keine kategorieller Unterschied zwischen Funktionen und Objekten
-      \ii<2-> Funktionen können Argument \textbf{und} Rückggabewert sein!
+      \ii Kein kategorieller Unterschied zwischen Funktionen und Objekten
+      \ii<2-> Funktionen können Argument \textbf{und} Rückgabewert sein!
       \ei
     }\medskip
     \ii<3-> Funktionen sind \ADVANTAGE{WIRKLICH} gleichberechtigt! {
@@ -465,7 +465,7 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
     }
     \ei
 
-    \uncover<4->{\Large $\Rightarrow$ \btSetTab Im funktionale Paradigma werden die\\
+    \uncover<4->{\Large $\Rightarrow$ \btSetTab Im funktionalen Paradigma werden die\\
                             \btUseTab algorithmischen Aspekte einer Sprache gestärkt!}
     \end{frame}
 #+end_src
@@ -503,7 +503,7 @@ Die einfachste Operation ist dabei der **Aufruf**, der ein Funktionsobjekt zusam
       \bi
       \ii \enquote{Äußere} Funktion steuert die Auswertung, die Übergebene macht die Arbeit.
       \ii Die übergebene Funktion kann mehrfach und mit unterschiedlichen Parametern aufgerufen werden. Die Ergebnisse können kombiniert werden.
-      \ii Die Auswertestrategie ist parametrisierbar und wird so \advantage{wiederverwendbar}!{\\\medskip
+      \ii Die Auswertungsstrategie ist parametrisierbar und wird so \advantage{wiederverwendbar}!{\\\medskip
       \begin{columns}
         \begin{column}{0.49\textwidth}
           \begin{code}[]
@@ -629,7 +629,7 @@ Im Beispiel definieren wir die Funktion ~make_multiplier()~ die, mittels eines L
 
         \medskip
         { \small
-          \codebox{filter()} prüft jedes Element mittels einem Prädikat und konstruiert eine Liste \enquote{erfolgreichen} Elementen.}
+          \codebox{filter()} prüft jedes Element mittels einem Prädikat und konstruiert eine Liste mit \enquote{erfolgreichen} Elementen.}
 
       \end{column}\hfill
       \begin{column}<4->{0.32\textwidth}
@@ -637,7 +637,7 @@ Im Beispiel definieren wir die Funktion ~make_multiplier()~ die, mittels eines L
 
         \medskip
         { \small
-          \codebox{reduce()} reduziert eine Liste zu einem Wert indem die übergebene Funktion als Infixoperator angewendet wird.}
+          \codebox{reduce()} reduziert eine Liste zu einem Wert, indem die übergebene Funktion als Infixoperator angewendet wird.}
       \end{column}
     \end{columns}
   \end{frame}
@@ -878,7 +878,7 @@ Lassen Sie uns das nun zur Anwendung bringen.
         \btAnimation[width=0.9\textwidth]{1:<1-3>,range=2-4:<4->}{fig/12-points}
       \end{column}\hfill
       \begin{column}{0.74\textwidth}
-        \textbf{Aufgabe}: Gegeben eine 2 dimensionale Punktwolke, finden Sie innerhalb des Einheitskreises die größte Distanz, die ein Punkt zum Ursprung hat.
+        \textbf{Aufgabe}: Gegeben sei eine 2-dimensionale Punktwolke. Finden Sie innerhalb des Einheitskreises die größte Distanz, die ein Punkt zum Ursprung hat.
 
         \begin{code}[]
           \begin{py}
@@ -906,7 +906,7 @@ Lassen Sie uns das nun zur Anwendung bringen.
         \ii<handout:2-|2-> Generische Normierungsfunktion $\|\cdot\|_N$
         \ii<handout:3-|3-> Die Distanz zum Ursprung ist die 2-Norm
         \ii<handout:4-|4-> Bilde jeden Punkt auf seine Distanz ab
-        \ii<handout:5-|5-> Filtere Distanzen die $\le 1$ sind
+        \ii<handout:5-|5-> Filtere Distanzen, die $\le 1$ sind
         \ii<handout:6-|6-> Reduziere Distanzen zur maximalen Distanz
         \eii
 
@@ -954,7 +954,7 @@ Dieser Vorteil lässt sich ebenfalls im kleinen Erreichen: Wenn wir uns zum Ausg
       \bi
       \ii Kein veränderlicher Zustand, keine Variablen, ausschließlich \structure{pure Funktionen}
       \ii[$\Rightarrow$] Jegliche Art der Ein- oder Ausgabe sind verbotene Seiteneffekte
-      \ii[$\Rightarrow$] Keine Terminalausgabe, keine Dateisystem, kein Netzwerk
+      \ii[$\Rightarrow$] Keine Terminalausgabe, kein Dateisystem, kein Netzwerk
       \ei
     }
     \ei
@@ -964,11 +964,11 @@ Dieser Vorteil lässt sich ebenfalls im kleinen Erreichen: Wenn wir uns zum Ausg
     \end{center}
 
     \bi
-    \ii<2-> \structure{Functional-Style Programming} als Funktionales Paradigma Light{
+    \ii<2-> \structure{Functional-Style Programming} als funktionales Paradigma Light{
       \bi
-      \ii Programmierstil der funktionale Elemente in anderen Sprachen verwendet
+      \ii Programmierstil, der funktionale Elemente in anderen Sprachen verwendet
       \ii Komposition, partielle Applikation, oder \texttt{map()} geht auch mit Seiteneffekten
-      \ii Trennung des Programs in Funktionen mit und ohne Seiteneffekte\\[2ex]
+      \ii Trennung des Programms in Funktionen mit und ohne Seiteneffekte\\[2ex]
       \ii[$\Rightarrow$] Ein effektiver Entwickler setzt Seiteneffekte gezielt ein
       \ei
     }\medskip
@@ -1040,14 +1040,14 @@ Dieser Vorteil lässt sich ebenfalls im kleinen Erreichen: Wenn wir uns zum Ausg
     \ii Die I/O  Monade ist \enquote{magisch} im Haskell Universum {
       \bi
       \ii Im Programm komponiert man nur Funktionen zusammen (\texttt{>>}, \texttt{>>=})
-      \ii Virtuelle Haskell-Maschine entimmt das Monadenobjekt \texttt{main} und führt es aus.
-      \ii<2-> \structure{Synaktischer Zucker} erleichtert die Monadenkomposition
+      \ii Virtuelle Haskell-Maschine entnimmt das Monadenobjekt \texttt{main} und führt es aus.
+      \ii<2-> \structure{Syntaktischer Zucker} erleichtert die Monadenkomposition
       \ei
     }\medskip
     \ii<3-> Monaden sind ein allgemeineres und mächtigeres Konzept{
       \bi
       \ii Monaden sind ein Konzept aus der \structure{Kategorientheorie}
-      \ii Monaden kapsel Strategien zur Auswertereihenfolge und zum Datenflusss
+      \ii Monaden kapseln Strategien zur Auswertungsreihenfolge und zum Datenfluss
       \ii Es gibt viele spannende Monadentypen: Maybe, State, Writer
       \ii Wir können und werden keine davon hier besprechen\ldots
       \ei
@@ -1081,8 +1081,8 @@ Für eine gut Illustrierte Erklärung zu Monaden verweise ich Sie auf den hervor
     \bi
     \ii \structure{Veränderlicher Zustand} ist problematisch in großen Softwareprojekten{
       \bi
-      \ii Viele Prozeduren interagiern mit und verändern eine Vielzahl an Objekten
-      \ii Zustand ist am Quellcode nicht sichtbar und daher unübersichtlich
+      \ii Viele Prozeduren interagieren mit und verändern eine Vielzahl an Objekten
+      \ii Zustand ist im Quellcode nicht sichtbar und daher unübersichtlich
       \ei
     }\medskip
     \ii Das (rein) \structure{funktionale Paradigma} verzichtet auf veränderlichen Zustand{%
@@ -1094,12 +1094,12 @@ Für eine gut Illustrierte Erklärung zu Monaden verweise ich Sie auf den hervor
     \ii Seiteneffektfreie Funktionen werden \structure{Bürger erster Klasse}{
       \bi
       \ii Funktionsobjekte sind als Argumente und Rückgabewerte gleichberechtigt
-      \ii Komposition, Partielle Applikation und Listenfunktionen
+      \ii Komposition, partielle Applikation und Listenfunktionen
       \ei
     }\medskip
     \ii \structure{Ein- und Ausgabe} kann nicht Seiteneffektfrei sein {
       \bi
-      \ii Der funktionale Programmierstil ist erlaubt veränderlichen Zustand
+      \ii Der funktionale Programmierstil erlaubt veränderlichen Zustand
       \ii Rein funktionale Sprachen transformieren die Welt über \structure{Monaden} 
       \ei
     }
