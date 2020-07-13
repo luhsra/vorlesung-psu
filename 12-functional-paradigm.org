@@ -31,7 +31,7 @@
 
   \begin{frame}{Probleme, Probleme, Probleme,\ldots}
     \bi
-    \ii Kleine Programme sind \advantage{einfach}, große Softwareprojekte sind \alert{schwer}.{
+    \ii Kleine Programme sind \advantage{einfach}, große Softwareprojekte sind \alert{schwierig}.{
       \bi
       \ii Viele EntwicklerInnen, viele Standorte, viele Zeitzonen
       \ii Riesige Codebasis und \structure{interagierende Komponenten}
@@ -43,7 +43,7 @@
     \includegraphics[width=3.5cm]{fig/12-brain}
   \end{center}
 
-    \ii Begrenzte geistige Kapazität: \structure{Veränderlichen Zustand} sieht man nicht {
+    \ii Begrenzte geistige Kapazität: \structure{Veränderlichen Zustand} sieht man nicht. {
       \bi
       \ii[$\leftrightarrow$] Ausführung von Code ist meist sequentiell und lokal
       \ii Der aktuelle Zustand ist die \textbf{Akkumulation aller Änderungen}
@@ -54,13 +54,13 @@
   \end{frame}
 
   \begin{frame}{Funktionen: Prozeduren mit Scheuklappen}
-    \mbox{}\hspace{-1.5em}\OrangeBox{(Reine) funktionale Programmierung erhöht die Lokalität von Änderungen}
+    \mbox{}\hspace{-1.5em}\OrangeBox{(Reine) funktionale Programmierung erhöht die Lokalität von Änderungen.}
 
     \bi
-    \ii \structure{Rein Funktional}: Prozeduren werden zu mathematischen Funktionen {
+    \ii \structure{Rein funktional}: Prozeduren werden zu mathematischen Funktionen. {
       \bi
       \ii Das Ergebnis einer (echten) Funktion hängt nur von ihren Parametern ab.
-      \ii Kein Seitenkanal über den globalen Zustand.
+      \ii Kein Seitenkanal über den globalen Zustand
       \ii Funktionsausführung hat \ADVANTAGE{keine Seiteneffekte}!
       \ei
     }
@@ -105,7 +105,7 @@
       \ii \structure{Funktionen}: \btUseTab Funktionsaufrufe modellieren abhängigkeiten Operationen!
       \ei
     }\medskip
-    \ii<3-> Weitere wichtige Fragen, die direkt aufkommen! {
+    \ii<3-> Weitere wichtige Fragen, die direkt aufkommen: {
       \bi
       \ii Wie soll man so bitte übersichtlich programmieren?!
       \ii Wie kann das bitte nicht ineffizient sein?!
@@ -200,7 +200,7 @@ Jedoch gibt es noch einige andere Fragen, denen wir uns im Folgenden widmen woll
     }
     \ii<2-> Bei hierarchisch verzeigerten Datentypen funktioniert das besonders gut {
       \bi
-      \ii \structure{Einfach verkettete Listen}: Vorne anhängen ist leicht
+      \ii \structure{Einfach verkettete Listen}: Vorne anhängen ist einfach
       \ii \structure{Bäume}: Unterbäume können bei einem Knotenupdate übernommen werden
       \ei
     }
@@ -214,12 +214,12 @@ Jedoch gibt es noch einige andere Fragen, denen wir uns im Folgenden widmen woll
     \ii Funktionale Programmierung arbeitet viel mit einfach verketteten Listen{%
       \bi
       \ii<2-> \structure{Vorne anhängen} erfordert keine Änderung der vorhandenen Listenelemente
-      \ii<2-> \structure{Gebundene Namen} bleiben valide und verändern ihren Wert nicht.
+      \ii<2-> \structure{Gebundene Namen} bleiben valide und verändern ihren Wert nicht
       \ii<3-> \structure{Updates} erfordern Elementkopien bis zur Änderungsstelle
       \ei
     }\medskip
     \ii<4-> Einfach verkettete Listen sind eine \ALERT{rekursive} Datenstruktur\\
-     $\Rightarrow$ Passt hervorragend zur rekursiven Struktur funktionaler Programme.
+     $\Rightarrow$ Passt hervorragend zur rekursiven Struktur funktionaler Programme
     \ei
   \end{frame}
 #+end_src
@@ -248,7 +248,7 @@ In ähnlicher Weise sind verzeigerte Bäume eine gute funktionale Datenstruktur.
 
 #+begin_src latex
   \begin{frame}<handout:1,2,4,5>[fragile]{Aufzählungstypen mit Nutzlast}
-    \OrangeBox{\textbf{Problem:} Wir wollen viele Objekte erzeugen und wieder zerlegen}
+    \OrangeBox{\textbf{Problem:} Wir wollen viele Objekte erzeugen und wieder zerlegen.}
     \medskip
     \begin{columns}
       \begin{column}{0.49\textwidth}
@@ -287,8 +287,8 @@ In ähnlicher Weise sind verzeigerte Bäume eine gute funktionale Datenstruktur.
     \ii Funktionale Sprachen bieten Aufzählungstypen (\structure{enum}) \only<2->{mit Nutzlast} {
       \bi
       \ii Endliche (aufzählbare) Anzahl an Varianten
-      \ii<handout:2-|2-> Jede Variante kann unterschiedliche Felder mit sich führen.
-      \ii<handout:3-|3-> Aufzählungsname wird Konstruktor.
+      \ii<handout:2-|2-> Jede Variante kann unterschiedliche Felder mit sich führen
+      \ii<handout:3-|3-> Aufzählungsname wird Konstruktor
       \ii<handout:4-|4-> Tagged variante Records (\structure{union}) sind typsicher und polymorph
       \ei
     }
@@ -391,7 +391,7 @@ Wie im Rust Beispiel sind die Aufzählungsvarianten gleichzeitig Konstruktoren, 
     }\medskip
     \ii<handout:2-|3-> \structure{Pattern Matching}: Selektionsoperation mittels Destructuring Bind{
       \bi
-      \ii Ähnlich, aber mächtiger wie ein switch-case in C
+      \ii Ähnlich, aber mächtiger als ein switch-case in C
       \ii Vergleich eines Objekts gegen mehrere Muster und Destructuring Bind
       \ii Der entsprechende Arm wird mit den gebundenen Namen ausgeführt
       \ii Semantische Analyse kann prüfen, ob alle Fälle abgedeckt sind
@@ -451,7 +451,7 @@ Durch pattern matching kann man sehr kompakt gegen alle Varianten eines Aufzähl
 
 
     \bi
-    \ii Im funktionalen Paradigma sind Funktionen wirklich gleichberechtigt {
+    \ii Im funktionalen Paradigma sind Funktionen wirklich gleichberechtigt. {
       \bi
       \ii Kein kategorieller Unterschied zwischen Funktionen und Objekten
       \ii<2-> Funktionen können Argument \textbf{und} Rückgabewert sein!
@@ -494,14 +494,14 @@ Die einfachste Operation ist dabei der **Aufruf**, der ein Funktionsobjekt zusam
 
   \begin{frame}[fragile]{Funktionen als Argumente}
     \begin{btBlock}{}
-      Obwohl Python keine rein(!) funktionale Programmiersprache ist, werde ich die Beispiele, soweit es geht, als Python Code zeigen.
+      Obwohl Python keine rein(!) funktionale Programmiersprache ist, werde ich die Beispiele, soweit es geht, als Python-Code zeigen.
     \end{btBlock}
     \bigskip
 
     \bi
     \ii Funktionen höherer Ordnung können \structure{Auswertungsstrategien} abstrahieren{%
       \bi
-      \ii \enquote{Äußere} Funktion steuert die Auswertung, die Übergebene macht die Arbeit.
+      \ii \enquote{Äußere} Funktion steuert die Auswertung, die übergebene macht die Arbeit.
       \ii Die übergebene Funktion kann mehrfach und mit unterschiedlichen Parametern aufgerufen werden. Die Ergebnisse können kombiniert werden.
       \ii Die Auswertungsstrategie ist parametrisierbar und wird so \advantage{wiederverwendbar}!{\\\medskip
       \begin{columns}
@@ -541,7 +541,7 @@ Die einfachste Operation ist dabei der **Aufruf**, der ein Funktionsobjekt zusam
     \ii Bei funktionaler Programmierung braucht man ständig kleine Funktionen{%
       \bi
       \ii Entfernte Funktionsdefinition an anderer Stelle zerstört die Code-Lokalität
-      \ii Außerdem ist es aufwändig sich ständig neue Funktionsnamen auszudenken
+      \ii Außerdem ist es aufwendig, sich ständig neue Funktionsnamen auszudenken
       \ei
     }\medskip
     \begin{center}
@@ -605,7 +605,7 @@ Im Beispiel definieren wir die Funktion ~make_multiplier()~, die mittels eines L
 #+begin_src latex
   \begin{frame}{Beispiel: Listenmanipulationen}
     \bi
-    \ii Listen sind die funktionale \enquote{Brot-und-Butter} Datenstruktur{
+    \ii Listen sind die funktionale \enquote{Brot-und-Butter}-Datenstruktur{
       \bi
       \ii Funktionen höherer Ordnung bieten standardisierte Auswertungsstrategien
       \ii Diese Funktionen ersetzen teilweise iterative Sprachelemente
@@ -620,7 +620,7 @@ Im Beispiel definieren wir die Funktion ~make_multiplier()~, die mittels eines L
       
         \medskip
         { \small
-          \codebox{map()} bildet jedes Element mit Hilfe der übergebenen Funktion ab und konstruiert daraus eine neue Ergebnisliste.}
+          \codebox{map()} bildet jedes Element mithilfe der übergebenen Funktion ab und konstruiert daraus eine neue Ergebnisliste.}
 
       \end{column}\hfill
       \begin{column}<3->{0.32\textwidth}
@@ -629,7 +629,7 @@ Im Beispiel definieren wir die Funktion ~make_multiplier()~, die mittels eines L
 
         \medskip
         { \small
-          \codebox{filter()} prüft jedes Element mittels einem Prädikat und konstruiert eine Liste mit \enquote{erfolgreichen} Elementen.}
+          \codebox{filter()} prüft jedes Element mittels eines Prädikats und konstruiert eine Liste mit \enquote{erfolgreichen} Elementen.}
 
       \end{column}\hfill
       \begin{column}<4->{0.32\textwidth}
@@ -699,10 +699,10 @@ Neben diesen Listenmanipulatoren kann es ähnliche Operationen auch auf komplexe
     \bi
     \ii \structure{Funktionskomposition} ist die Hintereinanderausführung von Funktionen{
       \bi
-      \ii Aus zwei Funktionsobjekten kreieren wir ein neues Funktionsobjekt
+      \ii Aus zwei Funktionsobjekten kreieren wir ein neues Funktionsobjekt.
       \ii Die neue Funktion wendet beide Funktionen in Reihe an.\\
           Das Ergebnis der ersten wird zur Eingabe der zweiten.
-      \ii Rückgabetypen und Parametertypen müssen zueinander passen
+      \ii Rückgabetypen und Parametertypen müssen zueinander passen.
       \ei
     }
     \ei
@@ -990,15 +990,15 @@ Dieser Vorteil lässt sich ebenfalls im Kleinen erreichen: Wenn wir uns zum Ausg
       \ii Es gibt noch weitere Forschungssprachen: Clean, Mercury\\[1ex]
       \ei
     }\medskip
-    \ii<2-|handout:2-> In Haskell wird I/O über die  \structure{I/O Monade} gesteuert{\medskip
+    \ii<2-|handout:2-> In Haskell wird I/O über die  \structure{I/O-Monade} gesteuert{\medskip
       \begin{columns}
         \begin{column}{0.6\textwidth}
             \btAnimation[width=\textwidth]{1:<1-2>,range=2-3:<3-end>,center,padding}{fig/12-haskell-io}
         \end{column}\hfill
         \begin{column}{0.38\textwidth}
           \bi
-          \ii \textbf{Intuition}: Die I/O Monade transformiert das Universum
-          \ii<3-> Sie steuert die Ausführung monadisch-komponierter Funktionen
+          \ii \textbf{Intuition}: Die I/O-Monade transformiert das Universum
+          \ii<3-> Sie steuert die Ausführung monadisch komponierter Funktionen
           \ii<3-> Ruft Funktionen mit Welt-Informationen auf und koppelt Ergebnisse zurück
           \ii<4-> Unten in der Aufrufhierarchie sind nur pure Funktionen
           \ei
@@ -1009,7 +1009,7 @@ Dieser Vorteil lässt sich ebenfalls im Kleinen erreichen: Wenn wir uns zum Ausg
     \ei
   \end{frame}
 
-  \begin{frame}[fragile]{I/O Monade in Haskell}
+  \begin{frame}[fragile]{I/O-Monade in Haskell}
     \begin{columns}
       \begin{column}{0.49\textwidth}
         \begin{code}
@@ -1037,7 +1037,7 @@ Dieser Vorteil lässt sich ebenfalls im Kleinen erreichen: Wenn wir uns zum Ausg
     \end{columns}
 
     \bi
-    \ii Die I/O  Monade ist \enquote{magisch} im Haskell Universum {
+    \ii Die I/O-Monade ist \enquote{magisch} im Haskell Universum {
       \bi
       \ii Im Programm komponiert man nur Funktionen zusammen (\texttt{>>}, \texttt{>>=})
       \ii Virtuelle Haskell-Maschine entnimmt das Monadenobjekt \texttt{main} und führt es aus.
