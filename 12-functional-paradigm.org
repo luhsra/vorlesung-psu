@@ -1,5 +1,7 @@
 #+TITLE: Programmiersprachen und Übersetzer
 #+SUBTITLE: 12 - Das Funktionale Programmierparadigma
+#+DATE: [2020-07-14]
+#+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/RNNoZ
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
