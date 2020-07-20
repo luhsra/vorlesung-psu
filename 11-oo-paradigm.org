@@ -179,7 +179,7 @@ Zum anderen haben wir uns mit den einzelnen Schritten der Übersetzung (Syntaxan
 In dieser und der nächsten Vorlesung wollen wir wieder einen Schritt zurück machen und uns die grundsätzliche Fragen "Warum haben wir überhaupt Programmiersprachen?" und "Folgen einzelne Sprachen ähnlichen Paradigmen?" stellen.
 
 Mit den verwendeten Sprachkonzepten erlauben Programmiersprachen es uns, ein Problem auf einer abstrakten Ebene und mit einem großen Abstand zu einer real existierenden Maschine zu formulieren.
-Dieser Abstand ist die semantische Lücke und der Übersetzer (oder auch ein Interpreter) überbrücken diese Lücke auf automatisierte Art- und Weise.
+Dieser Abstand ist die semantische Lücke und der Übersetzer (oder auch ein Interpreter) überbrückt diese Lücke auf automatisierte Art- und Weise.
 Dabei stellt sich aber die Frage, warum wir diese semantische Lücke aufbauen, wenn wir dafür zusätzliche Werkzeuge brauchen, um sie wieder zu überbrücken.
 Neben der Tatsache, dass Übersetzer leicht anfällig für Bugs sind, erzeugen komplexe Sprachkonstrukte eine Lernkurve, die von den Entwicklern erst überwunden werden muss, bevor diese effektiv und effizient arbeiten können.
 Welchen Nutzen hat es demnach, die semantische Lücke aktiv auszuweiten und sogar eventuelle Overheads, die bei der Abbildung auf die Maschine entstehen, in Kauf zu nehmen?
