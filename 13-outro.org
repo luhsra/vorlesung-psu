@@ -1,0 +1,412 @@
+#+TITLE: Programmiersprachen und Übersetzer
+#+SUBTITLE: 13 - Die Ausleitung
+#+DATE: [2020-07-21]
+#+SETUPFILE: setup.org
+#+INCLUDE: export-prologue.org
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
+
+#+NAME: topic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
+#+END_SRC
+
+#+NAME: endtopic
+#+BEGIN_SRC latex :tangle no
+\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
+#+END_SRC
+
+
+* FIN
+:PROPERTIES:
+:CUSTOM_ID: 13-einleitung
+:END:
+#+begin_src latex
+  \subtitle{{{{subtitle()}}}}
+  \maketitleframe
+
+
+
+  \begin{frame}{Besprechung der Evaluation}
+    \begin{center}
+      Veröffentlicht auf der Webseite des SRA.
+    \end{center}
+  \end{frame}
+
+  \dividerframe{AMA}
+
+
+  \begin{frame}{Ask me anything}
+    \begin{btBlock}{}
+      Frage: Was sind einfache Regeln, um den Compiler das optimieren zu vereinfachen?
+    \end{btBlock}
+
+    \bi
+    \ii Konstrukte verwenden die eine starke und eingeschränkte Semantik haben
+    \ii Beispiel: Iterator über ein Array
+    \ii Gegenbeispiel: Ein wilder Pointer
+    \ei
+  \end{frame}
+
+  \begin{frame}[t,fragile]{Ask me anything}
+    \begin{btBlock}{}
+      Frage: Ist sowas wie ++i statt i++ im dritten Teil der For-Loop sinnvoll, oder würde das sowieso einfach wegoptimiert werden?
+    \end{btBlock}
+    \bi
+    \ii Schauen wir den minimalen IR-Code an!\\[-1.6em]{
+    \begin{columns}[t]
+      \begin{column}{0.49\textwidth}
+        \bi
+        \ii Postincrement: \verb|a := (i++)| {
+          \begin{code}[]
+            \begin{lzero}
+              @t0@ := Assign i // (Klammer
+              i := Add i, 1  //  )
+              a  := @t0@
+            \end{lzero}
+          \end{code}
+        
+          Es wird eine Kopie des vorherigen Wertes benötigt.
+        }
+        \ii<2-> \textbf{Aber:} Umsortierung \only<3->{+CVP}\only<4->{+DCE}{
+          \begin{onlyenv}<2>
+            \begin{code}
+              \begin{lzero}
+                t0 := Assign i
+                a  := t0
+                i  := Add i, 1
+              \end{lzero}
+            \end{code}
+          \end{onlyenv}%
+          \begin{onlyenv}<3>
+            \begin{code}
+              \begin{lzero}
+                t0 := Assign i
+                a  := i
+                i  := Add i, 1
+              \end{lzero}
+            \end{code}
+          \end{onlyenv}%
+          \begin{onlyenv}<4->
+            \begin{code}
+              \begin{lzero}
+                `{\color{gray}t0 := Assign i}`
+                a  := i
+                i  := Add i, 1
+              \end{lzero}
+            \end{code}
+          \end{onlyenv}%
+        }
+        \ei
+      \end{column}\hfill
+      \begin{column}{0.49\textwidth}
+        \bi
+        \ii Preincrement: \verb|a := ++i|
+        \ei
+        \begin{code}[]
+          \begin{lzero}
+            @i@  := Add i, 1 // (Klammer)
+            a  := @i@
+          \end{lzero}
+        \end{code}
+
+        Die modifizierte Variable wird als L-Wert zurückggeben.\\[2em]
+
+        \only<5->{\ALERT{Leider ist die Welt nicht so einfach...}}
+      \end{column}
+    \end{columns}
+  }
+  \ei
+  \end{frame}
+
+  \begin{frame}[fragile]{Pre- und Postincrement}
+
+    \OrangeBox{Spannend sind Sprachen mit Operatorüberladung (C++)}
+  
+    \bi
+    \ii Temporäre Kopien komplexerer Objekte können nicht immer entfallen{%
+      \bi
+      \ii Falls das Kopieren Seiteneffekte hat.
+      \ii<2-> Falls der Überladungsoperator Seiteneffekte hat.
+      \ii<3-> Falls die Implementierung in einer anderen Translation Unit ist. Der Optimierer hat so keinen Zugriff auf den Code.
+      \ei
+    }
+    \ei
+
+    \begin{columns}[t]
+      \begin{column}{0.33\textwidth}
+        \begin{code}[]
+          \begin{CPP}
+            int copies;
+          
+            struct A {
+              A(const A& o) {
+                copies++;
+              }
+            };
+          
+          \end{CPP}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}<2->{0.33\textwidth}
+        \begin{code}[]
+          \begin{CPP}
+            struct A {
+              void *p;
+              A operator++(int) {
+                p = malloc(1000);
+                return A(p);
+              }
+            };
+          
+          \end{CPP}
+        \end{code}
+      \end{column}\hfill
+      \begin{column}<3->{0.33\textwidth}
+        \begin{code}[]
+          \begin{CPP}
+            // A.h
+            struct A {
+              A operator(int);
+            };
+          \end{CPP}
+        \end{code}
+      
+        \begin{code}[]
+          \begin{CPP}
+            // A.cxx
+            A A::operator(int) {
+              ....
+            }
+          \end{CPP}
+        \end{code}
+      \end{column}
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}{Ask me anything}
+    \begin{btBlock}{}
+      Lieber selber optimieren oder vom Compiler optimieren lassen?    
+    \end{btBlock}
+
+    \bi
+    \ii It depends was "optimieren" heißt und was die Zielplattform ist.
+    \ii<2-> Fall A: Die Anzahl der C-Variablen bei einem Unixtool minimieren. \\[1ex]{
+      \ALERT{Nein}, das ist Quatsch, denn die CVP macht das für Sie.
+    }
+    \ii<3-> Fall B: HPC Software + Keine Unterstützung für Vektorinstruktionen.\\[1ex]{
+      \ADVANTAGE{Ja}, verwenden Sie Intrinsics um die \textbf{inneren Schleifen} zu optimieren.
+    }
+    \ii<4-> Fall C: Ich hab 10 Millionen Objekte und der Speicher reicht nicht.\\[1ex] {
+      \ADVANTAGE{Ja}, denn Übersetzer optimieren nicht ihr Objektlayout.
+    }
+    \ii<5-> Fall D: Eine große Funktion anstatt viele kleine.\\[1ex] {
+      \ALERT{Nein}, falls der Übersetzer das selbst inlinen kann. (Selbe TU).
+    }
+    \ei
+
+  
+  \end{frame}
+
+  \begin{frame}{Ask me anything}
+    \begin{btBlock}{}
+      Was ist der Nachfolgeblock eines Return-Statements?
+
+      \small Soweit ich verstanden habe, müsste der Block einen Nachfolgeblock haben, weil sonst möglicherweise die Invariante verletzt wird, dass der CFG nur einen Knoten ohne Nachfolger haben darf. Es könnte ja aber mehrere Blöcke mit einem return Statement geben (siehe rek Fibonacci).
+    \end{btBlock}
+
+    \bi
+    \ii It depends, bzw. Definitionssache. {\btUseExtraItemSep
+      \bi
+      \ii<2-> Man muss diese Invariante nicht mit aufnehmen.\\{
+        Man kann definieren, dass es mehr als einen Exit-Block geben kann.
+      }
+      \ii<3-> Falls man die Invariante doch kauft...\\{
+        kann man den CFG in einem leeren Basisblock zusammenführen.
+      }
+      \ii<4-> \texttt{Return} ist kein Funktions-lokaler Sprung. \texttt{Goto} schon.\\{
+        Ein Return muss den Basisblock nicht spalten. Sie unsere Diskussion zu funktions-lokaler CFG vs. interprozeduraler CFG.
+      }
+      \ei
+    }
+    \ei
+  
+  \end{frame}
+
+  \begin{frame}{Ask me anything}
+    \begin{btBlock}{}
+      Frage: Welche Hilfsmittel sind in der Klausur erlaubt?
+    \end{btBlock}
+
+    Antwort:\\[1ex]
+    \bii
+    \ii<+-> Stifte.
+    \ii<+-> Dokumentenecht!
+    \ii<+-> Keine Bleistifte!
+    \ii<+-> Kein Tintenkiller!
+    \ii<+-> Kein Tippex!
+    \eii
+  \end{frame}
+
+  \begin{frame}{Ask me anything}
+    \begin{btBlock}{}
+      Frage:  Wie wichtig ist für die Klausur\ldots
+      \bii
+      \ii \ldots Python-programmieren allgemein?
+      \ii \ldots Wissen, wie der Übungsübersetzer aufgebaut ist?
+      \eii
+    \end{btBlock}
+
+    Antwort: Vorlesung, Übung und Skript sind Inhalt der Klausur.
+  \end{frame}
+
+  \dividerframe{PSÜ \Large \\ Rückblick \\ Ausblick}
+
+  \begin{frame}{Was haben wir alles gemacht?}
+    \begin{center}
+      \includegraphics[page=3,width=\textwidth]{fig/01-overview-small.pdf}
+    \end{center}
+  \end{frame}
+
+  \begin{frame}[allowframebreaks]{Was haben wir alles nicht gemacht?}
+    \btUseExtraItemSep
+    \bi
+    \ii 01 - Einleitung{
+      \bi
+      \ii Reflections on Trusting Trust 
+      \ii Historische Entwicklung von Programmiersprachen
+      \ei
+    }
+    \ii 02 - Synaktische Analyse{
+      \bi
+      \ii Mehr Theorie und Grammatikanalyse: LR(1), LALR(1), SLR(1), \ldots 
+      \ii Tabellengestützte Parser für LR(1)
+      \ii Parserkombinatoren: Der funktionale Ansatz zu rekursivem Abstieg
+      \ii Sicheres Design von Netzwerkprotokollformaten
+      % https://www-ps.informatik.uni-kiel.de/~bjp/lehre/fp11/Parser.html
+      \ei
+    }
+    \ii 03 - Typen {
+      \bi
+      \ii Haskell: Typklassen 
+      \ii C++ Templates: Accidentially Turing Complete
+      \ii Formale Betrachtung von Typsystemen
+      \ii Dependent Typing: Rechnen und Beweise im Typsystem
+      \ei
+    }
+    \ii 04 - Operationen {
+      \bi
+      \ii Dynamic Scoping und Implizite Parameter
+      \ii Call-by-Name und Call-by-Need
+      \ii Lazy Evaluation
+      \ei
+    }
+    \ii 05 - Semantische Analyse {
+      \bi
+      \ii Präprozessoren: CPP oder M4
+      \ii Gute Fehlermeldungen
+      \ii (Hygienische) Macros und AST-Transformationen
+      \ii Aspektorientiertes Programmieren
+      \ei
+    }
+    \ii 06 - Objekte {
+      \bi
+      \ii Rust: Lebenszeitannotationen und deren automatische  Überprüfung
+      \ii Vererbung über Mixins
+      \ii Komplexere Garbage Colllectors
+      \ei
+    }
+    \ii 07 - Operationen {
+      \bi
+      \ii Multithreading und Nebenläufigkeit
+      \ii Move-Semantik
+      \ei
+    }
+    \ii 08 - Zwischencodeerzeugung {
+      \bi
+      \ii Just-in-Time Compilation
+      \ii Debug-Informationen, DWARF Informationen
+      \ii LLVM IR: Beispiel einer realen IR
+      \ei
+    }
+    \ii 09 - Optimierung {
+      \bi
+      \ii Single Static Assignment
+      \ii Schleifentransformationen
+      \ii (Interprozedurale) Alias Analyse
+      \ii \ldots Stoff für eine eigenständige Vorlesung \ldots
+      \ei
+    }
+    \ii 10 - Maschinencode{
+      \bi
+      \ii Registervergabe durch Graphfärben
+      \ii Peep-Hole Optimizer
+      \ii Statische Umordnung von Instruktionen
+      \ei
+    }
+    \ii 11 - Das objektorientierte Paradigma {
+      \bi
+      \ii Design Prinzipien (z.B. SOLID)
+      \ii Meta-Object Protocol
+      \ii Metaklassen
+      \ii Mehrfachvererbung und zugehörige Probleme
+      \ei
+    }
+    \ii 12 - Das funktionale Paradigma {
+      \bi
+      \ii Monaden, Funktoren, Applikative
+      \ii Übersetzung funktionaler Programme
+      \ei
+    }
+    \ii NN - Was fehlt denn noch alles?! {
+      \bi
+      \ii Logische Programmierung: PROLOG
+      \ii Constraint Programming: Lineare Programmierung, SAT, SMT
+      \ii Datenstromorientierte Programmierung: LabView
+      \ei
+    }
+    \ei
+  \end{frame}
+
+  % Vorstellung des SRA
+
+  \dividerframe{Das SRA\\{\Large und seine}\\Veranstaltungen}
+
+  \btInputPDFFrames{%
+    file=fig/sra-vorstellung-studenten.pdf,clear={not title},
+    range={8,...,17}
+  }
+
+
+  \begin{frame}{Weitere Lehrveranstaltungen}
+    \btUseExtraItemSep
+    \bi
+    \ii Proseminar -- Wissenschaftliches Vortragen{
+      \bi
+      \ii Ziel: Wissenschaftspropädeutik (Einführung in die Methodik)
+      \ii Wird von vielen Instituten angeboten.
+      \ii Thema am SRA: Parallelrechner
+      \ei
+    }
+    \ii PSRA -- Projekt System- und Rechnerarchitekturen {
+      \bi
+      \ii Projekt im Bachelor (SS)
+      \ii Systemnahe Softwareentwicklung im OpenSource-Umfeld
+      \ei
+    }
+    \ii AKSI -- Ausgewählte Kapitel aus der Systemnahen Informatik{
+      \bi
+      \ii Seminar im Master (WS), wechselnde Themen
+      \ii Im Winter: Fehlerinjektion
+      \ei
+    }
+    \ei
+  \end{frame}
+
+
+
+  \btInputPDFFrames{%
+    file=fig/sra-vorstellung-studenten.pdf,clear={not title},
+    range={19,...,21}
+  }
+#+end_src
