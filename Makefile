@@ -69,6 +69,8 @@ fig/%.pdf: fig/%.svg bin/svgfig
 11_stamp_page=0
 12_stamp=fig/12-function.pdf
 12_stamp_page=0
+13_stamp=fig/13-fin.pdf
+13_stamp_page=0
 
 
 define CREATE_SUB # $(1) = 01, $(2) = 01-einleitung

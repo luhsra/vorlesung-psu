@@ -27,6 +27,9 @@
 {{{topic(./11-oo-paradigm.org,fig/11-stamp.png)}}}
 {{{topic(./12-functional-paradigm.org,fig/12-stamp.png)}}}
 
+-----
+{{{topic(./13-outro.org,fig/13-stamp.png)}}}
+
 #+begin_center
 **EOF**
 #+end_center
