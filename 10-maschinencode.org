@@ -310,7 +310,7 @@ Da Konventionen nur Konventionen sind, gibt es natürlich verschiedene Aufrufkon
       \begin{column}{0.6\textwidth}
         \bii
         \ii Auf der IA-32 Plattform wächst der Stack von den hohen zu den niedrigen Adressen
-        \ii Der \structure{Stackpointer} is in \texttt{\%esp}
+        \ii Der \structure{Stackpointer} ist in \texttt{\%esp}
         \eii
         \medskip
 
