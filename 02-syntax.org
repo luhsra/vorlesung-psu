@@ -721,7 +721,7 @@ Mit dieser Analyse von LL(1)-Grammatiken wollen wir uns nun genauer beschäftige
 Dies wird Sie nicht nur in die Lage versetzen LL(1)-Grammatiken zu formulieren, sondern auch selbst einen Parsergenerator zu schreiben. Es ist einfacher, als Sie befürchten!
 
 Die wichtigste Information, die wir aus einer LL(1)-Grammatik extrahieren wollen, sind die **PREDICT-Mengen**:
-Für jede Regel der Grammatik gibt die zugehörige PREDICT-Menge, die terminale Symbolen enthält, an, ob diese Regel genommen wird.
+Für jede Regel der Grammatik gibt die zugehörige PREDICT-Menge, die terminale Symboleantlr enthält, an, ob diese Regel genommen wird.
 Diese Mengen enthalten also genau jenen Token, anhand dessen der Parser mit rekursivem Abstieg, anhand des Look-Aheads, seine Entscheidungen trifft.
 Vice Versa:
 Haben wir die PREDICT-Mengen, so können wir daraus also einfach einen Parser konstruieren.
@@ -1169,7 +1169,7 @@ Dort können wir diese eindeutige Entscheidung nicht sofort treffen.
 LR(k)-Parser haben die Möglichkeit, beliebige Zeit in einem Zustand des "sich noch nicht entschieden habens" (tristate) zu bleiben.
 Sie führen dazu (virtuell) eine Menge von möglichen Regeln mit sich, die mit jedem weiteren Token weiter eingeschränkt wird.
 Erst wenn diese Menge nur noch eine Regel enthält, wird sie angewendet.
-Wenn Sie weiteres Interesse an LR(k)-Parsern haben, sei Ihnen, neben der Lektüre des Drachenbuches, oder [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert, ans Herz gelegt.
+Wenn Sie weiteres Interesse an LR(k)-Parsern haben, sei Ihnen, neben der Lektüre des Drachenbuches, [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert ans Herz gelegt.
 
 
 ** Abstrakter Syntaxbaum
