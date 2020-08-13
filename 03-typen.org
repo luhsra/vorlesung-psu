@@ -506,9 +506,9 @@ Häufig definiert hier die Programmiersprache noch, dass vorzeichenbehaftete Gan
 
 Ein wichtiger Punkt bei diesen numerischen Typen ist die Frage:
 Was passiert eigentlich, wenn der Wertebereich überschritten wird.
-Also was passiert, wenn ich bei einem ~int8_t~, der gerade den Wert 128 hat, eins aufaddiere?
+Also was passiert, wenn ich bei einem ~int8_t~, der gerade den Wert 127 hat, eins aufaddiere?
 An dieser Stelle kann eine Programmiersprache sehr unterschiedliche Entscheidungen treffen:
-Die eine Möglichkeit ist, dass sie ein Überlaufverhalten definiert und bestimmt, dass ~(int8_t)128++~ zum Wert -127 führt.
+Die eine Möglichkeit ist, dass sie ein Überlaufverhalten definiert und bestimmt, dass ~(int8_t)127++~ zum Wert -128 führt.
 Dadurch klopfen wir allerdings auch fest, dass die ganzen Zahlen das Verhalten des Zweierkomplements zeigen müssen.
 Soll ein Programm nun aber auf einer Einerkomplementmaschine ausgeführt werden, so muss der Übersetzer das Verhalten des Zweierkomplements aufwendig emulieren, um die versprochene Sprachsemantik zu erfüllen.
 Die andere Möglichkeit, die zum Beispiel von C gewählt wird, ist den Ganzzahlüberlauf als *undefiniertes Verhalten* zu markieren.
