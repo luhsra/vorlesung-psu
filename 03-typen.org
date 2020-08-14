@@ -843,7 +843,7 @@ Da sowohl Indizes als auch Werte homogen typisiert sind, ist die Signatur von ~g
 Etwas informeller ausgedrückt: Mit Abbildungen kann ich etwas unter einem Index speichern und unter dem gleichen Index wiederfinden.
 
 Der wohl geläufigste Abbildungstyp, den man zuerst nicht als solchen identifiziert, ist das *Array*.
-Bei Arrays ist der Datentyp der Indexmenge auf ~int~ festgelegt ist, die Indexmenge kompakt (ohne Lücken) ist, und beim Erstellen der Abbildungsobjekte angegeben werden muss. Dies geschieht durch die Angabe der Arraygröße und den Startindex.
+Bei Arrays ist der Datentyp der Indexmenge auf ~int~ festgelegt, die Indexmenge ist kompakt (ohne Lücken) und muss beim Erstellen der Abbildungsobjekte angegeben werden. Dies geschieht durch die Angabe der Arraygröße und den Startindex.
 Häufig ist der Startindex noch per Sprachregel, wie bei C, auf 0 festgetackert.
 Allerdings wird die Zugehörigkeit von Arrays zu den Abbildungstypen klarer, wenn wir uns anschauen, dass es Sprachen wie Pascal gibt, die es dem Programmierer erlauben, den Startindex frei zu wählen. Wenn wir einen Verein mit mindestens drei, aber maximal 100 Mitgliedern typisieren wollen, können wir dort schreiben:
 
