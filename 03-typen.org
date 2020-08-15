@@ -1203,8 +1203,8 @@ Die zweite Form des universellen Polymorphismus ist der *parametrische Polymorph
 Zunächst aber führen wir *generische Typen* ein, die Typkonstruktoren darstellen, die der Benutzer selbst definieren kann.
 Dazu führen wir *Typvariablen* auf Sprachebene ein, welche die Argumente für unsere selbst-definierten Typkonstruktoren sind.
 Gewissermaßen als Funktionsrumpf des generischen Typen erlauben wir es dem Benutzer einen unvollständigen Typausdruck zu schreiben, der neben den echten Typen auch Typvariablen enthalten kann.
-Instanziieren wir unseren generischen Typen, so werden die übergebenen Argumenttypen an die Typvariablen gebunden, im unvollständigem Typausdruck ersetzt, und der, nun valide Typausdruck, wird zurückgegeben.
-Der generische Typ ist also eine Art von Schablone oder /Template/ auf ebene der Typausdrücke.
+Instanziieren wir unseren generischen Typen, so werden die übergebenen Argumenttypen an die Typvariablen gebunden, im unvollständigem Typausdruck ersetzt, und der, nun valide, Typausdruck wird zurückgegeben.
+Der generische Typ ist also eine Art von Schablone oder /Template/ auf Ebene der Typausdrücke.
 
 Im Java Beispiel lässt sich der beschrieben Mechanismus sehr gut sehen. Dort heißen generische Typen sogar /Generics/. Wir definieren hier einen Typkonstruktor mit dem Namen ~Pair~, der eine Typvariable ~A~ als Argument bekommt. Diese Typvariable kommt im Rumpf des Konstruktors, der einen Strukturtyp erzeugt, zweimal vor, um zwei Strukturelemente zu typisieren. Dieser Konstruktor erzeugt also Typen, die homogen typisierte (beide Elemente haben den gleichen Typ) Paare bilden.
 
@@ -1231,7 +1231,7 @@ So brauchen wir für den Funktionstyp von ~length()~ den Typkonstruktor ~type le
 Daraus folgt auch, dass die selbe Typvariable in den Signaturen von generischen Funktionen mehrfach auftreten kann und so ein Kopplung zwischen Argumenttypen und Rückgabetyp entstehen kann.
 Dies wird gut am Beispiel von ~concat()~ deutlich:
 ~type concatType(N) = func(List(N), List(N), List(N))~.
-Durch diese Kopplung können, wenn wir generische Funktionen hintereinander schalten um neue generische Funktionen zu erzeugen.
+Durch diese Kopplung können wir generische Funktionen hintereinander schalten um neue generische Funktionen zu erzeugen.
 So hätte die Funktionskomposition beider Funktionen (~length(concat(x, y))~) den Typen ~func(int, List[T], List[T])~.
 Diese Komposition von generischen Funktionen zu komplexeren generischen Funktionen ist der Kern von funktionaler Programmierung.
 Wir werden diesem Thema in einem dedizierten Kapitel zu diesem Programmierparadigma noch genauer nachgehen.
@@ -1565,7 +1565,7 @@ Der dynamische Typ einer Variable kann immer erst zur Laufzeit festgestellt werd
 Der statische Typ der Variable steht schon zur Übersetzungszeit fest.
 Der Übersetzer ermittelt ihn in der semantischen Analyse und wir können bereits zur Übersetzungszeit Entscheidungen treffen, die uns später, zur Laufzeit, Rechenzeit sparen. Weiterhin können wir mit statischen Typen Garantien über jede möglich Ausführung eines Programms geben, wo der dynamische Typ nur situativ, für eine Ausführung, gültig ist.
 
-Da statische Typisierung oft eine Menge Schreibarbeit bedeutet, haben Übersetzer gelernt, statische Typen automatisch aus dem Programmkontext zu ermitteln (= zu inferieren). Bei der *Typinferenz* betrachtet der Übersetzer alle Verwendungen einer Variable und überlegt sich, welcher statische Typ den passen könnte. Am offensichtlichsten ist dies bei der Initialisierung einer Variable:
+Da statische Typisierung oft eine Menge Schreibarbeit bedeutet, haben Übersetzer gelernt, statische Typen automatisch aus dem Programmkontext zu ermitteln (= zu inferieren). Bei der *Typinferenz* betrachtet der Übersetzer alle Verwendungen einer Variable und überlegt sich, welcher statische Typ denn passen könnte. Am offensichtlichsten ist dies bei der Initialisierung einer Variable:
 
 #+begin_src C++
 object_t create_object();
@@ -1575,7 +1575,7 @@ auto b = create_object();
 #+end_src
 
 Bei der Variable ~a~ kann der Übersetzer aus dem statischen Typen des Literals ~23~ (Literale haben immer einen bekannten statischen Typen) ermitteln; bei ~b~ kann er dies aus dem Rückgabewert der Funktion ~create_object()~.
-Mit der Technik der *Unifikation*, die wir uns später anschauen wollen, werden wir die Übersetzertechnik kennenlernen, die hinter der Typinferenz steht. Für die Verwendung von Typinferenz auf Sprachebene, müssen wir allerdings nur wissen: Typinferenz bedeutet, dass der Übersetzer den statischen Typen einer Variable ausrechnet.
+Mit der Technik der *Unifikation*, die wir uns später anschauen wollen, werden wir die Übersetzertechnik kennenlernen, die hinter der Typinferenz steht. Für die Verwendung von Typinferenz auf Sprachebene müssen wir allerdings nur wissen: Typinferenz bedeutet, dass der Übersetzer den statischen Typen einer Variable ausrechnet.
 * Zusammenfassung
 
 #+begin_src latex
