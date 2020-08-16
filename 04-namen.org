@@ -137,7 +137,7 @@ Im Beispiel (auf den Folien) etabliert die Namensauflösung einen Link (die rote
 Entlang dieses Links fließt zum einen die Information, dass ~y~ vom Typ Ganzzahl ist, aber auch dass der Übersetzer das Speicherlayout von ~B~-Objekten so berechnet hat, dass das das Feld ~y~ mit einem relativen Offset (zum ~this~ Zeiger) von 4 zu finden ist.
 Mit diesem Wissen kann der Übersetzer in der Funktion ~func()~ zum einen prüfen, dass nur valide Operationen auf ~y~ ausgeführt werden und zum anderen kann er Code erzeugen, der das Feld, relativ zu einem ~this~ Zeiger, ~y~ lesen und schreiben kann.
 
-In diese Vorlesung werde ich mich hauptsächlich auf solche Deklarationen konzentrieren, hinter denen zur Laufzeit ein Objekt steht, welches eine Speicheradresse hat.
+In dieser Vorlesung werde ich mich hauptsächlich auf solche Deklarationen konzentrieren, hinter denen zur Laufzeit ein Objekt steht, welches eine Speicheradresse hat.
 Allerdings gilt dies nicht für jede Deklaration.
 So haben in übersetzten Sprachen *Typdeklarationen* oft kein Pendant zur Laufzeit (es gibt keine Typobjekte), sondern es sind nur die angehefteten Informationen an der Deklarationsstelle (z.B. der Typausdruck) von Relevanz.
 Allerdings gelten auch für diese Deklarationen die selben Regeln und Prinzipien zur Namensauflösung, sie ist nur schon an der Deklarationsstelle beendet und muss/kann nicht bis zu einer Speicheradresse fortgeführt werden. Hier kann der Übersetzer also bereits eine vollständige Namensauflösung durchführen.
@@ -251,7 +251,7 @@ REF   -> NAME          // Verwendung  eines Namens
 
 * Statische Namensauflösung
 
-Als erstes werden wir uns mit den Regel der Namensauflösung in geschachtelten Namensräumen beschäftigen.
+Als erstes werden wir uns mit den Regeln der Namensauflösung in geschachtelten Namensräumen beschäftigen.
 Dabei wollen wir uns zunächst nur mit statischer Namensauflösung beschäftigen, bei der hinter jeder Namensdeklaration maximal ein Laufzeitobjekt sein kann.
 Der Gegensatz zu dieser *statischen Namensauflösung* ist die dynamische Namensauflösung, bei der es zu einer Deklaration mehrere Objekte[fn::Hinter einem Attribut in einer Klasse steht in jeder Instanz ein anderes Objekt.
 Der ~this~ Zeiger dient zur Unterscheidung.] geben kann, zwischen denen wir mit zusätzlichem Laufzeitwissen unterscheiden werden, um den Namen doch noch eindeutig und vollständig aufzulösen.
@@ -314,7 +314,7 @@ Dazu beginnen wir unsere Suche nach der Deklaration bei dem Namensraum, der die 
 Diese Regel heißt die "Closest-nested scope rule" (CNSR).
 
 Eine Folge der CNSR ist, dass Deklarationen in untergeordneten Namensräumen *verdeckt* werden können.
-Dabei bleibt die äußere Deklaration weiterhin bestehen, aber wir können sie mittels der impliziten Namensauflösung nicht mehr referenzieren; sie verliert ihre *Sichtbarkeit*. Eine Deklaration ist an einer Stelle im Programm sichtbar, wenn eine Namensreferenz zu dieser Deklaration aufgelößt werden könnte.
+Dabei bleibt die äußere Deklaration weiterhin bestehen, aber wir können sie mittels der impliziten Namensauflösung nicht mehr referenzieren; sie verliert ihre *Sichtbarkeit*. Eine Deklaration ist an einer Stelle im Programm sichtbar, wenn eine Namensreferenz zu dieser Deklaration aufgelöst werden könnte.
 Nachdem der Namensraum der inneren Deklaration geschlossen wurde, wird die äußere Deklaration wieder sichtbar und kann referenziert werden.
 Erst nachdem auch der letzte Namensraum geschlossen wurde, verliert auch die letzte Deklaration von A ihre Sichtbarkeit.
 
@@ -379,7 +379,7 @@ DECL -> let NAME = SCOPE // Explizite benannte Namensräume
 #+end_example
 
 Das erste bekommen wir in unserer domänenspezifischen Sprache hin, wenn wir die Grammatik um eine Regel zu *expliziten Namensräumen* erweitern, welche dem folgenden Namensraum einen eigenen Namen gibt.
-Dieser Name ist dann an seiner Deklarationsstelle genauso sichtbar, wie das jeder andere Namen auch ist.
+Dieser Name ist dann an seiner Deklarationsstelle genauso sichtbar, wie das jeder andere Name auch ist.
 Allerdings schaffen wir mit dem ~::~-Operator die Möglichkeit, einen Namen innerhalb eines expliziten Namensraums zu suchen.   Diese explizite bzw. *qualifizierte Referenzierung* sucht dabei nur in dem gegebenen Namensraum und führt keine CNSR-Suche durch.
 Im Beispiel bedeutet der Ausdruck ~M::A~, dass wir den Namen ~A~ im expliziten Namensraum ~M~ referenzieren wollen.
 
@@ -396,7 +396,7 @@ Sehr nah an dieser Erweiterung ist das C++-Konstrukt ~namespace~, welches einem 
 
 Noch eine spannende Bemerkung zu impliziten Wurzelnamensräumen:
 Wenn eine Sprache keine Möglichkeit bietet, auf diese Wurzel zugreifen zu können, so kann man einen Namensraum vom Rest des Programms isolieren.
-Innerhalb des Namensraums hat man keine Möglichkeit Namen zu notieren, die auf Deklarationen, die außerhalb des Namensraums deklariert wurden,referenzieren.
+Innerhalb des Namensraums hat man keine Möglichkeit Namen zu notieren, die auf Deklarationen, die außerhalb des Namensraums deklariert wurden, referenzieren.
 Nur jene Objekte, die wir (dynamisch) in diesen Namensraum hinein geben, erlauben dem enthaltenen Code auf die Außenwelt zuzugreifen.
 
 
@@ -447,12 +447,12 @@ Mit expliziten Namensräumen und dem ~::~-Operator haben wir die Möglichkeit ge
 Allerdings führt die Verwendung von qualifizieren Namen zu schwer lesbarem Code, da die Zugriffspfade lang und länger werden.
 Würde eine Sprache keine weiteren Mittel anbieten, dieses Boilerplate-Problem zu lösen, würden sich Programmierer einfach weigern, ihre Namen hierarchisch anhand der logischen Komponentenstruktur zu deklarieren.
 Da wollen wir den Entwicklern natürlich entgegenkommen!
-Viele Sprachen bieten die Möglichkeit, Deklarationen von einem Namensraum in einen anderen Namensräumen zu *importieren*.
+Viele Sprachen bieten die Möglichkeit, Deklarationen von einem Namensraum in anderen Namensräumen zu *importieren*.
 
 Um den Import von Namen zu verstehen, müssen wir zunächst definieren, was in einem Namensraum überhaupt sichtbar ist.
 Zum einen hat jeder Namensraum eine Menge von Namen, die direkt in ihm deklariert sind.
 Im Folienbeispiel deklariert der Namensraum N die Namen ~{A, M}~.
-Zweitens hat jeder Namensraum eine Menge von sichtbaren Namen, welche die, zusätzlich zur Menge der direkt deklarierten Namen, alle Namen enthält, die durch die CNSR erreichbar sind.
+Zweitens hat jeder Namensraum eine Menge von sichtbaren Namen, die, zusätzlich zur Menge der direkt deklarierten Namen, alle Namen enthält, die durch die CNSR erreichbar sind.
 Mit dem Import von Namen können wir, je nach Sprache und verwendetem Konstrukt, die eine oder die andere Menge manipulieren.
 Da die Unterscheidung zwischen beiden Fällen nur in Randfällen wirklich relevant ist, werde ich im Folgenden (und auf den Folien) so tun, als würden wir immer in die Menge der direkt-deklarierten Namen importieren.
 
@@ -463,7 +463,7 @@ Letztere haben den Vorteil, dass wir das Import-Statement nicht anpassen müssen
 Wie bereits gesagt, importieren wir, der Einfachheit halber, nur in die Menge der direkt deklarierten Namen.
 Das Import-Statement wird also quasi zur Deklaration (oder, bei Wildcard-Importen, zu vielen Deklarationen).
 Daher können wir die importierten Namen von dritter Stelle wiederum importieren, falls wir den umgebenden Namensraum referenzieren können.
-Im Beispiel können wir, nachdem wir den Namen ~X~ vergeben haben, auf alle Deklarationen (~A,B,C~) zugreifen, wenn wird die ~import ::X::*~ schreiben.
+Im Beispiel können wir, nachdem wir den Namen ~X~ vergeben haben, auf alle Deklarationen (~A,B,C~) zugreifen, wenn wir ~import ::X::*~ schreiben.
 
 Manchmal ist der Import von Namen ein Seiteneffekt von anderen Sprachkonstrukten und nicht mit einem expliziten ~import~-Statement verbunden.
 So werden bei der Vererbung alle Namen aus dem Namensraum der Elternklasse in den Namensraum der Kindklasse importiert.
@@ -536,7 +536,7 @@ Wir erlauben allerdings auch, diese default-Sichtbarkeit am Beginn eines Namensr
 In richtigen Programmiersprachen gibt es noch fein-granularere Abstufungen von Sichtbarkeit.
 Zum Beispiel regelt das Sichtbarkeitsattribut ~protected~ bei Java, wie sich die Sichtbarkeit einer Deklaration beim Import durch Vererbung ändert.
 Aber solche Feinheiten sind immer spezifisch für eine Sprache.
-Nur das Prinzip, dass die Sichtbarkeit einer Deklaration, je nach Referenzstelle, unterschiedlich sein kann, die bleibt.
+Nur das Prinzip, dass die Sichtbarkeit einer Deklaration, je nach Referenzstelle, unterschiedlich sein kann, das bleibt.
 
 #+begin_src latex
   \begin{frame}[fragile]{Fallbeispiel: Java Packages}
@@ -585,7 +585,7 @@ Außerdem erlauben es Java-Pakete die Sichtbarkeit von Klassen zwischen Paketen 
 
 Im Beispiel sehen wir, dass Pakete, die durch das ~package <NAME>;~ "betreten" werden, eigene Namespaces sind.
 Dadurch erklärt sich bereits, wie es sein kann, dass in unterschiedlichen Paketen der gleiche Klassenname verwendet werden kann.
-Außerdem vererben Pakete ein interne Standardsichtbarkeit an die darin enthaltenen Klassen.
+Außerdem vererben Pakete eine interne Standardsichtbarkeit an die darin enthaltenen Klassen.
 Dies ist im übrigen bei Klassen ebenso, auch dort ist die Standardsichtbarkeit ~private~.
 Die Klassen A und B haben unterschiedliche Sichtbarkeiten und nur die Klasse A kann von außerhalb ihres Pakets referenziert werden.
 Daher ist es möglich, dass wir die Klasse N.A in das Paket M importieren.
@@ -838,11 +838,11 @@ Dieses Konzept beschreibt, wie wir einen Namensraum, mit all seinen Sichtbarkeit
 Somit kann ein Namensraum eine Blaupause für viele andere Namensräume werden.
 
 Das Konzept der instanziierbaren Namensräumen ist ein Schlüsselkonzept der Informatik und manifestiert sich besonders auffällig in Objekt-orientierten Programmiersprachen.
-Auch dort ist der Namensraum einer Klasse die Blaupause für all ihre Instanzobjekte. Aber moderne Isolationskonzepte auf Systemebene, wie Docker bzw. Container, sind Anwendungen dieses Konzepts.
+Auch dort ist der Namensraum einer Klasse die Blaupause für all ihre Instanzobjekte. Aber auch moderne Isolationskonzepte auf Systemebene, wie Docker bzw. Container, sind Anwendungen dieses Konzepts.
 
 In unserer Namensraumsprache führen wir, um instanziierbare Namensräume auszudrücken, das zusätzliche let-Attribut ~let [D] <NAME>~ ein und erlauben, dass wir Instanzen eines Namensraums anlegen können (~<NS>()~).
 Das zusätzliche Attribut bedeutet, dass zur Adressberechnung von ~NAME~ Laufzeitwissen benötigt wird. Der Teil hinter dem ~=~ gibt an, welcher Namensraum geklont werden soll.
-Im Gegensatz zu vielen Sprachen, bleiben wir dabei, immer den ~::~-Operator zur Namensauflösung zu nehmen, egal ob wir dynamisches Wissen brauchen oder nicht.
+Im Gegensatz zu vielen Sprachen bleiben wir dabei, immer den ~::~-Operator zur Namensauflösung zu nehmen, egal ob wir dynamisches Wissen brauchen oder nicht.
 
 #+begin_src latex
   \begin{frame}<beamer:0|handout:2>[fragile]{Fallbeispiel: Klassen in C++}
@@ -945,7 +945,7 @@ Das bedeutet, dass jede Instanz ein eigenes Objekt hinter der gleichen Felddekla
 Allerdings wollen Entwickler es manchmal haben, dass alle Instanzen das selbe Objekt hinter dem selben Namen im Namensraum der Klasse sehen.
 Dies hat den Vorteil, dass alle Instanzen der Klasse miteinander "reden" können, aber das Feld mit den gleichen Sichtbarkeits- und Zugriffsregeln versehen ist, wie alle anderen Felder.
 
-Daher gibt es das Schlüsselwort ~static~, das an bei der Adressberechnung allen Einfluss von dynamischen Informationen abschneidet.
+Daher gibt es das Schlüsselwort ~static~, das bei der Adressberechnung allen Einfluss von dynamischen Informationen abschneidet.
 Der Übersetzer ignoriert also beim Berechnen der Adresse für ~objO::objI::A~ die ~this~-Zeiger von beiden Objekten, sodass die Namensauflösung immer zum gleichen Ergebnis kommt.
 
 Um dieses Verhalten in unserer Namensraumsprache abzubilden, führen wir das let-Attribut ~[S]~ ein, das alle ~[D]~ Attribute im Auflösungspfad ungültig macht.
