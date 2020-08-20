@@ -528,7 +528,7 @@ Durch diese Festlegung ist es nur noch von innerhalb eines Namensraums, mittels 
 Von außerhalb, wo wir qualifizierte Pfade brauchen, schlägt die Namensauflösung fehl (siehe ~M::A~).
 
 In unserer Namensraumsprache führen wir ein optionales Attribut ~I~ ein[fn::Fun Fact am Rande:
-Die gewählt Notation ist die Notation für optionale Parameter bei Latex-Makros.
+Die gewählte Notation ist die Notation für optionale Parameter bei Latex-Makros.
 Die Notation soll andeuten, dass das I ein optionales Attribut für die Deklaration ist.], welches bei der Deklaration angegeben werden kann, um sie zu intern zu machen.
 Per Default sind alle Namen von überall sichtbar (~[E]~) und nur ausgewählte Deklarationen werden privat.
 Wir erlauben allerdings auch, diese default-Sichtbarkeit am Beginn eines Namensraums zu ändern.
@@ -589,7 +589,7 @@ Außerdem vererben Pakete eine interne Standardsichtbarkeit an die darin enthalt
 Dies ist im übrigen bei Klassen ebenso, auch dort ist die Standardsichtbarkeit ~private~.
 Die Klassen A und B haben unterschiedliche Sichtbarkeiten und nur die Klasse A kann von außerhalb ihres Pakets referenziert werden.
 Daher ist es möglich, dass wir die Klasse N.A in das Paket M importieren.
-Der einzige Unterschied zu unserer Namensraumsprache ist, dass Java an jeder Stelle den ~.~ zum trennen von Namen nimmt und nicht ~::~.
+Der einzige Unterschied zu unserer Namensraumsprache ist, dass Java an jeder Stelle den ~.~ zum Trennen von Namen nimmt und nicht ~::~.
 Die Klasse B ist tatsächlich intern deklariert und kann daher nur von anderen Klassen aus dem Paket M verwendet werden.
 Wir sehen ganz nebenbei in dem Beispiel, dass auch Funktionen Namensräume sind, die per Default ~[I]~ sind; lokale Variablen sind nicht von außen zugreifbar.
 
@@ -700,7 +700,7 @@ Das zweite, was wir zur Link Time wissen, ist der Offset des Objekts im BSS-Segm
 Der Linker hat dieses wissen, da er die einzelnen global-allokierten Objekte anordnet und Code-, Daten- und BSS-Segment mit ihnen auffüllt.
 Allerdings weiß der Linker noch nicht, wo das Programm hingeladen werden wird.
 Dieses Wissen haben wir erst zur Load Time, wenn klar ist, wo das BSS-Segment im Speicher zu finden ist.
-Auf diese Load-Time-Adresse (~0x1000~) können wir den relativen Offset für das Objekt und das Feld aufaddieren, sodass wir das Felde ~obj.p~ an der Speicherstelle ~0x1204~ verorten können.
+Auf diese Load-Time-Adresse (~0x1000~) können wir den relativen Offset für das Objekt und das Feld aufaddieren, sodass wir das Feld ~obj.p~ an der Speicherstelle ~0x1204~ verorten können.
 Da wir allerdings nicht nur auf ~obj.p~ zugreifen wollen, sondern auf das Objekt, auf das dieser Zeiger zeigt, müssen wir zur Laufzeit (run-time binding) noch eine Dereferenzierungsoperation durchführen, um die Adressberechnung abzuschließen.
 
 Da Compile-, Link- und Load-Time gut von der Werkzeugkette kontrolliert werden, gibt es Optimierungen, dass die Vorberechnung der Adresse ~&obj.p~ zu einer Konstante im Programmcode zusammenfällt.
@@ -900,7 +900,7 @@ Im Gegensatz zu vielen Sprachen bleiben wir dabei, immer den ~::~-Operator zur N
 
   #+end_src
 
-Mit dieser dem Wissen um instanziierbare Namensräume können wir ein C++-Beispiel recht vollständig in unsere Namensraumssprache übersetzen.
+Mit dem Wissen um instanziierbare Namensräume können wir ein C++-Beispiel recht vollständig in unsere Namensraumssprache übersetzen.
 Hierbei sehen wir, dass Klassen in C++ die bisher erwähnten Aspekte von Namensräumen (Sichtbarkeit, Import, Instanziierung) miteinander vereinen.
 Überlegen Sie sich an dem Beispiel Antworten für die folgenden Fragen:
 Welche Namen sind in dem Quellcode im Wurzelnamensraum deklariert?
@@ -1079,7 +1079,7 @@ Diese Call-Frames halten für jeden Aufruf Speicherplatz für alle lokalen Varia
 Die Namen innerhalb der Funktionsinstanz werden zum Aufrufzeitpunkt an das neu erzeugte Call-Frame-Objekt gebunden (run-time binding!). Die Auflösung der Namen erfolgt dann relativ zum Stackpointer (SP), der zu jedem Zeitpunkt auf den aktuell aktiven Call-Frame zeigt.
 
 Jedes Call-Frame-Objekt hat zusätzlich noch einen Zeiger auf den Call-Frame aus dem heraus er aufgerufen wurde (caller).
-In den meisten Fällen ist die Beziehung zwischen Aufrufer und Aufgerufenem hierarchisch und der Aufrufer wird solange pausiert bis der Aufrufer fertig ist.
+In den meisten Fällen ist die Beziehung zwischen Aufrufer und Aufgerufenem hierarchisch und der Aufrufer wird solange pausiert bis der Aufgerufene fertig ist.
 Der ~fak(3)~-Call-Frame existiert länger als der ~fak(2)~-Call-Frame.
 Daher kann man diese Objekte sehr effizient auf einem Stack direkt hintereinander speichern.
 Dies ist allerdings nur eine Optimierung und wir könnten auch für jedes Call-Frame-Objekt ~malloc()~ aufrufen.
@@ -1119,7 +1119,7 @@ Aber was passiert, wenn wir die Funktion ~inner()~ als Rückgabewert zurückgebe
 Wenn wir dann ~inner()~, irgendwann später, aufrufen wollen, müssen wir einen Call-Frame für ~inner()~ erzeugen und brauchen Zugriff auf einen Call-Frame von ~outer()~. Aber, woher nehmen, wenn nicht stehlen.
 
 Die Antwort auf diese Frage, die aktuelle Skriptsprachen, wie JavaScript, für diese Frage wählen, nennt sich *Lexikalisches Scoping*.
-Dabei speichern wir uns einen Zeigern auf den Call-Frame von ~outer()~ an der Stelle, wo ~inner()~ definiert wird, in einem *Closure*-Objekt weg.
+Dabei speichern wir uns einen Zeiger auf den Call-Frame von ~outer()~ an der Stelle, wo ~inner()~ definiert wird, in einem *Closure*-Objekt weg.
 Dieses Closure-Objekt liefert dann, wenn wir die zurückgegebene Funktion ~inner()~ aufrufen, das nötige ~outer()~-Call-Frame Objekt.
 Die Funktion ~inner()~ speichert also dauerhaft den Zustand der umgebenen Funktion zu dem Zeitpunkt, an dem die Closure erzeugt wurde.
 
@@ -1266,7 +1266,7 @@ Bei der Überladung von Funktionen haben wir das Funktionssymbol (~do()~), das s
 Allerdings gibt es einen grundlegenden Unterschied zwischen Subtyping und Überladung:
 Ein Subtyp verhält sich in jeder Situation in gleicher Weise (daher universell!)
 polymorph.
-Bei der Überladung kommt es auf den Kontext der Funktionsaufrufs an. Dort wird ad-hoc entschieden, welche Gestalten ~do()~ haben kann und dann auch einnimmt.
+Bei der Überladung kommt es auf den Kontext des Funktionsaufrufs an. Dort wird ad-hoc entschieden, welche Gestalten ~do()~ haben kann und dann auch einnimmt.
 Genauer gesagt werden wir uns die Argumente des Funktionsaufrufs genauer anschauen und anhand ihrer Typen entscheiden, welches Funktionsobjekt in genau diesem Kontext an den Namen ~do~ gebunden und letztendlich aufgerufen wird.
 
 Um unser Konzept von Namen, bei dem jeder Name stellvertretend für genau ein Objekt steht, aufrechtzuerhalten, müssen wir unsere Namen erweitern, damit sie trotz Überladung eindeutig bleiben.

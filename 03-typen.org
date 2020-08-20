@@ -392,7 +392,7 @@ Hier definieren wir das Interface ~Object2D~, welches durch die Methode ~float a
   \end{frame}
   #+end_src
 
-Mit unseren drei Brillen haben wir nur eins geschafft: Wir haben Typen geschaffen, aber bisher können wir mit ihnen nichts anstellen. Ziemlich nutzlose und faule mathematische Objekte, sich einfach wild von uns erzeugen zu lassen. Daher wollen wir nun, neben den Typkonstruktoren, weitere Operationen definieren, die auf unserer Typmenge arbeitet. Möglichst nützliche Operationen.
+Mit unseren drei Brillen haben wir nur eins geschafft: Wir haben Typen geschaffen, aber bisher können wir mit ihnen nichts anstellen. Ziemlich nutzlose und faule mathematische Objekte, sich einfach wild von uns erzeugen zu lassen. Daher wollen wir nun, neben den Typkonstruktoren, weitere Operationen definieren, die auf unserer Typmenge arbeiten. Möglichst nützliche Operationen.
 
 Die wahrscheinlich wichtigste Frage für einen Übersetzer ist, ob zwei gegebene Typen *äquivalent* sind.
 Also, ob sie das gleiche bedeuten.
@@ -707,7 +707,7 @@ Um das ganze etwas plastischer zu machen, wollen wir uns ansehen, wie C-~struct~
   //             (double, field_2))
 
   ...
-  struct foo var;
+  struct foo_t var;
   var.feld_1 = 1;    // dot_operator(foo_t, feld_1) -> int
   var.feld_2 = 1.5;  // dot_operator(foo_t, feld_2) -> double
 #+end_src
@@ -972,7 +972,7 @@ Entweder man stellt für jeden Typ einen eigenen Satz an Operationen bereit (~pr
 
 Allerdings sind Typen vielleicht gar nicht immer so unterschiedlich, wie das eine monomorphe Sicht der Dinge nahe legen würde, sondern es gibt oft Gemeinsamkeiten.
 Und es sind diese Gemeinsamkeiten, die der Polymorphismus einfängt und im Typsystem formalisiert.
-Wenn ein Typ Polymorph ist, bedeutet das, dass der selbe Typ unterschiedliche Rollen einnehmen bzw.
+Wenn ein Typ Polymorph ist, bedeutet das, dass derselbe Typ unterschiedliche Rollen einnehmen bzw.
 sich so wie ein anderer Typ verhalten kann.
 Am Beispiel des 3D-Punktes:
 Durch ignorieren der 3.
@@ -1077,7 +1077,7 @@ Allerdings kann ein Typsystem nicht all diese Fälle, insbesondere den letzten, 
     #+end_src
 
 
-In dieser Vorlesung wollen wir uns mit dem universellen Polymorphismus beschäftigen. Dabei geht es darum, dass die gleichen Typen in allen Kontexten gleich kompatibel sind. Beim ad-hoch Polymorphismus, der uns in den nächsten zwei Vorlesungen begegnen wird, wird in jedem Kontext einzeln festgestellt, ob die gerade vorliegenden Typen und Operationen kompatibel sind bzw. kompatibel gemacht werden können. Einen genaueren Überblick über das Thema des Polymorphismus finden Sie in dem Artikel [[http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf][On Understanding Types, Data Abstraction, and Polymorphism]] von Luca Cardelli und Peter Wegner.
+In dieser Vorlesung wollen wir uns mit dem universellen Polymorphismus beschäftigen. Dabei geht es darum, dass die gleichen Typen in allen Kontexten gleich kompatibel sind. Beim ad-hoc Polymorphismus, der uns in den nächsten zwei Vorlesungen begegnen wird, wird in jedem Kontext einzeln festgestellt, ob die gerade vorliegenden Typen und Operationen kompatibel sind bzw. kompatibel gemacht werden können. Einen genaueren Überblick über das Thema des Polymorphismus finden Sie in dem Artikel [[http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf][On Understanding Types, Data Abstraction, and Polymorphism]] von Luca Cardelli und Peter Wegner.
 
 Bei der ersten Form des Polymorphismus, dem *Polymorphismus durch Inklusion* setzen wir unsere denotationelle Brille auf und betrachten die zwei Typen S und T, deren Kompatibilität zur Frage steht.
 Beide dieser Typen spannen eine Menge von Objekten auf, indem sie ein Prädikat über die Zugehörigkeit zur Menge angeben (denotationelle Sicht).
@@ -1206,7 +1206,7 @@ Gewissermaßen als Funktionsrumpf des generischen Typen erlauben wir es dem Benu
 Instanziieren wir unseren generischen Typen, so werden die übergebenen Argumenttypen an die Typvariablen gebunden, im unvollständigem Typausdruck ersetzt, und der, nun valide, Typausdruck wird zurückgegeben.
 Der generische Typ ist also eine Art von Schablone oder /Template/ auf Ebene der Typausdrücke.
 
-Im Java Beispiel lässt sich der beschrieben Mechanismus sehr gut sehen. Dort heißen generische Typen sogar /Generics/. Wir definieren hier einen Typkonstruktor mit dem Namen ~Pair~, der eine Typvariable ~A~ als Argument bekommt. Diese Typvariable kommt im Rumpf des Konstruktors, der einen Strukturtyp erzeugt, zweimal vor, um zwei Strukturelemente zu typisieren. Dieser Konstruktor erzeugt also Typen, die homogen typisierte (beide Elemente haben den gleichen Typ) Paare bilden.
+Im Java Beispiel lässt sich der beschriebe Mechanismus sehr gut sehen. Dort heißen generische Typen sogar /Generics/. Wir definieren hier einen Typkonstruktor mit dem Namen ~Pair~, der eine Typvariable ~A~ als Argument bekommt. Diese Typvariable kommt im Rumpf des Konstruktors, der einen Strukturtyp erzeugt, zweimal vor, um zwei Strukturelemente zu typisieren. Dieser Konstruktor erzeugt also Typen, die homogen typisierte (beide Elemente haben den gleichen Typ) Paare bilden.
 
 Wie wir im C++-Beispiel, wo generische Typen *Templates* heißen, sehen, können wir eine Menge an Schreibarbeit durch die Verwendung von Templates sparen.
 Wir müssen in unserem Programm nur jedes vorkommen von ~intList~ durch ~List<int>~ und jedes Vorkommen von ~charList~ durch ~List<char>~ ersetzen. Dies spart eine Menge an sich immer wiederholenden Typdefinitionen.
@@ -1228,7 +1228,7 @@ Bekommt eine Funktion einen generischen Typen als Argument, so nennen wir sie *g
 Wenn wir bei diesen generischen Funktionen nach dem Funktionstyp fragen, so sehen wir, dass auch dieser selbst ein generischer Typ sein muss.
 So brauchen wir für den Funktionstyp von ~length()~ den Typkonstruktor ~type lengthType(N) = func(int, List(N))~.
 
-Daraus folgt auch, dass die selbe Typvariable in den Signaturen von generischen Funktionen mehrfach auftreten kann und so ein Kopplung zwischen Argumenttypen und Rückgabetyp entstehen kann.
+Daraus folgt auch, dass die selbe Typvariable in den Signaturen von generischen Funktionen mehrfach auftreten kann und so eine Kopplung zwischen Argumenttypen und Rückgabetyp entstehen kann.
 Dies wird gut am Beispiel von ~concat()~ deutlich:
 ~type concatType(N) = func(List(N), List(N), List(N))~.
 Durch diese Kopplung können wir generische Funktionen hintereinander schalten um neue generische Funktionen zu erzeugen.
@@ -1281,12 +1281,12 @@ Sind diese in keinster Weise kompatibel, so können wir auch davon ausgehen, das
 Verwenden wir allerdings Subtypen im generischen Typ, kommt es zu drei verschiedenen Fällen: Kovarianz, Kontravarianz und Invarianz.
 
 Bei der Kovarianz sind die instanziierten Typen in der gleichen Richtung kompatibel wie der übergebene Typ.
-Im Beispiel ist Cake kompatibel mit Bread (~Cake~ -> ~Bread~) und der dazugehörige Bäcker ist ein die gleiche Richtung kompatibel:
+Im Beispiel ist Cake kompatibel mit Bread (~Cake~ -> ~Bread~) und der dazugehörige Bäcker ist in die gleiche Richtung kompatibel:
 ~Baker[Cake]~ -> ~Baker[Bread]~.
 Umgangssprachlich würde man sagen:
 Jeder Kuchenbäcker ist auch ein Brotbäcker, weil Kuchen spezielle Brote sind.
 Diese Art der Kompatibilität tritt ein, wenn der generische Typ nur Quelle für Objekte des Subtyps sind, da jedes einspringende Objekt sofort als Objekt der Oberklasse interpretiert werden kann.
-Etwas anschaulicher können wir bei der Methode jeder Methode des Bäckers, die Cake zurückliefert (~Cake Baker[Cake]::bake()~), einen Cast zu ~Bread~ vorlagern:
+Etwas anschaulicher können wir bei jeder Methode des Bäckers, die Cake zurückliefert (~Cake Baker[Cake]::bake()~), einen Cast zu ~Bread~ vorlagern:
 ~((Bread) Baker[Cake]::bake())~.
 
 Der umgekehrte Fall tritt ein, wenn der generische Typ nur eine Senke für parametrische Objekte ist.
@@ -1296,7 +1296,7 @@ Der Subtyp ~Customer[Bread]::eat(Bread *)~ ist kompatibel mit allen Aufrufen, be
 
 Ist der generische Typ sowohl Quelle als auch Senke für parametrische Objekte, so können wir keine Kompatibilität annehmen. In diesem Fall sind die instanziierten Typen invariant und inkompatibel zueinander.
 
-Das Theme von Kovarianz, Kontravarianz und Invarianz ist eigentlich noch allgemeiner als nur das Zusammenspiel von Subtypen und parametrischem Polymorphismus.
+Das Thema von Kovarianz, Kontravarianz und Invarianz ist eigentlich noch allgemeiner als nur das Zusammenspiel von Subtypen und parametrischem Polymorphismus.
 Es erstreckt sich auf weitere Aspekte von Typsystemen, die wir hier allerdings nicht weiter besprechen werden. Das Verbindende ist immer: Kovarianz bedeutet das Kompatibilität entlang der Vererbungsrichtung stattfindet; Kontravarianz bedeutet, dass es entgegen der Vererbungsrichtung geschieht.
 
 #+begin_src latex

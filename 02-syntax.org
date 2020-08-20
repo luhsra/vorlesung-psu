@@ -149,7 +149,7 @@ Dateiformaten oder Netzwerkprotokollen.
 
 Daher hat die Informatik auch eine Reihe von präzisen Formalismen
 entwickelt (reguläre und kontextfreie Sprachen), mit Hilfe derer man
-solche Problem erfassen und angehen kann. Mit dieser Formalisierung
+solche Probleme erfassen und angehen kann. Mit dieser Formalisierung
 kam auch die Möglichkeit Werkzeuge zu bauen, die einem dabei helfen,
 Werkzeuge zur Syntaxanalyse zu erstellen
 (Parsergeneratoren)[fn::Parsergeneratoren werden auch
@@ -330,7 +330,7 @@ Daher wollen wir nun der ad-hoc Implementierung ~scanner_next()~ aus dem Beispie
 
 Zu Beginn müssen wir uns daran erinnern, was Grammatiken überhaupt
 waren. Die theoretische Informatikvorlesung ist lange her, und die
-Erinnerung bereits verschommen. Zunächst ist eine (formale) Grammatik
+Erinnerung bereits verschwommen. Zunächst ist eine (formale) Grammatik
 ein Regelsatz, der beschreibt, wie man, beginnend von einem
 *Startsymbol*, über einen iterativen *Textersetzungsprozess* zu einer
 Zeichenkette kommt. Zu jedem Zeitpunkt besteht die Zeichenkette aus
@@ -366,9 +366,9 @@ Genau das, was wir für unseren Scanner brauchen.
 
 Allerdings ist der Nachweis ob eine gegebene Grammatik wirklich regulär ist, nicht ganz leicht.
 Daher gehen wir das Problem von einer anderen Seite heran und greifen auf **reguläre Ausdrücke** zurück um die Token unserer Sprache zu beschreiben.
-Beim diesem Formalismus ist konstruktiv sicher gestellt, dass jeder reguläre Ausdruck eine reguläre Sprache beschreibt.
+Bei diesem Formalismus ist konstruktiv sicher gestellt, dass jeder reguläre Ausdruck eine reguläre Sprache beschreibt.
 Daher kann man aus jedem regulären Ausdruck eine entsprechende reguläre Grammatik ableiten und es kann niemals geschehen, dass ein regulärer Ausdruck ausversehen nicht mehr regulär ist.
-Erreicht wird diese Garantie durch das Verbot rekursive Ersetzungen[fn::In keiner der möglichen Ersetzung eines Nichtterminals kann das Nichtterminal noch einmal auftreten.].
+Erreicht wird diese Garantie durch das Verbot rekursiver Ersetzungen[fn::In keiner der möglichen Ersetzungen eines Nichtterminals kann das Nichtterminal noch einmal auftreten.].
 Um dennoch das wiederholte Auftreten eines Nichtterminals zu erlauben, welches in regulären Grammatiken möglich ist[fn::Reguläre Grammatik: ~A -> xA~, Regulärer Ausdruck: ~x*~] wird der Kleene-Stern eingeführt, bei dem das direkt vorangegangene Nichtterminal 0 bis N mal ersetzt werden kann.
 Beim Parsen werden wir *kontextfreie* Grammatiken verwenden, die rekursive Ersetzungen enthalten und daher nicht mittels regulärerer Ausdrücke beschrieben werden können.
 
@@ -542,7 +542,7 @@ Da wir bereits, bei den Anweisungen und dem Funktionsrumpf, erkannt haben, dass 
 
 Daher müssen wir auf die nächst mächtigere Klasse von Datenstruktur, nämlich die der **Bäume**, wechseln.
 Bäume sind hervorragend geeignet, die syntaktische Struktur von Programmen zu erfassen:
-Sie sind rekursiv, da jedes Kind eines Knotens wiederum ein Unterbaum ist; dabei sind Blätter sind triviale Bäume.
+Sie sind rekursiv, da jedes Kind eines Knotens wiederum ein Unterbaum ist; dabei sind Blätter triviale Bäume.
 
 Für unser Beispiel der arithmetischen Ausdrücke zeigt ein innerer Knoten an, welche Operation ausgeführt werden soll.
 Die Kinder dieses Knotens sind die Operanden, die verrechnet werden.
@@ -1132,7 +1132,7 @@ Der Parser würde sich also in einer Endlosrekursion fangen.
 
 Dass eine solche linksrekursive Grammatik nicht LL(1) sein kann, sehen wir auch an den PREDICT-Mengen.
 Im Beispiel der linksrekursiven Variante von ~intAdd~ sind die PREDICT-Mengen für die beiden Regeln von ~int~ nicht schnittfrei, womit der LL(1)-Test fehlschlägt.
-Allerdings sehen wir auch, dass die linksrekursive Variante deutlich intuitiver aufzuschreiben ist als die bisher diskutierte nicht-linksrekrusive Variante, die zwei Nichtterminale braucht, um die gleiche Sprache abzubilden.
+Allerdings sehen wir auch, dass die linksrekursive Variante deutlich intuitiver aufzuschreiben ist als die bisher diskutierte nicht-linksrekursive Variante, die zwei Nichtterminale braucht, um die gleiche Sprache abzubilden.
 
 Wiederum können wir (manchmal) die Grammatik heilen, indem wir ein zusätzliches Nicht-Terminal einführen. Dazu machen wir zuerst aus der Linksrekursion eine Rechtsrekursion.
 In der rechtsrekursiven Grammatik wächst das Wort nicht mehr an der linken Seite sondern an der rechten Seite.
@@ -1169,7 +1169,7 @@ Dort können wir diese eindeutige Entscheidung nicht sofort treffen.
 LR(k)-Parser haben die Möglichkeit, beliebige Zeit in einem Zustand des "sich noch nicht entschieden habens" (tristate) zu bleiben.
 Sie führen dazu (virtuell) eine Menge von möglichen Regeln mit sich, die mit jedem weiteren Token weiter eingeschränkt wird.
 Erst wenn diese Menge nur noch eine Regel enthält, wird sie angewendet.
-Wenn Sie weiteres Interesse an LR(k)-Parsern haben, sei Ihnen, neben der Lektüre des Drachenbuches, [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert ans Herz gelegt.
+Wenn Sie weiteres Interesse an LR(k)-Parsern haben, sei Ihnen, neben der Lektüre des Drachenbuches, der Artikel [[https://amor.cms.hu-berlin.de/~kunert/papers/lr-analyse/lr.pdf][LR(k)-Analyse für Pragmatiker]] von Andreas Kunert ans Herz gelegt.
 
 
 ** Abstrakter Syntaxbaum
