@@ -876,8 +876,8 @@ Wir übergeben der ~traversal()~-Funktion die Wurzel des ASTs und das Visitor-Ob
     \ii<3-> Sprachen definieren eine Reihe von impliziten Typumwandlungen{
       \bi
       \ii \structure{Ganzzahlweitung}: Umwandlung in breitere Integer ohne Informationsverlust
-      \ii C: \codebox{char}$\rightarrow$\codebox{short}$\rightarrow$\codebox{int}$\rightarrow$\codebox{long}
-      \ii C++: Implizite Umwandlung von \codebox{void*} zu beliebigen Zeigern (z.B. \codebox{int *})
+      \ii C++: \codebox{char}$\rightarrow$\codebox{short}$\rightarrow$\codebox{int}$\rightarrow$\codebox{long}
+      \ii C: Implizite Umwandlung von \codebox{void*} zu beliebigen Zeigern (z.B. \codebox{int *})
       \ei
     }
     \ei
