@@ -80,7 +80,7 @@
 Nachdem wir uns in den letzten zwei Vorlesungen wieder mit Elementen von Programmiersprachen beschäftigt haben, wollen wir uns in dieser, und den nächsten beiden Vorlesungen, anschauen, wie wir Objekte und Operationen auf die reale Maschine abbilden.
 Letztendlich werden wir durch diese Abbildung die verbleibende *semantische Lücke* zum Maschinencode schließen.
 Ausgangspunkt dieser Abbildung ist der abstrakte Syntaxbaum, Endpunkt ist eine Programmdatei, welche wir zur Ausführung bringen.
-Wir befinden uns in den nächsten drei Vorlesungen wieder im Übersetzer, wo wir "von unten" auf die Sprachsemantik blicken und diese "nach unten" auf die Hardware abbilden.
+Wir befinden uns in den nächsten drei Vorlesungen wieder im Übersetzer, wo wir "von Unten" auf die Sprachsemantik hinauf blicken und diese "nach Unten" auf die Hardware abbilden.
 Dazu werden wir einige Konzepte und Techniken kennenlernen, die es uns erlauben, einen übersichtlichen Übersetzer zu konstruieren, sowie effiziente Programme zu erzeugen.
 Wollen wir also Beginnen.
 
@@ -156,7 +156,7 @@ define dso_local i32 @fib(i32) #0 {
 
 Um die Übersetzung vom AST in IR-Code vorzunehmen, müssen wir zunächst die virtuelle Maschine definieren, für die wir die Codeerzeugung durchführen wollen.
 Eine solche IR-Maschine zu definieren, ist mehr eine Kunst als eine exakte Wissenschaft.
-Unterschiedliche Maschinentypen und -ausprägungen eigenen sich für manche Arten der Optimierungen besser als andere (und umgekehrt).
+Unterschiedliche Maschinentypen und -ausprägungen eignen sich für manche Arten der Optimierungen besser als andere (und umgekehrt).
 Auch ist das Abstraktionsniveau, welches man dem IR-Code noch bietet, ist eine Design-Entscheidung, die Einfluss auf die Komplexität des Übersetzers hat.
 Daher bedienen sich manche Übersetzer nicht nur einer IR-Maschine, sondern sie haben mehrere virtuelle Maschinen, die sukzessive weniger Abstraktionen bieten.
 So hat der Rust-Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch eine [[https://blog.rust-lang.org/2016/04/19/MIR.html][High-Level IR (HIR) und eine Mid-Level IR]].
@@ -265,7 +265,7 @@ So hat der Rust-Übersetzer nicht nur LLVM als Zwischensprache, sondern hat noch
 Grundlegend gibt es zwei Arten von Maschinentypen, die für IR-Maschinen herangezogen werden: Stack-Maschinen und Register-Maschinen. Beide Typen von Maschinen sind (natürlich) gleich mächtig, haben jedoch eine grundlegend unterschiedliche virtuelle Architektur.
 
 Bei der *Stack-Maschine* ist der zentrale Ort der Berechnung ein Operandenstack.
-Jeder Befehl verwendet diesen Operandenstack als impliziten Parameter. So legt ~push~ den angegebenen Wert auf den Stack; ~add~ nimmt die obersten beiden Elemente vom Stack, addiert sie, und legt das Ergebnis auf den Stack. Eine Stack-Maschine ist daher ähnlich zur umgekehrten Polnischen Notation (~3 4 +~), bei der die selbe Auswertungsmethode angewendet wird.
+Jeder Befehl verwendet diesen Operandenstack als impliziten Parameter. So legt ~push~ den angegebenen Wert auf den Stack; ~add~ nimmt die obersten beiden Elemente vom Stack, addiert sie, und legt das Ergebnis auf den Stack. Eine Stack-Maschine ist daher ähnlich zur umgekehrten Polnischen Notation (~3 4 +~), bei der dieselbe Auswertungsmethode angewendet wird.
 Durch den Operandenstack ist der Datenfluss, insbesondere langer Operationssequenzen, nicht mehr offensichtlich, da wir im Programmtext keinen Hinweis darauf finden, wo ein Operand herkommt. Wir müssten uns beim Betrachten solcher IR-Programme immer den Operandenstack im Kopf mitdenken. Dazu habe ich keine Lust und ich lehne Stack-Maschinen daher ab[fn::Zur Ehrenrettung von Stack-Maschinen ist aber zu sagen, dass sie für den Übersetzerbau eine wundervolle Eigenschaft haben: Reine Stack-Maschinen-Programme sind automatisch in SSA Form.].
 
 Das prominenteste Beispiel für eine Stack-Maschine als Zwischenrepräsentation ist die Java Virtual Maschine, deren IR-Code (der Java-Byte-Code) genau nach diesem Muster funktioniert. Die Zwischenrepräsentation von .NET verwendet mit der Common Interpreter Language (CIL) ebenfalls eine Stack-basierte Zwischensprache.
@@ -432,7 +432,7 @@ Aus dem vorangegangenen Satz lernen wir 2 Dinge:
 2. Es gibt Funktionen!
 
 
-Insbesondere der zweite Punkt ist bemerkenswert, da Funktionen ja eigentlich ein starke Abstraktion sind, die normale Prozessoren so nicht kennen.
+Insbesondere der zweite Punkt ist bemerkenswert, da Funktionen ja eigentlich eine starke Abstraktion sind, die normale Prozessoren so nicht kennen.
 Die Entscheidung diesen Teil des IR-Codes auf einer höheren Abstraktionsstufe zu belassen, ist eine sehr bewusste:
 Wir müssen uns an dieser Stelle noch keine Gedanken darum machen, wo unsere lokalen Variablen gespeichert werden, wie wir an unsere Parameter kommen oder wie genau man eine Funktion am Ende aufruft.
 Außerdem können wir jede Funktion für sich übersetzen, optimieren und zu Maschinencode überführen.
@@ -877,7 +877,7 @@ Aus der vagen Erinnerung an die Vorlesung zu Operationen{{{see(07-sequencing,Seq
 Eine solche Statement-Reihung ist im AST in einem Codeblock-Knoten zusammengefasst.
 
 Geht es nun daran, Code für diesen Block-Knoten zu generieren, sieht die Erzeugungsmethode denkbar einfach aus, denn sie besucht, in der gegebenen Reihenfolge, alle Statements des Blocks mit der ~visit()~-Funktion (unsere Statements haben keinen Rückgabewert).
-Allerdings steckt der Teufeln im Detail und dieses Vorgehen funktioniert nur, wenn wir eine Invariante über die ~visit_*()~ annehmen:
+Allerdings steckt der Teufel im Detail und dieses Vorgehen funktioniert nur, wenn wir eine Invariante über die ~visit_*()~ annehmen:
 Wir haben bereits diskutiert, dass die Erzeugungsmethoden als Seiteneffekt IR-Befehle an den aktuellen Block (~current_block~) anhängen.
 Bestehen die besuchten Statements nur aus Ausdrücken, so ist auch alles fein, da diese keine neuen Basisblöcke erzeugen wollen.
 Was machen wir aber mit Statements, die wiederum Kontrollflusskonstrukte, wie eine Selektion, beinhalten?
@@ -885,7 +885,7 @@ Um weiterhin korrekten Code für die Sequenzierung zu generieren, muss jede ~vis
 Technisch gesehen darf der ~current_block~ am Ende zwar auf einen anderen Basisblock zeigen, dieser muss jedoch in Reihe mit dem ersten Block der Sequenzierung ausgeführt werden.
 
 Diese etwas schwammige Bedingung lässt sich noch etwas genauer formulieren: Auf der Folie ist jeder schwarze Punkt eine Stelle im CFG und steht für den Beginn einer Statement-Ausführung. Zwischen jedem dieser Sequenzierungspunkte kann ein beliebig komplexer Kontrollfluss entstehen. Jedoch muss jeder Pfad durch den CFG, der durch einen Sequenzierungspunkt geht, vorher alle anderen Sequenzierungspunkte besucht haben. Diese Pfad-Eigenschaft heißt *Dominanz-Relation*: Ein Punkt A im CFG dominiert einen anderen B, wenn alle Kontrollflüsse durch B vorher A besucht haben müssen.
-Wir werden die Dominanz-Relation in dieser Vorlesung nicht weiter diskutieren, jedoch sei Ihnen gesagt, dass sie eine signifikante Rolle bei fortgeschritteneren Programm-Optimierungen spielt. Die entsprechenden Stichwort hierzu, wenn Sie sich weiter darüber informieren wollen, sind Dominanz-Grenze und Single-Static-Assignment-Form (SSA).
+Wir werden die Dominanz-Relation in dieser Vorlesung nicht weiter diskutieren, jedoch sei Ihnen gesagt, dass sie eine signifikante Rolle bei fortgeschritteneren Programm-Optimierungen spielt. Die entsprechenden Stichworte hierzu, wenn Sie sich weiter darüber informieren wollen, sind Dominanz-Grenze und Single-Static-Assignment-Form (SSA).
 
 #+begin_src latex
 \begin{frame}{Kontrollfluss: Selektion}
@@ -972,7 +972,7 @@ Wenn wir mit bloßem Augen auf solchen IR-Code schauen, könnten wir auf die Ide
 Die Aufgabe der Codeerzeugung ist es, den AST für eine lineare Maschine zu sequenzieren.
 Alles, was wir an zusätzlicher Logik in diesem Übersetzerschritt einbauen, um besseren IR-Code zu generieren, wird die Codeerzeugung verkomplizieren.
 Das eigentliche Ziel der Codeerzeugung wird verwässert und weniger offensichtlich.
-Und wenn eines an einem Übersetzer, bei dem wir erhöhte Ansprüche an die Korrektheit stellen, von Übel ist, so ist es wenig intuitiver, Code der mehrerer Zielsetzungen gleichzeitig verfolgt.
+Und wenn eines an einem Übersetzer, bei dem wir erhöhte Ansprüche an die Korrektheit stellen, von Übel ist, so ist es wenig intuitiver Code, der mehrerer Zielsetzungen gleichzeitig verfolgt.
 
 Im Fall des Übersetzers lösen wir das Dilemma zwischen klarerer Codeerzeugung und einem effizienten Kompilat dadurch auf, dass wir den informatischen Zaubertrick *Trennung der Belange* anwenden und die Optimierung als weiteren Schritt bei der Übersetzung einführen.
 So können wir zuerst ineffizienten Code in sehr klarer Weise generieren, und dennoch ein möglichst effizientes Übersetzungsergebnis bekommen.
@@ -994,9 +994,9 @@ int foo() {
 }
 #+end_src
 
-In diesem Stück Beispielcode ist, bei näherer Betrachtung, ganz klar, dass ~foo()~ immer das Ergebnis 3 liefern wird.
+In diesem Stück Beispielcode ist, bei näherer Betrachtung, ganz klar, dass ~foo()~ immer das Ergebnis 1 liefern wird.
 Eine Codeerzeugung zu erstellen, die dies nebenbei herausfindet, ist um Größenordnungen schwieriger, als was ich Ihnen in dieser Vorlesung gezeigt habe.
-In der nächsten Vorlesung werde ich mehrere, relativ einfache, Optimierungsroutinen diskutieren, die IR-Code so optimieren, dass am Ende tatsächlich nur ~Return 3~ übrig bleibt.
+In der nächsten Vorlesung werde ich mehrere, relativ einfache, Optimierungsroutinen diskutieren, die IR-Code so optimieren, dass am Ende tatsächlich nur ~Return 1~ übrig bleibt.
 
 Anders sieht die Geschichte bei Interpretern aus:
 Dort können wir nicht zuerst aufwendige Optimierung vorschalten, um den Start der Ausführung nicht übermäßig zu verzögern.
@@ -1378,7 +1378,7 @@ Dies geschieht an mehreren Stellen:
 Bei einer Zuweisung zu einer Variablen mit einem Record-Typ[fn::Seien Sie sich gewahr, dass eine Variable vom Typ ~struct foo*~ keinen Record-Typ hat, sondern ein Zeiger ist, der auf einen Record verweist.], bei Übergabe eines Record-Objekts an eine Unterfunktion und bei Verwendung eines Records als Rückgabewert.
 Diese drei Stellen werden wir uns im Detail ansehen.
 
-Gemeinsam ist diesen Stellen, dass es zur Kopie von Objekten kommt, da wir einer Wertesemantik folgen.
+Gemeinsam haben diese Stellen, dass es zur Kopie von Objekten kommt, da wir einer Wertesemantik folgen.
 Es stellt sich also die Frage: *Von wo* wird *nach wo* mit *welchem Mechanismus* kopiert?
 
 Die Frage nach Quelle und Ziel ist die Frage nach dem R-Wert und dem L-Wert einer Variable mit Record-Typ.
@@ -1399,7 +1399,7 @@ Dies ist wiederum eine Entscheidung, die dazu führt, dass wir unseren IR-Code s
 
 Bei *Funktionsaufrufen* müssen wir sehr ähnliche Probleme lösen wie bei der Zuweisung.
 Da der ~Call~-Befehl nur Maschinenwörter zwischen Aufrufendem (caller) und Aufgerufenem (callee) transportieren kann, bleibt uns nichts anderes übrig, als eine Referenz auf das übergebene Objekt als Parameter zu verwenden.
-Da wir allerdings dem Wertemodell folgen wollen, müssen wir mittels der IR-Befehle die *Call-by-Value*[fn::Der Aufgerufen bekommt eine Kopie des Objekts und keine Referenz (was Call-by-Reference wäre).]-Semantik der Sprachebene abbilden.
+Da wir allerdings dem Wertemodell folgen wollen, müssen wir mittels der IR-Befehle die *Call-by-Value*[fn::Der Aufgerufene bekommt eine Kopie des Objekts und keine Referenz (was Call-by-Reference wäre).]-Semantik der Sprachebene abbilden.
 Dazu legen wir eine Aufrufkonvention fest: Zwar bekommt der Aufgerufene einen Zeiger, legt sich aber selbständig eine Kopie in seinem Call-Frame an, die dann im Folgendem anstatt des Parameters verwendet wird.
 
 Im Beispiel übergeben wir ~src~ an die Funktion f als Parameter ~obj~. Diese Funktion legt in ihrem *Funktionsprolog*, bevor eine Instruktion für den Entwickler ausgeführt wird, ein lokales Objekt an, dessen Zeiger in ~__obj~ gespeichert wird. Ein Aufruf zu ~memcpy()~ erledigt das kopieren der Daten, und fortan wird nur noch ~__obj~ verwendet, wo ~obj~ im AST steht.

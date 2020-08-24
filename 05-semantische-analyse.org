@@ -73,7 +73,7 @@ Klammerung ist balanciert), können sich immer noch inhaltliche (oder semantisch
 So könnte in einem Ausdruck eine Variable referenziert werden, die nirgends deklariert ist, oder wir könnten versuchen eine Ganzzahl aufzurufen (~int x = 1; x();~).
 Beide Fehler können, prinzipbedingt, nicht durch einen kontextfreien Parser erkannt werden, da sie erst in einer gewissen Umgebung, einem Kontext, erkennbar werden.
 Daher teilt man die Menge aller Sprachregeln in die syntaktischen Regeln und die semantischen Regeln ein.
-Im Prinzip prüft die semantische Analyse all übrigen Regeln ab, die nicht bereits im Parser geprüft werden konnten.
+Im Prinzip prüft die semantische Analyse alle übrigen Regeln ab, die nicht bereits im Parser geprüft werden konnten.
 Dies bedeutet aber auch, dass wir am Ende der semantischen Analyse sicher wissen, ob ein vorliegendes Programm wirklich ein Programm der Sprache ist oder nur ein Zeichenstrom, der einem validen Programm zum verwechseln ähnlich sieht[fn::Wenn Ihr "C-Programm" nicht kompiliert, ist es kein Programm der Sprache C].
 
 Das Ergebnis der semantischen Analyse ist wieder der AST.
@@ -141,7 +141,7 @@ Am gezeigten Additionsknoten können wir wieder sehen, dass Typprüfung und Name
 
 Wir wollen uns im Folgenden den notwendigen Techniken für diese beiden Aspekte der semantischen Analyse widmen.
 Neben Typkonsistenz und Deklariertheit kann es allerdings noch andere Sprachregeln geben, die nicht kontextfrei prüfbar sind und daher in den Bereich der semantischen Analyse fallen.
-Diese lassen sich in aller Regel mit den selben Techniken erledigen.
+Diese lassen sich in aller Regel mit denselben Techniken erledigen.
 
 * AST-Struktur und Knotenattribute
 :PROPERTIES:
@@ -448,7 +448,7 @@ Bei einer Attributgrammatik legt man nicht für jeden AST Knotentyp eine semanti
 Solange allerdings alle Grammatik-Regeln, die eine bestimmte Knotenart erzeugen, die selbe Gleichung haben, ist unser vorgestelltes Modell von Attributgleichungen äquivalent zu Attributgrammatiken.
 
 Ein Beispiel für solche Attributgrammatiken sind die *Parseraktionen*, die viele Parsergeneratoren erlauben.
-Dabei wird ein Stück Code an jede Regeln geheftet, welches der Parser ausführt, wenn er die Grammatik-Regel anwendet.
+Dabei wird ein Stück Code an jede Regeln geheftet, die der Parser ausführt, wenn er die Grammatik-Regel anwendet.
 In der Übung werden wir solche Parseraktionen allerdings nur verwenden, um den AST während des Parsevorgangs zu konstruieren ohne zuerst den vollständigen Syntaxbaum zu erzeugen.
 
 #+begin_src latex
@@ -741,7 +741,7 @@ Um dieses Problem zu lösen und besseren Code zu schreiben, faktorisieren wir je
   \end{frame}
 #+end_src
 
-Mit dem *Visitor*-Pattern bündeln wir nur den knotenspezifischen Code und geben für jeden Knotenart eine ~visit()~-Funktion an.
+Mit dem *Visitor*-Pattern bündeln wir nur den knotenspezifischen Code und geben für jede Knotenart eine ~visit()~-Funktion an.
 Um dies generisch zu formulieren, können wir in C++ das Sprachfeature der überladenen Funktionen verwenden, welches wir in der letzten Vorlesung bereits diskutiert haben.
 Durch diese Überladung wird die ~visit()~-Funktion zu einer Art komplexem Operator, der für jede Art von Knoten weiß, welcher Code ausgeführt werden soll.
 Indem wir die ~visit()~-Methode virtuell machen, können wir von ~Visitor~ erben und Funktionen für einzelne Knotentypen überschreiben.
@@ -954,7 +954,7 @@ Zum anderen können automatisch angewendete Typumwandlungen zu Situationen führ
 Ein besonders schönes Beispiel für verwirrende Regeln zur impliziten Typumwandlung ist JavaScript.
 Dort gibt es viele Situationen, bei denen Zeichenketten automatisch zu einem "semantisch-äquivalenten Typen" umgewandelt werden.
 Verwendet man beispielsweise die Zeichenkette ~"23"~ in einem Ganzzahl-Kontext, so wird diese Zeichenkette als eine Ganzzahl zur Basis 10 geparst.
-Hier geschieht also nur auf Ebene der Typen eine Umwandlung, sondern es wird eine Interpretation der Zeichenkette, unter der Annahme des Zehnersystems, durchgeführt.
+Hier geschieht also nicht nur auf Ebene der Typen eine Umwandlung, sondern es wird eine Interpretation der Zeichenkette, unter der Annahme des Zehnersystems, durchgeführt.
 
 So gut die Idee auf den ersten Blick erscheinen mag (sie spart eine Menge ~parseInt()~-Aufrufe), so schlecht ist sie in der Praxis. Denn diese, und ähnliche semantische Interpretationen von leeren Arrays, führen dazu, dass der ~==~-Operator und der ~!=~-Operator inkonsistent werden![fn::Lassen Sie sich das noch einmal auf der Zunge zergehen! Inkonsistenz bei der Gleichheitsrelation! Um George Orwell zu zitieren: "Schwarz ist weiß, Freiheit ist Sklaverei".]
 Nachdem diese Inkonsistenz auffiel, hat JavaScript einen ~===~-Operator bekommen, bei dem die impliziten Typumwandlungen ausgeschaltet werden, um "echte Gleichheit" abprüfen zu können.

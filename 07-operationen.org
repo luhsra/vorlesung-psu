@@ -92,7 +92,7 @@ Effizienz: Seiteneffekte
 
 #+end_src
 
-In dieser Vorlesung widmen wir uns wieder einem der essenziellen Konzepten von Programmiersprachen:
+In dieser Vorlesung widmen wir uns wieder einem der essenziellen Konzepte von Programmiersprachen:
 *Operationen*.
 Im Rahmen unserer Betrachtungen sind die Operationen der letzte Baustein, um verschiedenste Programmiersprachen und Programmierparadigmen einheitlich fassen zu können.
 Für Ihr geistiges Modell: Denken Sie sich zunächst bei "Operation" einfach "Addition". Wir werden später auf komplexere Operationen kommen.
@@ -318,7 +318,7 @@ Ziel einer Zuweisung ist das Ergebnis einer Berechnung einer Variable, oder eine
 Dafür hat die Zuweisungsoperation zwei Operanden (rechte Seite/RHS und linke Seite/LHS), in denen sich die Asymmetrie des Informationsflusses widerspiegelt.
 Die rechte Seite wird ausgewertet und dann der linken Seite zugewiesen. 
 
-Aus diese Asymmetrie folgt auch, dass die beiden Operanden auf unterschiedliche Weisen ausgewertet werden müssen[fn::Dies wird wichtig beim Übersetzerbau.]. 
+Aus dieser Asymmetrie folgt auch, dass die beiden Operanden auf unterschiedliche Weisen ausgewertet werden müssen[fn::Dies wird wichtig beim Übersetzerbau.]. 
 Die rechte Seite wird als *R-Wert* (rvalue) ausgewertet, was bedeutet dass wir uns nur für das Ergebnis der Rechnung interessieren, unabhängig davon, wie und wo dieses gespeichert wird.
 Die linke Seite wird als *L-Wert* (lvalue) ausgewertet. Dabei ist unser Ziel eine Speicheradresse zu erfahren, an die wir das Ergebnis ablegen sollen.
 Im Beispiel ~a := b~, wollen beim Auswerten der Variable ~b~ (als R-Wert) wissen, was ihr Inhalt ist, beim Auswerten der Variable ~a~ (als L-Value) geht es um die Speicheradresse der Variable. 
@@ -327,7 +327,7 @@ Gehen Sie noch einmal in sich, und wiederholen Sie: *"Zuweisungen werten ihre be
 Die Unterscheidung beider Auswertungsarten wird noch deutlicher, wenn wir uns anschauen, dass nicht jede Operation/jeder Operand einen L-Wert hat:
 So haben Literale keinen L-Wert, da sie nicht wirklich an einem Ort gespeichert werden. Weisen wir einen C-Übersetzer an den Ausdruck ~1 = 2~ zu übersetzen, so bekommen wir die Fehlermeldung /"error: lvalue required as left operand of assignment"/ um die Ohren gehauen. Und zurecht! Denn was sollte es denn bedeuten, wenn wir dem Literal 1 den Wert 2 zuweisen? Sollen ab jetzt alle Einsen im Programm zur Zwei werden? 
 
-Die selbe Fehlermeldung über einen fehlenden L-Wert bekommen wir, wenn wir einem temporären Ergebnisobjekt einer einfachen Operation etwas zuweisen wollen (~(a + b) = c~).
+Dieselbe Fehlermeldung über einen fehlenden L-Wert bekommen wir, wenn wir einem temporären Ergebnisobjekt einer einfachen Operation etwas zuweisen wollen (~(a + b) = c~).
 Wir können für den Ausdruck ~a + b~ keine sinnvolle Antwort darauf geben, wo der Speicher des Ergebnisses liegt.
 Selbst wenn linke und rechte Seite vom Typ her kompatibel sind, so hätte der Programmierer nichts davon, wenn dem temporären Objekt der Wert von c zugewiesen wird; es gibt keine Möglichkeit darauf später zuzugreifen.
 
@@ -530,7 +530,7 @@ Auf diese Weise werden Sie es schaffen, Neues schneller einzuordnen und schnelle
 #+end_src
 
 
-Das erste Klasse von Sprachkonstrukten, die wir uns ansehen, haben Sie wahrscheinlich bisher noch nicht einmal als wirkliche Konstrukte wahrgenommen. Sie sind so sehr Teil von Programmierung, dass ihre Existenz in einer Sprache uns beinahe als gegebenes Naturgesetz vorkommen mag[fn::Es ist selten so, dass irgendetwas in einer Programmiersprache ein Naturgesetz ist. Sehr, sehr selten.]. Ich rede von der *Sequenzierung von Operationen*.
+Die erste Klasse von Sprachkonstrukten, die wir uns ansehen, haben Sie wahrscheinlich bisher noch nicht einmal als wirkliche Konstrukte wahrgenommen. Sie sind so sehr Teil von Programmierung, dass ihre Existenz in einer Sprache uns beinahe als gegebenes Naturgesetz vorkommen mag[fn::Es ist selten so, dass irgendetwas in einer Programmiersprache ein Naturgesetz ist. Sehr, sehr selten.]. Ich rede von der *Sequenzierung von Operationen*.
 
 Bei der Sequenzierung nehmen wir zwei Operationen und legen fest, dass die eine Operation vor bzw. nach der anderen ausgeführt werden muss; wir drücken eine feste Auswertungsreihenfolge aus.
 Da Sequenzierungen sehr nah an dem sind, wie die reale Maschinen arbeiten, können durchsequentialisierte Programme, bei denen alles geordnet ist, einfach übersetzt werden.
@@ -748,7 +748,7 @@ Da unbedingte Sprünge und Funktionsaufrufe sehr ähnlich sind, lohnt es sich di
 Sprünge haben den Nachteil, dass sie Code schnell unübersichtlich werden lassen, da wir immer nur einzelne Operationen anspringen und Hin- und Rücksprung einer Sequenz völlig voneinander entkoppelt sind und syntaktisch nicht als zusammengehörig erscheinen.
 Beim Funktionsaufruf springt man nicht nur eine Operation an, an der es dann "zufällig" weiter geht, sondern wir springen einen ganzen Programmabschnitt an.
 
-In gewissen Weise ist ein ~goto~ flexibler als ein ~call~.
+In gewisser Weise ist ein ~goto~ flexibler als ein ~call~.
 Dennoch verwenden wir kaum noch unbedingte Sprünge in unseren Programmen.
 Warum?
 Im Jahr 1968 hat Dijkstra einen Paper namens "GOTO considered harmful" veröffentlicht, bei dem er argumentiert, dass ein Programm welches *ausschließlich* durch Sprünge strukturiert wird[fn::Dijkstra meinte nicht nur Sprünge innerhalb von Funktionen, sondern wildes rumspringen durch die gesamte Codebasis.], völlig unlesbar und unverifizierbar wird.
@@ -988,7 +988,7 @@ Der Unterschied ist, dass die Operation "ite()" zuerst alle Kind-Operationen aus
   \end{frame}
 #+end_src
 
-Auf dieser Folie zeige ich Ihnen einige Arten von Selektionsoperationen, die sie in unterschiedlichen Sprachen in unterschiedlichen Notationen wiederfinden werden. Alle haben gemein, dass sie anhand von Daten-abhängigen Entscheidungen nur einen Teil ihrer Kinder ausführen. Sie *selektieren* alle ein Untermenge ihrer Operationen und führen nur diese aus.
+Auf dieser Folie zeige ich Ihnen einige Arten von Selektionsoperationen, die sie in unterschiedlichen Sprachen in unterschiedlichen Notationen wiederfinden werden. Alle haben gemein, dass sie anhand von Daten-abhängigen Entscheidungen nur einen Teil ihrer Kinder ausführen. Sie *selektieren* alle eine Untermenge ihrer Operationen und führen nur diese aus.
 
 Die *if-then-else*-Operationen haben eine Bedingung und eine fixe Anzahl an Kindern. Will man mehrere Bedingungen abprüfen, so kann man im Then- oder im Else-Teil weitere Selektionen ausführen.
 
@@ -999,7 +999,7 @@ Es ist ratsam, sowohl beim normalen if-else, als auch bei if-elseif-else, die Au
 Ähnlich zur if-elseif-else Kaskade ist die *Switch/Case-Operation*.
 Allerdings wird dort nur anhand eines einzelnen Wertes (~number~) entschieden, welcher Ast ausgeführt werden soll.
 Der Wert im Switch wird mit den Werten an jedem Case-Statement verglichen und daran entschieden.
-Die Werte-Zentrierung der Switch/Case-Operation erlaubt es dem Übersetzer, erweitere Checks unseres Programms durchzuführen:
+Die Werte-Zentrierung der Switch/Case-Operation erlaubt es dem Übersetzer, erweiterte Checks unseres Programms durchzuführen:
 Zum Beispiel kann der Übersetzer statisch prüfen, dass der gesamte Wertebereich abgedeckt ist oder dass keine Bedingungen überlappen.
 Außerdem kann ein Übersetzer mittels Sprungtabellen einfacher effizienteren Code erstellen. Seien Sie sich aber gewahr, dass optimierende Übersetzer Ihr Switch/Case auch gern in eine if-elseif-else-Kaskade verwandeln, wenn es ratsam erscheint.
 
@@ -1111,7 +1111,7 @@ Definierend für eine Iterationsoperation ist also, dass sie eine Operation als 
 
 In der Regel gibt es keinen impliziten Datenfluss zwischen zwei Schleifeniterationen, sondern es werden die gleichen Operationen mit den gleichen Operanden, einfach immer und immer wieder ausgeführt.
 Ein Vorgehen, das nur dann Sinn macht, wenn der Schleifenkörper Seiteneffekte hat; nur so können Daten zwischen den Durchläufen und zwischen der Schleife und dem Rest des Programms transportiert werden.
-Schleifen machen als in Sprachen ohne Seiteneffekten (Haskell) inhärent keinen Sinn!
+Schleifen machen in Sprachen ohne Seiteneffekten (Haskell) inhärent keinen Sinn!
 
 Im Beispiel ist die Veränderung der Variable ~a~ der Seitenkanal, der verwendet wird, um Informationen zwischen den drei Durchläufen zu transportieren. Wir führen das Inkrementieren mehrfach durch, weil es in jedem Durchlauf einen anderen Seiteneffekt gibt (~a := 1~, ~a := 2~, ~a := 3~,...).
 

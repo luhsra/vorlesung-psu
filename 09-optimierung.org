@@ -129,7 +129,7 @@ Geben wir dieses IR-Programm an den Optimierer, so wendet dieser eine Reihe von 
 Jede der im Beispiel aufgeführten Routinen werden wir in dieser Vorlesung besprechen und Sie finden im Übersetzer der Übung eine beispielhafte Implementierung.
 Daher können Sie sich an dieser Stelle zurücklehnen und das Schauspiel genießen, wie Instruktionen sich verändern und verschwinden, und wie Blöcke und Kanten verschoben, verschmolzen und weggeräumt werden.
 Wie wunderschön:
-Eine Programm, das ein Programm verkürzt, ganz ohne menschliches Zutun und ohne dabei seine Semantik zu verändern.
+Ein Programm, das ein Programm verkürzt, ganz ohne menschliches Zutun und ohne dabei seine Semantik zu verändern.
 Die Kontrollflussgraphen auf den Folien sind im übrigen echt und stammen aus dem Übungsübersetzer.
 
 * Voraussetzungen und Ziele
@@ -697,7 +697,7 @@ Wir haben einen Fixpunkt erreicht.
 
 Schauen wir uns den Code für einen solchen Fixpunktalgorithmus einmal genauer an.
 Was Sie hier auf der Folie sehen, ist ein *Worklist-Algorithmus*, der parametrisiert verschiedene Datenflussanalysen durchführen kann.
-Dieser Vorgehen heißt deswegen Worklist-Algorithmus, weil wir in einer Liste (~worklist~) speichern, für welche Blöcke wir das Verfahren noch einmal anwenden müssen.
+Dieses Vorgehen heißt deswegen Worklist-Algorithmus, weil wir in einer Liste (~worklist~) speichern, für welche Blöcke wir das Verfahren noch einmal anwenden müssen.
 
 Parametrisiert ist die Funktion ~fixpoint()~ mit den drei Funktionen (Initialisieren, Zustands-Merge und Transformation) sowie mit dem CFG, auf dem gearbeitet werden soll.
 
@@ -717,7 +717,7 @@ Ansonsten setzen wir den Ausgangszustand neu und werfen alle Nachfolger in die W
     \ii \structure{Voraussetzungen} für die Terminierung des Worklist-Algorithmus{
       \bi
       \ii Init+Merge+Transform muss Knotenzustände \alert{monoton} ändern
-      \ii Beliebte Datenstrukturen für die Zustand: Bitvektoren, Mengen
+      \ii Beliebte Datenstrukturen für diesen Zustand: Bitvektoren, Mengen
       \ii Beispiel für eine monotone Zustands-Transformationen: {
         \bi
         \ii \texttt{init()}: \hspace{2cm}\btSetTab Generiere eine leere Bitvektoren

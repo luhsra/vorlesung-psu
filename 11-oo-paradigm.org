@@ -195,7 +195,7 @@ Und hier kommt das eigentliche Problem bei der Programmierung: **Wie können wir
 
 Diese Aufgabe stellt sich als gar nicht so einfach heraus.
 Wollen wir zunächst einmal die beiden Prozessoren vergleichen:
-Auf der einen Seite des Rings stehen die mechanischen Rechenanlagen (Computer), die eine große Menge an Speicher haben, auf den sie mit großer Bandbreite uniform (jede Zugriff dauert in etwa gleich lange) zugreifen können.
+Auf der einen Seite des Rings stehen die mechanischen Rechenanlagen (Computer), die eine große Menge an Speicher haben, auf den sie mit großer Bandbreite uniform (jeder Zugriff dauert in etwa gleich lange) zugreifen können.
 Zusätzlich zu diesem perfekten Gedächtnis führen Maschinen in jedem Operationszyklus eine strikt definierte Aktion durch; ohne Gnade, ohne Zögern, ohne Fehler und ohne Müdigkeit, immer uniform.
 Auf der anderen Seite befinden sich unsere Gehirne, die im direkten Vergleich nicht gut abschneiden:
 Der Speicher eines Menschen ist begrenzt und nicht erweiterbar, Zugriffe dauern unterschiedlich lange (erinnern) und können verfälschte, oft nur assoziierte, Ergebnisse liefern.
@@ -581,7 +581,7 @@ Die Grundidee von OO ist das Objekt als eigenständige Entität zu sehen, das ei
 Wie wir bereits gesagt haben, stehen beim objektorientierten Paradigma die (OO-)Objekte im Mittelpunkt. Um dies noch etwas genauer zu fassen, wollen wir uns die Definition von Objektorientierung von Alan Kay, dem Erfinder von Smalltalk, der ersten objektorientierten Programmiersprache, anschauen.
 
 Für Kay ist das wichtigste Element von OO das **Messaging** zwischen Objekten. Anstatt Prozeduren mit Argumenten aufzurufen, findet alle Interaktion über Nachrichten statt. Objekte schicken anderen Objekten Nachrichten, welche auf diese Nachrichten reagieren. Technisch umgesetzt werden diese Nachrichten mittels Methodenaufrufe, aber das mentale Bild soll sein, dass einzelne Objekte anderen Objekten eine Nachricht schicken. Denken Sie dabei nicht an Netzwerknachrichten, sondern an etwas Abstrakteres. Das Firmenobjekt schickt dem Arbeiter eine Nachricht mit der nächsten Aufgabe.
-In Java ist dies durch dem Objekt angehängte Methoden implementiert.
+In Java ist dies durch, die dem Objekt angehängten, Methoden implementiert.
 
 Der zweite Aspekt von OO ist die **Persistenz** des privaten Objektzustandes. Objekte repräsentieren eigenständige Entitäten und haben einen internen Zustand, selbst wenn sie gerade keine Nachricht verarbeiten. Technisch gesehen bedeutet dies, dass die Eigenschaften des Objekts im Speicher residieren müssen, um über Methodenaufrufe hinweg Zustand zu halten. Dabei hat jedes Objekt seinen **eigenen** privaten Zustand.
 In Java ist dies durch Objekteigenschaften implementiert{{{see(03-composite-types,Zusammengesetzte Typen)}}}.
@@ -709,7 +709,7 @@ obj.zz = 42;
 
 
 Die **Prototypenkette** setzt an diesen Objekten an, indem /jedes/ Objekt eine interne Eigenschaft ~__proto__~ hat, die auf ein anderes Objekt verweisen kann (oder ~null~ ist, um die Kette abzubrechen).
-Das so referenziertes Objekt wird dann als Fallback für die Suche nach Attributen benutzt: Wenn wir mit dem Punktoperator (~objekt.attribut~) nach einem Attribut suchen, wird zuerst in den **eigenen Attributen** des Objekts gesucht. Hat das Objekt das gesuchte Attribut nicht selbst, so wird die Suche bei dem Objekt, was mittels ~__proto__~ als Prototyp angegeben ist, fortgesetzt. Dort wird die Suche dann noch weiter nach oben Eskaliert, bis das Attribut gefunden wurde oder die Prototypenkette abbricht (~null~).
+Das so referenzierte Objekt wird dann als Fallback für die Suche nach Attributen benutzt: Wenn wir mit dem Punktoperator (~objekt.attribut~) nach einem Attribut suchen, wird zuerst in den **eigenen Attributen** des Objekts gesucht. Hat das Objekt das gesuchte Attribut nicht selbst, so wird die Suche bei dem Objekt, was mittels ~__proto__~ als Prototyp angegeben ist, fortgesetzt. Dort wird die Suche dann noch weiter nach oben Eskaliert, bis das Attribut gefunden wurde oder die Prototypenkette abbricht (~null~).
 
 #+begin_src javascript
 var x = {a: 23};
@@ -1006,7 +1006,7 @@ Dennoch fußen ja all diese Prinzipien auf den Mechanismen, die wir im OO Paradi
 
 Um diese Kritik zu verstehen, muss man sich kurz die Grundüberlegung von OO vor Augen halten: Alle Entitäten sind Objekte, die Nachrichten austauschen. OO legt also einen großen Fokus auf die Objekte, was sich auch in der OO Entwurfsmethode der **Verb/Nomen-Analyse** niederschlägt. Diese wird verwendet, um Software objektorientiert zu entwerfen. Dazu nimmt man sich definierte Use-Cases zur Hand und markiert sich alle Nomen und alle Verben, die sich auf diese Nomen beziehen. Ganz grob vereinfacht sagt man dann, dass alle Nomen Objekte/Klassen werden und die Verben, untergeordnet, als Methoden an diese Objekte gehangen werden. Ich werde das hier nicht tiefer ausführen, da es eigentlich ein Thema des Software Engineering ist. Was wir allerdings in dieser Entwurfsmethodik sehen, ist, dass die Verben den Nomen untergeordnet werden.
 
-Der erste, relativ philosophische, Kritikpunkt zielt dann auch genau darauf ab, dass Verben vernachlässigt werden: Durch die OO Designphilosophie haben wir uns jahrelang nur auf die Objekte versteift und Software danach gebaut, wie wir alles einzelnen Objekten zuordnen können. Aber deswegen sind Verben, also Tätigkeiten bzw. Aktionen, ja nicht weniger wichtig geworden. Allerdings zwingt uns das objektorientierte Paradigma dazu, jedenfalls wenn man es konsequent durchzieht, dass Tätigkeiten (Verben) niemals alleine auftreten können. Sondern sie werden gewissermaßen immer von einem Objekt an der Leine geführt. Aus dieser gezwungenen Kopplung ergeben sich dann auch die anderen Kritikpunkte, die man am OO Paradigma anbringen kann.
+Der erste, relativ philosophische, Kritikpunkt zielt dann auch genau darauf ab, dass Verben vernachlässigt werden: Durch die OO Designphilosophie haben wir uns jahrelang nur auf die Objekte versteift und Software danach gebaut, wie wir Alles einzelnen Objekten zuordnen können. Aber deswegen sind Verben, also Tätigkeiten bzw. Aktionen, ja nicht weniger wichtig geworden. Allerdings zwingt uns das objektorientierte Paradigma dazu, jedenfalls wenn man es konsequent durchzieht, dass Tätigkeiten (Verben) niemals alleine auftreten können. Sondern sie werden gewissermaßen immer von einem Objekt an der Leine geführt. Aus dieser gezwungenen Kopplung ergeben sich dann auch die anderen Kritikpunkte, die man am OO Paradigma anbringen kann.
 
 So stellt sich bei manchen Aktionen (wir nennen sie dann mal wieder Funktionen) die Frage, zu welchem Objekt sie gehören sollen.
 An welchem Objekt sollte denn die Funktion "größter gemeinsamer Teiler" hängen?

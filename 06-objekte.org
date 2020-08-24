@@ -144,7 +144,7 @@ Das Löschen des einen Objekts führt nicht zwingend zur Löschung des anderen O
 
 Deutlich spannender als die Frage, welche Art von Objekten es gibt, ist der *Lebenszyklus* von Objekten, denn viele Sprachkonstrukte drehen sich um das Management dieses Lebenszyklus:
 Durch Allokation und Initialisierung wird ein Objekt geboren.
-Während des Lebens hat es einen oder mehrere Besitzer, die es ausgelesen, verändern und an Dritte weitergegeben.
+Während des Lebens hat es einen oder mehrere Besitzer, die es auslesen, verändern und an Dritte weitergegeben.
 Und mit der Deinitialisierung und der Freigabe des Speichers verlässt es uns wieder.
 
 Während der gesamten Lebenszeit ist ein Objekt nur deswegen Objekt, weil es die Regeln seines Typen, die *Typinvarianten*, einhält.
@@ -332,16 +332,16 @@ Alle hängen damit zusammen, wie uns die Sprache erlaubt, Objekte zu erzeugen un
 
 Der erste Schritt bei der Geburt eines Objekts ist die *Allokation von Speicher*.
 Das Ziel der Allokation ist es, eine Menge von Speicherzellen für dieses Objekt zu reservieren. Diese Speicherzellen sind dann ausschließlich für dieses Objekt reserviert.
-Dabei können wir meinst davon ausgehen, dass der Speicherbereich für das Objekt zusammenhängend ist; die Speicherzellen also ab einer Startadresse fortlaufend für das Objekt reserviert werden[fn::Wie alles in der Informatik, ist auch dies kein Naturgesetz, sondern eine Entscheidung des Menschen. Wenn man sehr viele gleichartige Objekte hat, kann man die Objekte an den Attributen aufteilen und spaltenweise speichern. Dazu gibt es einen sehr guten Talk von Mike Acton auf der CppCon2014: [[https://www.youtube.com/watch?v=rX0ItVEVjHc][Data-Oriented Design and C++]].].
+Dabei können wir meist davon ausgehen, dass der Speicherbereich für das Objekt zusammenhängend ist; die Speicherzellen also ab einer Startadresse fortlaufend für das Objekt reserviert werden[fn::Wie alles in der Informatik, ist auch dies kein Naturgesetz, sondern eine Entscheidung des Menschen. Wenn man sehr viele gleichartige Objekte hat, kann man die Objekte an den Attributen aufteilen und spaltenweise speichern. Dazu gibt es einen sehr guten Talk von Mike Acton auf der CppCon2014: [[https://www.youtube.com/watch?v=rX0ItVEVjHc][Data-Oriented Design and C++]].].
 Um genügend Speicher zu reservieren, brauchen wir die Größe des Objekts, eine Information, die uns normalerweise das Typsystem liefert und rufen damit eine Allokationsfunktion auf.
 
 Die Ihnen wahrscheinlich bekannteste Allokationsfunktion ist ~malloc()~.
 Allerdings gibt es noch weitere Arten, Speicher für Objekte zu reservieren, die nicht zwingend mit dem Aufruf einer Funktion verbunden sind.
 
 Bei der *statischen Allokation* übernimmt der Übersetzer, zusammen mit dem Linker und Loader, die Allokation des Speicherbereichs.
-Dabei wird, von vornherein, eine Ort für das Objekt in der Binärdatei vorgemerkt, sodass die Adresse des Objekts bereits vor der Laufzeit feststeht.
+Dabei wird, von vornherein, ein Ort für das Objekt in der Binärdatei vorgemerkt, sodass die Adresse des Objekts bereits vor der Laufzeit feststeht.
 Die Lebenszeit dieser statisch allokierten Objekte ist normalerweise gleich mit der Laufzeit des Programms; sie werden beim Start des Programms[fn::Oft vor der ~main()~-Funktion.] initialisiert und erst direkt vor dem Beenden des Prozesses werden sie wieder zerstört.
-Das klassische Beispiel für statische Allokation ist die Definition einer *globale Variable*. Aber auch konstante Literale, wie ~"foobar"~ oder die übersetzten Funktionen[fn::In der Binärdatei wird jede Funktion zu einer Sequenz von Maschineninstruktionen. Auch diese benötigen Platz und haben eine Startadresse.] werden vom Übersetzer statisch allokiert.
+Das klassische Beispiel für statische Allokation ist die Definition einer *globalen Variable*. Aber auch konstante Literale, wie ~"foobar"~ oder die übersetzten Funktionen[fn::In der Binärdatei wird jede Funktion zu einer Sequenz von Maschineninstruktionen. Auch diese benötigen Platz und haben eine Startadresse.] werden vom Übersetzer statisch allokiert.
 Die statische Allokation ist die unflexibelste Art Speicher zu reservieren, da die maximale Anzahl der Objekte bereits vor der Laufzeit feststehen muss.
 Allerdings ist sie auch die effizienteste, da keinerlei Kosten zur Laufzeit entstehen.
 
@@ -568,7 +568,7 @@ Die Delegation zwischen Konstruktoren erlaubt es uns weniger Code zu duplizieren
 Im ~Derived(int)~ Konstruktor rufen wir explizit einen gewissen Konstruktor (~Counter(int)~) der Elternklasse mittels ~super()~ auf.
 Hätten wir keinen expliziten ~super()~-Aufruf platziert, so hätte Java automatisch den "no-arg"-Konstruktor ~Counter()~ aufgerufen.
 
-Schließlich angekommen in ~Counter(int)~ initialisieren wir das Feld ~start~. Da diese Feld ~final~ ist, zwingt uns Java dieses Feld in einem Konstruktor zu initialisieren; sein Wert kann später nicht mehr geändert werden.
+Schließlich angekommen in ~Counter(int)~ initialisieren wir das Feld ~start~. Da dieses Feld ~final~ ist, zwingt uns Java dieses Feld in einem Konstruktor zu initialisieren; sein Wert kann später nicht mehr geändert werden.
 Der Sprachstandard von Java sieht weiterhin vor, dass das Feld ~next~ automatisch auf ~0~ initialisiert wird. Auf diese Weise verhindert Java, dass es uninitialisierte Felder gibt.
 
 Auf den Folien habe ich außerdem noch ein Stück Pseudo-C Code aufgeschrieben, welches eine ähnliche Initialisierung durchführen würde, wie die Java Laufzeitumgebung.
@@ -844,8 +844,8 @@ Beim Referenzmodell tragen wir immer die Kosten für die Indirektion über die R
 Beim Wertemodell müssen wir explizit danach verlangen eine Indirektion zu bekommen.
 So kann es effizienter sein, ein Objekt als Kopie an eine Funktion zu übergeben, als eine Referenz zu übergeben, die dann dereferenziert wird.
 Dazu kommt, dass das Referenzmodell eigentlich nur mit Heap-allokierten Objekten richtig gut funktioniert, was zusätzliche Kosten erzeugt.
-Beim Wertemodell können wir Objekte viel einfach auf dem Stack allokieren.
-Aber Vorsicht, die starke Kopplung von Variablen und Objekten und die implizierte Kopien können beim Wertemodell zu Overheads führen, die auf den ersten Blick nicht sichtbar sind.
+Beim Wertemodell können wir Objekte viel einfacher auf dem Stack allokieren.
+Aber Vorsicht, die starke Kopplung von Variablen und Objekten und die implizierten Kopien können beim Wertemodell zu Overheads führen, die auf den ersten Blick nicht sichtbar sind.
 So allokiert das folgende Stück C-Code 8192 Bytes vom Stack und kopiert 4096 Bytes in einer unscheinbaren Zuweisung:
 
 #+begin_src C
@@ -919,7 +919,7 @@ Aber welche Entitäten können Subjekt, also Handelnder, des Zugriffs sein?
 Hier müssen wir uns anschauen, was die aktiven Teile unseres Programms sind, all diese können wir als *Benutzer eines Objekts* bezeichnen. Da haben wir zum einen das Stück Code, von dem aus der Zugriff erfolgt; meist ist dies eine zugreifende Funktion. Aber auch der Thread, von dem aus der Zugriff geschieht, kann als Benutzer auftreten. Wichtig wird diese Festlegung des Benutzers, wie wir noch diskutieren werden, wenn wir den Benutzerkreis eines Objekts einschränken wollen.
 
 Der zweite Teil eines Zugriffs besteht aus der Frage:
-Mit welchem Recht wir zugegriffen.
+Mit welchem Recht greifen wir zu?
 Dabei ist der Besitz einer Referenz auf das Objekt die Bedingung, um einen Zugriff durchzuführen.
 Aber nicht jede Referenz muss gleich mächtig sein, und es kann eingeschränkte Referenzen (wie read-only Referenzen) geben, über die nicht jeder Zugriff möglich ist.
 Daher können wir Referenzen auch als Capabilities bzw. Befähigungen{{{wikipedia_de(Capability-based security)}}} zum Objektzugriff ansehen.
@@ -960,7 +960,7 @@ Generell müssen wir bei der benutzerabhängigen Zugriffseinschränkung die einz
 Der große Vorteil einer solchen Einschränkung der externen Nutzer ist, dass wir sicher sein können, dass es in der gesamten Code-Basis keinen Zugriff auf die privaten Felder gibt, der nicht von einer unserer Methoden ausgeht.
 *Alle Zugriffe auf private Felder laufen über Methoden.*
 Auf diese Weise können wir viel einfacher sicherstellen, dass die Invarianten des Objekts nicht verletzt werden.
-Außerdem können wir das Innere der Klasse beliebig verändern, da keine externer Benutzer Abhängigkeiten entwickeln konnte.
+Außerdem können wir das Innere der Klasse beliebig verändern, da kein externer Benutzer Abhängigkeiten entwickeln konnte.
 Dies ermöglicht es uns, Implementierung und Daten zu *kapseln*.
 
 Allerdings wird eine solche Kapselung löchrig, wenn wir in einer Methode eine Referenz auf ein eingebettetes Objekt an einen externen Benutzer herausgeben.
@@ -1005,7 +1005,7 @@ Wer eine Referenz hat, hat Macht über ein Objekt.
 Da nicht jede Nutzung eines Objekts volle Rechte braucht, erlauben es viele Sprachen Referenzen zu erzeugen, die *nicht* allmächtig sind und nicht jede Art von Zugriff erlauben.
 Der klassische Vertreter der *referenzabhängigen Zugriffseinschränkung* ist die read-only-Referenz.
 
-Sehen wir eine eingeschränkten Referenz, so können wir uns sicher sein, dass der Nutzer nur eine eingeschränkte Menge von Zugriffsarten durchführen wird.
+Sehen wir eine eingeschränkte Referenz, so können wir uns sicher sein, dass der Nutzer nur eine eingeschränkte Menge von Zugriffsarten durchführen wird.
 So kann der Besitzer einer read-only-Referenz das Objekt nur auslesen, nicht aber verändern.
 Wichtig ist, dass Referenzen nur weiter eingeschränkt werden dürfen.
 So sollte es dem Nutzer einer read-only-Referenz (eigentlich) nicht möglich sein, wieder eine read-write-Referenz abzuleiten.
@@ -1087,7 +1087,7 @@ Wie bereits mehrfach erwähnt, kann es problematisch sein, jedem direkten Speich
 Gut wäre es, wenn wir bei Objektzugriffen aktiven Code dazwischen schalten könnten.
 Genau dies wird bei *Zugriffsmethoden*{{{wikipedia_en(Mutator_method)}}} gemacht.
 Bei diesem Entwicklungsmuster verbietet man den Zugriff von Außen mittels Sichtbarkeit und legt Zugriffsmethoden mit kanonischen Namen an (~getLength(), ~setLength()~).
-Auf diese Weise können wir Zugriffe auf das Objekte filtern und sicherstellen, dass der (externe) Nutzer des Objekts die Invarianten nicht verletzt.
+Auf diese Weise können wir Zugriffe auf das Objekt filtern und sicherstellen, dass der (externe) Nutzer des Objekts die Invarianten nicht verletzt.
 
 Allerdings, Sie sehen das Problem bereits, das ganze artet, wenn man es von Anfang an konsequent umsetzen will, in eine richtige Boilerplateschlacht aus.
 Und man muss es von Anfang an durchführen, weil ansonsten das hinzufügen eines Zugriffsfilters Änderung an allen Benutzer des Objekts nach sich ziehen würde.
@@ -1135,14 +1135,14 @@ Diese unveränderlichen Objekte haben einige spannende Eigenschaften: Da sie nie
 Außerdem ist das Werte- und das Referenzmodell zu weiten Teilen bei unveränderlichen Objekten gleich.
 Da diese Objekte niemals verändert werden, kann ich sie zwar, wie vom Wertemodell gefordert, bei einer Zuweisung kopieren, aber der Übersetzer kann auch einfach eine Referenz weitergeben, falls dies effizienter ist.
 
-Weiterhin können wir unveränderliche Objekte auch einfach *deduplizieren*, wenn ihr Konstruktor nur von der Parametern abhängt. Deduplizieren bedeutet, dass wir die Daten mehrerer gleicher Objekte nur einmal speichern und die gleiche Referenz mehrfach herausgeben. Ein klassisches Beispiel für diese Deduplizierung ist die *Internalisierung von Strings*[fn::In Python: https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de]:
+Weiterhin können wir unveränderliche Objekte auch einfach *deduplizieren*, wenn ihr Konstruktor nur von den Parametern abhängt. Deduplizieren bedeutet, dass wir die Daten mehrerer gleicher Objekte nur einmal speichern und die gleiche Referenz mehrfach herausgeben. Ein klassisches Beispiel für diese Deduplizierung ist die *Internalisierung von Strings*[fn::In Python: https://medium.com/@bdov_/https-medium-com-bdov-python-objects-part-iii-string-interning-625d3c7319de]:
 
 #+include: ../lst/06-intern.py
 
 In diesem Beispiel übersetzen wir die Argumente von ~Intern()~ in eine Ganzzahl und tragen diese in zwei Tabellen ein, welche wir für die bidirektionale Übersetzung verwenden können.
-Die Rückgabewerte von ~Intern()~ sind Referenzen in auf die tatsächlichen Strings, können aber deutlich schneller herumgereicht und auf Gleichheit geprüft werden.
+Die Rückgabewerte von ~Intern()~ sind Referenzen auf die tatsächlichen Strings, können aber deutlich schneller herumgereicht und auf Gleichheit geprüft werden.
 
-Was in diesem Beispiel sehr hemdsärmlig und nur skizzenhaft gezeigt ist, ist eine Technik des Übersetzerbaus, die bei der Implementierung der Symboltabelle zum Einsatz kommt. Dort müssen Bezeichner in der Symboltabelle schnell wiedergefunden werden, was viele Vergleiche von Strings erfordert. Da die Anzahl der Bezeichner in einem Programm allerdings meist begrenzt ist, kann die Internalisierung von Strings signifikant Laufzeit sparen.
+Was in diesem Beispiel sehr hemdsärmelig und nur skizzenhaft gezeigt ist, ist eine Technik des Übersetzerbaus, die bei der Implementierung der Symboltabelle zum Einsatz kommt. Dort müssen Bezeichner in der Symboltabelle schnell wiedergefunden werden, was viele Vergleiche von Strings erfordert. Da die Anzahl der Bezeichner in einem Programm allerdings meist begrenzt ist, kann die Internalisierung von Strings signifikant Laufzeit sparen.
 
 Es gibt auch Objekte, die klassischerweise unveränderlich sind:
 Dazu gehören normalerweise Zahlen und Literale.
@@ -1306,7 +1306,7 @@ Sollten Sie in einem Projekt keinen Zugriff auf solche modernen Methoden haben, 
 
   #+end_src
 
-Kommen wir nur zur letzten Phase im Lebenszyklus eines einzelnen Objekts: seinem Tod und der Freigabe all seiner angeforderten Ressourcen. Dabei gibt es zwei grundlegende Fragen: "Wann endet die Lebenszeit eines Objekts?" und "Wann und wie wird das Objekt freigegeben?". Diesen beiden Fragen werden wir nun nachgehen.
+Kommen wir nun zur letzten Phase im Lebenszyklus eines einzelnen Objekts: seinem Tod und der Freigabe all seiner angeforderten Ressourcen. Dabei gibt es zwei grundlegende Fragen: "Wann endet die Lebenszeit eines Objekts?" und "Wann und wie wird das Objekt freigegeben?". Diesen beiden Fragen werden wir nun nachgehen.
 
 Ganz generell können wir sagen, dass die Freigabe eines Objekts erst dann erfolgen darf, wenn seine Lebenszeit geendet hat.
 Eine Verletzung dieses Prinzips haben wir gerade eben, beim dangling-reference problem, gesehen.
@@ -1472,7 +1472,7 @@ Wird ein Referenzobjekts gelöscht, weil zum Beispiel die lokale Variable, in de
     }\medskip
     \ii<3-> \structure{Vorbedingungen und Probleme}  \hfill \structure{Ansatz}{
       \bi
-      \ii Kenntnis alle existierender Objekte       \hfill Objektliste
+      \ii Kenntnis aller existierender Objekte      \hfill Objektliste
       \ii Konsistente Sicht auf den Referenzgraphen \hfill stop-the-world
       \ii Erkennung aller ausgehenden Referenzen    \hfill Typsicherheit
       \ii Iteration über alle Objekte ist teuer     \hfill Partitionierte Objektmenge
@@ -1523,7 +1523,7 @@ Daher ist es bei der Verwendung des Garbage Collectors schwierig, die Freigabe v
 offener Socket) an die Löschung des Objekts zu koppeln.
 Daher muss es in Java mehr ~deinit()~-Funktionen als in C++ geben.
 
-Ein konkrete Technik für Garbage Collection ist der *Mark-and-Sweep Garbage Collector*, für den Sie auf den Folien eine Animation seiner Funktionsweise finden.
+Eine konkrete Technik für Garbage Collection ist der *Mark-and-Sweep Garbage Collector*, für den Sie auf den Folien eine Animation seiner Funktionsweise finden.
 Dieser Garbage Collector arbeitet mit einer Markierung an jedem Objekt. Nachdem die Welt angehalten wurde, wird das root-set bestimmt und die Marke an allen Objekten zurückgesetzt. Mittels Tiefensuche im Graph markiert der Mark-and-Sweep GC alle erreichbaren Objekte (die Mark Phase).
 Dabei starten wir die Suche von jedem Element des root sets aus, aber brechen die Suche immer dann ab, wenn wir auf eine Positiv-Marke treffen; ab dort haben wir bereits alles Erreichbare markiert.
 In der Sweep Phase iterieren wir über alle existierenden Objekte und geben jene Objekte frei, die in der Mark Phase nicht markiert wurden.
@@ -1660,7 +1660,7 @@ Zusätzlich können wir uns den Referenzzähler der Liste mittels ~sys.getrefcou
   \end{frame}
 #+end_src
 
-Nachdem wir die toten Objekte gefunden haben, entweder durch explizites Freigaben, durch Referenzzählung, oder durch einen Garbage Collector, müssen wir sie nur noch wirklich Freigeben.
+Nachdem wir die toten Objekte gefunden haben, entweder durch explizites Freigeben, durch Referenzzählung, oder durch einen Garbage Collector, müssen wir sie nur noch wirklich Freigeben.
 Dazu ruft die Laufzeitumgebung zuerst eine benutzerdefinierte *Destruktormethode* auf, bevor der Speicher an die Speicherverwaltung zurückgegeben wird.
 
 Die Aufgabe des Destruktors ist es, die Effekte des Konstruktors rückgängig zu machen.

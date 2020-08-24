@@ -760,9 +760,9 @@ Es gibt keinerlei Probleme, dass es über Kontrollflüsse hinweg zu irgendwelche
 
 *Ineffizienz* ist genau das Problem dieser minimalen Maschinencodeerzeugung.
 An (mindestens) drei Stellen wird das Potential der Maschine nicht voll ausgenützt:
-Zum einen transferieren wir ständig Variablen-Werte zwischen Speicher und Register hin und her, egal ob diese vielleicht schon ein einem Register vorgeladen sind.
+Zum einen transferieren wir ständig Variablen-Werte zwischen Speicher und Register hin und her, egal ob diese vielleicht schon in einem Register vorgeladen sind.
 Allein am ~Add~-Beispiel, bei dem 3 von 4 Befehlen nur Transfers waren, wird deutlich, dass ein Hauptteil unseres Programms sich damit beschäftigt, den Speicher zu beschäftigen.
-Viel klüger wäre es, nur das aus dem Speicher zu laden, was nicht schon im Register ist und Werte noch einmal verwendet werden, solange es irgendwie geht, diese in Registern zu halten.
+Viel klüger wäre es, nur das aus dem Speicher zu laden, was nicht schon in einem Register geladen ist. Wenn wir den Preis für das Laden aus dem Speicher bezahlt haben, dann wollten wir, solange es irgendwie geht, auch etwas davon haben.
 
 Das zweite Problem ist, dass die starren Makros komplexere Fähigkeiten der CPU nicht ausnützen können.
 Insbesondere bei CISC Maschinen kann ein einzelner Befehl eine sehr komplexe Semantik haben.
@@ -1407,7 +1407,7 @@ Die Antwort liegt darin zuzugeben, dass Segmente beim Laden nicht wirklich in de
 Die gleiche physikalische Seite, wie sie im RAM-Riegel liegt, wird also in mehreren Prozessen, teilweise an unterschiedlichen virtuellen Adressen, sichtbar.
 Daher muss der Code in geteilten Bibliotheken auch Unabhängig von seiner Ladeadresse sein, was mit diversen technischen Tricks erreicht werden kann. 
 
-Auf Ebene der ELF-Datei funktionieren Bibliotheken so, dass das Hauptprogramm und jede Bibliothek eine Liste der benötigten Bibliotheken enthält. Außerdem sind in den ELF-Dateien auch noch alle importierten und der exportierten dynamischen Symbolen vermerkt, die als Referenzen vom Loader aufgelöst werden. Eine Übersicht über die benötigten Bibliotheken einer Binärdatei erhalten Sie mit dem Werkzeug ~ldd~:
+Auf Ebene der ELF-Datei funktionieren Bibliotheken so, dass das Hauptprogramm und jede Bibliothek eine Liste der benötigten Bibliotheken enthält. Außerdem sind in den ELF-Dateien auch noch alle importierten und exportierten dynamischen Symbolen vermerkt, die als Referenzen vom Loader aufgelöst werden. Eine Übersicht über die benötigten Bibliotheken einer Binärdatei erhalten Sie mit dem Werkzeug ~ldd~:
 
 #+begin_example
 $ ldd /bin/bash
