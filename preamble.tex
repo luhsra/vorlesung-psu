@@ -7,9 +7,6 @@
 
 \usepackage[sracolors,autonotes]{beamertools}
 
-
-\usepackage{pageslts} %  theCurrentPage
-\usepackage{calc} % theCurrentPage
 \usepackage{csquotes}
 \usepackage{booktabs}
 \usepackage{xspace}
@@ -37,27 +34,6 @@
   \usepackage[scaled=0.85]{beramono}
 \fi
 
-% Section Title and Block Number
-\newcommand{\psuSectionStart}[2]{
-  \ifdefstring{\psuOldTitle}{#1}
-  {}% Then
-  {\section{#1}}%
-  \def\psuOldTitle{#1}
-}
-
-
-\newwrite\cutfile
-\immediate\openout\cutfile=\jobname.topics
-\newcounter{FirstPage} % counter, for first page number
-\newcounter{EndPage} % counter, for first page number
-\setcounter{FirstPage}{1} % Set FirstPage to page 1
-\newcommand{\psuSectionStop}[2]{% {topic}{lines}
-  \setcounter{EndPage}{\theCurrentPage-1}
-  \immediate\write\cutfile{\theFirstPage -\theEndPage:#2:#1}%
-  \typeout{Topic: \theFirstPage -\theEndPage:#2:#1}
-  \setcounter{FirstPage}{\theCurrentPage}% set FirstPage to new first page
-}
-
 % Parse Filename
 \def\retrieveFileName#1-#2.#3\next{%
   \gdef\fileNumber{#1}%
@@ -70,7 +46,6 @@
 \input{preamble.\fileMode.tex}
 
 \AtBeginDocument{
-  \pagenumbering{arabic} % for pageslts
   \setcounter{part}{\fileNumber\relax}
 }
 

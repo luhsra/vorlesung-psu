@@ -1,11 +1,12 @@
 #+LANGUAGE: de
 #+HTML_HEAD: <meta name="viewport" content="width=device-width, initial-scale=1"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/tufte.css"/>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/org-lecture.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/style.css" />
 #+HTML_HEAD: <script type="text/javascript" src="js/jquery.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="js/bootstrap.min.js"></script>
-#+HTML_HEAD: <script type="text/javascript" src="js/org-bootstrap.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="js/org-lecture.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="js/studip.js"></script>
 #+MACRO: see (eval (org-macro-sra-see $1 $2))
 #+MACRO: wikipedia_de [fn::Wikipedia: [[https://de.wikipedia.org/wiki/$1][$1]]]
 #+MACRO: wikipedia_en [fn::Wikipedia: [[https://en.wikipedia.org/wiki/$1][$1]]]

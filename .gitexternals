@@ -1,0 +1,17 @@
+[external "bib"]
+	path = bib
+	url = git@github.com:luhsra/bib
+	branch = master
+	vcs = git
+
+[external "texmf"]
+        path = texmf
+        url = svn+ssh://git@scm.sra.uni-hannover.de/source/templates/texmf
+        branch = master
+        vcs = svn
+
+[external "org-lecture"]
+        path = org-lecture
+        url = https://github.com/stettberger/org-lecture
+        branch = master
+        vcs = git

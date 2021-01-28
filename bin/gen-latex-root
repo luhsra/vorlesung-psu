@@ -1,9 +1,0 @@
-#!/usr/bin/env python3
-
-import sys
-
-print(r"""\RequirePackage{luatex85}\documentclass[%s,xcolor={table,rgb,dvipsnames}]{beamer}
-\input{preamble}
-\begin{document}
-\input{%s}
-\end{document}"""%(sys.argv[1], sys.argv[2]))

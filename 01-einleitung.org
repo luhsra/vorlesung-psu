@@ -2,7 +2,7 @@
 #+SUBTITLE: 01 - Einleitung
 #+DATE: [2020-04-21]
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/RMaaL
-#+SETUPFILE: ) setup.org
+#+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
 

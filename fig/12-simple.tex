@@ -1,0 +1,13 @@
+\documentclass{lecturefig}
+\begin{document}
+\begin{frame}[fragile]
+  \begin{tikzpicture}[]
+    \node[draw] (a) {A};
+
+    \begin{visible}<2->
+      \node[draw,right=of a] (b) {B};
+      \draw[->] (a) -- (b);
+    \end{visible}
+  \end{tikzpicture}
+\end{frame}
+\end{document}
