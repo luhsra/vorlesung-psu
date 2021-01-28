@@ -53,7 +53,7 @@ function insert_entries(forum, entries) {
     for (let idx in entries) {
         var entry = entries[idx];
         var id = entry.topic_id;
-        console.log(entry);
+        //console.log(entry);
 
         var subject = $(entry.subject).text();
         var mkdate = new Date(parseInt(entry.mkdate)*1000);
