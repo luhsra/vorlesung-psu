@@ -2,3 +2,4 @@ build
 bib
 org-lecture
 __pycache__/
+texmf

@@ -6,9 +6,9 @@
 
 [external "texmf"]
         path = texmf
-        url = svn+ssh://git@scm.sra.uni-hannover.de/source/templates/texmf
+        url = git@github.com/luhsra/texmf
         branch = master
-        vcs = svn
+        vcs = git
 
 [external "org-lecture"]
         path = org-lecture
