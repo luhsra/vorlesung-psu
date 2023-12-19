@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 09 - Optimierung
+#+TITLE: 09 - Optimierung
 #+SETUPFILE: setup.org
 #+DATE: [2020-06-23]
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/wDZBj

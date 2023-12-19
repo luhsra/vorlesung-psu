@@ -1,20 +1,9 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 02 - Syntaktische Analyse
+#+TITLE: 02 - Syntaktische Analyse
 #+SETUPFILE: setup.org
 #+DATE: [2020-04-28]
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/QloLE
 #+INCLUDE: export-prologue.org
-#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
-
-#+NAME: topic
-#+BEGIN_SRC latex :tangle no
-\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
-#+END_SRC
-
-#+NAME: endtopic
-#+BEGIN_SRC latex :tangle no
-\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
-#+END_SRC
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :exports none
 
 * Gedanken zu dieser Vorlesung                                     :noexport:
 Mit der zweiten Vorlesung, will ich die Syntaktische Analyse

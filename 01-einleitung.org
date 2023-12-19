@@ -1,24 +1,12 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 01 - Einleitung
+#+TITLE: 01 - Einleitung
 #+DATE: [2020-04-21]
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/RMaaL
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
-#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :tangle-prologue topic :tangle-epilogue endtopic :exports none
-
-#+NAME: topic
-#+BEGIN_SRC latex :tangle no
-\psuSectionStart{{{{property(ITEM)}}}}{{{{n(block)}}}}
-#+END_SRC
-
-#+NAME: endtopic
-#+BEGIN_SRC latex :tangle no
-\psuSectionStop{{{{property(ITEM)}}}}{{{{n(block,-)}}}}
-#+END_SRC
-
+#+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :exports none
 
 #+BEGIN_SRC latex :tangle-prologue nil
-\subtitle{{{{subtitle()}}}}
+\subtitle{{{{title()}}}}
 
 \maketitleframe
 

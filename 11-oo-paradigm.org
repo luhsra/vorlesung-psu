@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 11 - Das Objektorientierte Programmierparadigma
+#+TITLE: 11 - Das Objektorientierte Programmierparadigma
 #+SETUPFILE: setup.org
 #+DATE: [2020-07-07]
 #+INCLUDE: export-prologue.org

@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 03 - Typen
+#+TITLE: 03 - Typen
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+DATE: [2020-05-05]

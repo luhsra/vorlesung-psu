@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 13 - Die Ausleitung
+#+TITLE: 13 - Die Ausleitung
 #+DATE: [2020-07-21]
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org

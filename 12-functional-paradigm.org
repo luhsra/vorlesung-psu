@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 12 - Das Funktionale Programmierparadigma
+#+TITLE: 12 - Das Funktionale Programmierparadigma
 #+DATE: [2020-07-14]
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/RNNoZ
 #+SETUPFILE: setup.org

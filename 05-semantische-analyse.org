@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 05 - Semantische Analyse
+#+TITLE: 05 - Semantische Analyse
 #+DATE: [2020-05-19]
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/paWmj
 #+SETUPFILE: setup.org

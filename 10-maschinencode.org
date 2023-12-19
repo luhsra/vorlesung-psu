@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 10 - Maschinencode
+#+TITLE: 10 - Maschinencode
 #+DATE: [2020-06-30]
 #+SETUPFILE: setup.org
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/pWelK

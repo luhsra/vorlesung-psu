@@ -10,10 +10,12 @@ ORG_SLIDES=$(wildcard 0*.org 1*.org)
 # into html files.
 ORG_HTML=index.org
 
-#REMOTE_SEVER ?= lab
-#REMOTE=${REMOTE_SERVER}:/proj/www/sra.uni-hannover.de/Lehre/V_PSÜ/skript/.
+REMOTE_SERVER ?= x1
+REMOTE=${REMOTE_SERVER}:/ibr/www/vss/Lehre/psu/.
 
-REMOTE=/tmp/remote
+RSYNC_OPTS += --exclude="*.html" --exclude="*~"
+
+# REMOTE=/tmp/remote
 
 build: texmf/ls-R
 texmf/ls-R:

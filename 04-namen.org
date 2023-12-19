@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 04 - Namen
+#+TITLE: 04 - Namen
 #+DATE: [2020-05-12]
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/wJbEo
 #+SETUPFILE: setup.org

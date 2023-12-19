@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 08 - Zwischencodeerzeugung
+#+TITLE: 08 - Zwischencodeerzeugung
 #+SETUPFILE: setup.org
 #+INCLUDE: export-prologue.org
 #+DATE: [2020-06-16]

@@ -1,5 +1,4 @@
-#+TITLE: Programmiersprachen und Übersetzer
-#+SUBTITLE: 06 - Objekte
+#+TITLE: 06 - Objekte
 #+DATE: [2020-05-26] 
 #+VIDEO_URL: https://flowcasts.uni-hannover.de/nodes/QVAqA
 #+SETUPFILE: setup.org
