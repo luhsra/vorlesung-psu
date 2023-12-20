@@ -11,7 +11,7 @@ ORG_SLIDES=$(wildcard 0*.org 1*.org)
 ORG_HTML=index.org
 
 REMOTE_SERVER ?= x1
-REMOTE=${REMOTE_SERVER}:/ibr/www/vss/Lehre/psu/.
+REMOTE=${REMOTE_SERVER}:/ibr/www/vss/Lehre/V_PSÜ/.
 
 RSYNC_OPTS += --exclude="*.html" --exclude="*~"
 
