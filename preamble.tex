@@ -2,7 +2,7 @@
 %** beamer setup  **************************************************************
 
 \usecolortheme{rose}
-\usetheme[wide=true]{sra}
+\usetheme[wide,bgstyle=tubs]{sra}
 \setbeamertemplate{navigation symbols}{}
 
 \usepackage[sracolors,autonotes]{beamertools}
@@ -17,21 +17,10 @@
 \ifluatex
   \usepackage{lmodern}
   \usepackage[no-math]{fontspec}
-  % VeraMono ist viel schmaller als Beramono
-  \setmonofont{VeraMono}[
-     Extension       = .ttf,
-     BoldFont        = *-Bold,
-     ItalicFont      = *-Italic,
-     BoldItalicFont  = *-Bold-Italic,
-     Scale           = MatchLowercase,
-  ]
+  \usepackage[light,condensed]{roboto}
   \usepackage{pifont}
 \else
-  \usepackage[utf8]{inputenc}
-  \usepackage[T1]{fontenc}
-  \usepackage{helvet}
-  \usepackage{pifont}
-  \usepackage[scaled=0.85]{beramono}
+  \errmessage{Use LuaLatex to Build the slides!}
 \fi
 
 % Parse Filename
@@ -51,44 +40,37 @@
 
 % Name, token and semester of the course
 \def\xtoken{PSÜ}
-\def\xtitle{Programmiersprachen und Übersetzer (PSÜ)}%
+\def\xtitle{Programmiersprachen und Übersetzer}%
 \def\xterm{SS}
-\def\xyear{20}
+\def\xyear{24}
 
-  % General organization of the course
-  \def\PartA{Einführung}
-  \def\PartB{Prozesse und Dateien}
-  \def\PartC{Interaktion und Kommunikation}
-  \def\PartD{Speicher und Zugriffsschutz}
-  \def\PartX{Anhang}
+\institute[VSS]{IBR\\Verlässliche Systemsoftware (VSS)}
+\author[\copyright\,cd]{Christian Dietrich}
 
-  \institute[SRA]{Institute for Systems Engineering\\System- und Rechnerarchitektur (SRA)}
-  \author[\copyright\,cd]{Christian Dietrich}
+\def\termurl{\url{https://ibr.cs.tu-bs.de/courses/}}
+\edef\term{\xterm\, \xyear}
+\def\auxWS{Wintersemester}
+\def\auxSS{Sommersemester}
+\edef\TERM{\csuse{aux\xterm} 20\xyear}
 
-  \def\termurl{\url{https://sra.uni-hannover.de/Lehre/\xterm\xyear/V_\xtoken}}
-  \edef\term{\xterm\, \xyear}
-  \def\auxWS{Wintersemester}
-  \def\auxSS{Sommersemester}
-  \edef\TERM{\csuse{aux\xterm} 20\xyear}
+\def\xshortdate{\ifx\insertpart\empty\term{}\else Teil~\thepart, \term{}\fi}
+\date[\xshortdate]{\TERM}
 
-  \def\xshortdate{\ifx\insertpart\empty\term{}\else Teil~\thepart, \term{}\fi}
-  \date[\xshortdate]{\TERM}
+\title[\xtoken]{\xtitle}
 
-  \title[\xtoken]{\xtitle}
+% Customize numbering:
+% We want to number frames as <chapter>-<frame> with <frame> being by-chapter numbers
+% Note: The following works only if a patch is applied to beamerbaseframe.sty (see README)
+\renewcommand{\theframenumber}{\thepart--\arabic{framenumber}}
+\renewcommand{\insertframenumber}{\theframenumber}
+\renewcommand{\InsertFrameNumber}{\insertframenumber}
 
-  % Customize numbering:
-  % We want to number frames as <chapter>-<frame> with <frame> being by-chapter numbers
-  % Note: The following works only if a patch is applied to beamerbaseframe.sty (see README)
-  \renewcommand{\theframenumber}{\thepart--\arabic{framenumber}}
-  \renewcommand{\insertframenumber}{\theframenumber}
-  \renewcommand{\InsertFrameNumber}{\insertframenumber}
+\newcommand{\columntitle}[1]{
+  {\centering\structure{\strut #1}\par}
+}
 
-  \newcommand{\columntitle}[1]{
-    {\centering\structure{\strut #1}\par}
-  }
-
-
-  \newcommand{\animation}[3][]{%
+% TODO: Remove this macro
+\newcommand{\animation}[3][]{%
   \foreach \p/\s in {#2} {%
     \includegraphics<\s|handout:\s|skript:\s>[page=\p,#1]{#3}%
   }%

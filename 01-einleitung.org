@@ -980,7 +980,7 @@ Auf den Folien finden Sie weitere Beispiele für reale bzw. virtuelle Maschinenm
     \ei
   \end{frame}
 
-  \begin{frame}[fragile,t]{Beispiele korrekter Übersetzung von C nach \only<1>{C}\only<2>{RISC-V}\only<3>{Kobold}}
+  \begin{frame}[fragile,t]{Beispiele korrekter Übersetzung von C nach \only<1|handout:1>{C}\only<2|handout:2>{RISC-V}\only<3|handout:3>{Kobold}}
     \begin{code}[tag=C]
       \begin{C}[]
         int foo() {
