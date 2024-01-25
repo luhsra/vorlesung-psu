@@ -489,84 +489,108 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eine
 :END:
 
 #+BEGIN_SRC latex
-    \begin{frame}[t]{Organisatorisches: Vorlesung}
-    \PutAt{(10.5cm,1cm)}{
-      \includegraphics[width=2cm]{fig/01-dietrich}
-    }
-    \bi
-    \ii Vorlesung: 12 Termine {
+      \begin{frame}[t]{Organisatorisches: Vorlesung}
+      \PutAt{(10.5cm,1cm)}{
+        \includegraphics[width=2cm]{fig/01-dietrich}
+      }
       \bi
-      \ii Mittwochs 9:45-11:15 Uhr, IZ160 und BBB (Hybrid)
-      \ii Terminplan und Vorlesungsaufzeichnung im Stud.IP
-      \ii Vorlesungsskript auf der IBR Seite
-      \ii Sourcen sind auf Github (CC-BY 4.0), PR welcome.
+      \ii Vorlesung: 12 Termine {
+        \bi
+        \ii Mittwochs 9:45-11:15 Uhr, IZ160 und BBB (Hybrid)
+        \ii Terminplan und Vorlesungsaufzeichnung im Stud.IP
+        \ii Vorlesungsskript auf der IBR Seite
+        \ii Sourcen sind auf Github (CC-BY 4.0), PR welcome.
+        \ei
+      }\medskip
+      \ii Besonderheiten in diesem Semester {
+        \bi
+        \ii Vorlesung und Übung aus einer Hand.
+        \ii Ihre Mithilfe ist essentiell (Beteiligung, Rückmeldungen, Solidarität)
+        \ei
+      }
       \ei
-    }\medskip
-    \ii Besonderheiten in diesem Semester {
+      \pause
+      \vspace{1em}
+      \Large
+       \STRUCTURE{Universität}:\\\hspace{1cm} Sprechen Sie \btSetTab mit den interessantesten Menschen\\\btUseTab über die abwegigsten Themen
+    \end{frame}
+
+    \begin{frame}[t]{Organisatorisches: Übungen}
+      \PutAt{(10.5cm,1cm)}{
+        \includegraphics[width=2cm]{fig/01-dietrich}\\
+      }
       \bi
-      \ii Vorlesung und Übung aus einer Hand.
-      \ii Ihre Mithilfe ist essentiell (Beteiligung, Rückmeldungen, Solidarität)
+      \ii \structure{Tafelübungen}: 6 Termine {
+        \bi
+        \ii Verantwortlicher: \textbf{Auch ich…}
+        \ii Donnerstag 15:00-16:30, IZ 161 und BBB (Hybrid)
+        \ii Übungsaufzeichnung im Stud.IP
+        \ii Vertiefung der Vorlesung, Erörterung der Übungsaufgaben
+        \ei
+      }\medskip
+      \ii \structure{Fragestunden}: Freie TÜ Slots {
+        \bi
+        \ii Donnerstag 15:00-16:30, IZ 161
+        \ii Beantwortung von Fragen, Hilfe bei den Übungen
+        \ii Bringen Sie ihr Notebook mit!
+        \ei
+      }\medskip
+      \ii \structure{Aufgaben}: 6 Aufgaben mit theoretischem und praktischen Anteil {
+        \bi
+        \ii Bearbeitung in \textbf{Zweierteams}, Abgabe im Gitlab
+        \ii Korrektur durch studentische Tutoren
+        \ei
+      }
       \ei
-    }
-    \ei
-    \pause
-    \vspace{1em}
-    \Large
-     \STRUCTURE{Universität}:\\\hspace{1cm} Sprechen Sie \btSetTab mit den interessantesten Menschen\\\btUseTab über die abwegigsten Themen
-  \end{frame}
+    \end{frame}
 
-  \begin{frame}[t]{Organisatorisches: Übungen}
-    \PutAt{(10.5cm,1cm)}{
-      \includegraphics[width=2cm]{fig/01-dietrich}\\
-    }
-    \bi
-    \ii \structure{Tafelübungen}: 6 Termine {
-      \bi
-      \ii Verantwortlicher: \textbf{Auch ich…}
-      \ii Donnerstag 15:00-16:30, IZ 161 und BBB (Hybrid)
-      \ii Übungsaufzeichnung im Stud.IP
-      \ii Vertiefung der Vorlesung, Erörterung der Übungsaufgaben
-      \ei
-    }\medskip
-    \ii \structure{Fragestunden}: Freie TÜ Slots {
-      \bi
-      \ii Donnerstag 15:00-16:30, IZ 161
-      \ii Beantwortung von Fragen, Hilfe bei den Übungen
-      \ii Bringen Sie ihr Notebook mit!
-      \ei
-    }\medskip
-    \ii \structure{Aufgaben}: 6 Aufgaben mit theoretischem und praktischen Anteil {
-      \bi
-      \ii Bearbeitung in \textbf{Zweierteams}, Abgabe im Gitlab
-      \ii Korrektur durch studentische Tutoren
-      \ii \ALERT{Studienleistung: Mindestens 50\% der Punkte müssen erreicht werden}
-      \ei
-    }
-    \ei
-  \end{frame}
-
-
-  \begin{frame}{Wo bekomme ich Hilfe?}
-    \begin{enumerate}
-      \ii ÜbungspartnerInnen
-      \ii KommilitonInnen\hfill\raisebox{0pt}[0pt]{\OrangeBox[align=left, scale content=0.85]{Reihenfolge beachten!}\vspace{2cm}}
-      \ii \STRUCTURE{Stud.IP-Forum}
-      \ii Übungstutoren
-      \ii Chris
-    \end{enumerate}
-
-    \btUseExtraItemSep
-
-    \begin{itemize}
-      \ii Schriftliche Fragen zum Inhalt werden \textbf{nur im Forum} bentwortet
+    \begin{frame}{Das Modul: Programmiersprachen und Übersetzer}
+      \btUseExtraItemSep
       \begin{itemize}
-        \ii Studentische Antworten sind hier \STRUCTURE{sehr gerne gesehen}
-        \ii Es gibt keine falschen Fragen -- und keine Nachteile durch Antworten
-        \ii Trauen Sie sich auch zu antworten -- man lernt eine Menge dabei!
+      \item Schriftliche Klausur\hfill\ALERT{rechtzeitig anmelden} {
+          \begin{itemize}
+          \item Dauer: \btSetTab[8ex] 90 Minuten, schriftlich
+          \item Termin: \btUseTab Unbekannt
+          \item \ALERT<2>{Benotete Prüfungsleistung}
+          \end{itemize}
+        }
+      \item Arbeitsblätter  \hfill\ALERT{rechtzeitig abgeben!} {
+          \begin{itemize}
+          \item 6 Arbeitsblätter, werden nur bei rechtzeitiger Abgabe gewertet
+          \item Mindestens 50\% der erreichbaren Punkte
+          \item \ALERT<2>{Unbenotete Studienleistung}
+          \end{itemize}
+        }
+      \item<2-> Verwendbar für folgende Studiengänge {
+          \bi
+          \ii Informatik Bachelor
+          \ei
+        }
       \end{itemize}
-      \ii Wir moderieren, korrigieren und ergänzen nach Bedarf. \textbf{Nur Mut!}
-    \end{itemize}
-  \end{frame}
+    \end{frame}
+
+
+    \begin{frame}{Wo bekomme ich Hilfe?}
+      \begin{enumerate}
+        \ii ÜbungspartnerInnen
+        \ii KommilitonInnen\hfill\raisebox{0pt}[0pt]{\OrangeBox[align=left, scale content=0.85]{Reihenfolge beachten!}\vspace{2cm}}
+        \ii \STRUCTURE{Stud.IP-Forum}
+        \ii Übungstutoren
+        \ii Chris
+      \end{enumerate}
+
+      \btUseExtraItemSep
+
+      \begin{itemize}
+        \ii Schriftliche Fragen zum Inhalt werden \textbf{nur im Forum} bentwortet
+        \begin{itemize}
+          \ii Studentische Antworten sind hier \STRUCTURE{sehr gerne gesehen}
+          \ii Es gibt keine falschen Fragen -- und keine Nachteile durch Antworten
+          \ii Trauen Sie sich auch zu antworten -- man lernt eine Menge dabei!
+        \end{itemize}
+        \ii Wir moderieren, korrigieren und ergänzen nach Bedarf. \textbf{Nur Mut!}
+      \end{itemize}
+    \end{frame}
 #+END_SRC
 
 * Ebenenmodell und Virtuelle Maschinen
