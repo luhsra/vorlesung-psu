@@ -1,44 +1,34 @@
 \long\def\maketitleframe{
-  \begin{frame}[noframenumbering]{}
-    \begin{center}
-      \Huge Start der Vorlesung: 16:00 s.t.
-    \end{center}
+\begin{frame}{\alert{Aufnahme} der Hybrid-Vorlesung}{\alert{Achtung Aufnahme!}}
+\tikz[overlay, remember picture, opacity=0.4]
+\node[xshift=9cm,yshift=1cm, anchor=north west]{
+  \includegraphics[width=2cm]{fig/microphone-antigo.pdf}
+};
 
-    \bi
-    \ii Die Vorlesung wird \alert{aufgezeichnet} und \alert{veröffentlicht}. {
+\btUseExtraItemSep
+\bi
+    \ii \textbf{Hybrid-Vorlesung mit Aufnahme}{
       \bi
-      \ii Verfügbar über Stud.IP und Flowcasts (uni-intern).
-      \ii Pre- und Aftershow nur Live im Internet
-      \ei
-    }\medskip
-    \ii Falls Sie \structure{Rückfragen} haben {
-      \bi
-      \ii Schriftlich per Twitch/Mumble Chat (wird nicht aufgezeichnet)
-      \ii Fernmündlich per Mumble (mit und ohne Aufzeichnung)
-      \ei
-    }\medskip
-    %\ii Plagiate in den Abgaben haben Folgen. {
-    %  \bi
-    %  \ii \alert{0 Punkte} für das gesamte Übungsblatt.
-    %  \ii \alert{0\% Klausurbonus} bei wiederholtem Plagiat.
-    %  \ii Wir räumen Ihnen die Möglichkeit ein, sich persönlich zu rechtfertigen.
-    %  \ei
-    %}
-    \ii Wichtige Termine für PSÜ {
-      \bi
-      \ii 12. \btSetTab August 2020, 23:59 Uhr: Deadline für die Abgabe der Probeklausur
-      \ii 17. August 2020, 12-14 Uhr: Fragestunde vor der Klausur, BBB
-      \ii 21. August 2020, 10-12 Uhr: Klausur, 3 Räume (Mensa, 2 Räume an der \\\btUseTab  Bismarckstraße), Raumvoranmeldung über StudIP Gruppen.
+      \ii Die Aufnahme ist anschließend in Stud.IP verfügbar
+      \ii Nutzen Sie die Gelegenheit zur Live-Veranstaltung!
       \ei
     }
-    \ei
-    
-  \end{frame}
+    \ii Wir nehmen auf {
+      \bi 
+      \ii Folien, Dozent, Live-Audio sowie BBB-Audio
+      \ii \alert{Ihre Stimme} beim Fragen und Sprechen
+      \ii \textbf{Durch aktive Teilnahme erklären Sie sich einverstanden!} 
+      \ei
+    }
+    \ii Fragen: Live, im Chat, Sprechen in der BBB-Sitzung
+\ei
+\end{frame}
 
   \begin{frame}[title]
     \maketitle
   \end{frame}
 }
+
 
 
 \newcommand{\dividerframe}[1]{

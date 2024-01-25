@@ -6,21 +6,22 @@
 #+PROPERTY: header-args:latex :tangle yes :noweb yes :tangle-macros yes :exports none
 
 #+BEGIN_SRC latex :tangle-prologue nil
-\subtitle{{{{title()}}}}
+    \subtitle{{{{title()}}}}
 
-\maketitleframe
+    \maketitleframe
 
-\begin{frame}{Der Dozent}
+  \begin{frame}{Der Dozent}
     \PutAt{(10cm,1.6cm)}{
-      \includegraphics[width=2cm]{fig/01-dietrich}
+      \includegraphics[width=2cm]{fig/01-dietrich}\scriptsize
+      \\\mbox{Christian Dietrich}
     }
     \bi
-    \ii Wer ist der Dozent da? (22. Semester)\\{
+    \ii Wer ist der Dozent da? (30. Semester)\\{
       \bi
       \ii Informatikstudium in Erlangen (ab 2009)
-      \ii System- und Rechnerarchitektur (ab 2017)
       \ii Promotion in Hannover (2019)
-      \ii Betriebssysteme, Emacs User, Schwäche für Graphen
+      \ii Juniorprofessor an der TUHH (2021-2023)
+      \ii Betriebssysteme, \textbf{Programmiersprachen}, \\Low-Level Gefrickel, Emacs User
       \ei
     }\medskip
     \ii Ich mag Programmiersprachen! {
@@ -29,7 +30,7 @@
       \ii Sowohl eleganter als auch zu komplexer Code ist Kunst.
       \ei
     }\qquad\qquad
-    \ii<2-> Dies ist meine erste eigene Vorlesung. {
+    \ii<2-> Programmiersprachen und Übersetzer erstmals an der TU-BS  {
       \bi
       \ii Wir müssen das jetzt gemeinsam durchstehen.
       \ii Ich werde mein Bestes geben ihnen nur Sinnvolles zu vermitteln.
@@ -37,7 +38,8 @@
       \ei
     }
     \ei
-\end{frame}
+  \end{frame}
+  
 #+END_SRC
 
 #+begin_export html
@@ -68,12 +70,6 @@ muss klar werden, dass er hier zukunftssicheres Wissen erlangt.
     Übersetzer?
 
   - Was darf ein Übersetzer und was darf dieser nicht?
-
-* TODO Verbesserungen                                              :noexport:
-
-- <mxk>dass auftauchen der "C-Virtuellen-Maschine" (aka PDP-11) ist etwas überraschend in dem Text, ich wusste, dass es kommt, aber etwas mehr hinführung von "hardware-vms" hin zu der abstrakten "sprach-vm" wäre glaube ich ganz gut um weniger leute zu verlieren
-
-- <mxk> und zu "Genauso ist es möglich, dass ein Übersetzer von RISC-V-Assembler nach C (umgekehrte Richtung) übersetzt oder von C nach JavaScript (quer zum Ebenenmodell)." währe wohl ein satz, dass entlang der abstaktionsschichten information verloren geht und deshalb die umkehr nicht verlustfrei sein kann, angemessen
 
 * Einleitung
 :PROPERTIES:
@@ -465,7 +461,7 @@ Jeder dieser Abschnitte wird in einer Vorlesung behandelt und soll einen Überbl
           \end{code}
         \end{column}
         \hfill
-        \begin{column}{0.49\textwidth}
+        \begin{column}{0.47\textwidth}
           \btUseExtraItemSep[-\smallskipamount]
           \bi
           \ii Globale und lokale Variablen
@@ -500,16 +496,15 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eine
     \bi
     \ii Vorlesung: 12 Termine {
       \bi
-      \ii Dienstag 16:00-17:30 Uhr, \url{https://twitch.tv/luhsra}
-      \ii Live-Stream mit Rückkanal, Vorlesungsaufzeichnung im Stud.IP
-      \ii Semesterplan und Vorlesungsskript auf der SRA Webseite
+      \ii Mittwochs 9:45-11:15 Uhr, IZ160 und BBB (Hybrid)
+      \ii Terminplan und Vorlesungsaufzeichnung im Stud.IP
+      \ii Vorlesungsskript auf der IBR Seite
       \ii Sourcen sind auf Github (CC-BY 4.0), PR welcome.
       \ei
     }\medskip
     \ii Besonderheiten in diesem Semester {
       \bi
-      \ii Wir können \alert{noch nicht} sagen, wie es nach Pfingsten aussieht.
-      \ii Wir versuchen unser Möglichstes und halten Sie auf dem Laufenden.
+      \ii Vorlesung und Übung aus einer Hand.
       \ii Ihre Mithilfe ist essentiell (Beteiligung, Rückmeldungen, Solidarität)
       \ei
     }
@@ -522,36 +517,34 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eine
 
   \begin{frame}[t]{Organisatorisches: Übungen}
     \PutAt{(10.5cm,1cm)}{
-      \includegraphics[width=2cm]{fig/01-landsberg}\\
+      \includegraphics[width=2cm]{fig/01-dietrich}\\
     }
     \bi
     \ii \structure{Tafelübungen}: 6 Termine {
       \bi
-      \ii Verantwortlicher: \textbf{Tobias Landsberg}
-      \ii Regulär: Freitag 10:30-12:00 Uhr, https://twitch.tv/luhsra
-      \ii \textbf{Sondertermin}: Donnerstag 30.04.2020, 10:30-12:00
-      \ii Live-Stream mit Rückkanal, Vorlesungsaufzeichnung im Stud.IP
+      \ii Verantwortlicher: \textbf{Auch ich…}
+      \ii Donnerstag 15:00-16:30, IZ 161 und BBB (Hybrid)
+      \ii Übungsaufzeichnung im Stud.IP
       \ii Vertiefung der Vorlesung, Erörterung der Übungsaufgaben
       \ei
     }\medskip
-    \ii \structure{Übungen}: 6 Aufgaben mit theoretischem und praktischen Anteil {
+    \ii \structure{Fragestunden}: Freie TÜ Slots {
       \bi
-      \ii Betreuung in Kleingruppen durch studentische Tutoren
-      \ii Treffen der Kleingruppen im Mumble, Beantwortung von Detailfragen
-      \ii Bearbeitung in \textbf{Zweierteams}, Abgabe mit SRAbmit
+      \ii Donnerstag 15:00-16:30, IZ 161
+      \ii Beantwortung von Fragen, Hilfe bei den Übungen
+      \ii Bringen Sie ihr Notebook mit!
       \ei
     }\medskip
-    \ii \structure{Bonuspunkte} auf die Klausur {
+    \ii \structure{Aufgaben}: 6 Aufgaben mit theoretischem und praktischen Anteil {
       \bi
-      \ii Bewertung der Übungsaufgaben, maximal +10\%  Klausurpunkte.
-      \ii Bonuspunkte helfen \ALERT{nicht} über die Bestehensgrenze.\\[2ex]
-      \ii \textbf{Falls möglich}: Vor-Ort Testatklausur mit +10\% Klausurpunkte\\
-          Eher unwahrscheinlich, wir halten Sie auf dem Laufenden!
+      \ii Bearbeitung in \textbf{Zweierteams}, Abgabe im Gitlab
+      \ii Korrektur durch studentische Tutoren
+      \ii \ALERT{Studienleistung: Mindestens 50\% der Punkte müssen erreicht werden}
       \ei
     }
     \ei
   \end{frame}
-  
+
 
   \begin{frame}{Wo bekomme ich Hilfe?}
     \begin{enumerate}
@@ -559,13 +552,13 @@ Durch diese Arbeit an einem existierenden Übersetzer lernen Sie den Aufbau eine
       \ii KommilitonInnen\hfill\raisebox{0pt}[0pt]{\OrangeBox[align=left, scale content=0.85]{Reihenfolge beachten!}\vspace{2cm}}
       \ii \STRUCTURE{Stud.IP-Forum}
       \ii Übungstutoren
-      \ii \textcolor{luhgray}{Mitarbeiter \tiny{\href{mailto:psu@sra.uni-hannover.de}{psu@sra.uni-hannover.de}}}
+      \ii Chris
     \end{enumerate}
 
     \btUseExtraItemSep
 
     \begin{itemize}
-      \ii Fragen zum Inhalt werden \textbf{nur im Forum} bentwortet
+      \ii Schriftliche Fragen zum Inhalt werden \textbf{nur im Forum} bentwortet
       \begin{itemize}
         \ii Studentische Antworten sind hier \STRUCTURE{sehr gerne gesehen}
         \ii Es gibt keine falschen Fragen -- und keine Nachteile durch Antworten
@@ -1243,20 +1236,20 @@ Modernere Übersetzer sind Multi-Targetfähig und sind von Anfang an darauf vorb
 #+begin_src latex
   \begin{frame}{Zusammenfassung}
     \bi
-    \ii Virtuelle Maschinen führen Programme aus, haben Speicher und Befehle{%
+    \ii \structure{Virtuelle Maschinen} führen Programme aus, haben Speicher und Befehle{%
       \bi
       \ii Ihre Maschinensprache umfasst alle valide Programme.
       \ii Korrekter Übersetzer erhält die Sprachsemantik und beobachtbare Zustände.
       \ei
     }\bigskip
-    \ii Ebenenmodell: Schrittweise Abstraktion von der echten Hardware {
+    \ii \structure{Ebenenmodell}: Schrittweise Abstraktion von der echten Hardware {
       \bi
       \ii Obere Schichten bieten ausdrucksstärkere Sprachen.
       \ii Untere Schichten sind direkt implementierbar.
       \ii Übergang zu den unteren Schichten durch Übersetzung (oder Interpretation)
       \ei
     }\bigskip
-    \ii Bootstrapping: Der erste Übersetzer übersetzt sich selbst. {
+    \ii \structure{Bootstrapping}: Der erste Übersetzer übersetzt sich selbst. {
       \bi
       \ii Reduktion auf manuelle Übersetzung eines abgespeckten Übersetzers
       \ii Bei der Portierung auf neue Plattform braucht es einen Cross-Compiler
