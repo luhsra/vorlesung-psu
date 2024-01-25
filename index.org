@@ -1,11 +1,12 @@
+#+TITLE: PSÜ Skript
 #+INCLUDE: export-prologue.org
 #+OPTIONS: toc:nil num:nil
 #+MACRO: topic (eval (org-macro-topic $1 $2))
 
 * Programmiersprachen und Übersetzer
 
-Begleitend zur Veranstaltung [[/p/lehre-V][Programmiersprachen und Übersetzer]] gibt es ein ausführliches Skript und Videoaufzeichnungen aus einem Durchlauf an der Leibniz Universität Hannover.
-Im Laufe des Semesters werden diese Aufzeichnungen durch aktuelle Aufzeichnungen ersetzt. 
+Begleitend zur Veranstaltung [[https://ibr.cs.tu-bs.de/vss/p/V_PSÜ][Programmiersprachen und Übersetzer]] gibt es ein ausführliches Skript und Videoaufzeichnungen aus einem Durchlauf an der Leibniz Universität Hannover.
+Im Laufe des Semesters werden diese Aufzeichnungen durch aktuelle Aufzeichnungen im StudIP ergänzt.
 
 {{{topic(./01-einleitung.org,fig/01-stamp.png)}}}
 -----
