@@ -1,6 +1,7 @@
 # Folien und Skript zur Vorlesung Progammiersprachen und Übersetzer
 
-The current version of this repository is located at https://gitlab.ibr.cs.tu-bs.de/vss/teaching/v_psu/skript
+> [!WARNING]
+> The current version of this repository is located at https://gitlab.ibr.cs.tu-bs.de/vss/teaching/v_psu/skript |
 
 ## Copyright
 
